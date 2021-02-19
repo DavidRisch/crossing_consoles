@@ -1,6 +1,12 @@
 add_library(crossing_consoles_lib
         Example.cpp
-        communication/Message.h communication/ICommunication.h communication/ClientCommunication.h communication/ClientCommunication.cpp communication/Message.cpp communication/ServerCommunication.h communication/ServerCommunication.cpp communication/ClientConnection.h communication/ClientConnection.cpp)
+
+        communication/ClientCommunication.cpp
+        communication/Message.cpp
+        communication/ServerCommunication.cpp
+        communication/ClientConnection.cpp
+        communication/ServerClientConnection.cpp
+        )
 
 add_executable(crossing_consoles_main_server
         main_client.cpp)

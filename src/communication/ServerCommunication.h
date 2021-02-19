@@ -4,8 +4,8 @@
 #include <list>
 
 #include "ClientCommunication.h"
-#include "ClientConnection.h"
 #include "ICommunication.h"
+#include "ServerClientConnection.h"
 
 class ServerCommunication : public ICommunication {
  public:
@@ -13,7 +13,7 @@ class ServerCommunication : public ICommunication {
   void Send(const Message &m) override;
   Message Receive() override;
   void Broadcast();
-  std::list<ClientConnection> GetClients();
+  std::list<ServerClientConnection> GetClients();
 
  private:
 };

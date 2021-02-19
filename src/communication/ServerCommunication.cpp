@@ -10,8 +10,8 @@ Message ServerCommunication::Receive() {
 void ServerCommunication::Broadcast() {
 }
 
-std::list<ClientConnection> ServerCommunication::GetClients() {
-  return std::list<ClientConnection>();
+std::list<ServerClientConnection> ServerCommunication::GetClients() {
+  return std::list<ServerClientConnection>();
 }
 
 ServerCommunication::ServerCommunication() {
