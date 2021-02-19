@@ -5,6 +5,12 @@ add_library(crossing_consoles_lib
         Game/Position.cpp
         Game/World.cpp
         Game/Wall.cpp
+
+        communication/ClientCommunication.cpp
+        communication/Message.cpp
+        communication/ServerCommunication.cpp
+        communication/ClientConnection.cpp
+        communication/ServerClientConnection.cpp
         )
 
 add_executable(crossing_consoles_main_server
