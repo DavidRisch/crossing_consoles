@@ -1,5 +1,10 @@
 add_library(crossing_consoles_lib
         Example.cpp
+
+        Game/Player.cpp
+        Game/Position.cpp
+        Game/World.cpp
+        Game/Wall.cpp
         )
 
 add_executable(crossing_consoles_main_server
