@@ -3,7 +3,7 @@ add_library(crossing_consoles_lib
         )
 
 add_executable(crossing_consoles_main_server
-        main_client.cpp)
+        main_server.cpp)
 target_link_libraries(crossing_consoles_main_server crossing_consoles_lib)
 
 add_executable(crossing_consoles_main_client
