@@ -1,10 +1,10 @@
 add_library(crossing_consoles_lib
         Example.cpp
 
-        Game/Player.cpp
-        Game/Position.cpp
-        Game/World.cpp
-        Game/Wall.cpp
+        game/Player.cpp
+        game/Position.cpp
+        game/World.cpp
+        game/Wall.cpp
 
         communication/ClientCommunication.cpp
         communication/Message.cpp

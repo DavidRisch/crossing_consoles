@@ -13,12 +13,16 @@
 - Typedefs: `snake_case_t`
 - Enums: `PascalCase`
 - Defines: `ALL_CAPS`
+
+### Files
+
 - Class files: `PascalCase.h`, `PascalCase.cpp`
 - None class files: `snake_case.cpp`
+- Directories: `snake_case`
 
 ### Git
 
-#### Commits:
+#### Commits
 
 - Start with a capital letter
 - Present tense
