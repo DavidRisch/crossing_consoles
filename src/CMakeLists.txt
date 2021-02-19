@@ -11,6 +11,10 @@ add_library(crossing_consoles_lib
         communication/ServerCommunication.cpp
         communication/ClientConnection.cpp
         communication/ServerClientConnection.cpp
+
+        communication/low_level/ByteStream.cpp
+        communication/low_level/ByteServer.cpp
+        communication/low_level/Socket.cpp
         )
 
 add_executable(crossing_consoles_main_server
