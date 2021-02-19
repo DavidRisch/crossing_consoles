@@ -9,6 +9,13 @@ namespace socket {
 #include <cassert>
 #include <cstring>
 
+ByteStream::ByteStream(file_descriptor_t socket_file_descriptor, IConnectionSimulator &connection_simulator_incoming,
+                       IConnectionSimulator &connection_simulator_outgoing)
+    : socket(std::make_shared<Socket>(socket_file_descriptor))
+    , connection_simulator_incoming(&connection_simulator_incoming)
+    , connection_simulator_outgoing(&connection_simulator_outgoing) {
+}
+
 ByteStream ByteStream::CreateClientSide(uint16_t port) {
   file_descriptor_t socket_file_descriptor = socket::socket(AF_INET, socket::SOCK_STREAM, 0);
   if (socket_file_descriptor < 0) {
@@ -38,6 +45,11 @@ size_t ByteStream::Read(  // NOLINT(readability-make-member-function-const)
     throw std::runtime_error("socket::recv failed");
   }
   assert(read_count <= max_length);
+
+  for (int i = 0; i < read_count; ++i) {
+    receive_buffer[i] = connection_simulator_incoming->Filter(receive_buffer[i]);
+  }
+
   return static_cast<size_t>(read_count);
 }
 
@@ -51,7 +63,16 @@ std::string ByteStream::ReadString(size_t max_length) {
 
 void ByteStream::Send(  // NOLINT(readability-make-member-function-const)
     const uint8_t *send_buffer, size_t length) {
-  ssize_t send_count = socket::send(socket->file_descriptor, send_buffer, length, 0);
+  auto *modified_send_buffer = new uint8_t[length];
+
+  for (int i = 0; i < length; ++i) {
+    modified_send_buffer[i] = connection_simulator_outgoing->Filter(send_buffer[i]);
+  }
+
+  ssize_t send_count = socket::send(socket->file_descriptor, modified_send_buffer, length, 0);
+
+  delete[] modified_send_buffer;
+
   if (send_count < 0) {
     throw std::runtime_error("socket::send failed");
   }
@@ -61,6 +82,10 @@ void ByteStream::SendString(const std::string &message) {
   Send(reinterpret_cast<const uint8_t *>(message.c_str()), message.size());
 }
 
-ByteStream::ByteStream(file_descriptor_t socket_file_descriptor)
-    : socket(std::make_shared<Socket>(socket_file_descriptor)) {
+void ByteStream::SetConnectionSimulatorIncoming(IConnectionSimulator &ConnectionSimulator) {
+  connection_simulator_incoming = &ConnectionSimulator;
+}
+
+void ByteStream::SetConnectionSimulatorOutgoing(IConnectionSimulator &ConnectionSimulator) {
+  connection_simulator_outgoing = &ConnectionSimulator;
 }
