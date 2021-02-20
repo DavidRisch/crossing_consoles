@@ -1,19 +1,22 @@
 #include "Message.h"
 
-Message::Message(ip_address_t& source, ip_address_t& destination, double timestamp) {
-  this->source = source;
-  this->destination = destination;
-  this->timestamp = timestamp;
+Message::Message(address_t address, MessageType message_type) {
 }
 
-std::string Message::GetSource() {
-  return this->source;
+Message::Message(address_t address, MessageType message_type, time_t timestamp_received, time_t timestamp_sent) {
 }
 
-std::string Message::GetDestination() {
-  return this->destination;
+address_t Message::GetAddress() const {
+  return address;
 }
 
-double Message::GetTimestamp() const {
-  return this->timestamp;
+time_t Message::GetTimestampReceived() const {
+  return timestamp_received;
+}
+
+time_t Message::GetTimestampSent() const {
+  return timestamp_sent;
+}
+MessageType Message::GetMessageType() const {
+  return message_type;
 }

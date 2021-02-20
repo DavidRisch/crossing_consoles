@@ -12,11 +12,10 @@ add_library(crossing_consoles_lib
         communication/ClientConnection.cpp
         communication/ServerClientConnection.cpp
 
-        communication/messages/RequestMessage.cpp
-        communication/messages/ResponseMessage.cpp
-        communication/messages/StatusMessage.cpp
-        communication/messages/GameMessage.cpp
-        communication/messages/GameCommandMessage.cpp
+        communication/messages/ConnectionRequestMessage.cpp
+        communication/messages/ConnectionResponseMessage.cpp
+        communication/messages/KeepAliveMessage.cpp
+        communication/messages/PayloadMessage.cpp
         )
 
 add_executable(crossing_consoles_main_server

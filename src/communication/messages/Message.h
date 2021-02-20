@@ -5,20 +5,28 @@
 #include <string>
 #include <vector>
 
-typedef std::string ip_address_t;
+enum MessageType : char { CONNECTION_REQUEST, CONNECTION_RESPONSE, PAYLOAD, KEEP_ALIVE};
+
+typedef uint16_t address_t;
 
 class Message {
  public:
-  Message(ip_address_t&, ip_address_t&, double);
+  // Draft message
+  Message(address_t address, MessageType message_type);
 
-  ip_address_t GetSource();
-  ip_address_t GetDestination();
-  double GetTimestamp() const;
+  // Received message
+  Message(address_t address, MessageType message_type, time_t timestamp_received, time_t timestamp_sent);
+
+  [[nodiscard]] time_t GetTimestampReceived() const;
+  [[nodiscard]] time_t GetTimestampSent() const;
+  [[nodiscard]] address_t GetAddress() const;
+  [[nodiscard]] MessageType GetMessageType() const;
 
  private:
-  ip_address_t source;
-  ip_address_t destination;
-  double timestamp;
+  address_t address;
+  time_t timestamp_received;
+  time_t timestamp_sent;
+  MessageType message_type;
 };
 
 #endif  // CROSSING_CONSOLES_MESSAGE_H
