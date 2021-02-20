@@ -11,7 +11,7 @@ class PayloadMessage : public Message {
   explicit PayloadMessage(address_t address);
 
   // Received message
-  PayloadMessage(address_t address, time_t timestamp_received, time_t timestamp_sent);
+  PayloadMessage(address_t address, MessageMetaData meta_data);
 };
 
 #endif  // CROSSING_CONSOLES_PAYLOADMESSAGE_H

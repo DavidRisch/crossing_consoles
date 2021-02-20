@@ -9,7 +9,7 @@ class KeepAliveMessage : public Message {
   explicit KeepAliveMessage(address_t address);
 
   // Received message
-  KeepAliveMessage(address_t address, time_t timestamp_received, time_t timestamp_sent);
+  KeepAliveMessage(address_t address, MessageMetaData meta_data);
 };
 
 #endif  // CROSSING_CONSOLES_KEEPALIVEMESSAGE_H

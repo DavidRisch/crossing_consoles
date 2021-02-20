@@ -9,7 +9,7 @@ class ConnectionResponseMessage : public Message {
   explicit ConnectionResponseMessage(address_t address);
 
   // Received message
-  ConnectionResponseMessage(address_t address, time_t timestamp_received, time_t timestamp_sent);
+  ConnectionResponseMessage(address_t address, MessageMetaData meta_data);
 };
 
 #endif  // CROSSING_CONSOLES_CONNECTIONRESPONSEMESSAGE_H
