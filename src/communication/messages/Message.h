@@ -7,8 +7,7 @@
 
 #include "MessageMetaData.h"
 
-
-enum MessageType : char { CONNECTION_REQUEST, CONNECTION_RESPONSE, PAYLOAD, KEEP_ALIVE};
+enum MessageType : char { CONNECTION_REQUEST, CONNECTION_RESPONSE, PAYLOAD, KEEP_ALIVE };
 
 typedef uint16_t address_t;
 

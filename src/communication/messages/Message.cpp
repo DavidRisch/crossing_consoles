@@ -1,15 +1,14 @@
 #include "Message.h"
 
-Message::Message(address_t address, MessageType message_type_de) {
-  this->address= address;
-  message_type = message_type_de;
+Message::Message(address_t address, MessageType message_type)
+    : address(address)
+    , message_type(message_type) {
 }
 
-Message::Message(address_t address, MessageType message_type, MessageMetaData meta_data) {
-  this->address = address;
-  this->message_type = message_type;
-  this->meta_data = meta_data;
-
+Message::Message(address_t address, MessageType message_type, MessageMetaData meta_data)
+    : address(address)
+    , message_type(message_type)
+    , meta_data(meta_data) {
 }
 
 address_t Message::GetAddress() const {
@@ -20,6 +19,6 @@ MessageType Message::GetMessageType() const {
   return message_type;
 }
 
-MessageMetaData Message::GetMessageMetaData() const{
+MessageMetaData Message::GetMessageMetaData() const {
   return meta_data;
 }
