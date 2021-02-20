@@ -6,6 +6,8 @@
 class KeepAliveMessage : public Message {
  public:
   static MessageType message_type;
+
+  // Draft message
   explicit KeepAliveMessage(address_t address);
 
   // Received message

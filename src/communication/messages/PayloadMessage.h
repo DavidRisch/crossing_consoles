@@ -3,15 +3,19 @@
 
 #include "Message.h"
 
-typedef std::string world_t;
-
 class PayloadMessage : public Message {
  public:
   static MessageType message_type;
-  explicit PayloadMessage(address_t address);
+
+  // Draft message
+  explicit PayloadMessage(address_t address, std::vector<uint8_t> payload);
 
   // Received message
-  PayloadMessage(address_t address, MessageMetaData meta_data);
+  PayloadMessage(address_t address, std::vector<uint8_t> payload, MessageMetaData meta_data);
+  [[nodiscard]] std::vector<uint8_t> GetPayload() const;
+
+ private:
+  std::vector<uint8_t> payload;
 };
 
 #endif  // CROSSING_CONSOLES_PAYLOADMESSAGE_H

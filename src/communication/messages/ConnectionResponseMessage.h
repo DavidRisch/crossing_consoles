@@ -6,6 +6,8 @@
 class ConnectionResponseMessage : public Message {
  public:
   static MessageType message_type;
+
+  // Draft message
   explicit ConnectionResponseMessage(address_t address);
 
   // Received message
