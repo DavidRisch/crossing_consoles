@@ -30,6 +30,8 @@ void test_with_connection_simulators(const char *server_to_client, const char *c
     server_received = byte_stream->ReadString();
   });
 
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
   std::thread client_thread([client_to_server, &client_received, &client_incoming, &client_outgoing] {
     ByteStream byte_stream = ByteStream::CreateClientSide();
 

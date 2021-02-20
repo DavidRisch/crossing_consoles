@@ -34,6 +34,12 @@ class ByteStream {
   void SetConnectionSimulatorIncoming(IConnectionSimulator& ConnectionSimulator);
   void SetConnectionSimulatorOutgoing(IConnectionSimulator& ConnectionSimulator);
 
+  class ConnectionRefusedException : public std::exception {
+    const char* what() const throw() {
+      return "Socket connection failed. Is the server started?";
+    }
+  };
+
  private:
   std::shared_ptr<Socket> socket;
 

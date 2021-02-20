@@ -32,6 +32,9 @@ ByteStream ByteStream::CreateClientSide(uint16_t port) {
   }
 
   if (socket::connect(socket_file_descriptor, (struct socket::sockaddr *)&server_address, sizeof(server_address)) < 0) {
+    if (errno == ECONNREFUSED) {
+      throw ConnectionRefusedException();
+    }
     throw std::runtime_error("socket::connect failed");
   }
 

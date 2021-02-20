@@ -78,6 +78,8 @@ TEST(ByteServer, TwoClients) {
     ASSERT_NE(counter, 0);
   });
 
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
   std::thread client1_thread([client1_to_server, &client1_received] {
     ByteStream b = ByteStream::CreateClientSide();
     b.SendString(client1_to_server);
