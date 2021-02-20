@@ -4,7 +4,7 @@ void ServerCommunication::Send(const Message& m) {
 }
 
 Message ServerCommunication::Receive() {
-  return Message();
+  return Message((ip_address_t&)"", (ip_address_t&)"", 0.);  // TODO
 }
 
 void ServerCommunication::Broadcast() {

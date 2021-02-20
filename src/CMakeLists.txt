@@ -7,10 +7,16 @@ add_library(crossing_consoles_lib
         game/Wall.cpp
 
         communication/ClientCommunication.cpp
-        communication/Message.cpp
+        communication/messages/Message.cpp
         communication/ServerCommunication.cpp
         communication/ClientConnection.cpp
         communication/ServerClientConnection.cpp
+
+        communication/messages/RequestMessage.cpp
+        communication/messages/ResponseMessage.cpp
+        communication/messages/StatusMessage.cpp
+        communication/messages/GameMessage.cpp
+        communication/messages/GameCommandMessage.cpp
         )
 
 add_executable(crossing_consoles_main_server
