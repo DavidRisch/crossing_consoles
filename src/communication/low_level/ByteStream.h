@@ -8,7 +8,6 @@
 #include "ConnectionSimulatorPerfect.h"
 #include "SocketHolder.h"
 
-typedef int file_descriptor_t;
 typedef uint16_t port_t;
 
 /// randomly chosen port number
@@ -41,7 +40,7 @@ class ByteStream {
   };
 
  private:
-  std::shared_ptr<SocketHolder> socket_ptr;
+  std::shared_ptr<SocketHolder> socket_holder;
 
   IConnectionSimulator* connection_simulator_incoming;
   IConnectionSimulator* connection_simulator_outgoing;

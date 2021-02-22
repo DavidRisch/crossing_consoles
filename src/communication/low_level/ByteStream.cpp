@@ -8,7 +8,7 @@
 
 ByteStream::ByteStream(file_descriptor_t socket_file_descriptor, IConnectionSimulator &connection_simulator_incoming,
                        IConnectionSimulator &connection_simulator_outgoing)
-    : socket_ptr(std::make_shared<SocketHolder>(socket_file_descriptor))
+    : socket_holder(std::make_shared<SocketHolder>(socket_file_descriptor))
     , connection_simulator_incoming(&connection_simulator_incoming)
     , connection_simulator_outgoing(&connection_simulator_outgoing) {
 }
@@ -38,7 +38,7 @@ ByteStream ByteStream::CreateClientSide(uint16_t port) {
 size_t ByteStream::Read(  // NOLINT(readability-make-member-function-const)
     uint8_t *receive_buffer, size_t max_length) {
   assert(max_length < SSIZE_MAX);
-  ssize_t read_count = recv(socket_ptr->file_descriptor, reinterpret_cast<char *>(receive_buffer), max_length, 0);
+  ssize_t read_count = recv(socket_holder->file_descriptor, reinterpret_cast<char *>(receive_buffer), max_length, 0);
   if (read_count < 0) {
     throw std::runtime_error("recv failed");
   }
@@ -68,7 +68,7 @@ void ByteStream::Send(  // NOLINT(readability-make-member-function-const)
     modified_send_buffer[i] = connection_simulator_outgoing->Filter(send_buffer[i]);
   }
 
-  ssize_t send_count = send(socket_ptr->file_descriptor, reinterpret_cast<char *>(modified_send_buffer), length, 0);
+  ssize_t send_count = send(socket_holder->file_descriptor, reinterpret_cast<char *>(modified_send_buffer), length, 0);
 
   delete[] modified_send_buffer;
 
