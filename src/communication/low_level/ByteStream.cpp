@@ -51,7 +51,8 @@ size_t ByteStream::Read(  // NOLINT(readability-make-member-function-const)
 
 std::string ByteStream::ReadString(size_t max_length) {
   char *receive_buffer = new char[max_length + 1];
-  Read(reinterpret_cast<uint8_t *>(receive_buffer), max_length);
+  auto read_count = Read(reinterpret_cast<uint8_t *>(receive_buffer), max_length);
+  receive_buffer[read_count] = '\0';
   std::string received(receive_buffer);
   delete[] receive_buffer;
   return received;
