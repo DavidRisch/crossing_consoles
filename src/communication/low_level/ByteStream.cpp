@@ -1,13 +1,14 @@
 #include "ByteStream.h"
 
 #include <cassert>
+#include <climits>
 #include <cstring>
 
 #include "socket_libs.h"
 
 ByteStream::ByteStream(file_descriptor_t socket_file_descriptor, IConnectionSimulator &connection_simulator_incoming,
                        IConnectionSimulator &connection_simulator_outgoing)
-    : socket_ptr(std::make_shared<Socket>(socket_file_descriptor))
+    : socket_ptr(std::make_shared<SocketHolder>(socket_file_descriptor))
     , connection_simulator_incoming(&connection_simulator_incoming)
     , connection_simulator_outgoing(&connection_simulator_outgoing) {
 }
@@ -36,13 +37,14 @@ ByteStream ByteStream::CreateClientSide(uint16_t port) {
 
 size_t ByteStream::Read(  // NOLINT(readability-make-member-function-const)
     uint8_t *receive_buffer, size_t max_length) {
+  assert(max_length < SSIZE_MAX);
   ssize_t read_count = recv(socket_ptr->file_descriptor, reinterpret_cast<char *>(receive_buffer), max_length, 0);
   if (read_count < 0) {
     throw std::runtime_error("recv failed");
   }
-  assert(read_count <= max_length);
+  assert(static_cast<size_t>(read_count) <= max_length);
 
-  for (int i = 0; i < read_count; ++i) {
+  for (ssize_t i = 0; i < read_count; ++i) {
     receive_buffer[i] = connection_simulator_incoming->Filter(receive_buffer[i]);
   }
 
@@ -62,7 +64,7 @@ void ByteStream::Send(  // NOLINT(readability-make-member-function-const)
     const uint8_t *send_buffer, size_t length) {
   auto *modified_send_buffer = new uint8_t[length];
 
-  for (int i = 0; i < length; ++i) {
+  for (size_t i = 0; i < length; ++i) {
     modified_send_buffer[i] = connection_simulator_outgoing->Filter(send_buffer[i]);
   }
 

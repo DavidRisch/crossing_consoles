@@ -6,7 +6,7 @@
 #include <stdexcept>
 
 #include "ConnectionSimulatorPerfect.h"
-#include "Socket.h"
+#include "SocketHolder.h"
 
 typedef int file_descriptor_t;
 typedef uint16_t port_t;
@@ -35,13 +35,13 @@ class ByteStream {
   void SetConnectionSimulatorOutgoing(IConnectionSimulator& ConnectionSimulator);
 
   class ConnectionRefusedException : public std::exception {
-    const char* what() const throw() {
+    [[nodiscard]] const char* what() const noexcept override {
       return "Socket connection failed. Is the server started?";
     }
   };
 
  private:
-  std::shared_ptr<Socket> socket_ptr;
+  std::shared_ptr<SocketHolder> socket_ptr;
 
   IConnectionSimulator* connection_simulator_incoming;
   IConnectionSimulator* connection_simulator_outgoing;

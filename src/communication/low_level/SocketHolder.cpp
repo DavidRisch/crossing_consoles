@@ -1,14 +1,14 @@
-#include "Socket.h"
+#include "SocketHolder.h"
 
 #include <unistd.h>
 
 #include <cassert>
 
-Socket::Socket(file_descriptor_t file_descriptor)
+SocketHolder::SocketHolder(file_descriptor_t file_descriptor)
     : file_descriptor(file_descriptor) {
   assert(file_descriptor != 0);
 }
 
-Socket::~Socket() {
+SocketHolder::~SocketHolder() {
   close(file_descriptor);
 }

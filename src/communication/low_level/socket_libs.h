@@ -7,9 +7,6 @@
 
 #define ECONNREFUSED WSAECONNREFUSED
 
-// SO_REUSEPORT does not exist on Windows
-#define SO_REUSEPORT 0
-
 #else
 // Linux
 #include <arpa/inet.h>

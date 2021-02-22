@@ -14,7 +14,7 @@ add_library(crossing_consoles_lib
 
         communication/low_level/ByteStream.cpp
         communication/low_level/ByteServer.cpp
-        communication/low_level/Socket.cpp
+        communication/low_level/SocketHolder.cpp
         communication/low_level/ConnectionSimulatorPerfect.cpp
         communication/low_level/ConnectionSimulatorFlakey.cpp
         )

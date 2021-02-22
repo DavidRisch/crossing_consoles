@@ -17,7 +17,7 @@ class ByteServer {
   std::optional<ByteStream> GetNewClient();
 
  private:
-  std::shared_ptr<Socket> socket_ptr;
+  std::shared_ptr<SocketHolder> socket_holder;
 };
 
 #endif  // CROSSING_CONSOLES_BYTE_SERVER_H
