@@ -41,7 +41,7 @@ class ByteStream {
   };
 
  private:
-  std::shared_ptr<Socket> socket;
+  std::shared_ptr<Socket> socket_ptr;
 
   IConnectionSimulator* connection_simulator_incoming;
   IConnectionSimulator* connection_simulator_outgoing;

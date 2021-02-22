@@ -7,31 +7,28 @@
 
 ByteStream::ByteStream(file_descriptor_t socket_file_descriptor, IConnectionSimulator &connection_simulator_incoming,
                        IConnectionSimulator &connection_simulator_outgoing)
-    : socket(std::make_shared<Socket>(socket_file_descriptor))
+    : socket_ptr(std::make_shared<Socket>(socket_file_descriptor))
     , connection_simulator_incoming(&connection_simulator_incoming)
     , connection_simulator_outgoing(&connection_simulator_outgoing) {
 }
 
 ByteStream ByteStream::CreateClientSide(uint16_t port) {
-  file_descriptor_t socket_file_descriptor = socket::socket(AF_INET, socket::SOCK_STREAM, 0);
+  file_descriptor_t socket_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
   if (socket_file_descriptor < 0) {
-    throw std::runtime_error("socket::socket failed");
+    throw std::runtime_error("socket failed");
   }
 
-  struct socket::sockaddr_in server_address {};
+  struct sockaddr_in server_address {};
   server_address.sin_family = AF_INET;
-  server_address.sin_port = socket::htons(port);
+  server_address.sin_port = htons(port);
 
-  // Convert IPv4 and IPv6 addresses from text to binary form
-  if (inet_pton(AF_INET, "127.0.0.1", &server_address.sin_addr) <= 0) {
-    throw std::runtime_error("Invalid address");
-  }
+  server_address.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-  if (socket::connect(socket_file_descriptor, (struct socket::sockaddr *)&server_address, sizeof(server_address)) < 0) {
+  if (connect(socket_file_descriptor, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) {
     if (errno == ECONNREFUSED) {
       throw ConnectionRefusedException();
     }
-    throw std::runtime_error("socket::connect failed");
+    throw std::runtime_error("connect failed");
   }
 
   return ByteStream(socket_file_descriptor);
@@ -39,9 +36,9 @@ ByteStream ByteStream::CreateClientSide(uint16_t port) {
 
 size_t ByteStream::Read(  // NOLINT(readability-make-member-function-const)
     uint8_t *receive_buffer, size_t max_length) {
-  ssize_t read_count = socket::recv(socket->file_descriptor, receive_buffer, max_length, 0);
+  ssize_t read_count = recv(socket_ptr->file_descriptor, reinterpret_cast<char *>(receive_buffer), max_length, 0);
   if (read_count < 0) {
-    throw std::runtime_error("socket::recv failed");
+    throw std::runtime_error("recv failed");
   }
   assert(read_count <= max_length);
 
@@ -68,12 +65,12 @@ void ByteStream::Send(  // NOLINT(readability-make-member-function-const)
     modified_send_buffer[i] = connection_simulator_outgoing->Filter(send_buffer[i]);
   }
 
-  ssize_t send_count = socket::send(socket->file_descriptor, modified_send_buffer, length, 0);
+  ssize_t send_count = send(socket_ptr->file_descriptor, reinterpret_cast<char *>(modified_send_buffer), length, 0);
 
   delete[] modified_send_buffer;
 
   if (send_count < 0) {
-    throw std::runtime_error("socket::send failed");
+    throw std::runtime_error("send failed");
   }
 }
 
