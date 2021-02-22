@@ -1,17 +1,6 @@
 #include "ByteServer.h"
 
-namespace socket {
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-
-// required for INADDR_ANY macro to work with this namespace setup
-#define in_addr_t socket::in_addr_t
-}  // namespace socket
-
-#include <fcntl.h>
-
-#include <cstring>
+#include "socket_libs.h"
 
 ByteServer::ByteServer(port_t port, int max_connections) {
   {
@@ -46,9 +35,19 @@ ByteServer::ByteServer(port_t port, int max_connections) {
   }
 
   // None blocking mode (needed for GetNewClient())
-  if (fcntl(socket->file_descriptor, F_SETFL, fcntl(socket->file_descriptor, F_GETFL, 0) | O_NONBLOCK)) {
+#ifdef _WIN32
+  // Windows
+  u_long blocking_io_mode = 1;  // != 0 -> none blocking mode
+  if (socket::ioctlsocket(socket->file_descriptor, socket::FIONBIO, &blocking_io_mode) != 0) {
+    throw std::runtime_error("ioctlsocket failed");
+  }
+#else
+  // Linux
+  if (socket::fcntl(socket->file_descriptor, F_SETFL,
+                    socket::fcntl(socket->file_descriptor, F_GETFL, 0) | O_NONBLOCK) != 0) {
     throw std::runtime_error("fcntl failed");
   }
+#endif
 }
 
 std::optional<ByteStream> ByteServer::GetNewClient() {  // NOLINT(readability-make-member-function-const)

@@ -1,13 +1,9 @@
 #include "ByteStream.h"
 
-namespace socket {
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-}  // namespace socket
-
 #include <cassert>
 #include <cstring>
+
+#include "socket_libs.h"
 
 ByteStream::ByteStream(file_descriptor_t socket_file_descriptor, IConnectionSimulator &connection_simulator_incoming,
                        IConnectionSimulator &connection_simulator_outgoing)
