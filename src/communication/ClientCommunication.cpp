@@ -7,5 +7,5 @@ void ClientCommunication::Send(const Message& m) {
 }
 
 Message ClientCommunication::Receive() {
-  return Message();
+  return Message(0, KEEP_ALIVE);  // TODO
 }
