@@ -1,5 +1,4 @@
 add_library(crossing_consoles_lib
-        Example.cpp
 
         game/Player.cpp
         game/Position.cpp
