@@ -4,6 +4,22 @@
 
 ByteServer::ByteServer(port_t port, int max_connections) {
   {
+#ifdef _WIN32
+    WORD w_version_requested;
+    WSADATA wsa_data;
+    int error;
+
+    w_version_requested = MAKEWORD(2, 2);
+    error = WSAStartup(w_version_requested, &wsa_data);
+    if (error != 0) {
+      throw std::runtime_error("WSAStartup failed with error");
+    }
+
+    if (LOBYTE(wsa_data.wVersion) != 2 || HIBYTE(wsa_data.wVersion) != 2) {
+      WSACleanup();
+      throw std::runtime_error("no usable Winsock.dll");
+    }
+#endif
     file_descriptor_t server_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
 
     // Create socket
@@ -16,9 +32,17 @@ ByteServer::ByteServer(port_t port, int max_connections) {
 
   // Configure socket
   int opt_val = 1;
+#ifdef _WIN32
+  // Windows
+  if (setsockopt(socket_holder->file_descriptor, SOL_SOCKET, SO_REUSEADDR, (char *)&opt_val, sizeof(opt_val))) {
+    throw std::runtime_error("setsockopt failed");
+  }
+#else
+  // Linux
   if (setsockopt(socket_holder->file_descriptor, SOL_SOCKET, SO_REUSEADDR, &opt_val, sizeof(opt_val))) {
     throw std::runtime_error("setsockopt failed");
   }
+#endif
 
   struct sockaddr_in address {};
   address.sin_family = AF_INET;
@@ -38,7 +62,7 @@ ByteServer::ByteServer(port_t port, int max_connections) {
 #ifdef _WIN32
   // Windows
   u_long blocking_io_mode = 1;  // != 0 -> none blocking mode
-  if (ioctlsocket(socket->file_descriptor, FIONBIO, &blocking_io_mode) != 0) {
+  if (ioctlsocket(socket_holder->file_descriptor, FIONBIO, &blocking_io_mode) != 0) {
     throw std::runtime_error("ioctlsocket failed");
   }
 #else
@@ -54,15 +78,29 @@ std::optional<ByteStream> ByteServer::GetNewClient() {  // NOLINT(readability-ma
   struct sockaddr_in address {};
   int address_length = sizeof(address);
 
+#ifdef _WIN32
+  // Windows
+  file_descriptor_t socket_file_descriptor;
+  socket_file_descriptor = accept(socket_holder->file_descriptor, (struct sockaddr *)&address, &address_length);
+
+  int error = WSAGetLastError();
+
+#else
+  // Linux
   file_descriptor_t socket_file_descriptor =
       accept(socket_holder->file_descriptor, (struct sockaddr *)&address, (socklen_t *)&address_length);
+#endif
+
   if (socket_file_descriptor < 0) {
+#ifdef _WIN32
+    if (error == WSAEWOULDBLOCK) {
+#else
     if (errno == EAGAIN) {
+#endif
       // No client is trying to connect
       return std::optional<ByteStream>();
     }
     throw std::runtime_error("accept failed");
   }
-
   return std::make_optional<ByteStream>(socket_file_descriptor);
 }

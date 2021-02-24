@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <iostream>
 #include <thread>
 
 #include "../src/communication/low_level/ByteServer.h"
