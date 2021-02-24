@@ -16,8 +16,8 @@ class ConnectionSimulator : public ::testing::Test {
   ConnectionSimulatorFlakey flakey_perfect;
   ConnectionSimulatorFlakey flakey;
 
-  const char *server_to_client = "abc123";
-  const char *client_to_server = "123ABC";
+  const char *server_to_client = "abc123abc123abc123abc123abc123abc123abc123abc123";
+  const char *client_to_server = "123ABC123ABC123ABC123ABC123ABC123ABC123ABC123ABC";
 
   std::string server_received;
   std::string client_received;
