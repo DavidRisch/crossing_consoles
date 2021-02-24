@@ -11,6 +11,12 @@ add_library(crossing_consoles_lib
         communication/ClientConnection.cpp
         communication/ServerClientConnection.cpp
 
+        communication/low_level/ByteStream.cpp
+        communication/low_level/ByteServer.cpp
+        communication/low_level/SocketHolder.cpp
+        communication/low_level/ConnectionSimulatorPerfect.cpp
+        communication/low_level/ConnectionSimulatorFlakey.cpp
+
         communication/messages/Message.cpp
         communication/messages/ConnectionRequestMessage.cpp
         communication/messages/ConnectionResponseMessage.cpp
