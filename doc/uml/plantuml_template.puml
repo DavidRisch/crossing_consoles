@@ -1,0 +1,7 @@
+{% extends 'default.puml' %}
+
+{% block preamble %}
+
+skinparam monochrome true
+
+{% endblock %}

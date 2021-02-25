@@ -14,7 +14,7 @@ typedef uint16_t port_t;
 inline const port_t socket_default_port = 56921;
 
 /**
- * Interface to communicate with another process without any structure to messages.
+ * \brief Interface to communicate with another process without any structure to messages.
  */
 class ByteStream {
  public:

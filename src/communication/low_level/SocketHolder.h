@@ -4,7 +4,7 @@
 typedef int file_descriptor_t;
 
 /**
- * Holds a file descriptor which is automatically closed in the destructor.
+ * \brief Holds a file descriptor which is automatically closed in the destructor.
  */
 class SocketHolder {
  public:
