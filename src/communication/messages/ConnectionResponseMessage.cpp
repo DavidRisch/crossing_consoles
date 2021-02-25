@@ -1,10 +1,14 @@
 #include "ConnectionResponseMessage.h"
 
 ConnectionResponseMessage::ConnectionResponseMessage(address_t address, MessageMetaData meta_data)
-    : Message(address, message_type, meta_data) {
+    : Message(address, meta_data) {
 }
 ConnectionResponseMessage::ConnectionResponseMessage(address_t address)
-    : Message(address, message_type) {
+    : Message(address) {
 }
 
-MessageType ConnectionResponseMessage::message_type = CONNECTION_RESPONSE;
+MessageType ConnectionResponseMessage::message_type = MessageType::CONNECTION_RESPONSE;
+
+MessageType ConnectionResponseMessage::GetMessageType() const {
+  return message_type;
+}

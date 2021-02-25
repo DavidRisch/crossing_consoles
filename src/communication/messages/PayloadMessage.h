@@ -12,6 +12,8 @@ class PayloadMessage : public Message {
 
   // Received message
   PayloadMessage(address_t address, std::vector<uint8_t> payload, MessageMetaData meta_data);
+
+  [[nodiscard]] MessageType GetMessageType() const override;
   [[nodiscard]] std::vector<uint8_t> GetPayload() const;
 
  private:

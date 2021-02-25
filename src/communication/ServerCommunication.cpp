@@ -5,7 +5,7 @@ void ServerCommunication::Send(const Message& m) {
 
 Message ServerCommunication::Receive() {
   // TODO
-  return Message(0, KEEP_ALIVE);
+  return Message(0);
 }
 
 void ServerCommunication::Broadcast() {

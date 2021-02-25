@@ -1,13 +1,13 @@
 #include "Message.h"
 
-Message::Message(address_t address, MessageType message_type)
-    : address(address)
-    , message_type(message_type) {
+#include <stdexcept>
+
+Message::Message(address_t address)
+    : address(address) {
 }
 
-Message::Message(address_t address, MessageType message_type, MessageMetaData meta_data)
+Message::Message(address_t address, MessageMetaData meta_data)
     : address(address)
-    , message_type(message_type)
     , meta_data(meta_data) {
 }
 
@@ -16,7 +16,7 @@ address_t Message::GetAddress() const {
 }
 
 MessageType Message::GetMessageType() const {
-  return message_type;
+  throw std::logic_error("Not implemented");
 }
 
 MessageMetaData Message::GetMessageMetaData() const {
