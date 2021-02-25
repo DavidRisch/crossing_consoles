@@ -7,5 +7,9 @@ if (DOXYGEN_FOUND)
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             VERBATIM)
 else (DOXYGEN_FOUND)
-    message("Doxygen not found")
+    message(WARNING "Doxygen not found")
+    add_custom_target(doc_doxygen
+            COMMAND echo "Doxygen not found, skipping!"
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            VERBATIM)
 endif (DOXYGEN_FOUND)
