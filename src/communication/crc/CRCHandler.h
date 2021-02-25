@@ -11,7 +11,7 @@ class CRCHandler {
    */
  public:
   CRCHandler();
-  static crc_value_t calculateCRCValue(char* payload);
+  static crc_value_t calculateCRCValue(const char* payload);
   static bool checkCRCValue(char* message, crc_value_t checksum);
 };
 
