@@ -6,15 +6,15 @@
 #include "IConnectionSimulator.h"
 
 /**
- * Does not change any bytes.
+ * \brief Does not change any bytes.
  */
 class ConnectionSimulatorPerfect : public IConnectionSimulator {
  public:
   uint8_t Filter(uint8_t input) override;
 
   /**
-   * Required for the constructor of ByteStream.
-   * Because this class holds no state this is ok here.
+   * \brief Required for the constructor of ByteStream.
+   * \details Because this class holds no state this is ok here.
    */
   static ConnectionSimulatorPerfect instance;
 };

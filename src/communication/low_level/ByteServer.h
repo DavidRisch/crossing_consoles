@@ -8,7 +8,7 @@
 #include "ByteStream.h"
 
 /**
- * Creates a socket to listen for clients and creates ByteStreams to communicate with them.
+ * \brief Creates a socket to listen for clients and creates ByteStreams to communicate with them.
  */
 class ByteServer {
  public:

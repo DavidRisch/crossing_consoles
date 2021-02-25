@@ -6,7 +6,7 @@
 #include "IConnectionSimulator.h"
 
 /**
- * Changes each byte to a random value with a probability of error_rate.
+ * \brief Changes each byte to a random value with a probability of error_rate.
  */
 class ConnectionSimulatorFlakey : public IConnectionSimulator {
  public:

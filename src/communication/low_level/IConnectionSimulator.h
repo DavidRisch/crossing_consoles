@@ -4,7 +4,7 @@
 #include <cstdint>
 
 /**
- * Used to simulate potential errors in a real world connection (e.g. UART).
+ * \brief Used to simulate potential errors in a real world connection (e.g. UART).
  */
 class IConnectionSimulator {
  public:
