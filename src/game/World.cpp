@@ -1,10 +1,10 @@
 #include "World.h"
 
-World::World(int width, int height) {
-  size[0] = width;
-  size[1] = height;
+World::World(int width, int height)
+    : size(Position(width, height)) {
 }
 
-bool World::IsWall(Position position) {
-  return false;
+void World::AddWall(const Position& position) {
+  walls.emplace_back(position);
+  updated = true;
 }

@@ -9,13 +9,14 @@
 
 class World {
  public:
-  int size[2]{};
-  std::list<Player> players;
-  std::list<Wall> walls;
+  object_size_t size;
+  std::list<Player> players{};
+  std::list<Wall> walls{};
+  bool updated = false;
 
   World(int width, int height);
 
-  bool IsWall(Position position);
+  void AddWall(const Position& position);
 };
 
 #endif  // CROSSING_CONSOLES_WORLD_H
