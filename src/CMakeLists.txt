@@ -22,6 +22,8 @@ add_library(crossing_consoles_lib
         communication/messages/KeepAliveMessage.cpp
         communication/messages/PayloadMessage.cpp
         communication/messages/MessageMetaData.cpp
+
+        communication/crc/CRCHandler.cpp
         )
 
 add_executable(crossing_consoles_main_server
