@@ -5,7 +5,7 @@
 
 #include "../src/communication/low_level/ByteServer.h"
 
-void test_single_client() {
+TEST(ByteServer, SingleClient) {
   const char* server_to_client = "0123456789";
   const char* client_to_server = "ABCDEFGHIJ";
 
@@ -38,10 +38,6 @@ void test_single_client() {
 
   EXPECT_EQ(server_to_client, client_received);
   EXPECT_EQ(client_to_server, server_received);
-}
-
-TEST(ByteServer, SingleClient) {
-  test_single_client();
 }
 
 TEST(ByteServer, TwoClients) {
