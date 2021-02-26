@@ -18,6 +18,9 @@ add_library(crossing_consoles_lib
         communication/low_level/MockInputStream.cpp
         communication/low_level/MockBidirectionalByteStream.cpp
 
+        communication/message_layer/MessageInputStream.cpp
+        communication/message_layer/MessageOutputStream.cpp
+
         communication/messages/Message.cpp
         communication/messages/ConnectionRequestMessage.cpp
         communication/messages/ConnectionResponseMessage.cpp

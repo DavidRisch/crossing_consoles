@@ -18,7 +18,7 @@ inline const port_t socket_default_port = 56921;
 /**
  * \brief Interface to communicate with another process without any structure to messages.
  */
-class ByteStream : public IOutputStream, IInputStream {
+class ByteStream : public IOutputStream, public IInputStream {
  public:
   explicit ByteStream(file_descriptor_t socket_file_descriptor,
                       IConnectionSimulator& connection_simulator_incoming = ConnectionSimulatorPerfect::instance,

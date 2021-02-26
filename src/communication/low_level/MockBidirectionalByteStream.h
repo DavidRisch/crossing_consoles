@@ -13,7 +13,7 @@
 /**
  * \brief Implementation of `IInputStream` and `IOutputStream` used for testing.
  */
-class MockBidirectionalByteStream : public IInputStream, IOutputStream {
+class MockBidirectionalByteStream : public IInputStream, public IOutputStream {
  public:
   /**
    * \brief Create two linked instances of `MockBidirectionalByteStream`, data sent with one will be received by the

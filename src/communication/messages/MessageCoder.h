@@ -22,15 +22,9 @@ class MessageCoder {
 
   /**
    * \brief Decode message of any type.
-   * \details If the encoded Message is larger than `receive_buffer_length`, an `InputTooShortException` is thrown.
    */
-  static std::unique_ptr<Message> Decode(IInputStream& stream);
+  static std::unique_ptr<Message> Decode(IInputStream& stream, bool expect_start_sequence = true);
 
-  class InputTooShortException : public std::exception {
-    [[nodiscard]] const char* what() const noexcept override {
-      return "Message decoding failed, input was shorter than expected.";
-    }
-  };
 
   class CrcIncorrectException : public std::exception {
     [[nodiscard]] const char* what() const noexcept override {

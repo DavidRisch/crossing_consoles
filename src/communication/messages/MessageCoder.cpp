@@ -66,12 +66,12 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
   return output;
 }
 
-std::unique_ptr<Message> MessageCoder::Decode(IInputStream &stream) {
-  size_t current_position = 0;
-
-  auto found_start_sequence =
-      ReadFromStream<ProtocolDefinition::start_sequence_t>(stream, sizeof(ProtocolDefinition::start_sequence));
-  assert(found_start_sequence == ProtocolDefinition::GetNumericStartSequence());
+std::unique_ptr<Message> MessageCoder::Decode(IInputStream &stream, bool expect_start_sequence) {
+  if (expect_start_sequence) {
+    auto found_start_sequence =
+        ReadFromStream<ProtocolDefinition::start_sequence_t>(stream, sizeof(ProtocolDefinition::start_sequence));
+    assert(found_start_sequence == ProtocolDefinition::GetNumericStartSequence());
+  }
 
   auto message_type_value = ReadFromStream<char>(stream, sizeof(char));
   assert(message_type_value >= 0);
