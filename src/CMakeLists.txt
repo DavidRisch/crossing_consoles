@@ -22,6 +22,7 @@ add_library(crossing_consoles_lib
         communication/messages/KeepAliveMessage.cpp
         communication/messages/PayloadMessage.cpp
         communication/messages/MessageMetaData.cpp
+        communication/messages/MessageCoder.cpp
 
         communication/crc/CRCHandler.cpp
         )

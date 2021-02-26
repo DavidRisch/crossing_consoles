@@ -12,6 +12,8 @@ class ConnectionRequestMessage : public Message {
 
   // Received message
   ConnectionRequestMessage(address_t address, MessageMetaData meta_data);
+
+  [[nodiscard]] MessageType GetMessageType() const override;
 };
 
 #endif  // CROSSING_CONSOLES_CONNECTIONREQUESTMESSAGE_H
