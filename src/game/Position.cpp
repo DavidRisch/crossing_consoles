@@ -20,8 +20,7 @@ Position Position::operator-(const Position &other_position) const {
   return Position(x - other_position.x, y - other_position.y);
 }
 
-
-Position Position::operator*(const Position& other_position) const {
+Position Position::operator*(const Position &other_position) const {
   return Position(x * other_position.x, y * other_position.y);
 }
 

@@ -13,9 +13,9 @@ void World::AddWall(const Position& position) {
 
 bool World::IsWall(const Position& position) {
   for (auto const& i_wall : walls) {
-     if (i_wall.position == position) {
-       return true;
-     }
+    if (i_wall.position == position) {
+      return true;
+    }
   }
   return false;
 }
