@@ -23,8 +23,7 @@ class MessageCoder {
   /**
    * \brief Decode message of any type.
    */
-  static std::unique_ptr<Message> Decode(IInputStream& stream, bool expect_start_sequence = true);
-
+  static std::shared_ptr<Message> Decode(IInputStream& stream, bool expect_start_sequence = true);
 
   class CrcIncorrectException : public std::exception {
     [[nodiscard]] const char* what() const noexcept override {

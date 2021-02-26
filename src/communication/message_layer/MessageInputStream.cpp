@@ -11,7 +11,7 @@ MessageInputStream::MessageInputStream(IInputStream &input_stream)
     : input_stream(input_stream) {
 }
 
-std::unique_ptr<Message> MessageInputStream::ReceiveMessage() {
+std::shared_ptr<Message> MessageInputStream::ReceiveMessage() {
   int start_sequence_position = 0;
 
   while (true) {

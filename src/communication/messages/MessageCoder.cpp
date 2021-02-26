@@ -66,7 +66,7 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
   return output;
 }
 
-std::unique_ptr<Message> MessageCoder::Decode(IInputStream &stream, bool expect_start_sequence) {
+std::shared_ptr<Message> MessageCoder::Decode(IInputStream &stream, bool expect_start_sequence) {
   if (expect_start_sequence) {
     auto found_start_sequence =
         ReadFromStream<ProtocolDefinition::start_sequence_t>(stream, sizeof(ProtocolDefinition::start_sequence));
@@ -92,11 +92,11 @@ std::unique_ptr<Message> MessageCoder::Decode(IInputStream &stream, bool expect_
 
   switch (message_type) {
     case MessageType::KEEP_ALIVE:
-      return std::make_unique<KeepAliveMessage>(KeepAliveMessage(0, message_meta_data));
+      return std::make_shared<KeepAliveMessage>(KeepAliveMessage(0, message_meta_data));
     case MessageType::CONNECTION_REQUEST:
-      return std::make_unique<ConnectionRequestMessage>(ConnectionRequestMessage(0, message_meta_data));
+      return std::make_shared<ConnectionRequestMessage>(ConnectionRequestMessage(0, message_meta_data));
     case MessageType::CONNECTION_RESPONSE:
-      return std::make_unique<ConnectionResponseMessage>(ConnectionResponseMessage(0, message_meta_data));
+      return std::make_shared<ConnectionResponseMessage>(ConnectionResponseMessage(0, message_meta_data));
     case MessageType::PAYLOAD:
       std::vector<uint8_t> payload;
       payload.resize(payload_length);
@@ -107,6 +107,6 @@ std::unique_ptr<Message> MessageCoder::Decode(IInputStream &stream, bool expect_
         read_pointer += read_length;
       }
 
-      return std::make_unique<PayloadMessage>(PayloadMessage(0, payload, message_meta_data));
+      return std::make_shared<PayloadMessage>(PayloadMessage(0, payload, message_meta_data));
   }
 }

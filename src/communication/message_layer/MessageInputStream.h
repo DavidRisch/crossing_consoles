@@ -14,7 +14,7 @@ class MessageInputStream {
  public:
   explicit MessageInputStream(IInputStream &input_stream);
 
-  std::unique_ptr<Message> ReceiveMessage();
+  std::shared_ptr<Message> ReceiveMessage();
 
  private:
   IInputStream &input_stream;
