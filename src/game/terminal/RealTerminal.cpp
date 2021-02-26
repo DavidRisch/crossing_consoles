@@ -1,6 +1,7 @@
 #include "RealTerminal.h"
 
 #include <cstdlib>
+#include <iostream>
 
 #ifdef _WIN32
 #include <conio.h>
@@ -35,7 +36,12 @@ int RealTerminal::GetInput() {
 }
 
 void RealTerminal::SetScreen(const std::string& content) {
+  Clear();
+#ifdef _WIN32
+  std::cout << content << std::endl;
+#else
   printf("%s", content.c_str());
+#endif
 }
 
 void RealTerminal::Initialise() {
