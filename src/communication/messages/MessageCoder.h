@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "../low_level/IInputStream.h"
 #include "Message.h"
 
 /**
@@ -23,7 +24,7 @@ class MessageCoder {
    * \brief Decode message of any type.
    * \details If the encoded Message is larger than `receive_buffer_length`, an `InputTooShortException` is thrown.
    */
-  static std::unique_ptr<Message> Decode(const uint8_t* receive_buffer, size_t receive_buffer_length);
+  static std::unique_ptr<Message> Decode(IInputStream& stream);
 
   class InputTooShortException : public std::exception {
     [[nodiscard]] const char* what() const noexcept override {
