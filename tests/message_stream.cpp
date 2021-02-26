@@ -1,10 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <thread>
+
 #include "../src/communication/low_level/ByteServer.h"
 #include "../src/communication/low_level/MockBidirectionalByteStream.h"
 #include "../src/communication/message_layer/MessageInputStream.h"
 #include "../src/communication/message_layer/MessageOutputStream.h"
 #include "../src/communication/messages/KeepAliveMessage.h"
+#include "../src/communication/messages/PayloadMessage.h"
 
 TEST(MessageStream, Simple) {
   auto stream_pair = MockBidirectionalByteStream::CreatePair();
@@ -39,4 +42,80 @@ TEST(MessageStream, WithPadding) {
   auto received_message = message_input_stream.ReceiveMessage();
 
   EXPECT_EQ(original_message.GetMessageType(), received_message->GetMessageType());
+}
+
+TEST(MessageStream, Multiple) {
+  auto stream_pair = MockBidirectionalByteStream::CreatePair();
+
+  MessageInputStream message_input_stream(*stream_pair.first);
+  MessageOutputStream message_output_stream(*stream_pair.second);
+
+  address_t target_address = 1234;
+  for (int i = 0; i < 10; ++i) {
+    std::vector<uint8_t> payload;
+    payload.push_back(i);
+    PayloadMessage original_message(target_address, payload);
+
+    message_output_stream.SendMessage(&original_message);
+
+    auto received_message = message_input_stream.ReceiveMessage();
+
+    EXPECT_EQ(original_message.GetMessageType(), received_message->GetMessageType());
+    auto &payload_message = dynamic_cast<PayloadMessage &>(*received_message);
+
+    EXPECT_EQ(payload_message.GetPayload().size(), original_message.GetPayload().size());
+    EXPECT_EQ(payload_message.GetPayload().at(0), original_message.GetPayload().at(0));
+  }
+}
+
+TEST(MessageStream, Threaded) {
+  auto stream_pair = MockBidirectionalByteStream::CreatePair();
+
+  auto a_message_input_stream = std::make_shared<MessageInputStream>(*stream_pair.second);
+  auto b_message_output_stream = std::make_shared<MessageOutputStream>(*stream_pair.first);
+
+  auto b_message_input_stream = std::make_shared<MessageInputStream>(*stream_pair.first);
+  auto a_message_output_stream = std::make_shared<MessageOutputStream>(*stream_pair.second);
+
+  address_t target_address = 1234;
+
+  int test_message_count = 100;
+
+  std::thread a_thread([&a_message_input_stream, &a_message_output_stream, target_address, test_message_count] {
+    for (int i = 0; i < test_message_count; ++i) {
+      std::vector<uint8_t> payload;
+      payload.push_back(i);
+      PayloadMessage original_message(target_address, payload);
+
+      a_message_output_stream->SendMessage(&original_message);
+    }
+    for (int i = 0; i < test_message_count; ++i) {
+      auto received_message = a_message_input_stream->ReceiveMessage();
+
+      EXPECT_EQ(received_message->GetMessageType(), MessageType::PAYLOAD);
+      auto &payload_message = dynamic_cast<PayloadMessage &>(*received_message);
+
+      EXPECT_EQ(payload_message.GetPayload().size(), 1);
+      EXPECT_EQ(payload_message.GetPayload().at(0), i + test_message_count);
+    }
+  });
+
+  for (int i = 0; i < test_message_count; ++i) {
+    auto received_message = b_message_input_stream->ReceiveMessage();
+
+    EXPECT_EQ(received_message->GetMessageType(), MessageType::PAYLOAD);
+    auto &payload_message = dynamic_cast<PayloadMessage &>(*received_message);
+
+    EXPECT_EQ(payload_message.GetPayload().size(), 1);
+    EXPECT_EQ(payload_message.GetPayload().at(0), i);
+  }
+  for (int i = 0; i < test_message_count; ++i) {
+    std::vector<uint8_t> payload;
+    payload.push_back(i + test_message_count);
+    PayloadMessage original_message(target_address, payload);
+
+    b_message_output_stream->SendMessage(&original_message);
+  }
+
+  a_thread.join();
 }

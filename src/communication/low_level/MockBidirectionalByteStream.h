@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <list>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include "IInputStream.h"
@@ -27,11 +28,13 @@ class MockBidirectionalByteStream : public IInputStream, public IOutputStream {
   void Send(const uint8_t* send_buffer, size_t length) override;
 
  private:
-  MockBidirectionalByteStream();
+  MockBidirectionalByteStream(std::shared_ptr<std::mutex> mutex);
 
   std::list<uint8_t> input_data;
 
   std::weak_ptr<MockBidirectionalByteStream> other_end_weak;
+
+  std::shared_ptr<std::mutex> mutex;
 };
 
 #endif  // CROSSING_CONSOLES_MOCK_BIDIRECTIONAL_BYTE_STREAM_H
