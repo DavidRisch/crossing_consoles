@@ -16,6 +16,7 @@ add_library(crossing_consoles_lib
         communication/low_level/ConnectionSimulatorPerfect.cpp
         communication/low_level/ConnectionSimulatorFlakey.cpp
         communication/low_level/MockInputStream.cpp
+        communication/low_level/MockBidirectionalByteStream.cpp
 
         communication/messages/Message.cpp
         communication/messages/ConnectionRequestMessage.cpp
