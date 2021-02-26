@@ -7,6 +7,7 @@ add_library(crossing_consoles_lib
         game/World.cpp
         game/Wall.cpp
         game/Renderer.cpp
+        game/Compositor.cpp
         game/Terminal.cpp
 
         communication/ClientCommunication.cpp

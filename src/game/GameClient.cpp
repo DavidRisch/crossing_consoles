@@ -6,14 +6,13 @@
 
 #include "Terminal.h"
 
-enum Keys : int { KEY_ESCAPE = 27, KEY_W = 119, KEY_A = 97, KEY_S = 115, KEY_D = 100 };
+enum Keys : int { KEY_ESCAPE = 27, KEY_W = 'w', KEY_A = 'a', KEY_S = 's', KEY_D = 'd', KEY_SPACE = ' ' };
 
-GameClient::GameClient(int viewport_width, int viewport_height, Player player, World world)
+GameClient::GameClient(Player player, World world)
     : player(std::move(player))
     , world(std::move(world)) {
-  viewport_size[0] = viewport_width;
-  viewport_size[1] = viewport_height;
-  renderer = new Renderer(viewport_size[0], viewport_size[1], this->world, this->player);
+  coordinate_size_t viewport_size = Position(51, 31);
+  compositor = new Compositor(viewport_size, this->world, this->player);
 
   Terminal::Initialise();
   RunGame();
@@ -24,28 +23,35 @@ void GameClient::RunGame() {
     KeyPressed();
     if (world.updated || player.updated) {
       Terminal::Clear();
-      std::cout << renderer->RenderWorld() << std::endl;
+      std::cout << compositor->CompositeViewport() << std::endl;
       Terminal::Initialise();
     }
   }
 }
 
 void GameClient::KeyPressed() {
+  coordinate_distance_t movement(0, 0);
   if (Terminal::CharacterWaiting()) {
     keypress = Terminal::GetCharacter();
     switch (keypress) {
       case KEY_W:
-        player.MoveBy(Position(0, -1));
+        movement.Set(0, -1);
         break;
       case KEY_A:
-        player.MoveBy(Position(-1, 0));
+        movement.Set(-1, 0);
         break;
       case KEY_S:
-        player.MoveBy(Position(0, 1));
+        movement.Set(0, 1);
         break;
       case KEY_D:
-        player.MoveBy(Position(1, 0));
+        movement.Set(1, 0);
         break;
+    }
+
+    if (keypress) {
+      if (movement != Position(0, 0) && !world.IsWall(player.position + movement)) {
+        player.MoveBy(movement);
+      }
     }
   }
 }

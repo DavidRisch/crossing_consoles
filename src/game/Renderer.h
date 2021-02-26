@@ -8,12 +8,12 @@
 
 class Renderer {
  public:
-  const object_size_t block_size = Position(2, 1);
-  object_size_t viewport_size;
+  coordinate_size_t block_size;
+  coordinate_size_t viewport_size;
   World* world;
   Player* player;
 
-  explicit Renderer(int width, int height, World& world, Player& player);
+  explicit Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size, World& world, Player& player);
 
   [[nodiscard]] std::string RenderWorld() const;
 };

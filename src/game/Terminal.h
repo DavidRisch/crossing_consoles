@@ -1,7 +1,7 @@
 #ifndef CROSSING_CONSOLES_TERMINAL_H
 #define CROSSING_CONSOLES_TERMINAL_H
 
-#ifndef WIN_32
+#ifndef _WIN32
 #include <termios.h>
 #endif
 

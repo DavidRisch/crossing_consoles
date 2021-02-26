@@ -9,7 +9,7 @@
 
 class World {
  public:
-  object_size_t size;
+  coordinate_size_t size;
   std::list<Player> players{};
   std::list<Wall> walls{};
   bool updated = false;
@@ -17,6 +17,8 @@ class World {
   World(int width, int height);
 
   void AddWall(const Position& position);
+
+  bool IsWall(const Position& position);
 };
 
 #endif  // CROSSING_CONSOLES_WORLD_H

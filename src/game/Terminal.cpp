@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 
-#ifdef WIN_32
+#ifdef _WIN32
 #include <conio.h>
 #else
 
@@ -12,7 +12,7 @@
 #endif
 
 void Terminal::Initialise() {
-#ifdef WIN_32
+#ifdef _WIN32
   // no configuration required
 #else
   // https://stackoverflow.com/a/7469410/13623303
@@ -25,7 +25,7 @@ void Terminal::Initialise() {
 }
 
 int Terminal::GetCharacter() {
-#ifdef WIN_32
+#ifdef _WIN32
   return getch();
 #else
   return getchar();
@@ -33,7 +33,7 @@ int Terminal::GetCharacter() {
 }
 
 bool Terminal::CharacterWaiting() {
-#ifdef WIN_32
+#ifdef _WIN32
   return kbhit();
 #else
   int bytes_waiting;
@@ -43,7 +43,7 @@ bool Terminal::CharacterWaiting() {
 }
 
 void Terminal::Clear() {
-#ifdef WIN_32
+#ifdef _WIN32
   system("cls");
 #else
   system("clear");
