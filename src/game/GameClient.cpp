@@ -48,8 +48,21 @@ void GameClient::KeyPressed() {
     }
 
     if (keypress) {
-      if (movement != Position(0, 0) && !world.IsWall(player.position + movement)) {
-        player.MoveBy(movement);
+      Position new_position = player.position + movement;
+
+      if (new_position.x < 0) {
+        new_position.x += world.size.x;
+      } else if (new_position.x >= world.size.x) {
+        new_position.x -= world.size.x;
+      }
+      if (new_position.y < 0) {
+        new_position.y += world.size.y;
+      } else if (new_position.y >= world.size.y) {
+        new_position.y -= world.size.y;
+      }
+
+      if (new_position != player.position && !world.IsWall(new_position)) {
+        player.MoveTo(new_position);
       }
     }
   }
