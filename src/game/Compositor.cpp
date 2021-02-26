@@ -21,6 +21,6 @@ std::string Compositor::CompositeViewport() const {
     out.insert(out.end() - 1, '|');
   }
   out.append(std::string(viewport_size.x * block_size.x + 2, '='));
-  out.append("\n")
+  out.append("\n");
   return out;
 }
