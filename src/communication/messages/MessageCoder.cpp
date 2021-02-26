@@ -4,6 +4,7 @@
 #include <memory>
 #include <optional>
 
+#include "../ProtocolDefinition.h"
 #include "ConnectionRequestMessage.h"
 #include "ConnectionResponseMessage.h"
 #include "KeepAliveMessage.h"
@@ -36,9 +37,10 @@ T ReadFromBuffer(const uint8_t *receive_buffer, size_t &current_position, size_t
 
 std::vector<uint8_t> MessageCoder::Encode(Message *message) {
   std::vector<uint8_t> output;
-  output.reserve(start_sequence_length + 1);
+  output.reserve(sizeof(ProtocolDefinition::start_sequence) + 1);
 
-  WriteToVector(output, start_sequence, start_sequence_length);
+  auto number_start_sequence = ProtocolDefinition::GetNumericStartSequence();
+  WriteToVector(output, number_start_sequence, sizeof(ProtocolDefinition::start_sequence));
   output.push_back(static_cast<uint8_t>(message->GetMessageType()));
 
   switch (message->GetMessageType()) {
@@ -50,7 +52,7 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
     case MessageType::PAYLOAD:
       auto *payload_message = reinterpret_cast<PayloadMessage *>(message);
       const auto &payload = payload_message->GetPayload();
-      payload_length_t payload_length = payload.size();
+      ProtocolDefinition::payload_length_t payload_length = payload.size();
 
       WriteToVector(output, payload_length, sizeof(payload_length));
 
@@ -70,19 +72,19 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
 std::unique_ptr<Message> MessageCoder::Decode(const uint8_t *receive_buffer, size_t receive_buffer_length) {
   size_t current_position = 0;
 
-  auto found_start_sequence =
-      ReadFromBuffer<start_sequence_t>(receive_buffer, current_position, receive_buffer_length, start_sequence_length);
-  assert(found_start_sequence == start_sequence);
+  auto found_start_sequence = ReadFromBuffer<ProtocolDefinition::start_sequence_t>(
+      receive_buffer, current_position, receive_buffer_length, sizeof(ProtocolDefinition::start_sequence));
+  assert(found_start_sequence == ProtocolDefinition::GetNumericStartSequence());
 
   auto message_type_value = ReadFromBuffer<char>(receive_buffer, current_position, receive_buffer_length, sizeof(char));
   assert(message_type_value >= 0);
   assert(message_type_value <= static_cast<uint8_t>(MessageType::HIGHEST_ELEMENT));
   auto message_type = static_cast<MessageType>(message_type_value);
 
-  payload_length_t payload_length = 0;
+  ProtocolDefinition::payload_length_t payload_length = 0;
   if (message_type == MessageType::PAYLOAD) {
-    payload_length = ReadFromBuffer<payload_length_t>(receive_buffer, current_position, receive_buffer_length,
-                                                      sizeof(payload_length_t));
+    payload_length = ReadFromBuffer<ProtocolDefinition::payload_length_t>(
+        receive_buffer, current_position, receive_buffer_length, sizeof(ProtocolDefinition::payload_length_t));
   }
 
   size_t crc_position = current_position + payload_length;

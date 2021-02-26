@@ -10,15 +10,6 @@
  */
 class MessageCoder {
  public:
-  typedef uint32_t start_sequence_t;
-  /// Arbitrary constant, used to mark the start of a packet
-  static const start_sequence_t start_sequence = 0x12345678u;
-  /// Length of start_sequence in bytes
-  static const int start_sequence_length = 4;
-  static_assert(sizeof(start_sequence) >= start_sequence_length);
-
-  typedef uint16_t payload_length_t;
-
   // TODO: CRC implementation
   typedef uint32_t crc_t;
   static const int crc_length = 4;
