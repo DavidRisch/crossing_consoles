@@ -3,9 +3,9 @@
 
 #include <memory>
 
+#include "../crc/CRCHandler.h"
 #include "../low_level/IInputStream.h"
 #include "Message.h"
-#include "../crc/CRCHandler.h"
 
 /**
  * \brief Contains static methods for `Message` en- and decoding.

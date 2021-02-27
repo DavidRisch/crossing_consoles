@@ -51,24 +51,6 @@ TEST(MessageCoder, PayloadMessage) {
   }
 }
 
-TEST(MessageCoder, InputTooShortException) {
-  address_t target_address = 1234;
-  std::vector<uint8_t> original_payload;
-
-  int original_payload_length = 123;
-  original_payload.reserve(original_payload_length);
-  for (int i = 0; i < original_payload_length; ++i) {
-    original_payload.push_back(i);
-  }
-  PayloadMessage original_message(target_address, original_payload);
-
-  auto encoded_message = MessageCoder::Encode(&original_message);
-
-  for (size_t i = 0; i < encoded_message.size(); ++i) {
-    EXPECT_THROW(MessageCoder::Decode(encoded_message.data(), i), MessageCoder::InputTooShortException);
-  }
-}
-
 TEST(MessageCoder, CrcIncorrectException) {
   // Create a message
   address_t target_address = 1234;
@@ -91,6 +73,7 @@ TEST(MessageCoder, CrcIncorrectException) {
     encoded_message.at(position) = rd();
   }
 
-  EXPECT_THROW(MessageCoder::Decode(encoded_message.data(), encoded_message.size()),
-               MessageCoder::CrcIncorrectException);
+  MockInputStream mock_input_stream;
+  mock_input_stream.AddData(encoded_message);
+  EXPECT_THROW(MessageCoder::Decode(mock_input_stream), MessageCoder::CrcIncorrectException);
 }

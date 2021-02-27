@@ -32,6 +32,20 @@ T ReadFromStream(IInputStream &stream, unsigned int type_length) {
   return output;
 }
 
+template <typename T>
+T ReadFromStreamWithCopy(IInputStream &stream, unsigned int type_length, std::vector<uint8_t> &raw_message) {
+  T output = 0;
+  for (unsigned int i = 0; i < type_length; ++i) {
+    unsigned int byte_position = type_length - 1 - i;  // to get big endian mode
+
+    T byte = 0;
+    stream.Read(reinterpret_cast<uint8_t *>(&byte), 1);
+    raw_message.push_back(byte);
+    output |= byte << 8 * byte_position;
+  }
+  return output;
+}
+
 std::vector<uint8_t> MessageCoder::Encode(Message *message) {
   std::vector<uint8_t> output;
   output.reserve(sizeof(ProtocolDefinition::start_sequence) + 1);
@@ -39,10 +53,6 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
   auto number_start_sequence = ProtocolDefinition::GetNumericStartSequence();
   WriteToStream(output, number_start_sequence, sizeof(ProtocolDefinition::start_sequence));
   output.push_back(static_cast<uint8_t>(message->GetMessageType()));
-
-  // TODO: CRC implementation
-  crc_t crc = 0xEFEFEFEFu;
-  WriteToStream(output, crc, crc_length);
 
   switch (message->GetMessageType()) {
     case MessageType::KEEP_ALIVE:
@@ -63,8 +73,9 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
       break;
   }
 
-  crc_value_t crc = CRCHandler::CalculateCRCValue(output.data(), output.size());
-  WriteToVector(output, crc, crc_length);
+  int crc_start_offset = sizeof(ProtocolDefinition::start_sequence);
+  crc_value_t crc = CRCHandler::CalculateCRCValue(output.data() + crc_start_offset, output.size() - crc_start_offset);
+  WriteToStream(output, crc, crc_length);
 
   return output;
 }
@@ -76,38 +87,37 @@ std::shared_ptr<Message> MessageCoder::Decode(IInputStream &stream, bool expect_
     assert(found_start_sequence == ProtocolDefinition::GetNumericStartSequence());
   }
 
-  auto message_type_value = ReadFromStream<char>(stream, sizeof(char));
+  // used to generate crc
+  std::vector<uint8_t> raw_message;
+
+  auto message_type_value = ReadFromStreamWithCopy<char>(stream, sizeof(char), raw_message);
   assert(message_type_value >= 0);
   assert(message_type_value <= static_cast<uint8_t>(MessageType::HIGHEST_ELEMENT));
   auto message_type = static_cast<MessageType>(message_type_value);
 
-  auto crc = ReadFromStream<crc_t>(stream, crc_length);
-  // TODO: CRC implementation (throw CrcIncorrectException)
-
   ProtocolDefinition::payload_length_t payload_length = 0;
   if (message_type == MessageType::PAYLOAD) {
-    payload_length =
-        ReadFromStream<ProtocolDefinition::payload_length_t>(stream, sizeof(ProtocolDefinition::payload_length_t));
-  }
-
-  size_t crc_position = current_position + payload_length;
-  auto crc = ReadFromBuffer<crc_value_t>(receive_buffer, crc_position, receive_buffer_length, crc_length);
-
-  if (!CRCHandler::CheckCRCValue(receive_buffer, crc_position - crc_length, crc)) {
-    throw CrcIncorrectException();
+    payload_length = ReadFromStreamWithCopy<ProtocolDefinition::payload_length_t>(
+        stream, sizeof(ProtocolDefinition::payload_length_t), raw_message);
   }
 
   // TODO: create real metadata
   MessageMetaData message_meta_data(123, 456);
 
+  std::shared_ptr<Message> message;
+
   switch (message_type) {
     case MessageType::KEEP_ALIVE:
-      return std::make_shared<KeepAliveMessage>(KeepAliveMessage(0, message_meta_data));
+      // TODO: use real address (also applies to lines below
+      message = std::make_shared<KeepAliveMessage>(0, message_meta_data);
+      break;
     case MessageType::CONNECTION_REQUEST:
-      return std::make_shared<ConnectionRequestMessage>(ConnectionRequestMessage(0, message_meta_data));
+      message = std::make_shared<ConnectionRequestMessage>(0, message_meta_data);
+      break;
     case MessageType::CONNECTION_RESPONSE:
-      return std::make_shared<ConnectionResponseMessage>(ConnectionResponseMessage(0, message_meta_data));
-    case MessageType::PAYLOAD:
+      message = std::make_shared<ConnectionResponseMessage>(0, message_meta_data);
+      break;
+    case MessageType::PAYLOAD: {
       std::vector<uint8_t> payload;
       payload.resize(payload_length);
       size_t read_length = 0;
@@ -117,6 +127,20 @@ std::shared_ptr<Message> MessageCoder::Decode(IInputStream &stream, bool expect_
         read_pointer += read_length;
       }
 
-      return std::make_shared<PayloadMessage>(PayloadMessage(0, payload, message_meta_data));
+      raw_message.insert(raw_message.end(), payload.begin(), payload.end());
+
+      message = std::make_shared<PayloadMessage>(0, payload, message_meta_data);
+      break;
+    }
+    default:
+      assert(false);
   }
+
+  auto read_crc = ReadFromStream<crc_value_t>(stream, crc_length);
+
+  if (!CRCHandler::CheckCRCValue(raw_message.data(), raw_message.size(), read_crc)) {
+    throw CrcIncorrectException();
+  }
+
+  return message;
 }
