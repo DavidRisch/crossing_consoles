@@ -59,27 +59,26 @@ TEST(MessageCoder, InputTooShortException) {
   }
 }
 
-std::vector<uint8_t> create_test_message() {
+TEST(MessageCoder, CrcIncorrectException) {
+  // Create a message
   address_t target_address = 1234;
   std::vector<uint8_t> original_payload;
 
-  int original_payload_length = 123;
+  int original_payload_length = 185;
   original_payload.reserve(original_payload_length);
   for (int i = 0; i < original_payload_length; ++i) {
     original_payload.push_back(i);
   }
-
   PayloadMessage original_message(target_address, original_payload);
-
   auto encoded_message = MessageCoder::Encode(&original_message);
+
+  // Change random bytes in message
   srand(encoded_message.size() - 1);
-  int position = rand() % (encoded_message.size() - 1);
+  for (int i = 0; i < 5; i++) {
+    int position = rand() % (encoded_message.size() - 1);
+    encoded_message.at(position) = rand();
+  }
 
-  encoded_message.at(position) = rand();
-  return encoded_message;
-}
-
-TEST(MessageCoder, CrcIncorrectException) {
-  std::vector<uint8_t> test_message = create_test_message();
-  EXPECT_THROW(MessageCoder::Decode(test_message.data(), test_message.size()), MessageCoder::CrcIncorrectException);
+  EXPECT_THROW(MessageCoder::Decode(encoded_message.data(), encoded_message.size()),
+               MessageCoder::CrcIncorrectException);
 }

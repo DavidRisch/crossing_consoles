@@ -19,7 +19,7 @@ class MessageCoder {
   static_assert(sizeof(start_sequence) >= start_sequence_length);
 
   typedef uint16_t payload_length_t;
-  static const int crc_length = 4;
+  static const int crc_length = sizeof(crc_value_t);
 
   /**
    * \brief Encode message of any type.

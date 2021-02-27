@@ -85,7 +85,7 @@ std::unique_ptr<Message> MessageCoder::Decode(const uint8_t *receive_buffer, siz
   }
 
   size_t crc_position = current_position + payload_length;
-  auto crc = ReadFromBuffer<uint32_t>(receive_buffer, crc_position, receive_buffer_length, crc_length);
+  auto crc = ReadFromBuffer<crc_value_t>(receive_buffer, crc_position, receive_buffer_length, crc_length);
 
   if (!CRCHandler::CheckCRCValue(receive_buffer, crc_position - crc_length, crc)) {
     throw CrcIncorrectException();
