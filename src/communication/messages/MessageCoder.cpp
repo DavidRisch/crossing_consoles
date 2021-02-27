@@ -63,6 +63,9 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
       break;
   }
 
+  crc_value_t crc = CRCHandler::CalculateCRCValue(output.data(), output.size());
+  WriteToVector(output, crc, crc_length);
+
   return output;
 }
 
@@ -85,6 +88,13 @@ std::shared_ptr<Message> MessageCoder::Decode(IInputStream &stream, bool expect_
   if (message_type == MessageType::PAYLOAD) {
     payload_length =
         ReadFromStream<ProtocolDefinition::payload_length_t>(stream, sizeof(ProtocolDefinition::payload_length_t));
+  }
+
+  size_t crc_position = current_position + payload_length;
+  auto crc = ReadFromBuffer<crc_value_t>(receive_buffer, crc_position, receive_buffer_length, crc_length);
+
+  if (!CRCHandler::CheckCRCValue(receive_buffer, crc_position - crc_length, crc)) {
+    throw CrcIncorrectException();
   }
 
   // TODO: create real metadata
