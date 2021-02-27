@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <random>
+
 #include "../src/communication/messages/KeepAliveMessage.h"
 #include "../src/communication/messages/MessageCoder.h"
 #include "../src/communication/messages/PayloadMessage.h"
@@ -73,10 +75,12 @@ TEST(MessageCoder, CrcIncorrectException) {
   auto encoded_message = MessageCoder::Encode(&original_message);
 
   // Change random bytes in message
-  srand(encoded_message.size() - 1);
+  std::random_device rd;
+  std::uniform_int_distribution<int> dist(0, encoded_message.size() - 1);
+
   for (int i = 0; i < 5; i++) {
-    int position = rand() % (encoded_message.size() - 1);
-    encoded_message.at(position) = rand();
+    int position = dist(rd);
+    encoded_message.at(position) = rd();
   }
 
   EXPECT_THROW(MessageCoder::Decode(encoded_message.data(), encoded_message.size()),
