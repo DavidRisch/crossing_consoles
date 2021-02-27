@@ -14,6 +14,8 @@ class ConnectionRequestMessage : public Message {
   ConnectionRequestMessage(address_t address, MessageMetaData meta_data);
 
   [[nodiscard]] MessageType GetMessageType() const override;
+
+  // TODO: Protocol specification calls for 'client identification', that should happen here.
 };
 
 #endif  // CROSSING_CONSOLES_CONNECTIONREQUESTMESSAGE_H

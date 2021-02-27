@@ -21,6 +21,8 @@ add_library(crossing_consoles_lib
         communication/message_layer/MessageInputStream.cpp
         communication/message_layer/MessageOutputStream.cpp
 
+        communication/connection_layer/Connection.cpp
+
         communication/messages/Message.cpp
         communication/messages/ConnectionRequestMessage.cpp
         communication/messages/ConnectionResponseMessage.cpp
