@@ -16,11 +16,11 @@ TEST(CRCHandler, CalculateCRCValue) {
   const char sample_empty[] = {""};
   const char sample_null[] = {'\0'};
 
-  ASSERT_EQ(CRCHandler::CalculateCRCValue(sample, sizeof(sample)), 3632233996);
-  ASSERT_EQ(CRCHandler::CalculateCRCValue(sample_single, sizeof(sample_single)), 2766056989);
-  ASSERT_EQ(CRCHandler::CalculateCRCValue(sample_mixed, sizeof(sample_mixed)), 3861871196);
-  ASSERT_EQ(CRCHandler::CalculateCRCValue(sample_empty, sizeof(sample_empty)), 3523407757);
-  ASSERT_EQ(CRCHandler::CalculateCRCValue(sample_null, sizeof(sample_null)), 3523407757);
+  ASSERT_EQ(CRCHandler::CalculateCRCValue(sample, sizeof(sample), true), 3632233996);
+  ASSERT_EQ(CRCHandler::CalculateCRCValue(sample_single, sizeof(sample_single), true), 2766056989);
+  ASSERT_EQ(CRCHandler::CalculateCRCValue(sample_mixed, sizeof(sample_mixed), true), 3861871196);
+  ASSERT_EQ(CRCHandler::CalculateCRCValue(sample_empty, sizeof(sample_empty), true), 3523407757);
+  ASSERT_EQ(CRCHandler::CalculateCRCValue(sample_null, sizeof(sample_null), true), 3523407757);
 }
 
 TEST(CRCHandler, CheckCRCValue) {
@@ -34,13 +34,13 @@ TEST(CRCHandler, CheckCRCValue) {
   const crc_value_t checksum_mixed = 3861871196;
   const crc_value_t checksum_empty = 3523407757;
 
-  ASSERT_TRUE(CRCHandler::CheckCRCValue(sample, sizeof(sample), checksum_sample));
-  ASSERT_TRUE(CRCHandler::CheckCRCValue(sample_single, sizeof(sample_single), checksum_single));
-  ASSERT_TRUE(CRCHandler::CheckCRCValue(sample_mixed, sizeof(sample_mixed), checksum_mixed));
-  ASSERT_TRUE(CRCHandler::CheckCRCValue(sample_empty, sizeof(sample_empty), checksum_empty));
+  ASSERT_TRUE(CRCHandler::CheckCRCValue(sample, sizeof(sample), checksum_sample, true));
+  ASSERT_TRUE(CRCHandler::CheckCRCValue(sample_single, sizeof(sample_single), checksum_single, true));
+  ASSERT_TRUE(CRCHandler::CheckCRCValue(sample_mixed, sizeof(sample_mixed), checksum_mixed, true));
+  ASSERT_TRUE(CRCHandler::CheckCRCValue(sample_empty, sizeof(sample_empty), checksum_empty, true));
 
-  ASSERT_FALSE(CRCHandler::CheckCRCValue(sample, sizeof(sample), checksum_mixed));
-  ASSERT_FALSE(CRCHandler::CheckCRCValue(sample_single, sizeof(sample_empty), checksum_empty));
-  ASSERT_FALSE(CRCHandler::CheckCRCValue(sample_mixed, sizeof(sample_mixed), checksum_single));
-  ASSERT_FALSE(CRCHandler::CheckCRCValue(sample_empty, sizeof(sample_mixed), checksum_sample));
+  ASSERT_FALSE(CRCHandler::CheckCRCValue(sample, sizeof(sample), checksum_mixed, true));
+  ASSERT_FALSE(CRCHandler::CheckCRCValue(sample_single, sizeof(sample_empty), checksum_empty, true));
+  ASSERT_FALSE(CRCHandler::CheckCRCValue(sample_mixed, sizeof(sample_mixed), checksum_single, true));
+  ASSERT_FALSE(CRCHandler::CheckCRCValue(sample_empty, sizeof(sample_mixed), checksum_sample, true));
 }
