@@ -9,12 +9,12 @@
  */
 
 TEST(CRCHandler, CalculateCRCValue) {
-  const char sample[] = {'t', 'e', 's', 't'};
-  const char sample_single[] = {'@'};
-  const char sample_mixed[] = {'4', '3', '5', '/', '(', '/', '&', ')', 'e', 'w',
-                               'f', 'c', '.', ',', '.', ' ', 'd', 'q', 'w', 'd'};
-  const char sample_empty[] = {""};
-  const char sample_null[] = {'\0'};
+  const uint8_t sample[] = {'t', 'e', 's', 't'};
+  const uint8_t sample_single[] = {'@'};
+  const uint8_t sample_mixed[] = {'4', '3', '5', '/', '(', '/', '&', ')', 'e', 'w',
+                                  'f', 'c', '.', ',', '.', ' ', 'd', 'q', 'w', 'd'};
+  const uint8_t sample_empty[] = {""};
+  const uint8_t sample_null[] = {'\0'};
 
   ASSERT_EQ(CRCHandler::CalculateCRCValue(sample, sizeof(sample)), 3632233996);
   ASSERT_EQ(CRCHandler::CalculateCRCValue(sample_single, sizeof(sample_single)), 2766056989);
@@ -24,11 +24,11 @@ TEST(CRCHandler, CalculateCRCValue) {
 }
 
 TEST(CRCHandler, CheckCRCValue) {
-  const char sample[] = {'t', 'e', 's', 't'};
-  const char sample_single[] = {'@'};
-  const char sample_mixed[] = {'4', '3', '5', '/', '(', '/', '&', ')', 'e', 'w',
-                               'f', 'c', '.', ',', '.', ' ', 'd', 'q', 'w', 'd'};
-  const char sample_empty[] = {""};
+  const uint8_t sample[] = {'t', 'e', 's', 't'};
+  const uint8_t sample_single[] = {'@'};
+  const uint8_t sample_mixed[] = {'4', '3', '5', '/', '(', '/', '&', ')', 'e', 'w',
+                                  'f', 'c', '.', ',', '.', ' ', 'd', 'q', 'w', 'd'};
+  const uint8_t sample_empty[] = {""};
   const crc_value_t checksum_sample = 3632233996;
   const crc_value_t checksum_single = 2766056989;
   const crc_value_t checksum_mixed = 3861871196;

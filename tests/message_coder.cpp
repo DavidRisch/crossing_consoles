@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <random>
+
 #include "../src/communication/messages/KeepAliveMessage.h"
 #include "../src/communication/messages/MessageCoder.h"
 #include "../src/communication/messages/PayloadMessage.h"
@@ -59,4 +61,28 @@ TEST(MessageCoder, InputTooShortException) {
   }
 }
 
-// TODO: CRC implementation (add CRC test cases)
+TEST(MessageCoder, CrcIncorrectException) {
+  // Create a message
+  address_t target_address = 1234;
+  std::vector<uint8_t> original_payload;
+
+  int original_payload_length = 185;
+  original_payload.reserve(original_payload_length);
+  for (int i = 0; i < original_payload_length; ++i) {
+    original_payload.push_back(i);
+  }
+  PayloadMessage original_message(target_address, original_payload);
+  auto encoded_message = MessageCoder::Encode(&original_message);
+
+  // Change random bytes in message
+  std::random_device rd;
+  std::uniform_int_distribution<int> dist(0, encoded_message.size() - 1);
+
+  for (int i = 0; i < 5; i++) {
+    int position = dist(rd);
+    encoded_message.at(position) = rd();
+  }
+
+  EXPECT_THROW(MessageCoder::Decode(encoded_message.data(), encoded_message.size()),
+               MessageCoder::CrcIncorrectException);
+}

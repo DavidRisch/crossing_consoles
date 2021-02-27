@@ -60,8 +60,7 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
       break;
   }
 
-  // TODO: CRC implementation
-  crc_t crc = 0xEFEFEFEFu;
+  crc_value_t crc = CRCHandler::CalculateCRCValue(output.data(), output.size());
   WriteToVector(output, crc, crc_length);
 
   return output;
@@ -86,8 +85,11 @@ std::unique_ptr<Message> MessageCoder::Decode(const uint8_t *receive_buffer, siz
   }
 
   size_t crc_position = current_position + payload_length;
-  auto crc = ReadFromBuffer<crc_t>(receive_buffer, crc_position, receive_buffer_length, crc_length);
-  // TODO: CRC implementation (throw CrcIncorrectException)
+  auto crc = ReadFromBuffer<crc_value_t>(receive_buffer, crc_position, receive_buffer_length, crc_length);
+
+  if (!CRCHandler::CheckCRCValue(receive_buffer, crc_position - crc_length, crc)) {
+    throw CrcIncorrectException();
+  }
 
   // TODO: create real metadata
   MessageMetaData message_meta_data(123, 456);
