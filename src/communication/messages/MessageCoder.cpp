@@ -65,7 +65,9 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
       const auto &payload = payload_message->GetPayload();
       ProtocolDefinition::payload_length_t payload_length = payload.size();
 
-      WriteToStream(output, payload_length, sizeof(payload_length));
+      for (int i = 0; i < 2; ++i) {
+        WriteToStream(output, payload_length, sizeof(payload_length));
+      }
 
       for (const auto &payload_byte : payload) {
         output.push_back(payload_byte);
@@ -95,12 +97,6 @@ std::shared_ptr<Message> MessageCoder::Decode(IInputStream &stream, bool expect_
   assert(message_type_value <= static_cast<uint8_t>(MessageType::HIGHEST_ELEMENT));
   auto message_type = static_cast<MessageType>(message_type_value);
 
-  ProtocolDefinition::payload_length_t payload_length = 0;
-  if (message_type == MessageType::PAYLOAD) {
-    payload_length = ReadFromStreamWithCopy<ProtocolDefinition::payload_length_t>(
-        stream, sizeof(ProtocolDefinition::payload_length_t), raw_message);
-  }
-
   // TODO: create real metadata
   MessageMetaData message_meta_data(123, 456);
 
@@ -118,6 +114,16 @@ std::shared_ptr<Message> MessageCoder::Decode(IInputStream &stream, bool expect_
       message = std::make_shared<ConnectionResponseMessage>(0, message_meta_data);
       break;
     case MessageType::PAYLOAD: {
+      auto payload_length = ReadFromStreamWithCopy<ProtocolDefinition::payload_length_t>(
+          stream, sizeof(ProtocolDefinition::payload_length_t), raw_message);
+      auto payload_length_backup = ReadFromStreamWithCopy<ProtocolDefinition::payload_length_t>(
+          stream, sizeof(ProtocolDefinition::payload_length_t), raw_message);
+
+      if (payload_length != payload_length_backup) {
+        // TODO: Exception name not an exact fit. Rename Exception?
+        throw CrcIncorrectException();
+      }
+
       std::vector<uint8_t> payload;
       payload.resize(payload_length);
       size_t read_length = 0;

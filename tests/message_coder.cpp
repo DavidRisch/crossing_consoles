@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <random>
-
+#include "../src/communication/ProtocolDefinition.h"
 #include "../src/communication/low_level/MockInputStream.h"
 #include "../src/communication/messages/KeepAliveMessage.h"
 #include "../src/communication/messages/MessageCoder.h"
@@ -64,16 +63,12 @@ TEST(MessageCoder, CrcIncorrectException) {
   PayloadMessage original_message(target_address, original_payload);
   auto encoded_message = MessageCoder::Encode(&original_message);
 
-  // Change random bytes in message
-  std::random_device rd;
-  std::uniform_int_distribution<int> dist(0, encoded_message.size() - 1);
+  for (size_t i = sizeof(ProtocolDefinition::start_sequence); i < encoded_message.size(); ++i) {
+    std::vector<uint8_t> bad_encoded_message(encoded_message);
+    bad_encoded_message.at(i) ^= 1;  // change a single byte of the encoded message
 
-  for (int i = 0; i < 5; i++) {
-    int position = dist(rd);
-    encoded_message.at(position) = rd();
+    MockInputStream mock_input_stream;
+    mock_input_stream.AddData(bad_encoded_message);
+    EXPECT_THROW(MessageCoder::Decode(mock_input_stream), MessageCoder::CrcIncorrectException);
   }
-
-  MockInputStream mock_input_stream;
-  mock_input_stream.AddData(encoded_message);
-  EXPECT_THROW(MessageCoder::Decode(mock_input_stream), MessageCoder::CrcIncorrectException);
 }
