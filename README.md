@@ -1,3 +1,5 @@
+![CI](https://github.com/DavidRisch/crossing_consoles/actions/workflows/build_and_test.yml/badge.svg?branch=master)
+
 # Developer Guide
 
 ## Table of Contents
