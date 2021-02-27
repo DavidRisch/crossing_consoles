@@ -1,9 +1,6 @@
 #include "Renderer.h"
 
 #include <algorithm>
-#include <iostream>
-
-#include "Position.h"
 
 Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size, World& world, Player& player)
     : block_size(block_size)
@@ -26,24 +23,28 @@ std::string Renderer::RenderWorld() const {
   coordinate_size_t viewport_size_delta(viewport_size.x / 2, viewport_size.y / 2);
   Position start = Position(player->position.x - viewport_size_delta.x, player->position.y - viewport_size_delta.y);
   Position end = Position(player->position.x + viewport_size_delta.x, player->position.y + viewport_size_delta.y);
-  int line_length = line.size();
 
-  if (start < Position(0, 0)) {
-    coordinate_factor_t factor = (start / world->size).abs();
-    start = start + world->size * factor;
-    end = end + world->size * factor;
-  } else if (end > world->size) {
-    coordinate_factor_t factor = end / world->size;
-    start = start - world->size * factor;
-    end = end - world->size * factor;
+  Position negative_factor = Position(0, 0);
+  Position positive_factor = Position(1, 1);
+
+  if (start.x < 0 || start.y < 0) {
+    negative_factor = (start - world->size + Position(1, 1)) / world->size;
+  }
+  if (end.x >= world->size.x || end.y >= world->size.y) {
+    positive_factor = (end + world->size - Position(1, 1)) / world->size;
   }
 
   for (auto const& i_wall : world->walls) {
-    if (i_wall.position >= start && i_wall.position <= end) {
-      Position relative_position = i_wall.position - start;
-      for (int y = 0; y < block_size.y; y++) {
-        out.replace(((relative_position.y * block_size.y) + y) * line_length + relative_position.x * block_size.x,
-                    block_size.x, std::string(block_size.x, '#'));
+    for (int y_factor = negative_factor.y; y_factor < positive_factor.y; y_factor++) {
+      for (int x_factor = negative_factor.x; x_factor < positive_factor.x; x_factor++) {
+        Position position = i_wall.position + (world->size * Position(x_factor, y_factor));
+        if (position >= start && position <= end) {
+          Position relative_position = position - start;
+          for (int y = 0; y < block_size.y; y++) {
+            out.replace(((relative_position.y * block_size.y) + y) * line_length + relative_position.x * block_size.x,
+                        block_size.x, std::string(block_size.x, '#'));
+          }
+        }
       }
     }
   }

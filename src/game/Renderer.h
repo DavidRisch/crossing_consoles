@@ -10,6 +10,7 @@ class Renderer {
  public:
   coordinate_size_t block_size;
   coordinate_size_t viewport_size;
+  int line_length = block_size.x * viewport_size.x + 1;
   World* world;
   Player* player;
 
