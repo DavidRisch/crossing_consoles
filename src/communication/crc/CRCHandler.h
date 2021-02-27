@@ -11,8 +11,8 @@ class CRCHandler {
    */
  public:
   CRCHandler();
-  static crc_value_t CalculateCRCValue(const char* data, size_t data_length, bool char_flag = false);
-  static bool CheckCRCValue(const char* data, size_t data_length, const crc_value_t checksum, bool char_flag = false);
+  static crc_value_t CalculateCRCValue(void const* data, size_t data_length);
+  static bool CheckCRCValue(void const* data, size_t data_length, const crc_value_t checksum);
 };
 
 #endif  // CROSSING_CONSOLES_CRCHANDLER_H

@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "Message.h"
+#include "../crc/CRCHandler.h"
 
 /**
  * \brief Contains static methods for `Message` en- and decoding.
@@ -18,9 +19,6 @@ class MessageCoder {
   static_assert(sizeof(start_sequence) >= start_sequence_length);
 
   typedef uint16_t payload_length_t;
-
-  // TODO: CRC implementation
-  typedef uint32_t crc_t;
   static const int crc_length = 4;
 
   /**
