@@ -3,8 +3,8 @@
 
 #include <memory>
 
-#include "Message.h"
 #include "../crc/CRCHandler.h"
+#include "Message.h"
 
 /**
  * \brief Contains static methods for `Message` en- and decoding.
