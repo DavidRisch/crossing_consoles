@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <random>
-
+#include "../src/communication/ProtocolDefinition.h"
+#include "../src/communication/low_level/MockInputStream.h"
 #include "../src/communication/messages/KeepAliveMessage.h"
 #include "../src/communication/messages/MessageCoder.h"
 #include "../src/communication/messages/PayloadMessage.h"
@@ -12,7 +12,11 @@ TEST(MessageCoder, KeepAliveMessage) {
 
   auto encoded_message = MessageCoder::Encode(&original_message);
 
-  auto decoded_message = MessageCoder::Decode(encoded_message.data(), encoded_message.size());
+  MockInputStream mock_input_stream;
+  mock_input_stream.AddData(encoded_message);
+
+  auto decoded_message = MessageCoder::Decode(mock_input_stream);
+  EXPECT_TRUE(mock_input_stream.IsEmpty());
 
   EXPECT_EQ(original_message.GetMessageType(), decoded_message->GetMessageType());
 }
@@ -30,7 +34,10 @@ TEST(MessageCoder, PayloadMessage) {
 
   auto encoded_message = MessageCoder::Encode(&original_message);
 
-  auto decoded_message = MessageCoder::Decode(encoded_message.data(), encoded_message.size());
+  MockInputStream mock_input_stream;
+  mock_input_stream.AddData(encoded_message);
+  auto decoded_message = MessageCoder::Decode(mock_input_stream);
+  EXPECT_TRUE(mock_input_stream.IsEmpty());
 
   EXPECT_EQ(original_message.GetMessageType(), decoded_message->GetMessageType());
   auto &pm = dynamic_cast<PayloadMessage &>(*decoded_message);
@@ -40,24 +47,6 @@ TEST(MessageCoder, PayloadMessage) {
 
   for (int i = 0; i < original_payload_length; ++i) {
     EXPECT_EQ(original_payload.at(i), decoded_payload.at(i));
-  }
-}
-
-TEST(MessageCoder, InputTooShortException) {
-  address_t target_address = 1234;
-  std::vector<uint8_t> original_payload;
-
-  int original_payload_length = 123;
-  original_payload.reserve(original_payload_length);
-  for (int i = 0; i < original_payload_length; ++i) {
-    original_payload.push_back(i);
-  }
-  PayloadMessage original_message(target_address, original_payload);
-
-  auto encoded_message = MessageCoder::Encode(&original_message);
-
-  for (size_t i = 0; i < encoded_message.size(); ++i) {
-    EXPECT_THROW(MessageCoder::Decode(encoded_message.data(), i), MessageCoder::InputTooShortException);
   }
 }
 
@@ -74,15 +63,12 @@ TEST(MessageCoder, CrcIncorrectException) {
   PayloadMessage original_message(target_address, original_payload);
   auto encoded_message = MessageCoder::Encode(&original_message);
 
-  // Change random bytes in message
-  std::random_device rd;
-  std::uniform_int_distribution<int> dist(0, encoded_message.size() - 1);
+  for (size_t i = sizeof(ProtocolDefinition::start_sequence); i < encoded_message.size(); ++i) {
+    std::vector<uint8_t> bad_encoded_message(encoded_message);
+    bad_encoded_message.at(i) ^= 1;  // change a single byte of the encoded message
 
-  for (int i = 0; i < 5; i++) {
-    int position = dist(rd);
-    encoded_message.at(position) = rd();
+    MockInputStream mock_input_stream;
+    mock_input_stream.AddData(bad_encoded_message);
+    EXPECT_THROW(MessageCoder::Decode(mock_input_stream), MessageCoder::CrcIncorrectException);
   }
-
-  EXPECT_THROW(MessageCoder::Decode(encoded_message.data(), encoded_message.size()),
-               MessageCoder::CrcIncorrectException);
 }
