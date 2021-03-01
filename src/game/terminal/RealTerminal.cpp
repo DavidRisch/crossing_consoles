@@ -11,7 +11,8 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 
-#include <cstdio>
+#include <codecvt>
+#include <locale>
 #endif
 
 RealTerminal::RealTerminal() {
@@ -41,7 +42,9 @@ void RealTerminal::SetScreen(const std::wstring& content) {
 #ifdef _WIN32
   _cwprintf(content.c_str());
 #else
-  printf("%s", content.c_str());
+  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+  std::string narrow = converter.to_bytes(content);
+  printf("%s", narrow.c_str());
 #endif
 }
 
