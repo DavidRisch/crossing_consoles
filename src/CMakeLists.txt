@@ -5,11 +5,6 @@ add_library(crossing_consoles_lib
         game/World.cpp
         game/Wall.cpp
 
-        communication/ClientCommunication.cpp
-        communication/ServerCommunication.cpp
-        communication/ClientConnection.cpp
-        communication/ServerClientConnection.cpp
-
         communication/byte_layer/byte_stream/SocketByteStream.cpp
         communication/byte_layer/byte_stream/SocketByteServer.cpp
         communication/byte_layer/byte_stream/SocketHolder.cpp
