@@ -6,6 +6,9 @@
 #include "../src/communication/byte_layer/byte_stream/MockBidirectionalByteStream.h"
 #include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
 
+using namespace communication;
+using namespace communication::byte_layer;
+
 TEST(Mocks, MockBidirectionalByteStream) {
   const uint8_t first_to_second[] = {'t', 'e', 's', 't'};
   const uint8_t second_to_first[] = {'a', 'b', 'c', 'd'};

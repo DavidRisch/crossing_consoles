@@ -3,6 +3,9 @@
 
 #include "Message.h"
 
+namespace communication {
+namespace message_layer {
+
 class PayloadMessage : public Message {
  public:
   static MessageType message_type;
@@ -19,5 +22,8 @@ class PayloadMessage : public Message {
  private:
   std::vector<uint8_t> payload;
 };
+
+}  // namespace message_layer
+}  // namespace communication
 
 #endif  // CROSSING_CONSOLES_PAYLOADMESSAGE_H

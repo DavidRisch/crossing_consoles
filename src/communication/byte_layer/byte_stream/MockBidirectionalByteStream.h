@@ -11,6 +11,9 @@
 #include "IOutputByteStream.h"
 #include "SocketHolder.h"
 
+namespace communication {
+namespace byte_layer {
+
 /**
  * \brief Implementation of `IInputByteStream` and `IOutputByteStream` used for testing.
  */
@@ -36,5 +39,8 @@ class MockBidirectionalByteStream : public IInputByteStream, public IOutputByteS
 
   std::shared_ptr<std::mutex> mutex;
 };
+
+}  // namespace byte_layer
+}  // namespace communication
 
 #endif  // CROSSING_CONSOLES_MOCK_BIDIRECTIONAL_BYTE_STREAM_H

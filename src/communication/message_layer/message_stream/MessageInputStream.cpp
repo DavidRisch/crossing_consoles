@@ -5,9 +5,10 @@
 #include "../../ProtocolDefinition.h"
 #include "MessageCoder.h"
 
-using namespace std;
+using namespace communication;
+using namespace communication::message_layer;
 
-MessageInputStream::MessageInputStream(IInputByteStream &input_stream)
+MessageInputStream::MessageInputStream(byte_layer::IInputByteStream &input_stream)
     : input_stream(input_stream) {
 }
 

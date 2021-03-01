@@ -1,6 +1,8 @@
 #ifndef CROSSING_CONSOLES_PROTOCOL_DEFINITION_H
 #define CROSSING_CONSOLES_PROTOCOL_DEFINITION_H
 
+namespace communication {
+
 /**
  * \brief Defines constants used in the protocol.
  */
@@ -23,5 +25,7 @@ class ProtocolDefinition {
 
   typedef uint16_t payload_length_t;
 };
+
+}  // namespace communication
 
 #endif  // CROSSING_CONSOLES_PROTOCOL_DEFINITION_H

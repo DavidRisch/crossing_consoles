@@ -1,5 +1,8 @@
 #include "MessageMetaData.h"
 
+using namespace communication;
+using namespace communication::message_layer;
+
 MessageMetaData::MessageMetaData(time_t timestamp_received, time_t timestamp_sent)
     : timestamp_sent(timestamp_sent)
     , timestamp_received(timestamp_received) {

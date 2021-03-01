@@ -5,6 +5,9 @@
 #include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
 #include "../src/communication/byte_layer/connection_simulator/ConnectionSimulatorFlakey.h"
 
+using namespace communication;
+using namespace communication::byte_layer;
+
 class ConnectionSimulator : public ::testing::Test {
  public:
   ConnectionSimulator()

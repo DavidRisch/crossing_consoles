@@ -1,6 +1,9 @@
 #ifndef CROSSING_CONSOLES_SOCKET_HOLDER_H
 #define CROSSING_CONSOLES_SOCKET_HOLDER_H
 
+namespace communication {
+namespace byte_layer {
+
 typedef int file_descriptor_t;
 
 /**
@@ -13,5 +16,8 @@ class SocketHolder {
   explicit SocketHolder(file_descriptor_t file_descriptor);
   ~SocketHolder();
 };
+
+}  // namespace byte_layer
+}  // namespace communication
 
 #endif  // CROSSING_CONSOLES_SOCKET_HOLDER_H

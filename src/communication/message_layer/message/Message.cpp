@@ -2,6 +2,9 @@
 
 #include <stdexcept>
 
+using namespace communication;
+using namespace communication::message_layer;
+
 Message::Message(address_t address)
     : address(address) {
 }

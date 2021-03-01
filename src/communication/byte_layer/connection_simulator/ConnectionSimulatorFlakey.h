@@ -5,6 +5,9 @@
 
 #include "IConnectionSimulator.h"
 
+namespace communication {
+namespace byte_layer {
+
 /**
  * \brief Changes each byte to a random value with a probability of error_rate.
  */
@@ -17,5 +20,8 @@ class ConnectionSimulatorFlakey : public IConnectionSimulator {
  private:
   double error_rate;
 };
+
+}  // namespace byte_layer
+}  // namespace communication
 
 #endif  // CROSSING_CONSOLES_CONNECTION_SIMULATOR_FLAKEY_H

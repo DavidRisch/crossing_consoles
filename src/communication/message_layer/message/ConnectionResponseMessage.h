@@ -3,6 +3,9 @@
 
 #include "Message.h"
 
+namespace communication {
+namespace message_layer {
+
 class ConnectionResponseMessage : public Message {
  public:
   static MessageType message_type;
@@ -15,5 +18,8 @@ class ConnectionResponseMessage : public Message {
 
   [[nodiscard]] MessageType GetMessageType() const override;
 };
+
+}  // namespace message_layer
+}  // namespace communication
 
 #endif  // CROSSING_CONSOLES_CONNECTIONRESPONSEMESSAGE_H

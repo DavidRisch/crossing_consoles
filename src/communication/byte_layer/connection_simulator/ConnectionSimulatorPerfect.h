@@ -5,6 +5,9 @@
 
 #include "IConnectionSimulator.h"
 
+namespace communication {
+namespace byte_layer {
+
 /**
  * \brief Does not change any bytes.
  */
@@ -18,5 +21,8 @@ class ConnectionSimulatorPerfect : public IConnectionSimulator {
    */
   static ConnectionSimulatorPerfect instance;
 };
+
+}  // namespace byte_layer
+}  // namespace communication
 
 #endif  // CROSSING_CONSOLES_CONNECTION_SIMULATOR_PERFECT_H

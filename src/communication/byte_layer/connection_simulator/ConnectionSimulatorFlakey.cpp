@@ -2,6 +2,9 @@
 
 #include <cstdlib>
 
+using namespace communication;
+using namespace communication::byte_layer;
+
 ConnectionSimulatorFlakey::ConnectionSimulatorFlakey(double error_rate)
     : error_rate(error_rate) {
 }

@@ -1,14 +1,11 @@
 #include "MessageOutputStream.h"
 
-#include <iostream>
-
-#include "../../ProtocolDefinition.h"
 #include "MessageCoder.h"
-#include "MessageInputStream.h"
 
-using namespace std;
+using namespace communication;
+using namespace communication::message_layer;
 
-MessageOutputStream::MessageOutputStream(IOutputByteStream &output_stream)
+MessageOutputStream::MessageOutputStream(byte_layer::IOutputByteStream &output_stream)
     : output_stream(output_stream) {
 }
 

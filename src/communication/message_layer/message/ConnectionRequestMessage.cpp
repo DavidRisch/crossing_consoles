@@ -1,5 +1,8 @@
 #include "ConnectionRequestMessage.h"
 
+using namespace communication;
+using namespace communication::message_layer;
+
 ConnectionRequestMessage::ConnectionRequestMessage(address_t address, MessageMetaData meta_data)
     : Message(address, meta_data) {
 }

@@ -2,6 +2,9 @@
 
 #include "socket_libs.h"
 
+using namespace communication;
+using namespace communication::byte_layer;
+
 SocketByteServer::SocketByteServer(port_t port, int max_connections) {
   {
 #ifdef _WIN32

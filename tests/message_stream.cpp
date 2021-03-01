@@ -9,6 +9,11 @@
 #include "../src/communication/message_layer/message_stream/MessageInputStream.h"
 #include "../src/communication/message_layer/message_stream/MessageOutputStream.h"
 
+using namespace communication;
+using namespace communication::byte_layer;
+using namespace communication;
+using namespace communication::message_layer;
+
 TEST(MessageStream, Simple) {
   auto stream_pair = MockBidirectionalByteStream::CreatePair();
 

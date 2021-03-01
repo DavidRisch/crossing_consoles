@@ -10,6 +10,9 @@
 #include "IOutputByteStream.h"
 #include "SocketHolder.h"
 
+namespace communication {
+namespace byte_layer {
+
 typedef uint16_t port_t;
 
 /// randomly chosen port number
@@ -47,5 +50,8 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
   IConnectionSimulator* connection_simulator_incoming;
   IConnectionSimulator* connection_simulator_outgoing;
 };
+
+}  // namespace byte_layer
+}  // namespace communication
 
 #endif  // CROSSING_CONSOLES_BYTE_STREAM_H

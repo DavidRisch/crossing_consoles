@@ -6,6 +6,9 @@
 
 #include "socket_libs.h"
 
+using namespace communication;
+using namespace communication::byte_layer;
+
 SocketByteStream::SocketByteStream(file_descriptor_t socket_file_descriptor,
                                    IConnectionSimulator &connection_simulator_incoming,
                                    IConnectionSimulator &connection_simulator_outgoing)

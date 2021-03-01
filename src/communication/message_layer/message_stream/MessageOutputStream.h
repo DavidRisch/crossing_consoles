@@ -7,17 +7,23 @@
 #include "../../byte_layer/byte_stream/SocketByteStream.h"
 #include "../message/Message.h"
 
+namespace communication {
+namespace message_layer {
+
 /**
  * \brief Can send `Message`s to the given `IOutputByteStream`.
  */
 class MessageOutputStream {
  public:
-  explicit MessageOutputStream(IOutputByteStream &output_stream);
+  explicit MessageOutputStream(byte_layer::IOutputByteStream &output_stream);
 
   void SendMessage(Message *message);
 
  private:
-  IOutputByteStream &output_stream;
+  byte_layer::IOutputByteStream &output_stream;
 };
+
+}  // namespace message_layer
+}  // namespace communication
 
 #endif  // CROSSING_CONSOLES_MESSAGE_OUTPUT_STREAM_H

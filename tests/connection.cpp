@@ -11,6 +11,11 @@
 #include "../src/communication/message_layer/message/KeepAliveMessage.h"
 #include "../src/communication/message_layer/message/PayloadMessage.h"
 
+using namespace communication;
+using namespace communication::byte_layer;
+using namespace communication::connection_layer;
+using namespace communication::message_layer;
+
 TEST(Connection, Simple) {
   auto stream_pair = MockBidirectionalByteStream::CreatePair();
   auto &server_side = *stream_pair.first;

@@ -8,6 +8,9 @@
 #include "IInputByteStream.h"
 #include "SocketHolder.h"
 
+namespace communication {
+namespace byte_layer {
+
 /**
  * \brief Implementation  of `IInputByteStream` used for testing.
  */
@@ -22,5 +25,8 @@ class MockInputStream : public IInputByteStream {
  private:
   std::list<uint8_t> data;
 };
+
+}  // namespace byte_layer
+}  // namespace communication
 
 #endif  // CROSSING_CONSOLES_MOCK_INPUT_STREAM_H

@@ -5,6 +5,9 @@
 
 #include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
 
+using namespace communication;
+using namespace communication::byte_layer;
+
 TEST(ByteServer, SingleClient) {
   const char* server_to_client = "0123456789";
   const char* client_to_server = "ABCDEFGHIJ";

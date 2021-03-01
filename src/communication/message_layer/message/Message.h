@@ -7,6 +7,9 @@
 
 #include "MessageMetaData.h"
 
+namespace communication {
+namespace message_layer {
+
 enum class MessageType : char {
   CONNECTION_REQUEST = 0,
   CONNECTION_RESPONSE,
@@ -33,5 +36,8 @@ class Message {
   address_t address;
   MessageMetaData meta_data = MessageMetaData(0, 0);
 };
+
+}  // namespace message_layer
+}  // namespace communication
 
 #endif  // CROSSING_CONSOLES_MESSAGE_H

@@ -4,6 +4,9 @@
 
 #include "../src/communication/message_layer/crc/CRCHandler.h"
 
+using namespace communication;
+using namespace communication::message_layer;
+
 /*
  * All sample crc values from https://crccalc.com/
  */

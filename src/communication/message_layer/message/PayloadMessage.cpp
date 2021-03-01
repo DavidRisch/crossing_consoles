@@ -2,6 +2,9 @@
 
 #include <utility>
 
+using namespace communication;
+using namespace communication::message_layer;
+
 PayloadMessage::PayloadMessage(address_t address, std::vector<uint8_t> payload, MessageMetaData meta_data)
     : Message(address, meta_data)
     , payload(std::move(payload)) {

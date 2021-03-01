@@ -6,6 +6,11 @@
 #include "../src/communication/message_layer/message/PayloadMessage.h"
 #include "../src/communication/message_layer/message_stream/MessageCoder.h"
 
+using namespace communication;
+using namespace communication::byte_layer;
+using namespace communication;
+using namespace communication::message_layer;
+
 TEST(MessageCoder, KeepAliveMessage) {
   address_t target_address = 1234;
   KeepAliveMessage original_message(target_address);

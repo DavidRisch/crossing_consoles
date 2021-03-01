@@ -2,6 +2,9 @@
 
 #include <utility>
 
+using namespace communication;
+using namespace communication::byte_layer;
+
 std::pair<std::shared_ptr<MockBidirectionalByteStream>, std::shared_ptr<MockBidirectionalByteStream>>
 MockBidirectionalByteStream::CreatePair() {
   auto mutex = std::make_shared<std::mutex>();

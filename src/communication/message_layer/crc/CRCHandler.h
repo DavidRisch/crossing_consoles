@@ -2,6 +2,10 @@
 #define CROSSING_CONSOLES_CRCHANDLER_H
 
 #include <boost/crc.hpp>
+
+namespace communication {
+namespace message_layer {
+
 typedef uint32_t crc_value_t;  // depends on CRC algorithm
 
 class CRCHandler {
@@ -21,5 +25,8 @@ class CRCHandler {
    */
   static bool CheckCRCValue(const uint8_t* data, size_t data_length, const crc_value_t checksum);
 };
+
+}  // namespace message_layer
+}  // namespace communication
 
 #endif  // CROSSING_CONSOLES_CRCHANDLER_H

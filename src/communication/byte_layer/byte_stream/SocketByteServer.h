@@ -7,6 +7,9 @@
 
 #include "SocketByteStream.h"
 
+namespace communication {
+namespace byte_layer {
+
 /**
  * \brief Creates a socket to listen for clients and creates `SocketByteStream`s to communicate with them.
  */
@@ -19,5 +22,8 @@ class SocketByteServer {
  private:
   std::shared_ptr<SocketHolder> socket_holder;
 };
+
+}  // namespace byte_layer
+}  // namespace communication
 
 #endif  // CROSSING_CONSOLES_BYTE_SERVER_H

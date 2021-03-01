@@ -1,5 +1,8 @@
 #include "MockInputStream.h"
 
+using namespace communication;
+using namespace communication::byte_layer;
+
 size_t MockInputStream::Read(uint8_t* receive_buffer, size_t max_length) {
   for (unsigned int i = 0; i < max_length; ++i) {
     if (!data.empty()) {

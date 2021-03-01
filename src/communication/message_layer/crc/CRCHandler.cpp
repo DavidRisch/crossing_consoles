@@ -2,6 +2,9 @@
 
 #include <cstring>
 
+using namespace communication;
+using namespace communication::message_layer;
+
 CRCHandler::CRCHandler() = default;
 
 crc_value_t CRCHandler::CalculateCRCValue(const uint8_t *data, size_t data_length) {

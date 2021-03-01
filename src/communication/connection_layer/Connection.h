@@ -7,6 +7,9 @@
 #include "../message_layer/message_stream/MessageInputStream.h"
 #include "../message_layer/message_stream/MessageOutputStream.h"
 
+namespace communication {
+namespace connection_layer {
+
 /**
  * \brief Layer which is responsible for most of the TCP features.
  */
@@ -15,17 +18,19 @@ class Connection {
   /**
    * \brief Perform 3-way handshake as the client.
    */
-  static std::shared_ptr<Connection> CreateClientSide(std::shared_ptr<MessageInputStream> message_input_stream,
-                                                      std::shared_ptr<MessageOutputStream> message_output_stream);
+  static std::shared_ptr<Connection> CreateClientSide(
+      std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
+      std::shared_ptr<message_layer::MessageOutputStream> message_output_stream);
 
   /**
    * \brief Perform 3-way handshake as the server.
    */
-  static std::shared_ptr<Connection> CreateServerSide(std::shared_ptr<MessageInputStream> message_input_stream,
-                                                      std::shared_ptr<MessageOutputStream> message_output_stream);
+  static std::shared_ptr<Connection> CreateServerSide(
+      std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
+      std::shared_ptr<message_layer::MessageOutputStream> message_output_stream);
 
-  void SendMessage(Message* message);
-  std::shared_ptr<Message> ReceiveMessage();
+  void SendMessage(message_layer::Message* message);
+  std::shared_ptr<message_layer::Message> ReceiveMessage();
 
   // TODO: send connection reset
 
@@ -40,11 +45,14 @@ class Connection {
   };
 
  private:
-  Connection(std::shared_ptr<MessageInputStream> message_input_stream,
-             std::shared_ptr<MessageOutputStream> message_output_stream);
+  Connection(std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
+             std::shared_ptr<message_layer::MessageOutputStream> message_output_stream);
 
-  std::shared_ptr<MessageInputStream> message_input_stream;
-  std::shared_ptr<MessageOutputStream> message_output_stream;
+  std::shared_ptr<message_layer::MessageInputStream> message_input_stream;
+  std::shared_ptr<message_layer::MessageOutputStream> message_output_stream;
 };
+
+}  // namespace connection_layer
+}  // namespace communication
 
 #endif  // CROSSING_CONSOLES_CONNECTION_H
