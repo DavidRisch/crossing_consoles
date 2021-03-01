@@ -9,13 +9,13 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
     , player(&player) {
 }
 
-std::string Renderer::RenderWorld() const {
+std::wstring Renderer::RenderWorld() const {
   world->updated = false;
   player->updated = false;
 
-  std::string line(viewport_size.x * block_size.x, ' ');
-  line += "\n";
-  std::string out;
+  std::wstring line(viewport_size.x * block_size.x, ' ');
+  line += L"\n";
+  std::wstring out;
   for (int y = 0; y < viewport_size.y * block_size.y; y++) {
     out.append(line);
   }
@@ -42,7 +42,7 @@ std::string Renderer::RenderWorld() const {
           Position relative_position = position - start;
           for (int y = 0; y < block_size.y; y++) {
             out.replace(((relative_position.y * block_size.y) + y) * line_length + relative_position.x * block_size.x,
-                        block_size.x, std::string(block_size.x, '#'));
+                        block_size.x, std::wstring(block_size.x, L'\u2588'));
           }
         }
       }
@@ -53,15 +53,15 @@ std::string Renderer::RenderWorld() const {
     if (i_player.position >= start && i_player.position <= end) {
       Position relative_position = i_player.position - start;
       out.replace(relative_position.y * block_size.y * line_length + relative_position.x * block_size.x, block_size.x,
-                  std::string(block_size.x, 'X'));
+                  std::wstring(block_size.x, 'X'));
     }
   }
 
   Position relative_position = viewport_size_delta;
   out.replace(((relative_position.y * block_size.y) + 0) * line_length + relative_position.x * block_size.x,
-              block_size.x, "JL");
+              block_size.x, L"JL");
   out.replace(((relative_position.y * block_size.y) + 1) * line_length + relative_position.x * block_size.x,
-              block_size.x, "/\\");
+              block_size.x, L"/\\");
 
   return out;
 }

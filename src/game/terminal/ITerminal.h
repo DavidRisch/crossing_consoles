@@ -19,7 +19,7 @@ class ITerminal {
   /**
    * \brief Clear the screen and set it to the specified content.
    */
-  virtual void SetScreen(const std::string &content) = 0;
+  virtual void SetScreen(const std::wstring &content) = 0;
 };
 
 #endif  // CROSSING_CONSOLES_I_TERMINAL_H

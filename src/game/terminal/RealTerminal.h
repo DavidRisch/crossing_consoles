@@ -15,7 +15,7 @@ class RealTerminal : public ITerminal {
   bool HasInput() override;
   int GetInput() override;
 
-  void SetScreen(const std::string &content) override;
+  void SetScreen(const std::wstring &content) override;
 
  private:
   /**

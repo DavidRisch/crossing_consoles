@@ -13,15 +13,15 @@ class MockTerminal : public ITerminal {
   bool HasInput() override;
   int GetInput() override;
 
-  void SetScreen(const std::string &content) override;
+  void SetScreen(const std::wstring &content) override;
 
   void AddInput(char input);
 
-  [[nodiscard]] const std::string &GetLastOutput() const;
+  [[nodiscard]] const std::wstring &GetLastOutput() const;
 
  private:
-  std::string last_output;
-  std::string unused_inputs;
+  std::wstring last_output;
+  std::wstring unused_inputs;
 };
 
 #endif  // CROSSING_CONSOLES_MOCK_TERMINAL_H

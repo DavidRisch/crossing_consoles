@@ -5,6 +5,7 @@
 
 #ifdef _WIN32
 #include <conio.h>
+#include <fcntl.h>
 #else
 
 #include <sys/ioctl.h>
@@ -19,7 +20,7 @@ RealTerminal::RealTerminal() {
 
 bool RealTerminal::HasInput() {
 #ifdef _WIN32
-  return kbhit();
+  return _kbhit();
 #else
   int bytes_waiting;
   ioctl(0, FIONREAD, &bytes_waiting);
@@ -29,16 +30,16 @@ bool RealTerminal::HasInput() {
 
 int RealTerminal::GetInput() {
 #ifdef _WIN32
-  return getch();
+  return _getch();
 #else
   return getchar();
 #endif
 }
 
-void RealTerminal::SetScreen(const std::string& content) {
+void RealTerminal::SetScreen(const std::wstring& content) {
   Clear();
 #ifdef _WIN32
-  std::cout << content << std::endl;
+  _cwprintf(content.c_str());
 #else
   printf("%s", content.c_str());
 #endif
@@ -46,7 +47,8 @@ void RealTerminal::SetScreen(const std::string& content) {
 
 void RealTerminal::Initialise() {
 #ifdef _WIN32
-  // no configuration required
+  _setmode(_fileno(stdout), _O_U16TEXT);
+  std::ios_base::sync_with_stdio(false);
 #else
   // https://stackoverflow.com/a/7469410/13623303
   struct termios current {};

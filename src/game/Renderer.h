@@ -16,7 +16,7 @@ class Renderer {
 
   explicit Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size, World& world, Player& player);
 
-  [[nodiscard]] std::string RenderWorld() const;
+  [[nodiscard]] std::wstring RenderWorld() const;
 };
 
 #endif  // CROSSING_CONSOLES_RENDERER_H

@@ -16,7 +16,7 @@ class Compositor {
 
   Compositor(coordinate_size_t viewport_size, World& world, Player& player);
 
-  [[nodiscard]] std::string CompositeViewport() const;
+  [[nodiscard]] std::wstring CompositeViewport() const;
 };
 
 #endif  // CROSSING_CONSOLES_COMPOSITOR_H

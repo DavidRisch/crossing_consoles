@@ -10,13 +10,13 @@ int MockTerminal::GetInput() {
   return input;
 }
 
-void MockTerminal::SetScreen(const std::string& content) {
+void MockTerminal::SetScreen(const std::wstring& content) {
   last_output = content;
 }
 
 void MockTerminal::AddInput(char input) {
   unused_inputs += input;
 }
-const std::string& MockTerminal::GetLastOutput() const {
+const std::wstring& MockTerminal::GetLastOutput() const {
   return last_output;
 }

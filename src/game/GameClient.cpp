@@ -1,7 +1,9 @@
 #include "GameClient.h"
 
+#include <chrono>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <utility>
 
 #include "terminal/RealTerminal.h"
@@ -23,6 +25,7 @@ void GameClient::RunGame() {
     KeyPressed();
     if (world.updated || player.updated) {
       terminal->SetScreen(compositor->CompositeViewport());
+      std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
   }
 }
