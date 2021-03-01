@@ -3,9 +3,9 @@
 
 #include <memory>
 
+#include "../../byte_layer/byte_stream/IInputByteStream.h"
 #include "../crc/CRCHandler.h"
-#include "../low_level/IInputStream.h"
-#include "Message.h"
+#include "../message/Message.h"
 
 /**
  * \brief Contains static methods for `Message` en- and decoding.
@@ -22,7 +22,7 @@ class MessageCoder {
   /**
    * \brief Decode message of any type.
    */
-  static std::shared_ptr<Message> Decode(IInputStream& stream, bool expect_start_sequence = true);
+  static std::shared_ptr<Message> Decode(IInputByteStream& stream, bool expect_start_sequence = true);
 
   class CrcIncorrectException : public std::exception {
     [[nodiscard]] const char* what() const noexcept override {

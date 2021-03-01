@@ -1,8 +1,8 @@
-#include "ByteServer.h"
+#include "SocketByteServer.h"
 
 #include "socket_libs.h"
 
-ByteServer::ByteServer(port_t port, int max_connections) {
+SocketByteServer::SocketByteServer(port_t port, int max_connections) {
   {
 #ifdef _WIN32
     WORD w_version_requested;
@@ -74,7 +74,7 @@ ByteServer::ByteServer(port_t port, int max_connections) {
 #endif
 }
 
-std::optional<ByteStream> ByteServer::GetNewClient() {  // NOLINT(readability-make-member-function-const)
+std::optional<SocketByteStream> SocketByteServer::GetNewClient() {  // NOLINT(readability-make-member-function-const)
   struct sockaddr_in address {};
   int address_length = sizeof(address);
 
@@ -98,9 +98,9 @@ std::optional<ByteStream> ByteServer::GetNewClient() {  // NOLINT(readability-ma
     if (errno == EAGAIN) {
 #endif
       // No client is trying to connect
-      return std::optional<ByteStream>();
+      return std::optional<SocketByteStream>();
     }
     throw std::runtime_error("accept failed");
   }
-  return std::make_optional<ByteStream>(socket_file_descriptor);
+  return std::make_optional<SocketByteStream>(socket_file_descriptor);
 }

@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 
 #include "../src/communication/ProtocolDefinition.h"
-#include "../src/communication/low_level/MockInputStream.h"
-#include "../src/communication/messages/KeepAliveMessage.h"
-#include "../src/communication/messages/MessageCoder.h"
-#include "../src/communication/messages/PayloadMessage.h"
+#include "../src/communication/byte_layer/byte_stream/MockInputStream.h"
+#include "../src/communication/message_layer/message/KeepAliveMessage.h"
+#include "../src/communication/message_layer/message/PayloadMessage.h"
+#include "../src/communication/message_layer/message_stream/MessageCoder.h"
 
 TEST(MessageCoder, KeepAliveMessage) {
   address_t target_address = 1234;

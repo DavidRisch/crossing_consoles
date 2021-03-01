@@ -4,7 +4,7 @@
 /**
  * \brief Abstract object with which bytes can be received.
  */
-class IInputStream {
+class IInputByteStream {
  public:
   virtual size_t Read(uint8_t* receive_buffer, size_t max_length) = 0;
 };

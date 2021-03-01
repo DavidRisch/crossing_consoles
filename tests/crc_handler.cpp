@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../src/communication/crc/CRCHandler.h"
+#include "../src/communication/message_layer/crc/CRCHandler.h"
 
 /*
  * All sample crc values from https://crccalc.com/

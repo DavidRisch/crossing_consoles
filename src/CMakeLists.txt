@@ -10,28 +10,29 @@ add_library(crossing_consoles_lib
         communication/ClientConnection.cpp
         communication/ServerClientConnection.cpp
 
-        communication/low_level/ByteStream.cpp
-        communication/low_level/ByteServer.cpp
-        communication/low_level/SocketHolder.cpp
-        communication/low_level/ConnectionSimulatorPerfect.cpp
-        communication/low_level/ConnectionSimulatorFlakey.cpp
-        communication/low_level/MockInputStream.cpp
-        communication/low_level/MockBidirectionalByteStream.cpp
+        communication/byte_layer/byte_stream/SocketByteStream.cpp
+        communication/byte_layer/byte_stream/SocketByteServer.cpp
+        communication/byte_layer/byte_stream/SocketHolder.cpp
+        communication/byte_layer/byte_stream/MockInputStream.cpp
+        communication/byte_layer/byte_stream/MockBidirectionalByteStream.cpp
 
-        communication/message_layer/MessageInputStream.cpp
-        communication/message_layer/MessageOutputStream.cpp
+        communication/byte_layer/connection_simulator/ConnectionSimulatorPerfect.cpp
+        communication/byte_layer/connection_simulator/ConnectionSimulatorFlakey.cpp
+
+        communication/message_layer/message_stream/MessageInputStream.cpp
+        communication/message_layer/message_stream/MessageOutputStream.cpp
+        communication/message_layer/message_stream/MessageCoder.cpp
+
+        communication/message_layer/message/Message.cpp
+        communication/message_layer/message/ConnectionRequestMessage.cpp
+        communication/message_layer/message/ConnectionResponseMessage.cpp
+        communication/message_layer/message/KeepAliveMessage.cpp
+        communication/message_layer/message/PayloadMessage.cpp
+        communication/message_layer/message/MessageMetaData.cpp
+
+        communication/message_layer/crc/CRCHandler.cpp
 
         communication/connection_layer/Connection.cpp
-
-        communication/messages/Message.cpp
-        communication/messages/ConnectionRequestMessage.cpp
-        communication/messages/ConnectionResponseMessage.cpp
-        communication/messages/KeepAliveMessage.cpp
-        communication/messages/PayloadMessage.cpp
-        communication/messages/MessageMetaData.cpp
-        communication/messages/MessageCoder.cpp
-
-        communication/crc/CRCHandler.cpp
         )
 
 add_executable(crossing_consoles_main_server

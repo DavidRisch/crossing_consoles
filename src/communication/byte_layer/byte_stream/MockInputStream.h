@@ -5,13 +5,13 @@
 #include <list>
 #include <vector>
 
-#include "IInputStream.h"
+#include "IInputByteStream.h"
 #include "SocketHolder.h"
 
 /**
- * \brief Implementation  of `IInputStream` used for testing.
+ * \brief Implementation  of `IInputByteStream` used for testing.
  */
-class MockInputStream : public IInputStream {
+class MockInputStream : public IInputByteStream {
  public:
   size_t Read(uint8_t* receive_buffer, size_t max_length) override;
 

@@ -2,13 +2,13 @@
 
 #include <iostream>
 
-#include "../ProtocolDefinition.h"
-#include "../messages/MessageCoder.h"
+#include "../../ProtocolDefinition.h"
+#include "MessageCoder.h"
 #include "MessageInputStream.h"
 
 using namespace std;
 
-MessageOutputStream::MessageOutputStream(IOutputStream &output_stream)
+MessageOutputStream::MessageOutputStream(IOutputByteStream &output_stream)
     : output_stream(output_stream) {
 }
 

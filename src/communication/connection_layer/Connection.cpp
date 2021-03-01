@@ -3,8 +3,8 @@
 #include <thread>
 #include <utility>
 
-#include "../messages/ConnectionRequestMessage.h"
-#include "../messages/ConnectionResponseMessage.h"
+#include "../message_layer/message/ConnectionRequestMessage.h"
+#include "../message_layer/message/ConnectionResponseMessage.h"
 
 std::shared_ptr<Connection> Connection::CreateClientSide(std::shared_ptr<MessageInputStream> message_input_stream,
                                                          std::shared_ptr<MessageOutputStream> message_output_stream) {

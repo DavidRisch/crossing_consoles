@@ -7,14 +7,14 @@
 #include <mutex>
 #include <vector>
 
-#include "IInputStream.h"
-#include "IOutputStream.h"
+#include "IInputByteStream.h"
+#include "IOutputByteStream.h"
 #include "SocketHolder.h"
 
 /**
- * \brief Implementation of `IInputStream` and `IOutputStream` used for testing.
+ * \brief Implementation of `IInputByteStream` and `IOutputByteStream` used for testing.
  */
-class MockBidirectionalByteStream : public IInputStream, public IOutputStream {
+class MockBidirectionalByteStream : public IInputByteStream, public IOutputByteStream {
  public:
   /**
    * \brief Create two linked instances of `MockBidirectionalByteStream`, data sent with one will be received by the

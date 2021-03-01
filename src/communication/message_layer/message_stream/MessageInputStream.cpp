@@ -2,12 +2,12 @@
 
 #include <iostream>
 
-#include "../ProtocolDefinition.h"
-#include "../messages/MessageCoder.h"
+#include "../../ProtocolDefinition.h"
+#include "MessageCoder.h"
 
 using namespace std;
 
-MessageInputStream::MessageInputStream(IInputStream &input_stream)
+MessageInputStream::MessageInputStream(IInputByteStream &input_stream)
     : input_stream(input_stream) {
 }
 

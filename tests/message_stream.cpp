@@ -2,12 +2,12 @@
 
 #include <thread>
 
-#include "../src/communication/low_level/ByteServer.h"
-#include "../src/communication/low_level/MockBidirectionalByteStream.h"
-#include "../src/communication/message_layer/MessageInputStream.h"
-#include "../src/communication/message_layer/MessageOutputStream.h"
-#include "../src/communication/messages/KeepAliveMessage.h"
-#include "../src/communication/messages/PayloadMessage.h"
+#include "../src/communication/byte_layer/byte_stream/MockBidirectionalByteStream.h"
+#include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
+#include "../src/communication/message_layer/message/KeepAliveMessage.h"
+#include "../src/communication/message_layer/message/PayloadMessage.h"
+#include "../src/communication/message_layer/message_stream/MessageInputStream.h"
+#include "../src/communication/message_layer/message_stream/MessageOutputStream.h"
 
 TEST(MessageStream, Simple) {
   auto stream_pair = MockBidirectionalByteStream::CreatePair();

@@ -5,9 +5,9 @@
 #include <memory>
 #include <stdexcept>
 
-#include "ConnectionSimulatorPerfect.h"
-#include "IInputStream.h"
-#include "IOutputStream.h"
+#include "../connection_simulator/ConnectionSimulatorPerfect.h"
+#include "IInputByteStream.h"
+#include "IOutputByteStream.h"
 #include "SocketHolder.h"
 
 typedef uint16_t port_t;
@@ -18,13 +18,13 @@ inline const port_t socket_default_port = 56921;
 /**
  * \brief Interface to communicate with another process without any structure to messages.
  */
-class ByteStream : public IOutputStream, public IInputStream {
+class SocketByteStream : public IOutputByteStream, public IInputByteStream {
  public:
-  explicit ByteStream(file_descriptor_t socket_file_descriptor,
-                      IConnectionSimulator& connection_simulator_incoming = ConnectionSimulatorPerfect::instance,
-                      IConnectionSimulator& connection_simulator_outgoing = ConnectionSimulatorPerfect::instance);
+  explicit SocketByteStream(file_descriptor_t socket_file_descriptor,
+                            IConnectionSimulator& connection_simulator_incoming = ConnectionSimulatorPerfect::instance,
+                            IConnectionSimulator& connection_simulator_outgoing = ConnectionSimulatorPerfect::instance);
 
-  static ByteStream CreateClientSide(port_t port = socket_default_port);
+  static SocketByteStream CreateClientSide(port_t port = socket_default_port);
 
   void Send(const uint8_t* send_buffer, size_t length) override;
   void SendString(const std::string& message);

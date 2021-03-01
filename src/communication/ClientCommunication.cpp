@@ -1,6 +1,6 @@
 #include "ClientCommunication.h"
 
-#include "messages/Message.h"
+#include "message_layer/message/Message.h"
 
 ClientCommunication::ClientCommunication() {
 }

@@ -2,8 +2,8 @@
 
 #include <thread>
 
-#include "../src/communication/low_level/ByteServer.h"
-#include "../src/communication/low_level/ConnectionSimulatorFlakey.h"
+#include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
+#include "../src/communication/byte_layer/connection_simulator/ConnectionSimulatorFlakey.h"
 
 class ConnectionSimulator : public ::testing::Test {
  public:
@@ -24,10 +24,10 @@ class ConnectionSimulator : public ::testing::Test {
 
   void TestWithConnectionSimulators(IConnectionSimulator &server_incoming, IConnectionSimulator &server_outgoing,
                                     IConnectionSimulator &client_incoming, IConnectionSimulator &client_outgoing) {
-    ByteServer byte_server;
+    SocketByteServer byte_server;
 
     std::thread client_thread([this, &client_incoming, &client_outgoing] {
-      ByteStream byte_stream = ByteStream::CreateClientSide();
+      SocketByteStream byte_stream = SocketByteStream::CreateClientSide();
 
       byte_stream.SetConnectionSimulatorIncoming(client_incoming);
       byte_stream.SetConnectionSimulatorOutgoing(client_outgoing);
@@ -36,7 +36,7 @@ class ConnectionSimulator : public ::testing::Test {
       client_received = byte_stream.ReadString();
     });
 
-    std::optional<ByteStream> byte_stream;
+    std::optional<SocketByteStream> byte_stream;
 
     int counter = 1000;
     while (!byte_stream.has_value() && counter > 0) {

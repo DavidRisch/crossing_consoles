@@ -4,20 +4,20 @@
 #include <optional>
 #include <vector>
 
-#include "../low_level/ByteStream.h"
-#include "../messages/Message.h"
+#include "../../byte_layer/byte_stream/SocketByteStream.h"
+#include "../message/Message.h"
 
 /**
- * \brief Can send `Message`s to the given `IOutputStream`.
+ * \brief Can send `Message`s to the given `IOutputByteStream`.
  */
 class MessageOutputStream {
  public:
-  explicit MessageOutputStream(IOutputStream &output_stream);
+  explicit MessageOutputStream(IOutputByteStream &output_stream);
 
   void SendMessage(Message *message);
 
  private:
-  IOutputStream &output_stream;
+  IOutputByteStream &output_stream;
 };
 
 #endif  // CROSSING_CONSOLES_MESSAGE_OUTPUT_STREAM_H

@@ -4,7 +4,7 @@
 /**
  * \brief Abstract object with which bytes can be sent.
  */
-class IOutputStream {
+class IOutputByteStream {
  public:
   virtual void Send(const uint8_t* send_buffer, size_t length) = 0;
 };

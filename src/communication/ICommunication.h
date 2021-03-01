@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#include "messages/Message.h"
+#include "message_layer/message/Message.h"
 
 class ICommunication {
  public:

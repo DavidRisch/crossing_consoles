@@ -1,4 +1,4 @@
-#include "ByteStream.h"
+#include "SocketByteStream.h"
 
 #include <cassert>
 #include <climits>
@@ -6,14 +6,15 @@
 
 #include "socket_libs.h"
 
-ByteStream::ByteStream(file_descriptor_t socket_file_descriptor, IConnectionSimulator &connection_simulator_incoming,
-                       IConnectionSimulator &connection_simulator_outgoing)
+SocketByteStream::SocketByteStream(file_descriptor_t socket_file_descriptor,
+                                   IConnectionSimulator &connection_simulator_incoming,
+                                   IConnectionSimulator &connection_simulator_outgoing)
     : socket_holder(std::make_shared<SocketHolder>(socket_file_descriptor))
     , connection_simulator_incoming(&connection_simulator_incoming)
     , connection_simulator_outgoing(&connection_simulator_outgoing) {
 }
 
-ByteStream ByteStream::CreateClientSide(uint16_t port) {
+SocketByteStream SocketByteStream::CreateClientSide(uint16_t port) {
   file_descriptor_t socket_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
   if (socket_file_descriptor < 0) {
     throw std::runtime_error("socket failed");
@@ -32,10 +33,10 @@ ByteStream ByteStream::CreateClientSide(uint16_t port) {
     throw std::runtime_error("connect failed");
   }
 
-  return ByteStream(socket_file_descriptor);
+  return SocketByteStream(socket_file_descriptor);
 }
 
-size_t ByteStream::Read(  // NOLINT(readability-make-member-function-const)
+size_t SocketByteStream::Read(  // NOLINT(readability-make-member-function-const)
     uint8_t *receive_buffer, size_t max_length) {
   assert(max_length < SSIZE_MAX);
   ssize_t read_count = recv(socket_holder->file_descriptor, reinterpret_cast<char *>(receive_buffer), max_length, 0);
@@ -51,7 +52,7 @@ size_t ByteStream::Read(  // NOLINT(readability-make-member-function-const)
   return static_cast<size_t>(read_count);
 }
 
-std::string ByteStream::ReadString(size_t max_length) {
+std::string SocketByteStream::ReadString(size_t max_length) {
   char *receive_buffer = new char[max_length + 1];
   auto read_count = Read(reinterpret_cast<uint8_t *>(receive_buffer), max_length);
   receive_buffer[read_count] = '\0';
@@ -60,7 +61,7 @@ std::string ByteStream::ReadString(size_t max_length) {
   return received;
 }
 
-void ByteStream::Send(  // NOLINT(readability-make-member-function-const)
+void SocketByteStream::Send(  // NOLINT(readability-make-member-function-const)
     const uint8_t *send_buffer, size_t length) {
   auto *modified_send_buffer = new uint8_t[length];
 
@@ -77,14 +78,14 @@ void ByteStream::Send(  // NOLINT(readability-make-member-function-const)
   }
 }
 
-void ByteStream::SendString(const std::string &message) {
+void SocketByteStream::SendString(const std::string &message) {
   Send(reinterpret_cast<const uint8_t *>(message.c_str()), message.size());
 }
 
-void ByteStream::SetConnectionSimulatorIncoming(IConnectionSimulator &ConnectionSimulator) {
+void SocketByteStream::SetConnectionSimulatorIncoming(IConnectionSimulator &ConnectionSimulator) {
   connection_simulator_incoming = &ConnectionSimulator;
 }
 
-void ByteStream::SetConnectionSimulatorOutgoing(IConnectionSimulator &ConnectionSimulator) {
+void SocketByteStream::SetConnectionSimulatorOutgoing(IConnectionSimulator &ConnectionSimulator) {
   connection_simulator_outgoing = &ConnectionSimulator;
 }

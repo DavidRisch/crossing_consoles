@@ -3,9 +3,9 @@
 
 #include <memory>
 
-#include "../message_layer/MessageInputStream.h"
-#include "../message_layer/MessageOutputStream.h"
-#include "../messages/Message.h"
+#include "../message_layer/message/Message.h"
+#include "../message_layer/message_stream/MessageInputStream.h"
+#include "../message_layer/message_stream/MessageOutputStream.h"
 
 /**
  * \brief Layer which is responsible for most of the TCP features.

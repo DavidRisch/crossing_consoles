@@ -4,11 +4,11 @@
 #include <memory>
 #include <optional>
 
-#include "../ProtocolDefinition.h"
-#include "ConnectionRequestMessage.h"
-#include "ConnectionResponseMessage.h"
-#include "KeepAliveMessage.h"
-#include "PayloadMessage.h"
+#include "../../ProtocolDefinition.h"
+#include "../message/ConnectionRequestMessage.h"
+#include "../message/ConnectionResponseMessage.h"
+#include "../message/KeepAliveMessage.h"
+#include "../message/PayloadMessage.h"
 
 template <typename T>
 void WriteToStream(std::vector<uint8_t> &output, T input, unsigned int input_length) {
@@ -20,7 +20,7 @@ void WriteToStream(std::vector<uint8_t> &output, T input, unsigned int input_len
 }
 
 template <typename T>
-T ReadFromStream(IInputStream &stream, unsigned int type_length) {
+T ReadFromStream(IInputByteStream &stream, unsigned int type_length) {
   T output = 0;
   for (unsigned int i = 0; i < type_length; ++i) {
     unsigned int byte_position = type_length - 1 - i;  // to get big endian mode
@@ -33,7 +33,7 @@ T ReadFromStream(IInputStream &stream, unsigned int type_length) {
 }
 
 template <typename T>
-T ReadFromStreamWithCopy(IInputStream &stream, unsigned int type_length, std::vector<uint8_t> &raw_message) {
+T ReadFromStreamWithCopy(IInputByteStream &stream, unsigned int type_length, std::vector<uint8_t> &raw_message) {
   T output = 0;
   for (unsigned int i = 0; i < type_length; ++i) {
     unsigned int byte_position = type_length - 1 - i;  // to get big endian mode
@@ -82,7 +82,7 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
   return output;
 }
 
-std::shared_ptr<Message> MessageCoder::Decode(IInputStream &stream, bool expect_start_sequence) {
+std::shared_ptr<Message> MessageCoder::Decode(IInputByteStream &stream, bool expect_start_sequence) {
   if (expect_start_sequence) {
     auto found_start_sequence =
         ReadFromStream<ProtocolDefinition::start_sequence_t>(stream, sizeof(ProtocolDefinition::start_sequence));

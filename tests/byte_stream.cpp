@@ -3,7 +3,7 @@
 #include <iostream>
 #include <thread>
 
-#include "../src/communication/low_level/ByteServer.h"
+#include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
 
 TEST(ByteServer, SingleClient) {
   const char* server_to_client = "0123456789";
@@ -11,15 +11,15 @@ TEST(ByteServer, SingleClient) {
 
   std::string client_received;
 
-  ByteServer byte_server;
+  SocketByteServer byte_server;
 
   std::thread client_thread([client_to_server, &client_received] {
-    ByteStream b = ByteStream::CreateClientSide();
+    SocketByteStream b = SocketByteStream::CreateClientSide();
     b.SendString(client_to_server);
     client_received = b.ReadString();
   });
 
-  std::optional<ByteStream> byte_stream;
+  std::optional<SocketByteStream> byte_stream;
 
   int counter = 1000;
   while (!byte_stream.has_value() && counter > 0) {
@@ -50,10 +50,10 @@ TEST(ByteServer, TwoClients) {
   std::string client1_received;
   std::string client2_received;
 
-  ByteServer byte_server;
+  SocketByteServer byte_server;
 
   std::thread server_thread([&byte_server, server_to_client1, server_to_client2, &server_received] {
-    std::optional<ByteStream> byte_stream;
+    std::optional<SocketByteStream> byte_stream;
 
     int success_count = 0;
     const char* next_message = server_to_client1;
@@ -75,7 +75,7 @@ TEST(ByteServer, TwoClients) {
   });
 
   std::thread client1_thread([client1_to_server, &client1_received] {
-    ByteStream b = ByteStream::CreateClientSide();
+    SocketByteStream b = SocketByteStream::CreateClientSide();
     b.SendString(client1_to_server);
     client1_received = b.ReadString();
   });
@@ -85,7 +85,7 @@ TEST(ByteServer, TwoClients) {
   EXPECT_EQ(std::string(client1_to_server), server_received);
 
   std::thread client2_thread([client2_to_server, &client2_received] {
-    ByteStream b = ByteStream::CreateClientSide();
+    SocketByteStream b = SocketByteStream::CreateClientSide();
     b.SendString(client2_to_server);
     client2_received = b.ReadString();
   });

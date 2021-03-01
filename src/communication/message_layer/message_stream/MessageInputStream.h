@@ -4,20 +4,20 @@
 #include <optional>
 #include <vector>
 
-#include "../low_level/ByteStream.h"
-#include "../messages/Message.h"
+#include "../../byte_layer/byte_stream/SocketByteStream.h"
+#include "../message/Message.h"
 
 /**
- * \brief Can receive `Message`s from the given `IInputStream`.
+ * \brief Can receive `Message`s from the given `IInputByteStream`.
  */
 class MessageInputStream {
  public:
-  explicit MessageInputStream(IInputStream &input_stream);
+  explicit MessageInputStream(IInputByteStream &input_stream);
 
   std::shared_ptr<Message> ReceiveMessage();
 
  private:
-  IInputStream &input_stream;
+  IInputByteStream &input_stream;
 };
 
 #endif  // CROSSING_CONSOLES_MESSAGE_INPUT_STREAM_H

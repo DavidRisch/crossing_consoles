@@ -3,8 +3,8 @@
 #include <iostream>
 #include <thread>
 
-#include "../src/communication/low_level/ByteServer.h"
-#include "../src/communication/low_level/MockBidirectionalByteStream.h"
+#include "../src/communication/byte_layer/byte_stream/MockBidirectionalByteStream.h"
+#include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
 
 TEST(Mocks, MockBidirectionalByteStream) {
   const uint8_t first_to_second[] = {'t', 'e', 's', 't'};
