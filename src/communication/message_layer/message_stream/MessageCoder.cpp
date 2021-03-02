@@ -23,28 +23,17 @@ void WriteToStream(std::vector<uint8_t> &output, T input, unsigned int input_len
 }
 
 template <typename T>
-T ReadFromStream(byte_layer::IInputByteStream &stream, unsigned int type_length) {
+T ReadFromStreamWithCRC(byte_layer::IInputByteStream &stream, unsigned int type_length,
+                        CRCHandler *crc_handler = nullptr) {
   T output = 0;
   for (unsigned int i = 0; i < type_length; ++i) {
     unsigned int byte_position = type_length - 1 - i;  // to get big endian mode
 
     T byte = 0;
     stream.Read(reinterpret_cast<uint8_t *>(&byte), 1);
-    output |= byte << 8 * byte_position;
-  }
-  return output;
-}
-
-template <typename T>
-T ReadFromStreamWithCopy(byte_layer::IInputByteStream &stream, unsigned int type_length,
-                         std::vector<uint8_t> &raw_message) {
-  T output = 0;
-  for (unsigned int i = 0; i < type_length; ++i) {
-    unsigned int byte_position = type_length - 1 - i;  // to get big endian mode
-
-    T byte = 0;
-    stream.Read(reinterpret_cast<uint8_t *>(&byte), 1);
-    raw_message.push_back(byte);
+    if (crc_handler != nullptr) {
+      crc_handler->AppendByte(byte);
+    }
     output |= byte << 8 * byte_position;
   }
   return output;
@@ -87,16 +76,15 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
 }
 
 std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stream, bool expect_start_sequence) {
+  CRCHandler crc_handler = CRCHandler();
+
   if (expect_start_sequence) {
     auto found_start_sequence =
-        ReadFromStream<ProtocolDefinition::start_sequence_t>(stream, sizeof(ProtocolDefinition::start_sequence));
+        ReadFromStreamWithCRC<ProtocolDefinition::start_sequence_t>(stream, sizeof(ProtocolDefinition::start_sequence));
     assert(found_start_sequence == ProtocolDefinition::GetNumericStartSequence());
   }
 
-  // used to generate crc
-  std::vector<uint8_t> raw_message;
-
-  auto message_type_value = ReadFromStreamWithCopy<char>(stream, sizeof(char), raw_message);
+  auto message_type_value = ReadFromStreamWithCRC<char>(stream, sizeof(char), &crc_handler);
   assert(message_type_value >= 0);
   assert(message_type_value <= static_cast<uint8_t>(MessageType::HIGHEST_ELEMENT));
   auto message_type = static_cast<MessageType>(message_type_value);
@@ -118,10 +106,10 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
       message = std::make_shared<ConnectionResponseMessage>(0, message_meta_data);
       break;
     case MessageType::PAYLOAD: {
-      auto payload_length = ReadFromStreamWithCopy<ProtocolDefinition::payload_length_t>(
-          stream, sizeof(ProtocolDefinition::payload_length_t), raw_message);
-      auto payload_length_backup = ReadFromStreamWithCopy<ProtocolDefinition::payload_length_t>(
-          stream, sizeof(ProtocolDefinition::payload_length_t), raw_message);
+      auto payload_length = ReadFromStreamWithCRC<ProtocolDefinition::payload_length_t>(
+          stream, sizeof(ProtocolDefinition::payload_length_t), &crc_handler);
+      auto payload_length_backup = ReadFromStreamWithCRC<ProtocolDefinition::payload_length_t>(
+          stream, sizeof(ProtocolDefinition::payload_length_t), &crc_handler);
 
       if (payload_length != payload_length_backup) {
         // TODO: Exception name not an exact fit. Rename Exception?
@@ -137,8 +125,7 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
         read_pointer += read_length;
       }
 
-      raw_message.insert(raw_message.end(), payload.begin(), payload.end());
-
+      crc_handler.AppendData(payload.data(), payload_length);
       message = std::make_shared<PayloadMessage>(0, payload, message_meta_data);
       break;
     }
@@ -146,9 +133,9 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
       assert(false);
   }
 
-  auto read_crc = ReadFromStream<crc_value_t>(stream, crc_length);
+  auto read_crc = ReadFromStreamWithCRC<crc_value_t>(stream, crc_length);
 
-  if (!CRCHandler::CheckCRCValue(raw_message.data(), raw_message.size(), read_crc)) {
+  if (!crc_handler.CheckCRCValue(read_crc)) {
     throw CrcIncorrectException();
   }
 
