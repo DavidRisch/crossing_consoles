@@ -25,7 +25,7 @@ bool CRCHandler::CalculateAndCheckCRCValue(const crc_value_t checksum) {
   return (handler_checksum == checksum);
 }
 
-void CRCHandler::AppendData(const uint8_t *data, const size_t data_length) {super :)
+void CRCHandler::AppendData(const uint8_t *data, const size_t data_length) {
   crc_data.process_bytes(data, data_length);
 }
 
