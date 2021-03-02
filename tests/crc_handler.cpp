@@ -47,3 +47,31 @@ TEST(CRCHandler, CheckCRCValue) {
   ASSERT_FALSE(CRCHandler::CheckCRCValue(sample_mixed, sizeof(sample_mixed), checksum_single));
   ASSERT_FALSE(CRCHandler::CheckCRCValue(sample_empty, sizeof(sample_mixed), checksum_sample));
 }
+
+TEST(CRCHandler, CalculateCRCValueFromHandler) {
+  CRCHandler crc_handler = CRCHandler();
+  const uint8_t sample[] = {'t', 'e', 's', 't'};
+  const uint8_t sample_single = '@';
+  const uint8_t sample_mixed[] = {'4', '3', '5', '/', '(', '/', '&', ')', 'e', 'w',
+                                  'f', 'c', '.', ',', '.', ' ', 'd', 'q', 'w', 'd'};
+  const uint8_t sample_null = '\0';
+
+  crc_handler.AppendData(sample, sizeof(sample));
+  crc_handler.AppendByte(sample_single);
+  crc_handler.AppendData(sample_mixed, sizeof(sample_mixed));
+  crc_handler.AppendByte(sample_null);
+
+  ASSERT_TRUE(crc_handler.CalculateAndCheckCRCValue(4078792735));
+}
+
+TEST(CRCHandler, CalculateCRCValueFromHandlerReset) {
+  CRCHandler crc_handler = CRCHandler();
+  const uint8_t sample[] = {'t', 'e', 's', 't'};
+  crc_handler.AppendData(sample, sizeof(sample));
+  ASSERT_TRUE(crc_handler.CalculateAndCheckCRCValue(3632233996));
+
+  // Check for reset after checkCRCValue() was called
+  crc_handler.AppendData(sample, sizeof(sample));
+  crc_value_t crc_checksum = CRCHandler::CalculateCRCValue(sample, sizeof(sample));
+  ASSERT_TRUE(crc_handler.CalculateAndCheckCRCValue(crc_checksum));
+}

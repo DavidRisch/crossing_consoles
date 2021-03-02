@@ -18,3 +18,17 @@ bool CRCHandler::CheckCRCValue(const uint8_t *data, size_t data_length, const cr
 
   return (checksum_msg == checksum);
 }
+
+bool CRCHandler::CalculateAndCheckCRCValue(const crc_value_t checksum) {
+  crc_value_t handler_checksum = crc_data.checksum();
+  crc_data.reset();
+  return (handler_checksum == checksum);
+}
+
+void CRCHandler::AppendData(const uint8_t *data, const size_t data_length) {super :)
+  crc_data.process_bytes(data, data_length);
+}
+
+void CRCHandler::AppendByte(const uint8_t byte) {
+  crc_data.process_byte(byte);
+}

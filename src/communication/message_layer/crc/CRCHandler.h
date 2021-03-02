@@ -24,6 +24,24 @@ class CRCHandler {
    * \brief Compare the associated CRC32 value of given data with the provided checksum
    */
   static bool CheckCRCValue(const uint8_t* data, size_t data_length, const crc_value_t checksum);
+  /**
+ * \brief Compare the associated CRC32 value of 'crc_handler' with the provided checksum
+   \details All data of 'crc_handler' will be reset.
+ */
+  bool CalculateAndCheckCRCValue(const crc_value_t checksum);
+
+  /**
+   * \brief Add data to 'crc_data'
+   */
+  void AppendData(const uint8_t* data, const size_t data_length);
+
+  /**
+   * \brief Add byte to 'crc_data'
+   */
+  void AppendByte(const uint8_t byte);
+
+ private:
+  boost::crc_32_type crc_data;
 };
 
 }  // namespace message_layer
