@@ -22,7 +22,6 @@ class Player {
   [[nodiscard]] bool IsAlive() const;
 
   void MoveTo(const Position& new_position);
-  void MoveBy(const Position& new_position);
 
   void Attack();
 };

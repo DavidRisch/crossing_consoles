@@ -1,12 +1,8 @@
 #include "GameClient.h"
 
 #include <chrono>
-#include <iostream>
-#include <string>
 #include <thread>
 #include <utility>
-
-#include "terminal/RealTerminal.h"
 
 enum Keys : int { KEY_ESCAPE = 27, KEY_W = 'w', KEY_A = 'a', KEY_S = 's', KEY_D = 'd', KEY_SPACE = ' ' };
 
@@ -14,6 +10,7 @@ GameClient::GameClient(Player player, World world, std::shared_ptr<ITerminal> te
     : player(std::move(player))
     , world(std::move(world))
     , terminal(std::move(terminal)) {
+  this->world.AddPlayer(&this->player);
   coordinate_size_t viewport_size = Position(51, 31);
   compositor = new Compositor(viewport_size, this->world, this->player);
 
@@ -22,15 +19,15 @@ GameClient::GameClient(Player player, World world, std::shared_ptr<ITerminal> te
 
 void GameClient::RunGame() {
   while (keypress != KEY_ESCAPE) {
-    KeyPressed();
+    ProcessInput();
     if (world.updated || player.updated) {
       terminal->SetScreen(compositor->CompositeViewport());
-      std::this_thread::sleep_for(std::chrono::milliseconds(500));
+      std::this_thread::sleep_for(std::chrono::microseconds(500));
     }
   }
 }
 
-void GameClient::KeyPressed() {
+void GameClient::ProcessInput() {
   coordinate_distance_t movement(0, 0);
 
   if (terminal->HasInput()) {

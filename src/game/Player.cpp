@@ -16,10 +16,5 @@ void Player::MoveTo(const Position &new_position) {
   updated = true;
 }
 
-void Player::MoveBy(const Position &new_position_diff) {
-  position = position + new_position_diff;
-  updated = true;
-}
-
 void Player::Attack() {
 }

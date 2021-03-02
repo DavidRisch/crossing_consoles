@@ -10,12 +10,13 @@
 class World {
  public:
   coordinate_size_t size;
-  std::list<Player> players{};
-  std::list<Wall> walls{};
+  std::list<Player*> players{};
+  std::list<Wall*> walls{};
   bool updated = false;
 
   World(int width, int height);
 
+  void AddPlayer(Player* player);
   void AddWall(const Position& position);
 
   bool IsWall(const Position& position);

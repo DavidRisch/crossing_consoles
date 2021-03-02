@@ -18,7 +18,7 @@ class GameClient {
   GameClient(Player player, World world, std::shared_ptr<ITerminal> terminal);
 
   void RunGame();
-  void KeyPressed();
+  void ProcessInput();
 
  private:
   std::shared_ptr<ITerminal> terminal;

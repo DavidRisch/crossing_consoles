@@ -1,7 +1,5 @@
 #include "Position.h"
 
-#include <cstdlib>
-
 Position::Position(int x, int y) {
   this->x = x;
   this->y = y;
@@ -26,10 +24,6 @@ Position Position::operator*(const Position &other_position) const {
 
 Position Position::operator/(const Position &other_position) const {
   return Position(x / other_position.x, y / other_position.y);
-}
-
-Position Position::abs() const {
-  return Position(std::abs(x), std::abs(y));
 }
 
 bool Position::operator==(const Position &other_position) const {

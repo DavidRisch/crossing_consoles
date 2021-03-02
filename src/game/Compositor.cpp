@@ -1,5 +1,9 @@
 #include "Compositor.h"
 
+#include "symbols.h"
+
+using namespace symbols;
+
 Compositor::Compositor(coordinate_size_t viewport_size, World &world, Player &player)
     : viewport_size(viewport_size)
     , world(&world)
@@ -10,16 +14,28 @@ Compositor::Compositor(coordinate_size_t viewport_size, World &world, Player &pl
 std::wstring Compositor::CompositeViewport() const {
   std::wstring rendered_world = renderer->RenderWorld();
   std::wstring out;
-  out += L'\u2554' + std::wstring(viewport_size.x * block_size.x, L'\u2550') + L"\u2557\n";
-  out += L"\u2551 SCORE" + std::wstring(viewport_size.x * block_size.x - 6, L' ') + L"\u2551\n";
-  out += L'\u2560' + std::wstring(viewport_size.x * block_size.x, L'\u2550') + L"\u2563\n";
+
+  out += box_drawings_double_down_and_right +
+         std::wstring(viewport_size.x * block_size.x, box_drawings_double_horizontal) +
+         box_drawings_double_down_and_left + L'\n';
+
+  out += box_drawings_double_vertical + std::wstring(L" SCORE") +
+         std::wstring(viewport_size.x * block_size.x - 6, L' ') + box_drawings_double_vertical + L'\n';
+
+  out += box_drawings_double_vertical_and_right +
+         std::wstring(viewport_size.x * block_size.x, box_drawings_double_horizontal) +
+         box_drawings_double_vertical_and_left + L'\n';
+
   for (int y = 0; y < viewport_size.y * block_size.y; y++) {
-    out += L"\u2551";
+    out += box_drawings_double_vertical;
     int rendered_world_line_length = viewport_size.x * block_size.x + 1;
     out += rendered_world.substr(y * rendered_world_line_length, rendered_world_line_length);
-    out.insert(out.end() - 1, L'\u2551');
+    out.insert(out.end() - 1, box_drawings_double_vertical);
   }
-  out += L'\u255A' + std::wstring(viewport_size.x * block_size.x, L'\u2550') + L'\u255D';
-  out += L"\n";
+
+  out += box_drawings_double_up_and_right +
+         std::wstring(viewport_size.x * block_size.x, box_drawings_double_horizontal) +
+         box_drawings_double_up_and_left + L'\n';
+
   return out;
 }

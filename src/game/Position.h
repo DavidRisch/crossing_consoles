@@ -17,8 +17,6 @@ class Position {
   Position operator*(const Position& other_position) const;
   Position operator/(const Position& other_position) const;
 
-  Position abs() const;
-
   bool operator==(const Position& other_position) const;
   bool operator!=(const Position& other_position) const;
   bool operator<(const Position& other_position) const;
