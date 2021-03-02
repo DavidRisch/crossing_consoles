@@ -37,15 +37,15 @@ TEST(CRCHandler, CheckCRCValue) {
   const crc_value_t checksum_mixed = 3861871196;
   const crc_value_t checksum_empty = 3523407757;
 
-  ASSERT_TRUE(CRCHandler::CheckCRCValue(sample, sizeof(sample), checksum_sample));
-  ASSERT_TRUE(CRCHandler::CheckCRCValue(sample_single, sizeof(sample_single), checksum_single));
-  ASSERT_TRUE(CRCHandler::CheckCRCValue(sample_mixed, sizeof(sample_mixed), checksum_mixed));
-  ASSERT_TRUE(CRCHandler::CheckCRCValue(sample_empty, sizeof(sample_empty), checksum_empty));
+  ASSERT_TRUE(CRCHandler::CalculateAndCheckCRCValue(sample, sizeof(sample), checksum_sample));
+  ASSERT_TRUE(CRCHandler::CalculateAndCheckCRCValue(sample_single, sizeof(sample_single), checksum_single));
+  ASSERT_TRUE(CRCHandler::CalculateAndCheckCRCValue(sample_mixed, sizeof(sample_mixed), checksum_mixed));
+  ASSERT_TRUE(CRCHandler::CalculateAndCheckCRCValue(sample_empty, sizeof(sample_empty), checksum_empty));
 
-  ASSERT_FALSE(CRCHandler::CheckCRCValue(sample, sizeof(sample), checksum_mixed));
-  ASSERT_FALSE(CRCHandler::CheckCRCValue(sample_single, sizeof(sample_empty), checksum_empty));
-  ASSERT_FALSE(CRCHandler::CheckCRCValue(sample_mixed, sizeof(sample_mixed), checksum_single));
-  ASSERT_FALSE(CRCHandler::CheckCRCValue(sample_empty, sizeof(sample_mixed), checksum_sample));
+  ASSERT_FALSE(CRCHandler::CalculateAndCheckCRCValue(sample, sizeof(sample), checksum_mixed));
+  ASSERT_FALSE(CRCHandler::CalculateAndCheckCRCValue(sample_single, sizeof(sample_empty), checksum_empty));
+  ASSERT_FALSE(CRCHandler::CalculateAndCheckCRCValue(sample_mixed, sizeof(sample_mixed), checksum_single));
+  ASSERT_FALSE(CRCHandler::CalculateAndCheckCRCValue(sample_empty, sizeof(sample_mixed), checksum_sample));
 }
 
 TEST(CRCHandler, CalculateCRCValueFromHandler) {
@@ -61,17 +61,17 @@ TEST(CRCHandler, CalculateCRCValueFromHandler) {
   crc_handler.AppendData(sample_mixed, sizeof(sample_mixed));
   crc_handler.AppendByte(sample_null);
 
-  ASSERT_TRUE(crc_handler.CalculateAndCheckCRCValue(4078792735));
+  ASSERT_TRUE(crc_handler.CheckCRCValue(4078792735));
 }
 
 TEST(CRCHandler, CalculateCRCValueFromHandlerReset) {
   CRCHandler crc_handler = CRCHandler();
   const uint8_t sample[] = {'t', 'e', 's', 't'};
   crc_handler.AppendData(sample, sizeof(sample));
-  ASSERT_TRUE(crc_handler.CalculateAndCheckCRCValue(3632233996));
+  ASSERT_TRUE(crc_handler.CheckCRCValue(3632233996));
 
   // Check for reset after checkCRCValue() was called
   crc_handler.AppendData(sample, sizeof(sample));
   crc_value_t crc_checksum = CRCHandler::CalculateCRCValue(sample, sizeof(sample));
-  ASSERT_TRUE(crc_handler.CalculateAndCheckCRCValue(crc_checksum));
+  ASSERT_TRUE(crc_handler.CheckCRCValue(crc_checksum));
 }

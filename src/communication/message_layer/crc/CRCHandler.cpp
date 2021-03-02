@@ -13,13 +13,13 @@ crc_value_t CRCHandler::CalculateCRCValue(const uint8_t *data, size_t data_lengt
   return crc_object.checksum();
 }
 
-bool CRCHandler::CheckCRCValue(const uint8_t *data, size_t data_length, const crc_value_t checksum) {
+bool CRCHandler::CalculateAndCheckCRCValue(const uint8_t *data, size_t data_length, const crc_value_t checksum) {
   crc_value_t checksum_msg = CalculateCRCValue(data, data_length);
 
   return (checksum_msg == checksum);
 }
 
-bool CRCHandler::CalculateAndCheckCRCValue(const crc_value_t checksum) {
+bool CRCHandler::CheckCRCValue(const crc_value_t checksum) {
   crc_value_t handler_checksum = crc_data.checksum();
   crc_data.reset();
   return (handler_checksum == checksum);

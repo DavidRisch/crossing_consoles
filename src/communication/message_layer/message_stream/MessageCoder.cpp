@@ -135,7 +135,7 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
 
   auto read_crc = ReadFromStreamWithCRC<crc_value_t>(stream, crc_length);
 
-  if (!crc_handler.CalculateAndCheckCRCValue(read_crc)) {
+  if (!crc_handler.CheckCRCValue(read_crc)) {
     throw CrcIncorrectException();
   }
 
