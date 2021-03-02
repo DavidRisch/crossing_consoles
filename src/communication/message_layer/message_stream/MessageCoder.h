@@ -27,9 +27,22 @@ class MessageCoder {
    */
   static std::shared_ptr<Message> Decode(byte_layer::IInputByteStream& stream, bool expect_start_sequence = true);
 
-  class CrcIncorrectException : public std::exception {
+  /**
+   * \brief Thrown if message en-/ or decoding fails for any reason.
+   * \details `CrcIncorrectException' and `InvalidMessageException` distinguish reason of failure for debugging
+   * purposes.
+   */
+  class DecodeFailedException : public std::exception {};
+
+  class CrcIncorrectException : public DecodeFailedException {
     [[nodiscard]] const char* what() const noexcept override {
       return "Message decoding failed, read CRC did not match expected CRC.";
+    }
+  };
+
+  class InvalidMessageException : public DecodeFailedException {
+    [[nodiscard]] const char* what() const noexcept override {
+      return "Unexpected sequence in message.";
     }
   };
 };

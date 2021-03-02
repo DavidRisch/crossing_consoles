@@ -8,20 +8,17 @@ namespace communication {
  */
 class ProtocolDefinition {
  public:
+  /// A type large enough to hold `flag`.
+  typedef uint8_t flag_t;
+
   /// Arbitrary constant, used to mark the start of a message.
-  constexpr static const uint8_t start_sequence[] = {0x12u, 0x34u, 0x56u, 0x78u};
+  static const flag_t flag = 0x86u;
 
-  /// A type large enough to hold `start_sequence`.
-  typedef uint32_t start_sequence_t;
-  static_assert(sizeof(start_sequence_t) >= sizeof(start_sequence));
+  /// A type large enough to hold `escape`.
+  typedef uint8_t escape_t;
 
-  [[nodiscard]] static start_sequence_t GetNumericStartSequence() {
-    uint32_t numeric_start_sequence = 0;
-    for (unsigned int i = 0; i < sizeof(start_sequence); ++i) {
-      numeric_start_sequence |= start_sequence[i] << (8 * (sizeof(start_sequence) - 1 - i));
-    }
-    return numeric_start_sequence;
-  }
+  /// Arbitrary constant, used as the `escape` sequence.
+  constexpr static const escape_t escape = 0x87u;
 
   typedef uint16_t payload_length_t;
 };
