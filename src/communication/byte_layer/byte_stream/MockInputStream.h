@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <list>
+#include <stdexcept>
 #include <vector>
 
 #include "IInputByteStream.h"
@@ -21,6 +22,10 @@ class MockInputStream : public IInputByteStream {
   void AddData(const std::vector<uint8_t>& new_data);
 
   bool IsEmpty() const;
+
+  bool HasInput() override {
+    return !data.empty();
+  }
 
  private:
   std::list<uint8_t> data;

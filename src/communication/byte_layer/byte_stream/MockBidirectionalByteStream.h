@@ -30,6 +30,12 @@ class MockBidirectionalByteStream : public IInputByteStream, public IOutputByteS
 
   void Send(const uint8_t* send_buffer, size_t length) override;
 
+  bool HasInput() override {
+    // lock mutex, multiple processes can access function
+    std::lock_guard<std::mutex> lock_guard(*mutex);
+    return !input_data.empty();
+  }
+
  private:
   MockBidirectionalByteStream(std::shared_ptr<std::mutex> mutex);
 

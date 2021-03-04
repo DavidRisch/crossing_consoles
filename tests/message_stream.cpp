@@ -1,9 +1,7 @@
 #include <gtest/gtest.h>
-
 #include <thread>
 
 #include "../src/communication/byte_layer/byte_stream/MockBidirectionalByteStream.h"
-#include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
 #include "../src/communication/message_layer/message/KeepAliveMessage.h"
 #include "../src/communication/message_layer/message/PayloadMessage.h"
 #include "../src/communication/message_layer/message_stream/MessageInputStream.h"
@@ -13,6 +11,17 @@ using namespace communication;
 using namespace communication::byte_layer;
 using namespace communication;
 using namespace communication::message_layer;
+
+TEST(MessageStream, NoBlocking) {
+  auto stream_pair = MockBidirectionalByteStream::CreatePair();
+
+  MessageInputStream message_input_stream(*stream_pair.first);
+
+  auto received_message = message_input_stream.ReceiveMessage(false);
+
+  // check if received msg is empty
+  EXPECT_FALSE(received_message);
+}
 
 TEST(MessageStream, Simple) {
   auto stream_pair = MockBidirectionalByteStream::CreatePair();

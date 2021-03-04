@@ -20,7 +20,8 @@ MockBidirectionalByteStream::CreatePair() {
 }
 
 MockBidirectionalByteStream::MockBidirectionalByteStream(std::shared_ptr<std::mutex> mutex)
-    : mutex(std::move(mutex)){};
+    : mutex(std::move(mutex)) {
+}
 
 size_t MockBidirectionalByteStream::Read(uint8_t *receive_buffer, size_t max_length) {
   std::lock_guard<std::mutex> lock_guard(*mutex);

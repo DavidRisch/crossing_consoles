@@ -17,7 +17,7 @@ class MessageInputStream {
  public:
   explicit MessageInputStream(byte_layer::IInputByteStream &input_stream);
 
-  std::shared_ptr<Message> ReceiveMessage();
+  std::shared_ptr<Message> ReceiveMessage(bool blocking = true);
 
  private:
   byte_layer::IInputByteStream &input_stream;

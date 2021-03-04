@@ -1,12 +1,44 @@
 #include <gtest/gtest.h>
-
-#include <iostream>
 #include <thread>
 
 #include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
 
 using namespace communication;
 using namespace communication::byte_layer;
+
+TEST(ByteServer, NoBlocking) {
+  SocketByteServer byte_server;
+
+  std::thread client_thread([] {
+    SocketByteStream byte_stream = SocketByteStream::CreateClientSide();
+
+    std::vector<uint8_t> receive_buffer(100);
+    u_int8_t first_byte = 123;
+    receive_buffer.at(0) = first_byte;
+
+    int read_count = byte_stream.ReadWithoutBlocking(receive_buffer.data(), receive_buffer.capacity());
+    EXPECT_EQ(read_count, 0);
+    EXPECT_EQ(receive_buffer.at(0), first_byte);
+  });
+
+  std::optional<SocketByteStream> byte_stream;
+
+  int counter = 1000;
+  while (!byte_stream.has_value() && counter > 0) {
+    byte_stream = byte_server.GetNewClient();
+    std::this_thread::sleep_for(std::chrono::microseconds(100));
+    counter--;
+  }
+
+  std::vector<uint8_t> receive_buffer(100);
+  u_int8_t first_byte = 123;
+  receive_buffer.at(0) = first_byte;
+  int read_count = byte_stream->ReadWithoutBlocking(receive_buffer.data(), receive_buffer.capacity());
+  EXPECT_EQ(read_count, 0);
+  EXPECT_EQ(receive_buffer.at(0), first_byte);
+
+  client_thread.join();
+}
 
 TEST(ByteServer, SingleClient) {
   const char* server_to_client = "0123456789";
