@@ -2,9 +2,9 @@
 
 #include "../src/communication/ProtocolDefinition.h"
 #include "../src/communication/byte_layer/byte_stream/MockInputStream.h"
+#include "../src/communication/message_layer/message/AcknowledgeMessage.h"
 #include "../src/communication/message_layer/message/KeepAliveMessage.h"
 #include "../src/communication/message_layer/message/PayloadMessage.h"
-#include "../src/communication/message_layer/message/AcknowledgeMessage.h"
 #include "../src/communication/message_layer/message_stream/MessageCoder.h"
 
 using namespace communication;
@@ -87,8 +87,8 @@ TEST(MessageCoder, CrcIncorrectException) {
   auto encoded_message = MessageCoder::Encode(&original_message);
 
   // only payload is manipulated, other cases are tested separately
-  size_t payload_offset =
-      sizeof(ProtocolDefinition::flag) + sizeof(MessageType) + sizeof(ProtocolDefinition::payload_length_t) + sizeof(ProtocolDefinition::sequence_t);
+  size_t payload_offset = sizeof(ProtocolDefinition::flag) + sizeof(MessageType) +
+                          sizeof(ProtocolDefinition::payload_length_t) + sizeof(ProtocolDefinition::sequence_t);
 
   for (size_t i = payload_offset; i < encoded_message.size() - sizeof(ProtocolDefinition::flag); ++i) {
     std::vector<uint8_t> bad_encoded_message(encoded_message);
