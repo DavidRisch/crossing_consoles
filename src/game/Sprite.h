@@ -1,8 +1,8 @@
 #ifndef CROSSING_CONSOLES_SPRITE_H
 #define CROSSING_CONSOLES_SPRITE_H
 
-#include <vector>
 #include <string>
+#include <vector>
 
 class Sprite {
  public:

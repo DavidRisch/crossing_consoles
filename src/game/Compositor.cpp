@@ -21,7 +21,8 @@ std::wstring Compositor::CompositeViewport() const {
 
   std::wstring information = L" SCORE";
   out += box_drawings_double_vertical + information +
-         std::wstring(viewport_size.x * block_size.x - information.length(), L' ') + box_drawings_double_vertical + L'\n';
+         std::wstring(viewport_size.x * block_size.x - information.length(), L' ') + box_drawings_double_vertical +
+         L'\n';
 
   out += box_drawings_double_vertical_and_right +
          std::wstring(viewport_size.x * block_size.x, box_drawings_double_horizontal) +
