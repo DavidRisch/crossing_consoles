@@ -16,7 +16,6 @@ class IInputByteStream {
 
   /**
    * \brief Read data without blocking
-   *
    */
   size_t ReadWithoutBlocking(uint8_t* receive_buffer, size_t max_length) {
     if (!HasInput()) {
@@ -28,7 +27,7 @@ class IInputByteStream {
 
   /**
    * \brief Read data
-   *  \details May block if `HasInput()` = false
+   * \details May block if `HasInput()` = false
    */
   virtual size_t Read(uint8_t* receive_buffer, size_t max_length) = 0;
 };
