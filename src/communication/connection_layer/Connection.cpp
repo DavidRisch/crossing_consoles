@@ -68,10 +68,12 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
   auto received_message = message_input_stream->ReceiveMessage();
 
   // TODO: Handle connection reset by other side
-
   // TODO: Set MetaData
 
-  // TODO: Send Acknowledge Message
+  // Send acknowledge for every received message except for other acknowledges
+  if (received_message->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
+    SendAcknowledge(received_message->GetAddress(), received_message->GetMessageSequence());
+  }
 
   return received_message;
 }
@@ -88,4 +90,8 @@ ProtocolDefinition::sequence_t Connection::GenerateSequence() {
   ProtocolDefinition::sequence_t current_counter = sequence_counter;
   sequence_counter++;
   return current_counter;
+}
+void Connection::SendAcknowledge(message_layer::address_t address, ProtocolDefinition::sequence_t sequence) {
+  auto ack_msg = message_layer::AcknowledgeMessage(address, sequence, GenerateSequence());
+  SendMessage(&ack_msg);
 }
