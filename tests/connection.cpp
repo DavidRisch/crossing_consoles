@@ -44,6 +44,8 @@ TEST(Connection, Simple) {
 
     auto received_message = server_connection->ReceiveMessage();
     EXPECT_EQ(original_message.GetMessageType(), received_message->GetMessageType());
+    auto ack_message = client_connection->ReceiveMessage();
+    EXPECT_EQ(ack_message->GetMessageType(), MessageType::ACKNOWLEDGE);
   }
 
   {
