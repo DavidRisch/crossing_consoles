@@ -1,9 +1,6 @@
-
-
 #include "../src/communication/connection_layer/Connection.h"
 
 #include <gtest/gtest.h>
-
 #include <thread>
 
 #include "../src/communication/byte_layer/byte_stream/MockBidirectionalByteStream.h"

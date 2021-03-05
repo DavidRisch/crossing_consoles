@@ -20,6 +20,6 @@ class ConnectionRequestMessage : public Message {
   // TODO: Protocol specification calls for 'client identification', that should happen here.
 };
 
-}  // namespace communication
+}  // namespace communication::message_layer
 
 #endif  // CROSSING_CONSOLES_CONNECTIONREQUESTMESSAGE_H
