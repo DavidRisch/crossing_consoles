@@ -8,7 +8,7 @@ Compositor::Compositor(coordinate_size_t viewport_size, World &world, Player &pl
     : viewport_size(viewport_size)
     , world(&world)
     , player(&player) {
-  renderer = new Renderer(viewport_size, block_size, world, player);
+  renderer = std::make_unique<Renderer>(viewport_size, block_size, world, player);
 }
 
 std::wstring Compositor::CompositeViewport() const {
@@ -19,8 +19,9 @@ std::wstring Compositor::CompositeViewport() const {
          std::wstring(viewport_size.x * block_size.x, box_drawings_double_horizontal) +
          box_drawings_double_down_and_left + L'\n';
 
-  out += box_drawings_double_vertical + std::wstring(L" SCORE") +
-         std::wstring(viewport_size.x * block_size.x - 6, L' ') + box_drawings_double_vertical + L'\n';
+  std::wstring information = L" SCORE";
+  out += box_drawings_double_vertical + information +
+         std::wstring(viewport_size.x * block_size.x - information.length(), L' ') + box_drawings_double_vertical + L'\n';
 
   out += box_drawings_double_vertical_and_right +
          std::wstring(viewport_size.x * block_size.x, box_drawings_double_horizontal) +

@@ -2,9 +2,13 @@
 
 #include <algorithm>
 
+#include "Sprite.h"
 #include "symbols.h"
 
 using namespace symbols;
+
+Sprite wall_sprite = Sprite(std::wstring(2, full_block) + L"\n" + std::wstring(2, full_block));
+Sprite player_sprite = Sprite(L"JL\n/\\");
 
 Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size, World& world, Player& player)
     : block_size(block_size)
@@ -48,7 +52,7 @@ std::wstring Renderer::RenderWorld() const {
           Position relative_position = position - viewport_start;
           for (int y = 0; y < block_size.y; y++) {
             out.replace(((relative_position.y * block_size.y) + y) * line_length + relative_position.x * block_size.x,
-                        block_size.x, std::wstring(block_size.x, full_block));
+                        block_size.x, wall_sprite.GetLine(y));
           }
         }
       }
@@ -58,10 +62,10 @@ std::wstring Renderer::RenderWorld() const {
   for (auto const& i_player : world->players) {
     if (i_player->position >= viewport_start && i_player->position <= viewport_end) {
       Position relative_position = i_player->position - viewport_start;
-      out.replace(((relative_position.y * block_size.y) + 0) * line_length + relative_position.x * block_size.x,
-                  block_size.x, L"JL");
-      out.replace(((relative_position.y * block_size.y) + 1) * line_length + relative_position.x * block_size.x,
-                  block_size.x, L"/\\");
+      for (int y = 0; y < block_size.y; y++) {
+        out.replace(((relative_position.y * block_size.y) + y) * line_length + relative_position.x * block_size.x,
+                    block_size.x, player_sprite.GetLine(y));
+      }
     }
   }
 

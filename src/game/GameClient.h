@@ -12,7 +12,7 @@ class GameClient {
  public:
   Player player;
   World world;
-  Compositor* compositor;
+  std::unique_ptr<Compositor> compositor;
   int keypress = 0;
 
   GameClient(Player player, World world, std::shared_ptr<ITerminal> terminal);

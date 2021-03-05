@@ -16,7 +16,7 @@ void World::AddWall(const Position& position) {
   updated = true;
 }
 
-bool World::IsWall(const Position& position) {
+bool World::IsBlocked(const Position& position) {
   for (auto const& i_wall : walls) {
     if (i_wall->position == position) {
       return true;

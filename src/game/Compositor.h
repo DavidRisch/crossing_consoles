@@ -1,6 +1,8 @@
 #ifndef CROSSING_CONSOLES_COMPOSITOR_H
 #define CROSSING_CONSOLES_COMPOSITOR_H
 
+#include <memory>
+
 #include "Player.h"
 #include "Position.h"
 #include "Renderer.h"
@@ -10,7 +12,7 @@ class Compositor {
  public:
   const coordinate_size_t block_size = Position(2, 2);
   coordinate_size_t viewport_size;
-  Renderer* renderer;
+  std::unique_ptr<Renderer> renderer;
   World* world;
   Player* player;
 

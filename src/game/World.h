@@ -19,7 +19,7 @@ class World {
   void AddPlayer(Player* player);
   void AddWall(const Position& position);
 
-  bool IsWall(const Position& position);
+  bool IsBlocked(const Position& position);
 };
 
 #endif  // CROSSING_CONSOLES_WORLD_H

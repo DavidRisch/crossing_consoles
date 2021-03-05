@@ -8,6 +8,7 @@ add_library(crossing_consoles_lib
         game/Wall.cpp
         game/Renderer.cpp
         game/Compositor.cpp
+        game/Sprite.cpp
 
         game/terminal/RealTerminal.cpp
         game/terminal/MockTerminal.cpp

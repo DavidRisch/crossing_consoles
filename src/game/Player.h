@@ -5,7 +5,7 @@
 
 #include "Position.h"
 
-enum Direction : int { NORTH, EAST, SOUTH, WEST };
+enum Direction : char { NORTH, EAST, SOUTH, WEST };
 
 class Player {
  public:

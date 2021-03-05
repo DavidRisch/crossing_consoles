@@ -12,7 +12,7 @@ GameClient::GameClient(Player player, World world, std::shared_ptr<ITerminal> te
     , terminal(std::move(terminal)) {
   this->world.AddPlayer(&this->player);
   coordinate_size_t viewport_size = Position(51, 31);
-  compositor = new Compositor(viewport_size, this->world, this->player);
+  compositor = std::make_unique<Compositor>(viewport_size, this->world, this->player);
 
   RunGame();
 }
@@ -61,7 +61,7 @@ void GameClient::ProcessInput() {
         new_position.y -= world.size.y;
       }
 
-      if (new_position != player.position && !world.IsWall(new_position)) {
+      if (new_position != player.position && !world.IsBlocked(new_position)) {
         player.MoveTo(new_position);
       }
     }
