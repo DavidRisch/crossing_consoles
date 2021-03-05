@@ -13,14 +13,15 @@ class Player {
   int score = 0;
   Position position;
   Direction direction = NORTH;
-  static int max_health;
+  int max_health = 100;
   int health = max_health;
+  bool updated = false;
 
-  explicit Player(std::string name, Position position);
+  Player(std::string name, Position position);
 
   [[nodiscard]] bool IsAlive() const;
 
-  void Move(const Position& new_position);
+  void MoveTo(const Position& new_position);
 
   void Attack();
 };

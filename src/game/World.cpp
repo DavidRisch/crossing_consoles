@@ -1,10 +1,26 @@
 #include "World.h"
 
-World::World(int width, int height) {
-  size[0] = width;
-  size[1] = height;
+#include <algorithm>
+
+World::World(int width, int height)
+    : size(Position(width, height)) {
 }
 
-bool World::IsWall(Position position) {
+void World::AddPlayer(Player* player) {
+  players.emplace_back(player);
+  updated = true;
+}
+
+void World::AddWall(const Position& position) {
+  walls.emplace_back(new Wall(position));
+  updated = true;
+}
+
+bool World::IsBlocked(const Position& position) {
+  for (auto const& i_wall : walls) {
+    if (i_wall->position == position) {
+      return true;
+    }
+  }
   return false;
 }

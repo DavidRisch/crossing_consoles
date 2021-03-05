@@ -1,9 +1,16 @@
 add_library(crossing_consoles_lib
 
+        game/GameClient.cpp
         game/Player.cpp
         game/Position.cpp
         game/World.cpp
         game/Wall.cpp
+        game/Renderer.cpp
+        game/Compositor.cpp
+        game/Sprite.cpp
+
+        game/terminal/RealTerminal.cpp
+        game/terminal/MockTerminal.cpp
 
         communication/byte_layer/byte_stream/SocketByteStream.cpp
         communication/byte_layer/byte_stream/SocketByteServer.cpp
