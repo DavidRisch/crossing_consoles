@@ -3,11 +3,12 @@
 using namespace communication;
 using namespace communication::message_layer;
 
-ConnectionRequestMessage::ConnectionRequestMessage(address_t address, MessageMetaData meta_data)
-    : Message(address, meta_data) {
+ConnectionRequestMessage::ConnectionRequestMessage(address_t address, MessageMetaData meta_data,
+                                                   ProtocolDefinition::sequence_t sequence)
+    : Message(address, sequence, meta_data) {
 }
-ConnectionRequestMessage::ConnectionRequestMessage(address_t address)
-    : Message(address) {
+ConnectionRequestMessage::ConnectionRequestMessage(address_t address, ProtocolDefinition::sequence_t sequence)
+    : Message(address, sequence) {
 }
 
 MessageType ConnectionRequestMessage::message_type = MessageType::CONNECTION_REQUEST;

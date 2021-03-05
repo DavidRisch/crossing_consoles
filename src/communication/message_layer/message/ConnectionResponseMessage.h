@@ -3,23 +3,21 @@
 
 #include "Message.h"
 
-namespace communication {
-namespace message_layer {
+namespace communication::message_layer {
 
 class ConnectionResponseMessage : public Message {
  public:
   static MessageType message_type;
 
   // Draft message
-  explicit ConnectionResponseMessage(address_t address);
+  explicit ConnectionResponseMessage(address_t address, ProtocolDefinition::sequence_t sequence = 0);
 
   // Received message
-  ConnectionResponseMessage(address_t address, MessageMetaData meta_data);
+  ConnectionResponseMessage(address_t address, MessageMetaData meta_data, ProtocolDefinition::sequence_t sequence = 0);
 
   [[nodiscard]] MessageType GetMessageType() const override;
 };
 
-}  // namespace message_layer
-}  // namespace communication
+}  // namespace communication::message_layer
 
 #endif  // CROSSING_CONSOLES_CONNECTIONRESPONSEMESSAGE_H
