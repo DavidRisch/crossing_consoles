@@ -31,6 +31,7 @@ class Message {
   Message(address_t address, ProtocolDefinition::sequence_t sequence, MessageMetaData meta_data);
 
   ProtocolDefinition::sequence_t GetMessageSequence() const;
+  void SetMessageSequence(ProtocolDefinition::sequence_t new_sequence);
 
   [[nodiscard]] address_t GetAddress() const;
   [[nodiscard]] virtual MessageType GetMessageType() const;

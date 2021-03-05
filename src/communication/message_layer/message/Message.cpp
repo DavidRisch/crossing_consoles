@@ -30,3 +30,6 @@ MessageMetaData Message::GetMessageMetaData() const {
 ProtocolDefinition::sequence_t Message::GetMessageSequence() const {
   return sequence;
 }
+void Message::SetMessageSequence(ProtocolDefinition::sequence_t new_sequence) {
+  sequence = new_sequence;
+}
