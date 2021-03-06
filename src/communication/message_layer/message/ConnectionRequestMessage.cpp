@@ -7,8 +7,8 @@ ConnectionRequestMessage::ConnectionRequestMessage(address_t address, MessageMet
                                                    ProtocolDefinition::sequence_t sequence)
     : Message(address, sequence, meta_data) {
 }
-ConnectionRequestMessage::ConnectionRequestMessage(address_t address, ProtocolDefinition::sequence_t sequence)
-    : Message(address, sequence) {
+ConnectionRequestMessage::ConnectionRequestMessage(address_t address)
+    : Message(address) {
 }
 
 MessageType ConnectionRequestMessage::message_type = MessageType::CONNECTION_REQUEST;

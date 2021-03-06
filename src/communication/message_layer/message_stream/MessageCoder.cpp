@@ -64,7 +64,10 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
 
   WriteToStream(output, ProtocolDefinition::flag, sizeof(ProtocolDefinition::flag), false);
 
-  // MessageType is never flag or escape, add without any checking
+  // MessageType is never flag or escape
+  assert(static_cast<const unsigned char>(message->GetMessageType()) != ProtocolDefinition::flag);
+  assert(static_cast<const unsigned char>(message->GetMessageType()) != ProtocolDefinition::escape);
+
   output.push_back(static_cast<uint8_t>(message->GetMessageType()));
 
   // write sequence to output and check for flags/escape sequences
@@ -77,13 +80,14 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
       // no payload necessary
       break;
     case MessageType::ACKNOWLEDGE: {
-      // "payload" equals sequence of acknowledged message
+      // insert sequence of acknowledged message
       auto *acknowledge_message = reinterpret_cast<AcknowledgeMessage *>(message);
       ProtocolDefinition::sequence_t sequence = acknowledge_message->GetAcknowledgedMessageSequence();
       WriteToStream(output, sequence, sizeof(sequence));
       break;
     }
     case MessageType::PAYLOAD:
+      // insert payload length and payload
       auto *payload_message = reinterpret_cast<PayloadMessage *>(message);
       const auto &payload = payload_message->GetPayload();
       ProtocolDefinition::payload_length_t payload_length = payload.size();

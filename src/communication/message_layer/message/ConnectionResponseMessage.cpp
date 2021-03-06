@@ -7,8 +7,8 @@ ConnectionResponseMessage::ConnectionResponseMessage(address_t address, MessageM
                                                      ProtocolDefinition::sequence_t sequence)
     : Message(address, sequence, meta_data) {
 }
-ConnectionResponseMessage::ConnectionResponseMessage(address_t address, ProtocolDefinition::sequence_t sequence)
-    : Message(address, sequence) {
+ConnectionResponseMessage::ConnectionResponseMessage(address_t address)
+    : Message(address) {
 }
 
 MessageType ConnectionResponseMessage::message_type = MessageType::CONNECTION_RESPONSE;

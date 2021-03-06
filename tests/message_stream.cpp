@@ -20,7 +20,7 @@ TEST(MessageStream, NoBlocking) {
 
   auto received_message = message_input_stream.ReceiveMessage(false);
 
-  // check if received msg is empty
+  // assert that no message was received
   EXPECT_FALSE(received_message);
 }
 

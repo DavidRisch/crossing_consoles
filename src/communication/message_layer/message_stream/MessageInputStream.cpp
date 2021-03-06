@@ -15,17 +15,9 @@ MessageInputStream::MessageInputStream(byte_layer::IInputByteStream &input_strea
 
 std::shared_ptr<Message> MessageInputStream::ReceiveMessage(bool blocking) {
   while (true) {
-    /*
-    if(!blocking){
-      if(!input_stream.HasInput()){
-        return std::shared_ptr<Message>();
-      }
-    }
-    */
-
     uint8_t current_byte = 0;
-    // TODO: use ReadWithoutBlocking
     auto read_count = input_stream.ReadWithoutBlocking(&current_byte, 1);
+
     if (!blocking && read_count == 0) {
       return std::shared_ptr<Message>();
     }

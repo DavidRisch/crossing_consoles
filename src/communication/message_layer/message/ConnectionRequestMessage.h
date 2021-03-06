@@ -10,7 +10,7 @@ class ConnectionRequestMessage : public Message {
   static MessageType message_type;
 
   // Draft message
-  explicit ConnectionRequestMessage(address_t address, ProtocolDefinition::sequence_t sequence = 0);
+  explicit ConnectionRequestMessage(address_t address);
 
   // Received message
   ConnectionRequestMessage(address_t address, MessageMetaData meta_data, ProtocolDefinition::sequence_t sequence = 0);

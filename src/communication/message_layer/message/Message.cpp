@@ -5,9 +5,9 @@
 using namespace communication;
 using namespace communication::message_layer;
 
-Message::Message(address_t address, ProtocolDefinition::sequence_t sequence)
-    : address(address)
-    , sequence(sequence) {
+Message::Message(address_t address)
+    : address(address) {
+  sequence = 0;
 }
 
 Message::Message(address_t address, ProtocolDefinition::sequence_t sequence, MessageMetaData meta_data)

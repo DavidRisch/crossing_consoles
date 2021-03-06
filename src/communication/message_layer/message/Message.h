@@ -25,7 +25,7 @@ typedef uint16_t address_t;
 class Message {
  public:
   // Draft message
-  Message(address_t address, ProtocolDefinition::sequence_t sequence);
+  Message(address_t address);
 
   // Received message
   Message(address_t address, ProtocolDefinition::sequence_t sequence, MessageMetaData meta_data);

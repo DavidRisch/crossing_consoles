@@ -11,7 +11,7 @@ class KeepAliveMessage : public Message {
   static MessageType message_type;
 
   // Draft message
-  explicit KeepAliveMessage(address_t address, ProtocolDefinition::sequence_t sequence = 0);
+  explicit KeepAliveMessage(address_t address);
 
   // Received message
   KeepAliveMessage(address_t address, MessageMetaData meta_data, ProtocolDefinition::sequence_t sequence = 0);

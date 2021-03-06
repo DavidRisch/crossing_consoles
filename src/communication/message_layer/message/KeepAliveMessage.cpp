@@ -7,8 +7,8 @@ KeepAliveMessage::KeepAliveMessage(address_t address, MessageMetaData meta_data,
                                    ProtocolDefinition::sequence_t sequence)
     : Message(address, sequence, meta_data) {
 }
-KeepAliveMessage::KeepAliveMessage(address_t address, ProtocolDefinition::sequence_t sequence)
-    : Message(address, sequence) {
+KeepAliveMessage::KeepAliveMessage(address_t address)
+    : Message(address) {
 }
 
 MessageType KeepAliveMessage::message_type = MessageType::KEEP_ALIVE;

@@ -11,8 +11,7 @@ class AcknowledgeMessage : public Message {
   static MessageType message_type;
 
   // Draft message
-  explicit AcknowledgeMessage(address_t address, ProtocolDefinition::sequence_t acknowledged_msg_sequence,
-                              ProtocolDefinition::sequence_t sequence = 0);
+  explicit AcknowledgeMessage(address_t address, ProtocolDefinition::sequence_t acknowledged_msg_sequence);
 
   // Received message
   AcknowledgeMessage(address_t address, ProtocolDefinition::sequence_t acknowledged_msg_sequence,
