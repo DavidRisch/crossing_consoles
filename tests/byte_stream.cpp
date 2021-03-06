@@ -14,7 +14,7 @@ TEST(ByteServer, NoBlocking) {
     SocketByteStream byte_stream = SocketByteStream::CreateClientSide();
 
     std::vector<uint8_t> receive_buffer(100);
-    u_int8_t first_byte = 123;
+    uint8_t first_byte = 123;
     receive_buffer.at(0) = first_byte;
 
     int read_count = byte_stream.ReadWithoutBlocking(receive_buffer.data(), receive_buffer.capacity());
@@ -32,7 +32,7 @@ TEST(ByteServer, NoBlocking) {
   }
 
   std::vector<uint8_t> receive_buffer(100);
-  u_int8_t first_byte = 123;
+  uint8_t first_byte = 123;
   receive_buffer.at(0) = first_byte;
   int read_count = byte_stream->ReadWithoutBlocking(receive_buffer.data(), receive_buffer.capacity());
   EXPECT_EQ(read_count, 0);

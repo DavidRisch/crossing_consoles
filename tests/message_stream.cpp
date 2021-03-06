@@ -49,7 +49,7 @@ TEST(MessageStream, WithPadding) {
   address_t target_address = 1234;
   KeepAliveMessage original_message(target_address);
 
-  u_int8_t padding[10] = {};
+  uint8_t padding[10] = {};
   stream_pair.second->Send(padding, sizeof(padding));
   message_output_stream.SendMessage(&original_message);
   stream_pair.second->Send(padding, sizeof(padding));
