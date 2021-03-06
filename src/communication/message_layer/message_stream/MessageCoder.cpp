@@ -4,7 +4,7 @@
 #include <memory>
 #include <optional>
 
-#include "../../ProtocolDefinition.h"
+#include "../message/AcknowledgeMessage.h"
 #include "../message/ConnectionRequestMessage.h"
 #include "../message/ConnectionResponseMessage.h"
 #include "../message/KeepAliveMessage.h"
@@ -63,7 +63,15 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
   std::vector<uint8_t> output;
 
   WriteToStream(output, ProtocolDefinition::flag, sizeof(ProtocolDefinition::flag), false);
+
+  // MessageType is never flag or escape
+  assert(static_cast<const unsigned char>(message->GetMessageType()) != ProtocolDefinition::flag);
+  assert(static_cast<const unsigned char>(message->GetMessageType()) != ProtocolDefinition::escape);
+
   output.push_back(static_cast<uint8_t>(message->GetMessageType()));
+
+  // write sequence to output and check for flags/escape sequences
+  WriteToStream(output, message->GetMessageSequence(), sizeof(ProtocolDefinition::sequence_t));
 
   switch (message->GetMessageType()) {
     case MessageType::KEEP_ALIVE:
@@ -71,7 +79,15 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
     case MessageType::CONNECTION_RESPONSE:
       // no payload necessary
       break;
+    case MessageType::ACKNOWLEDGE: {
+      // insert sequence of acknowledged message
+      auto *acknowledge_message = reinterpret_cast<AcknowledgeMessage *>(message);
+      ProtocolDefinition::sequence_t sequence = acknowledge_message->GetAcknowledgedMessageSequence();
+      WriteToStream(output, sequence, sizeof(sequence));
+      break;
+    }
     case MessageType::PAYLOAD:
+      // insert payload length and payload
       auto *payload_message = reinterpret_cast<PayloadMessage *>(message);
       const auto &payload = payload_message->GetPayload();
       ProtocolDefinition::payload_length_t payload_length = payload.size();
@@ -93,6 +109,7 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
   crc_value_t crc = CRCHandler::CalculateCRCValue(output.data() + crc_start_offset, output.size() - crc_start_offset);
   WriteToStream(output, crc, crc_length);
 
+  // Write flag to mark end of message
   WriteToStream(output, ProtocolDefinition::flag, sizeof(ProtocolDefinition::flag), false);
 
   return output;
@@ -100,7 +117,6 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
 
 std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stream, bool expect_start_sequence) {
   CRCHandler crc_handler = CRCHandler();
-
   if (expect_start_sequence) {
     auto found_start_sequence =
         ReadFromStreamWithCRC<ProtocolDefinition::flag_t>(stream, sizeof(ProtocolDefinition::flag), nullptr, false);
@@ -113,6 +129,8 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
   }
 
   auto message_type = static_cast<MessageType>(message_type_value);
+  auto message_sequence = ReadFromStreamWithCRC<ProtocolDefinition::sequence_t>(
+      stream, sizeof(ProtocolDefinition::sequence_t), &crc_handler);
 
   // TODO: create real metadata
   MessageMetaData message_meta_data(123, 456);
@@ -122,14 +140,22 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
   switch (message_type) {
     case MessageType::KEEP_ALIVE:
       // TODO: use real address (also applies to lines below
-      message = std::make_shared<KeepAliveMessage>(0, message_meta_data);
+      message = std::make_shared<KeepAliveMessage>(0, message_meta_data, message_sequence);
+
       break;
     case MessageType::CONNECTION_REQUEST:
-      message = std::make_shared<ConnectionRequestMessage>(0, message_meta_data);
+      message = std::make_shared<ConnectionRequestMessage>(0, message_meta_data, message_sequence);
       break;
     case MessageType::CONNECTION_RESPONSE:
-      message = std::make_shared<ConnectionResponseMessage>(0, message_meta_data);
+      message = std::make_shared<ConnectionResponseMessage>(0, message_meta_data, message_sequence);
       break;
+    case MessageType::ACKNOWLEDGE: {
+      auto ack_sequence = ReadFromStreamWithCRC<ProtocolDefinition::sequence_t>(
+          stream, sizeof(ProtocolDefinition::sequence_t), &crc_handler);
+
+      message = std::make_shared<AcknowledgeMessage>(0, ack_sequence, message_meta_data, message_sequence);
+      break;
+    }
     case MessageType::PAYLOAD: {
       auto payload_length = ReadFromStreamWithCRC<ProtocolDefinition::payload_length_t>(
           stream, sizeof(ProtocolDefinition::payload_length_t), &crc_handler);
@@ -154,7 +180,7 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
         payload.push_back(byte);
       }
 
-      message = std::make_shared<PayloadMessage>(0, payload, message_meta_data);
+      message = std::make_shared<PayloadMessage>(0, payload, message_meta_data, message_sequence);
       break;
     }
     default:

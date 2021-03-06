@@ -2,6 +2,7 @@
 
 #include "../src/communication/ProtocolDefinition.h"
 #include "../src/communication/byte_layer/byte_stream/MockInputStream.h"
+#include "../src/communication/message_layer/message/AcknowledgeMessage.h"
 #include "../src/communication/message_layer/message/KeepAliveMessage.h"
 #include "../src/communication/message_layer/message/PayloadMessage.h"
 #include "../src/communication/message_layer/message_stream/MessageCoder.h"
@@ -55,6 +56,24 @@ TEST(MessageCoder, PayloadMessage) {
   }
 }
 
+TEST(MessageCoder, AcknowledgeMessage) {
+  address_t target_address = 1234;
+  ProtocolDefinition::sequence_t sequence = 70;
+  AcknowledgeMessage original_message(target_address, sequence);
+
+  auto encoded_message = MessageCoder::Encode(&original_message);
+
+  MockInputStream mock_input_stream;
+  mock_input_stream.AddData(encoded_message);
+
+  auto decoded_message = MessageCoder::Decode(mock_input_stream);
+  EXPECT_TRUE(mock_input_stream.IsEmpty());
+
+  EXPECT_EQ(original_message.GetMessageType(), decoded_message->GetMessageType());
+  auto decoded_message_ack = dynamic_cast<AcknowledgeMessage &>(*decoded_message);
+  EXPECT_EQ(original_message.GetAcknowledgedMessageSequence(), decoded_message_ack.GetAcknowledgedMessageSequence());
+}
+
 TEST(MessageCoder, CrcIncorrectException) {
   address_t target_address = 1234;
   std::vector<uint8_t> original_payload;
@@ -68,8 +87,8 @@ TEST(MessageCoder, CrcIncorrectException) {
   auto encoded_message = MessageCoder::Encode(&original_message);
 
   // only payload is manipulated, other cases are tested separately
-  size_t payload_offset =
-      sizeof(ProtocolDefinition::flag) + sizeof(MessageType) + sizeof(ProtocolDefinition::payload_length_t);
+  size_t payload_offset = sizeof(ProtocolDefinition::flag) + sizeof(MessageType) +
+                          sizeof(ProtocolDefinition::payload_length_t) + sizeof(ProtocolDefinition::sequence_t);
 
   for (size_t i = payload_offset; i < encoded_message.size() - sizeof(ProtocolDefinition::flag); ++i) {
     std::vector<uint8_t> bad_encoded_message(encoded_message);

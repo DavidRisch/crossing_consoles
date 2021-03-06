@@ -1,6 +1,8 @@
 #ifndef CROSSING_CONSOLES_PROTOCOL_DEFINITION_H
 #define CROSSING_CONSOLES_PROTOCOL_DEFINITION_H
 
+#include <cstdint>
+
 namespace communication {
 
 /**
@@ -21,6 +23,9 @@ class ProtocolDefinition {
   constexpr static const escape_t escape = 0x87u;
 
   typedef uint16_t payload_length_t;
+
+  /// A type large enough to hold message `sequence`.
+  typedef uint16_t sequence_t;
 };
 
 }  // namespace communication

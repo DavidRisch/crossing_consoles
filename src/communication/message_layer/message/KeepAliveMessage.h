@@ -14,7 +14,7 @@ class KeepAliveMessage : public Message {
   explicit KeepAliveMessage(address_t address);
 
   // Received message
-  KeepAliveMessage(address_t address, MessageMetaData meta_data);
+  KeepAliveMessage(address_t address, MessageMetaData meta_data, ProtocolDefinition::sequence_t sequence = 0);
 
   [[nodiscard]] MessageType GetMessageType() const override;
 };

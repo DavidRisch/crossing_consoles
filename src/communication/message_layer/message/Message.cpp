@@ -7,11 +7,13 @@ using namespace communication::message_layer;
 
 Message::Message(address_t address)
     : address(address) {
+  sequence = 0;
 }
 
-Message::Message(address_t address, MessageMetaData meta_data)
+Message::Message(address_t address, ProtocolDefinition::sequence_t sequence, MessageMetaData meta_data)
     : address(address)
-    , meta_data(meta_data) {
+    , meta_data(meta_data)
+    , sequence(sequence) {
 }
 
 address_t Message::GetAddress() const {
@@ -24,4 +26,10 @@ MessageType Message::GetMessageType() const {
 
 MessageMetaData Message::GetMessageMetaData() const {
   return meta_data;
+}
+ProtocolDefinition::sequence_t Message::GetMessageSequence() const {
+  return sequence;
+}
+void Message::SetMessageSequence(ProtocolDefinition::sequence_t new_sequence) {
+  sequence = new_sequence;
 }

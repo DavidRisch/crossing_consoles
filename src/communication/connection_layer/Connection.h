@@ -46,7 +46,14 @@ class Connection {
 
  private:
   Connection(std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
-             std::shared_ptr<message_layer::MessageOutputStream> message_output_stream);
+             std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
+             ProtocolDefinition::sequence_t sequence_counter);
+
+  void SendAcknowledge(message_layer::address_t address, ProtocolDefinition::sequence_t sequence);
+
+  ProtocolDefinition::sequence_t GenerateSequence();
+
+  ProtocolDefinition::sequence_t sequence_counter;
 
   std::shared_ptr<message_layer::MessageInputStream> message_input_stream;
   std::shared_ptr<message_layer::MessageOutputStream> message_output_stream;

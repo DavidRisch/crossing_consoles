@@ -15,7 +15,7 @@ namespace byte_layer {
 
 typedef uint16_t port_t;
 
-/// randomly chosen port number
+/// arbitrary chosen port number
 inline const port_t socket_default_port = 56921;
 
 /**
@@ -34,6 +34,9 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
 
   size_t Read(uint8_t* receive_buffer, size_t max_length) override;
   std::string ReadString(size_t max_length = 1024);
+
+  /// Indicates data is available and can be read
+  bool HasInput() override;
 
   void SetConnectionSimulatorIncoming(IConnectionSimulator& ConnectionSimulator);
   void SetConnectionSimulatorOutgoing(IConnectionSimulator& ConnectionSimulator);
