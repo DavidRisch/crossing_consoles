@@ -41,6 +41,43 @@ TEST(ByteServer, NoBlocking) {
   client_thread.join();
 }
 
+TEST(ByteServer, SuccessfullNoneBlocking) {
+  const char* server_to_client = "0123456789";
+  const char* client_to_server = "ABCDEFGHIJ";
+
+  std::string client_received;
+
+  SocketByteServer byte_server;
+
+  std::thread client_thread([client_to_server, &client_received] {
+    SocketByteStream b = SocketByteStream::CreateClientSide();
+    b.SendString(client_to_server);
+    std::this_thread::sleep_for(std::chrono::microseconds(1000));  // time for the message to arrive
+    client_received = b.ReadStringWithoutBlocking();
+  });
+
+  std::optional<SocketByteStream> byte_stream;
+
+  int counter = 1000;
+  while (!byte_stream.has_value() && counter > 0) {
+    byte_stream = byte_server.GetNewClient();
+    std::this_thread::sleep_for(std::chrono::microseconds(100));
+    counter--;
+  }
+
+  ASSERT_NE(counter, 0);
+  ASSERT_TRUE(byte_stream.has_value());
+
+  byte_stream->SendString(server_to_client);
+  std::this_thread::sleep_for(std::chrono::microseconds(1000));  // time for the message to arrive
+  std::string server_received = byte_stream->ReadStringWithoutBlocking();
+
+  client_thread.join();
+
+  EXPECT_EQ(server_to_client, client_received);
+  EXPECT_EQ(client_to_server, server_received);
+}
+
 TEST(ByteServer, SingleClient) {
   const char* server_to_client = "0123456789";
   const char* client_to_server = "ABCDEFGHIJ";
@@ -52,6 +89,7 @@ TEST(ByteServer, SingleClient) {
   std::thread client_thread([client_to_server, &client_received] {
     SocketByteStream b = SocketByteStream::CreateClientSide();
     b.SendString(client_to_server);
+    std::this_thread::sleep_for(std::chrono::microseconds(1000));
     client_received = b.ReadString();
   });
 
@@ -68,6 +106,7 @@ TEST(ByteServer, SingleClient) {
   ASSERT_TRUE(byte_stream.has_value());
 
   byte_stream->SendString(server_to_client);
+  std::this_thread::sleep_for(std::chrono::microseconds(1000));
   std::string server_received = byte_stream->ReadString();
 
   client_thread.join();

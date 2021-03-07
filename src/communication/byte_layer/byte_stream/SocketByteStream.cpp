@@ -92,6 +92,7 @@ void SocketByteStream::SetConnectionSimulatorIncoming(IConnectionSimulator &Conn
 void SocketByteStream::SetConnectionSimulatorOutgoing(IConnectionSimulator &ConnectionSimulator) {
   connection_simulator_outgoing = &ConnectionSimulator;
 }
+
 bool SocketByteStream::HasInput() {
   struct timeval timeout {
     0, 0
@@ -101,7 +102,7 @@ bool SocketByteStream::HasInput() {
   FD_ZERO(&read_fds);
   FD_SET(socket_holder->file_descriptor, &read_fds);
 
-  int ready_count = select(1, &read_fds, nullptr, nullptr, &timeout);
+  int ready_count = select(socket_holder->file_descriptor + 1, &read_fds, nullptr, nullptr, &timeout);
 
   if (ready_count < 0) {
     throw(std::runtime_error("select failed"));

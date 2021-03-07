@@ -25,6 +25,15 @@ class IInputByteStream {
     return Read(receive_buffer, max_length);
   }
 
+  std::string ReadStringWithoutBlocking(size_t max_length = 1024) {
+    char* receive_buffer = new char[max_length + 1];
+    auto read_count = ReadWithoutBlocking(reinterpret_cast<uint8_t*>(receive_buffer), max_length);
+    receive_buffer[read_count] = '\0';
+    std::string received(receive_buffer);
+    delete[] receive_buffer;
+    return received;
+  }
+
   /**
    * \brief Read data
    * \details May block if `HasInput()` = false
