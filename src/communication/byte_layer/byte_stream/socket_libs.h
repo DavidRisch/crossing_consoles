@@ -1,6 +1,11 @@
 #ifndef CROSSING_CONSOLES_SOCKET_LIBS_H
 #define CROSSING_CONSOLES_SOCKET_LIBS_H
 
+/**
+ * \file
+ * \brief Includes all headers needed for sockets on Linux and Windows.
+ */
+
 #ifdef _WIN32
 // Windows
 #include <winsock2.h>

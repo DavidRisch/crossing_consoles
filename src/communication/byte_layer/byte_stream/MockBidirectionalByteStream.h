@@ -43,6 +43,7 @@ class MockBidirectionalByteStream : public IInputByteStream, public IOutputByteS
 
   std::weak_ptr<MockBidirectionalByteStream> other_end_weak;
 
+  /// Needed because a linked pair is used by multiple threads at the same time.
   std::shared_ptr<std::mutex> mutex;
 };
 

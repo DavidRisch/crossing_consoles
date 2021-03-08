@@ -11,6 +11,9 @@ namespace byte_layer {
  */
 class IConnectionSimulator {
  public:
+  /**
+   * \brief Run byte through virtual connection and get end result.
+   */
   virtual uint8_t Filter(uint8_t input) = 0;
 };
 

@@ -14,6 +14,10 @@ class SocketHolder {
   const file_descriptor_t file_descriptor;
 
   explicit SocketHolder(file_descriptor_t file_descriptor);
+
+  /**
+   * \brief Closes the socket.
+   */
   ~SocketHolder();
 };
 

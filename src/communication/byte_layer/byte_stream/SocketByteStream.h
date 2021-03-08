@@ -27,6 +27,10 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
                             IConnectionSimulator& connection_simulator_incoming = ConnectionSimulatorPerfect::instance,
                             IConnectionSimulator& connection_simulator_outgoing = ConnectionSimulatorPerfect::instance);
 
+  /**
+   * \brief Connect to a `SocketByteServer` and create a new `SocketByteStream`.
+   * \details Blocks until a connection is established.
+   */
   static SocketByteStream CreateClientSide(port_t port = socket_default_port);
 
   void Send(const uint8_t* send_buffer, size_t length) override;
@@ -41,6 +45,9 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
   void SetConnectionSimulatorIncoming(IConnectionSimulator& ConnectionSimulator);
   void SetConnectionSimulatorOutgoing(IConnectionSimulator& ConnectionSimulator);
 
+  /**
+   * \brief Thrown if a client tries to connect to a server which does not exist.
+   */
   class ConnectionRefusedException : public std::exception {
     [[nodiscard]] const char* what() const noexcept override {
       return "Socket connection failed. Is the server started?";
