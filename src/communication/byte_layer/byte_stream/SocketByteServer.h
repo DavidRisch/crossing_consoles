@@ -17,7 +17,7 @@ class SocketByteServer {
  public:
   explicit SocketByteServer(uint16_t port = socket_default_port, int max_connections = 5);
 
-  std::optional<SocketByteStream> GetNewClient();
+  std::shared_ptr<SocketByteStream> GetNewClient();
 
  private:
   std::shared_ptr<SocketHolder> socket_holder;

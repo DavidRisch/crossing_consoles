@@ -16,7 +16,7 @@ using namespace communication::message_layer;
 TEST(MessageStream, NoBlocking) {
   auto stream_pair = MockBidirectionalByteStream::CreatePair();
 
-  MessageInputStream message_input_stream(*stream_pair.first);
+  MessageInputStream message_input_stream(stream_pair.first);
 
   auto received_message = message_input_stream.ReceiveMessage(false);
 
@@ -27,8 +27,8 @@ TEST(MessageStream, NoBlocking) {
 TEST(MessageStream, Simple) {
   auto stream_pair = MockBidirectionalByteStream::CreatePair();
 
-  MessageInputStream message_input_stream(*stream_pair.first);
-  MessageOutputStream message_output_stream(*stream_pair.second);
+  MessageInputStream message_input_stream(stream_pair.first);
+  MessageOutputStream message_output_stream(stream_pair.second);
 
   address_t target_address = 1234;
   KeepAliveMessage original_message(target_address);
@@ -43,8 +43,8 @@ TEST(MessageStream, Simple) {
 TEST(MessageStream, WithPadding) {
   auto stream_pair = MockBidirectionalByteStream::CreatePair();
 
-  MessageInputStream message_input_stream(*stream_pair.first);
-  MessageOutputStream message_output_stream(*stream_pair.second);
+  MessageInputStream message_input_stream(stream_pair.first);
+  MessageOutputStream message_output_stream(stream_pair.second);
 
   address_t target_address = 1234;
   KeepAliveMessage original_message(target_address);
@@ -62,8 +62,8 @@ TEST(MessageStream, WithPadding) {
 TEST(MessageStream, Multiple) {
   auto stream_pair = MockBidirectionalByteStream::CreatePair();
 
-  MessageInputStream message_input_stream(*stream_pair.first);
-  MessageOutputStream message_output_stream(*stream_pair.second);
+  MessageInputStream message_input_stream(stream_pair.first);
+  MessageOutputStream message_output_stream(stream_pair.second);
 
   address_t target_address = 1234;
   for (int i = 0; i < 10; ++i) {
@@ -86,11 +86,11 @@ TEST(MessageStream, Multiple) {
 TEST(MessageStream, Threaded) {
   auto stream_pair = MockBidirectionalByteStream::CreatePair();
 
-  auto a_message_input_stream = std::make_shared<MessageInputStream>(*stream_pair.second);
-  auto b_message_output_stream = std::make_shared<MessageOutputStream>(*stream_pair.first);
+  auto a_message_input_stream = std::make_shared<MessageInputStream>(stream_pair.second);
+  auto b_message_output_stream = std::make_shared<MessageOutputStream>(stream_pair.first);
 
-  auto b_message_input_stream = std::make_shared<MessageInputStream>(*stream_pair.first);
-  auto a_message_output_stream = std::make_shared<MessageOutputStream>(*stream_pair.second);
+  auto b_message_input_stream = std::make_shared<MessageInputStream>(stream_pair.first);
+  auto a_message_output_stream = std::make_shared<MessageOutputStream>(stream_pair.second);
 
   address_t target_address = 1234;
 

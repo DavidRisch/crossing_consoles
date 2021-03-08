@@ -70,16 +70,15 @@ void Connection::SendMessage(message_layer::Message *message) {
 }
 
 std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
-  // TODO: set address
-  auto received_message = message_input_stream->ReceiveMessage();
+  auto received_message = message_input_stream->ReceiveMessage(false);
 
-  // TODO: Handle connection reset by other side
   // TODO: Set MetaData
 
   // Send acknowledge for every received message except for other acknowledges
-  if (received_message->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
-    SendAcknowledge(received_message->GetAddress(), received_message->GetMessageSequence());
-  }
+  if (received_message)
+    if (received_message->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
+      SendAcknowledge(received_message->GetAddress(), received_message->GetMessageSequence());
+    }
 
   return received_message;
 }

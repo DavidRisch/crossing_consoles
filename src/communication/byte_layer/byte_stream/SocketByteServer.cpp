@@ -77,7 +77,7 @@ SocketByteServer::SocketByteServer(port_t port, int max_connections) {
 #endif
 }
 
-std::optional<SocketByteStream> SocketByteServer::GetNewClient() {  // NOLINT(readability-make-member-function-const)
+std::shared_ptr<SocketByteStream> SocketByteServer::GetNewClient() {  // NOLINT(readability-make-member-function-const)
   struct sockaddr_in address {};
   int address_length = sizeof(address);
 
@@ -101,9 +101,9 @@ std::optional<SocketByteStream> SocketByteServer::GetNewClient() {  // NOLINT(re
     if (errno == EAGAIN) {
 #endif
       // No client is trying to connect
-      return std::optional<SocketByteStream>();
+      return std::shared_ptr<SocketByteStream>();
     }
     throw std::runtime_error("accept failed");
   }
-  return std::make_optional<SocketByteStream>(socket_file_descriptor);
+  return std::make_shared<SocketByteStream>(socket_file_descriptor);
 }

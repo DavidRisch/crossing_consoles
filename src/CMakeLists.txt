@@ -36,6 +36,9 @@ add_library(crossing_consoles_lib
         communication/message_layer/crc/CRCHandler.cpp
 
         communication/connection_layer/Connection.cpp
+        communication/connection_layer/ConnectionManager.cpp
+        communication/connection_layer/ServerSideConnectionManager.cpp
+        communication/connection_layer/ClientSideConnectionManager.cpp
         )
 
 add_executable(crossing_consoles_main_server

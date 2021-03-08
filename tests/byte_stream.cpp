@@ -11,21 +11,21 @@ TEST(ByteServer, NoBlocking) {
   SocketByteServer byte_server;
 
   std::thread client_thread([] {
-    SocketByteStream byte_stream = SocketByteStream::CreateClientSide();
+    std::shared_ptr<SocketByteStream> byte_stream = SocketByteStream::CreateClientSide();
 
     std::vector<uint8_t> receive_buffer(100);
     uint8_t first_byte = 123;
     receive_buffer.at(0) = first_byte;
 
-    int read_count = byte_stream.ReadWithoutBlocking(receive_buffer.data(), receive_buffer.capacity());
+    int read_count = byte_stream->ReadWithoutBlocking(receive_buffer.data(), receive_buffer.capacity());
     EXPECT_EQ(read_count, 0);
     EXPECT_EQ(receive_buffer.at(0), first_byte);
   });
 
-  std::optional<SocketByteStream> byte_stream;
+  std::shared_ptr<SocketByteStream> byte_stream;
 
   int counter = 1000;
-  while (!byte_stream.has_value() && counter > 0) {
+  while (!byte_stream && counter > 0) {
     byte_stream = byte_server.GetNewClient();
     std::this_thread::sleep_for(std::chrono::microseconds(100));
     counter--;
@@ -50,23 +50,23 @@ TEST(ByteServer, SuccessfullNoneBlocking) {
   SocketByteServer byte_server;
 
   std::thread client_thread([client_to_server, &client_received] {
-    SocketByteStream b = SocketByteStream::CreateClientSide();
-    b.SendString(client_to_server);
+    std::shared_ptr<SocketByteStream> b = SocketByteStream::CreateClientSide();
+    b->SendString(client_to_server);
     std::this_thread::sleep_for(std::chrono::microseconds(1000));  // time for the message to arrive
-    client_received = b.ReadStringWithoutBlocking();
+    client_received = b->ReadStringWithoutBlocking();
   });
 
-  std::optional<SocketByteStream> byte_stream;
+  std::shared_ptr<SocketByteStream> byte_stream;
 
   int counter = 1000;
-  while (!byte_stream.has_value() && counter > 0) {
+  while (!byte_stream && counter > 0) {
     byte_stream = byte_server.GetNewClient();
     std::this_thread::sleep_for(std::chrono::microseconds(100));
     counter--;
   }
 
   ASSERT_NE(counter, 0);
-  ASSERT_TRUE(byte_stream.has_value());
+  ASSERT_TRUE(byte_stream);
 
   byte_stream->SendString(server_to_client);
   std::this_thread::sleep_for(std::chrono::microseconds(1000));  // time for the message to arrive
@@ -87,23 +87,23 @@ TEST(ByteServer, SingleClient) {
   SocketByteServer byte_server;
 
   std::thread client_thread([client_to_server, &client_received] {
-    SocketByteStream b = SocketByteStream::CreateClientSide();
+    SocketByteStream b = *SocketByteStream::CreateClientSide();
     b.SendString(client_to_server);
     std::this_thread::sleep_for(std::chrono::microseconds(1000));
     client_received = b.ReadString();
   });
 
-  std::optional<SocketByteStream> byte_stream;
+  std::shared_ptr<SocketByteStream> byte_stream;
 
   int counter = 1000;
-  while (!byte_stream.has_value() && counter > 0) {
+  while (!byte_stream && counter > 0) {
     byte_stream = byte_server.GetNewClient();
     std::this_thread::sleep_for(std::chrono::microseconds(100));
     counter--;
   }
 
   ASSERT_NE(counter, 0);
-  ASSERT_TRUE(byte_stream.has_value());
+  ASSERT_TRUE(byte_stream);
 
   byte_stream->SendString(server_to_client);
   std::this_thread::sleep_for(std::chrono::microseconds(1000));
@@ -128,7 +128,7 @@ TEST(ByteServer, TwoClients) {
   SocketByteServer byte_server;
 
   std::thread server_thread([&byte_server, server_to_client1, server_to_client2, &server_received] {
-    std::optional<SocketByteStream> byte_stream;
+    std::shared_ptr<SocketByteStream> byte_stream;
 
     int success_count = 0;
     const char* next_message = server_to_client1;
@@ -138,7 +138,7 @@ TEST(ByteServer, TwoClients) {
       byte_stream = byte_server.GetNewClient();
       std::this_thread::sleep_for(std::chrono::microseconds(100));
       counter--;
-      if (byte_stream.has_value()) {
+      if (byte_stream) {
         byte_stream->SendString(next_message);
         next_message = server_to_client2;
         server_received += byte_stream->ReadString();
@@ -150,7 +150,7 @@ TEST(ByteServer, TwoClients) {
   });
 
   std::thread client1_thread([client1_to_server, &client1_received] {
-    SocketByteStream b = SocketByteStream::CreateClientSide();
+    SocketByteStream b = *SocketByteStream::CreateClientSide();
     b.SendString(client1_to_server);
     client1_received = b.ReadString();
   });
@@ -160,7 +160,7 @@ TEST(ByteServer, TwoClients) {
   EXPECT_EQ(std::string(client1_to_server), server_received);
 
   std::thread client2_thread([client2_to_server, &client2_received] {
-    SocketByteStream b = SocketByteStream::CreateClientSide();
+    SocketByteStream b = *SocketByteStream::CreateClientSide();
     b.SendString(client2_to_server);
     client2_received = b.ReadString();
   });

@@ -1,6 +1,8 @@
 #ifndef CROSSING_CONSOLES_PROTOCOL_DEFINITION_H
 #define CROSSING_CONSOLES_PROTOCOL_DEFINITION_H
 
+#include <time.h>
+
 #include <cstdint>
 
 namespace communication {
@@ -26,6 +28,9 @@ class ProtocolDefinition {
 
   /// A type large enough to hold message `sequence`.
   typedef uint16_t sequence_t;
+
+  /// Set timeout duration
+  static const time_t timeout = static_cast<time_t>(3);
 };
 
 }  // namespace communication

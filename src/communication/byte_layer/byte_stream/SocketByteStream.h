@@ -27,7 +27,7 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
                             IConnectionSimulator& connection_simulator_incoming = ConnectionSimulatorPerfect::instance,
                             IConnectionSimulator& connection_simulator_outgoing = ConnectionSimulatorPerfect::instance);
 
-  static SocketByteStream CreateClientSide(port_t port = socket_default_port);
+  static std::shared_ptr<SocketByteStream> CreateClientSide(port_t port = socket_default_port);
 
   void Send(const uint8_t* send_buffer, size_t length) override;
   void SendString(const std::string& message);

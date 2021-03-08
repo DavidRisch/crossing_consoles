@@ -15,12 +15,12 @@ namespace message_layer {
  */
 class MessageOutputStream {
  public:
-  explicit MessageOutputStream(byte_layer::IOutputByteStream &output_stream);
+  explicit MessageOutputStream(std::shared_ptr<byte_layer::IOutputByteStream> output_stream);
 
   void SendMessage(Message *message);
 
  private:
-  byte_layer::IOutputByteStream &output_stream;
+  std::shared_ptr<byte_layer::IOutputByteStream> output_stream;
 };
 
 }  // namespace message_layer
