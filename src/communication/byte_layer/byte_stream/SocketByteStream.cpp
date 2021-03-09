@@ -36,7 +36,11 @@ SocketByteStream SocketByteStream::CreateClientSide(uint16_t port) {
     throw std::runtime_error("connect failed");
   }
 
-  return SocketByteStream(socket_file_descriptor);
+  auto socket_byte_stream = SocketByteStream(socket_file_descriptor);
+
+  socket_byte_stream.ConfigureSocket();
+
+  return socket_byte_stream;
 }
 
 size_t SocketByteStream::Read(  // NOLINT(readability-make-member-function-const)
@@ -106,8 +110,21 @@ bool SocketByteStream::HasInput() {
 
   if (ready_count < 0) {
     throw(std::runtime_error("select failed"));
+  } else if (ready_count > 0) {
+    assert(ready_count == 1);
+    assert(FD_ISSET(socket_holder->file_descriptor, &read_fds));
+    return true;
   } else {
-    // set HasInput true, if data is available
-    return (ready_count != 0);
+    return false;
   }
+}
+void SocketByteStream::ConfigureSocket() {
+#ifndef _WIN32
+  // Fix issue causing high latency. See: https://stackoverflow.com/a/39272176
+  int tcp_no_delay_value = 1;
+  if (setsockopt(socket_holder->file_descriptor, IPPROTO_TCP, TCP_NODELAY, (char *)&tcp_no_delay_value, sizeof(int)) ==
+      -1) {
+    throw std::runtime_error("setsockopt failed");
+  }
+#endif
 }

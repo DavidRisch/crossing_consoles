@@ -105,5 +105,10 @@ std::optional<SocketByteStream> SocketByteServer::GetNewClient() {  // NOLINT(re
     }
     throw std::runtime_error("accept failed");
   }
-  return std::make_optional<SocketByteStream>(socket_file_descriptor);
+
+  auto socket_byte_stream = std::make_optional<SocketByteStream>(socket_file_descriptor);
+
+  socket_byte_stream->ConfigureSocket();
+
+  return socket_byte_stream;
 }
