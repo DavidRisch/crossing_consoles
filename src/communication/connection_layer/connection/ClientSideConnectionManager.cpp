@@ -5,12 +5,12 @@
 using namespace communication;
 using namespace connection_layer;
 
-ClientSideConnectionManager::ClientSideConnectionManager(ProtocolDefinition::ms_count_t timeout)
+ClientSideConnectionManager::ClientSideConnectionManager(ProtocolDefinition::timeout_t timeout)
     : ConnectionManager(timeout) {
 }
 
 std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::CreateClientSide(
-    ProtocolDefinition::ms_count_t timeout) {
+    ProtocolDefinition::timeout_t timeout) {
   auto byte_stream = byte_layer::SocketByteStream::CreateClientSide();
   auto message_input_stream = std::make_shared<message_layer::MessageInputStream>(byte_stream);
   auto message_output_stream = std::make_shared<message_layer::MessageOutputStream>(byte_stream);
@@ -23,4 +23,8 @@ std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::Create
 
 void ClientSideConnectionManager::HandleConnections() {
   ReceiveMessages();
+}
+
+partner_id_t ClientSideConnectionManager::GetNextPartnerId() {
+  return ProtocolDefinition::server_partner_id;  // constant because only a single server can exist.
 }

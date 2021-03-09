@@ -1,13 +1,11 @@
 #include "ServerSideConnectionManager.h"
 
-#include <iostream>
-
 #include "ConnectionManager.h"
 
 using namespace communication;
 using namespace connection_layer;
 
-ServerSideConnectionManager::ServerSideConnectionManager(ProtocolDefinition::ms_count_t timeout)
+ServerSideConnectionManager::ServerSideConnectionManager(ProtocolDefinition::timeout_t timeout)
     : ConnectionManager(timeout) {
 }
 
@@ -25,12 +23,17 @@ void ServerSideConnectionManager::HandleConnections() {
 }
 
 std::shared_ptr<ServerSideConnectionManager> ServerSideConnectionManager::CreateServerSide(
-    ProtocolDefinition::ms_count_t timeout) {
+    ProtocolDefinition::timeout_t timeout) {
   std::shared_ptr<ServerSideConnectionManager> manager =
       std::shared_ptr<ServerSideConnectionManager>(new ServerSideConnectionManager(timeout));
   manager->byte_server = std::make_shared<byte_layer::SocketByteServer>();
   return manager;
 }
-bool ServerSideConnectionManager::HasConnections() {
-  return !connection_map.empty();
+
+int ServerSideConnectionManager::ConnectionCount() {
+  return connection_map.size();
+}
+
+partner_id_t ServerSideConnectionManager::GetNextPartnerId() {
+  return next_partner_id++;
 }

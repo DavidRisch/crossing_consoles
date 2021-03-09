@@ -5,9 +5,9 @@
 #include <thread>
 #include <utility>
 
-#include "../message_layer/message/AcknowledgeMessage.h"
-#include "../message_layer/message/ConnectionRequestMessage.h"
-#include "../message_layer/message/ConnectionResponseMessage.h"
+#include "../../message_layer/message/AcknowledgeMessage.h"
+#include "../../message_layer/message/ConnectionRequestMessage.h"
+#include "../../message_layer/message/ConnectionResponseMessage.h"
 #include "ConnectionManager.h"
 
 using namespace communication;
@@ -15,7 +15,7 @@ using namespace communication::connection_layer;
 
 std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout(
     const std::shared_ptr<message_layer::MessageInputStream> &message_input_stream,
-    ProtocolDefinition::ms_count_t timeout) {
+    ProtocolDefinition::timeout_t timeout) {
   const auto start_time = std::chrono::steady_clock::now();
 
   while (std::chrono::steady_clock::now() - start_time <= timeout) {
@@ -25,12 +25,12 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout(
       return message;
     }
   }
-  throw ConnectionManager::ConnectionTimeout();
+  throw ConnectionManager::TimeoutException();
 }
 
 std::shared_ptr<Connection> Connection::CreateClientSide(
     std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
-    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, ProtocolDefinition::ms_count_t timeout) {
+    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, ProtocolDefinition::timeout_t timeout) {
   ProtocolDefinition::sequence_t client_sequence = 7;    // start with an arbitrary chosen sequence
   message_layer::ConnectionRequestMessage step_1(1234);  // TODO: address
   step_1.SetMessageSequence(client_sequence);
@@ -53,7 +53,7 @@ std::shared_ptr<Connection> Connection::CreateClientSide(
 
 std::shared_ptr<Connection> Connection::CreateServerSide(
     std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
-    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, ProtocolDefinition::ms_count_t timeout) {
+    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, ProtocolDefinition::timeout_t timeout) {
   ProtocolDefinition::sequence_t server_sequence = 146;  // start with an arbitrary chosen sequence
   auto step_1 = ReceiveWithTimeout(message_input_stream, timeout);
   if (step_1->GetMessageType() != message_layer::MessageType::CONNECTION_REQUEST) {
