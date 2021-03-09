@@ -61,6 +61,13 @@ class Connection {
   ProtocolDefinition::sequence_t GenerateSequence();
   ProtocolDefinition::sequence_t sequence_counter;
 
+  /**
+   *
+   * \brief Check for timeout while receiving messages
+   */
+  static std::shared_ptr<message_layer::Message> ReceiveWithTimeout(
+      const std::shared_ptr<message_layer::MessageInputStream>& message_input_stream);
+
   std::shared_ptr<message_layer::MessageInputStream> message_input_stream;
   std::shared_ptr<message_layer::MessageOutputStream> message_output_stream;
 };

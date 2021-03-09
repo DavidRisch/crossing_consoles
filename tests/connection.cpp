@@ -7,6 +7,7 @@
 
 #include "../src/communication/byte_layer/byte_stream/MockBidirectionalByteStream.h"
 #include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
+#include "../src/communication/connection_layer/ConnectionManager.h"
 #include "../src/communication/message_layer/message/KeepAliveMessage.h"
 #include "../src/communication/message_layer/message/PayloadMessage.h"
 
@@ -88,4 +89,28 @@ TEST(Connection, Integration) {
                   server_message_output_stream);
 }
 
-// TODO: test failed connection
+TEST(Connection, FailedHandshakeClient) {
+  // Server unreachable, Client throws timeout exception
+  auto stream_pair = MockBidirectionalByteStream::CreatePair();
+  auto &client_side = stream_pair.second;
+
+  auto client_message_input_stream = std::make_shared<MessageInputStream>(client_side);
+  auto client_message_output_stream = std::make_shared<MessageOutputStream>(client_side);
+
+  ASSERT_THROW(
+      Connection::CreateClientSide(std::move(client_message_input_stream), std::move(client_message_output_stream)),
+      ConnectionManager::ConnectionTimeout);
+}
+
+TEST(Connection, FailedHandshakeServer) {
+  // Client unreachable, Server throws timeout exception
+  auto stream_pair = MockBidirectionalByteStream::CreatePair();
+  auto &server_side = stream_pair.second;
+
+  auto server_message_input_stream = std::make_shared<MessageInputStream>(server_side);
+  auto server_message_output_stream = std::make_shared<MessageOutputStream>(server_side);
+
+  ASSERT_THROW(
+      Connection::CreateServerSide(std::move(server_message_input_stream), std::move(server_message_output_stream)),
+      ConnectionManager::ConnectionTimeout);
+}

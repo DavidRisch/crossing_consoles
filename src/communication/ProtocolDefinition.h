@@ -30,7 +30,7 @@ class ProtocolDefinition {
   typedef uint16_t sequence_t;
 
   /// Set timeout duration
-  static const time_t timeout = static_cast<time_t>(3);
+  static const time_t timeout = static_cast<time_t>(1);  // TODO: set higher?
 };
 
 }  // namespace communication

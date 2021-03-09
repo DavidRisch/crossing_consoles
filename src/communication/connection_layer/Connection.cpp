@@ -1,5 +1,7 @@
 #include "Connection.h"
 
+#include <cassert>
+#include <iostream>
 #include <memory>
 #include <thread>
 #include <utility>
@@ -7,9 +9,23 @@
 #include "../message_layer/message/AcknowledgeMessage.h"
 #include "../message_layer/message/ConnectionRequestMessage.h"
 #include "../message_layer/message/ConnectionResponseMessage.h"
+#include "ConnectionManager.h"
 
 using namespace communication;
 using namespace communication::connection_layer;
+
+std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout(
+    const std::shared_ptr<message_layer::MessageInputStream> &message_input_stream) {
+  time_t start_time = std::time(nullptr);
+  while (std::time(nullptr) - start_time <= ProtocolDefinition::timeout) {
+    auto message = message_input_stream->ReceiveMessage(false);
+
+    if (message != nullptr) {
+      return message;
+    }
+  }
+  throw ConnectionManager::ConnectionTimeout();
+}
 
 std::shared_ptr<Connection> Connection::CreateClientSide(
     std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
@@ -20,8 +36,8 @@ std::shared_ptr<Connection> Connection::CreateClientSide(
   client_sequence++;
   message_output_stream->SendMessage(&step_1);
 
-  // TODO: some kind of timeout
-  auto step_2 = message_input_stream->ReceiveMessage();
+  auto step_2 = ReceiveWithTimeout(message_input_stream);
+  assert(step_2 != nullptr);
   if (step_2->GetMessageType() != message_layer::MessageType::CONNECTION_RESPONSE) {
     throw ConnectionCreationFailed();
   }
@@ -37,9 +53,8 @@ std::shared_ptr<Connection> Connection::CreateClientSide(
 std::shared_ptr<Connection> Connection::CreateServerSide(
     std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
     std::shared_ptr<message_layer::MessageOutputStream> message_output_stream) {
-  // TODO: some kind of timeout
   ProtocolDefinition::sequence_t server_sequence = 146;  // start with an arbitrary chosen sequence
-  auto step_1 = message_input_stream->ReceiveMessage();
+  auto step_1 = ReceiveWithTimeout(message_input_stream);
   if (step_1->GetMessageType() != message_layer::MessageType::CONNECTION_REQUEST) {
     throw ConnectionCreationFailed();
   }
@@ -49,8 +64,7 @@ std::shared_ptr<Connection> Connection::CreateServerSide(
   server_sequence++;
   message_output_stream->SendMessage(&step_2);
 
-  // TODO: some kind of timeout
-  auto step_3 = message_input_stream->ReceiveMessage();
+  auto step_3 = ReceiveWithTimeout(message_input_stream);
   if (step_3->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
     throw ConnectionCreationFailed();
   } else {
