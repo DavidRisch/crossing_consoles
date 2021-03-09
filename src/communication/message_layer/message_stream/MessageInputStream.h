@@ -15,12 +15,12 @@ namespace message_layer {
  */
 class MessageInputStream {
  public:
-  explicit MessageInputStream(byte_layer::IInputByteStream &input_stream);
+  explicit MessageInputStream(std::shared_ptr<byte_layer::IInputByteStream> input_stream);
 
   std::shared_ptr<Message> ReceiveMessage(bool blocking = true);
 
  private:
-  byte_layer::IInputByteStream &input_stream;
+  std::shared_ptr<byte_layer::IInputByteStream> input_stream;
 };
 
 }  // namespace message_layer

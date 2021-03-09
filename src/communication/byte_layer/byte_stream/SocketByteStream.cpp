@@ -17,7 +17,7 @@ SocketByteStream::SocketByteStream(file_descriptor_t socket_file_descriptor,
     , connection_simulator_outgoing(&connection_simulator_outgoing) {
 }
 
-SocketByteStream SocketByteStream::CreateClientSide(uint16_t port) {
+std::shared_ptr<SocketByteStream> SocketByteStream::CreateClientSide(uint16_t port) {
   file_descriptor_t socket_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
   if (socket_file_descriptor < 0) {
     throw std::runtime_error("socket failed");
@@ -36,9 +36,9 @@ SocketByteStream SocketByteStream::CreateClientSide(uint16_t port) {
     throw std::runtime_error("connect failed");
   }
 
-  auto socket_byte_stream = SocketByteStream(socket_file_descriptor);
+  auto socket_byte_stream = std::make_shared<SocketByteStream>(SocketByteStream(socket_file_descriptor));
 
-  socket_byte_stream.ConfigureSocket();
+  socket_byte_stream->ConfigureSocket();
 
   return socket_byte_stream;
 }

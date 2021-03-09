@@ -1,6 +1,9 @@
 #ifndef CROSSING_CONSOLES_PROTOCOL_DEFINITION_H
 #define CROSSING_CONSOLES_PROTOCOL_DEFINITION_H
 
+#include <time.h>
+
+#include <chrono>
 #include <cstdint>
 
 namespace communication {
@@ -26,6 +29,12 @@ class ProtocolDefinition {
 
   /// A type large enough to hold message `sequence`.
   typedef uint16_t sequence_t;
+
+  typedef std::chrono::duration<int64_t, std::milli> ms_count_t;
+
+  /// Set timeout duration
+  // TODO Set higher?
+  static constexpr const ms_count_t timeout = std::chrono::milliseconds(100);  // timeout in milliseconds
 };
 
 }  // namespace communication

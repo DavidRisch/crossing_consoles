@@ -1,5 +1,6 @@
 #include "Connection.h"
 
+#include <cassert>
 #include <memory>
 #include <thread>
 #include <utility>
@@ -7,21 +8,37 @@
 #include "../message_layer/message/AcknowledgeMessage.h"
 #include "../message_layer/message/ConnectionRequestMessage.h"
 #include "../message_layer/message/ConnectionResponseMessage.h"
+#include "ConnectionManager.h"
 
 using namespace communication;
 using namespace communication::connection_layer;
 
+std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout(
+    const std::shared_ptr<message_layer::MessageInputStream> &message_input_stream,
+    ProtocolDefinition::ms_count_t timeout) {
+  const auto start_time = std::chrono::steady_clock::now();
+
+  while (std::chrono::steady_clock::now() - start_time <= timeout) {
+    auto message = message_input_stream->ReceiveMessage(false);
+
+    if (message != nullptr) {
+      return message;
+    }
+  }
+  throw ConnectionManager::ConnectionTimeout();
+}
+
 std::shared_ptr<Connection> Connection::CreateClientSide(
     std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
-    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream) {
+    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, ProtocolDefinition::ms_count_t timeout) {
   ProtocolDefinition::sequence_t client_sequence = 7;    // start with an arbitrary chosen sequence
   message_layer::ConnectionRequestMessage step_1(1234);  // TODO: address
   step_1.SetMessageSequence(client_sequence);
   client_sequence++;
   message_output_stream->SendMessage(&step_1);
 
-  // TODO: some kind of timeout
-  auto step_2 = message_input_stream->ReceiveMessage();
+  auto step_2 = ReceiveWithTimeout(message_input_stream, timeout);
+  assert(step_2 != nullptr);
   if (step_2->GetMessageType() != message_layer::MessageType::CONNECTION_RESPONSE) {
     throw ConnectionCreationFailed();
   }
@@ -36,10 +53,9 @@ std::shared_ptr<Connection> Connection::CreateClientSide(
 
 std::shared_ptr<Connection> Connection::CreateServerSide(
     std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
-    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream) {
-  // TODO: some kind of timeout
+    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, ProtocolDefinition::ms_count_t timeout) {
   ProtocolDefinition::sequence_t server_sequence = 146;  // start with an arbitrary chosen sequence
-  auto step_1 = message_input_stream->ReceiveMessage();
+  auto step_1 = ReceiveWithTimeout(message_input_stream, timeout);
   if (step_1->GetMessageType() != message_layer::MessageType::CONNECTION_REQUEST) {
     throw ConnectionCreationFailed();
   }
@@ -49,8 +65,7 @@ std::shared_ptr<Connection> Connection::CreateServerSide(
   server_sequence++;
   message_output_stream->SendMessage(&step_2);
 
-  // TODO: some kind of timeout
-  auto step_3 = message_input_stream->ReceiveMessage();
+  auto step_3 = ReceiveWithTimeout(message_input_stream, timeout);
   if (step_3->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
     throw ConnectionCreationFailed();
   } else {
@@ -70,16 +85,15 @@ void Connection::SendMessage(message_layer::Message *message) {
 }
 
 std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
-  // TODO: set address
-  auto received_message = message_input_stream->ReceiveMessage();
+  auto received_message = message_input_stream->ReceiveMessage(false);
 
-  // TODO: Handle connection reset by other side
   // TODO: Set MetaData
 
   // Send acknowledge for every received message except for other acknowledges
-  if (received_message->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
-    SendAcknowledge(received_message->GetAddress(), received_message->GetMessageSequence());
-  }
+  if (received_message)
+    if (received_message->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
+      SendAcknowledge(received_message->GetAddress(), received_message->GetMessageSequence());
+    }
 
   return received_message;
 }

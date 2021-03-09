@@ -31,7 +31,12 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
    * \brief Connect to a `SocketByteServer` and create a new `SocketByteStream`.
    * \details Blocks until a connection is established.
    */
-  static SocketByteStream CreateClientSide(port_t port = socket_default_port);
+  static std::shared_ptr<SocketByteStream> CreateClientSide(port_t port = socket_default_port);
+
+  /**
+   * \brief Configure the os socket.
+   */
+  void ConfigureSocket();
 
   /**
    * \brief Configure the os socket.

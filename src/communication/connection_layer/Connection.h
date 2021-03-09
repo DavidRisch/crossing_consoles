@@ -20,23 +20,26 @@ class Connection {
    */
   static std::shared_ptr<Connection> CreateClientSide(
       std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
-      std::shared_ptr<message_layer::MessageOutputStream> message_output_stream);
+      std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
+      ProtocolDefinition::ms_count_t timeout = ProtocolDefinition::timeout);
 
   /**
    * \brief Perform 3-way handshake as the server.
    */
   static std::shared_ptr<Connection> CreateServerSide(
       std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
-      std::shared_ptr<message_layer::MessageOutputStream> message_output_stream);
+      std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
+      ProtocolDefinition::ms_count_t timeout = ProtocolDefinition::timeout);
 
+  /**
+   * \brief Send message
+   */
   void SendMessage(message_layer::Message* message);
+  /**
+   * \brief Receive and message and send acknowledge message.
+   * \details Sends acknowledge message only if received message type is not acknowledge.
+   */
   std::shared_ptr<message_layer::Message> ReceiveMessage();
-
-  // TODO: send connection reset
-
-  // TODO: send acknowledges
-
-  // TODO: keep track of and handle timeouts
 
   class ConnectionCreationFailed : public std::exception {
     [[nodiscard]] const char* what() const noexcept override {
@@ -49,11 +52,24 @@ class Connection {
              std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
              ProtocolDefinition::sequence_t sequence_counter);
 
+  /**
+   * \brief Send acknowledge message for a received message identified by its sequence to the specified address.
+   */
   void SendAcknowledge(message_layer::address_t address, ProtocolDefinition::sequence_t sequence);
 
+  /**
+   * \brief Return current sequence count and increment sequence counter.
+   */
   ProtocolDefinition::sequence_t GenerateSequence();
-
   ProtocolDefinition::sequence_t sequence_counter;
+
+  /**
+   *
+   * \brief Check for timeout while receiving messages
+   */
+  static std::shared_ptr<message_layer::Message> ReceiveWithTimeout(
+      const std::shared_ptr<message_layer::MessageInputStream>& message_input_stream,
+      ProtocolDefinition::ms_count_t timeout = ProtocolDefinition::timeout);
 
   std::shared_ptr<message_layer::MessageInputStream> message_input_stream;
   std::shared_ptr<message_layer::MessageOutputStream> message_output_stream;

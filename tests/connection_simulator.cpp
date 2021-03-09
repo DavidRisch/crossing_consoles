@@ -30,7 +30,7 @@ class ConnectionSimulator : public ::testing::Test {
     SocketByteServer byte_server;
 
     std::thread client_thread([this, &client_incoming, &client_outgoing] {
-      SocketByteStream byte_stream = SocketByteStream::CreateClientSide();
+      SocketByteStream byte_stream = *SocketByteStream::CreateClientSide();
 
       byte_stream.SetConnectionSimulatorIncoming(client_incoming);
       byte_stream.SetConnectionSimulatorOutgoing(client_outgoing);
@@ -39,17 +39,17 @@ class ConnectionSimulator : public ::testing::Test {
       client_received = byte_stream.ReadString();
     });
 
-    std::optional<SocketByteStream> byte_stream;
+    std::shared_ptr<SocketByteStream> byte_stream;
 
     int counter = 1000;
-    while (!byte_stream.has_value() && counter > 0) {
+    while (!byte_stream && counter > 0) {
       byte_stream = byte_server.GetNewClient();
       std::this_thread::sleep_for(std::chrono::microseconds(100));
       counter--;
     }
 
     ASSERT_NE(counter, 0);
-    ASSERT_TRUE(byte_stream.has_value());
+    ASSERT_TRUE(byte_stream);
 
     byte_stream->SetConnectionSimulatorIncoming(server_incoming);
     byte_stream->SetConnectionSimulatorOutgoing(server_outgoing);

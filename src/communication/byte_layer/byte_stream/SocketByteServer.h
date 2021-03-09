@@ -22,7 +22,7 @@ class SocketByteServer {
    * \details If no clients want to connect, do nothing. If clients are waiting for a connection, accept a single on of
    * them and create a new `SocketByteStream` to it.
    */
-  std::optional<SocketByteStream> GetNewClient();
+  std::shared_ptr<SocketByteStream> GetNewClient();
 
  private:
   std::shared_ptr<SocketHolder> socket_holder;

@@ -8,6 +8,7 @@ add_executable(crossing_consoles_test
         message_stream.cpp
         connection.cpp
         game.cpp
+        connection_manager.cpp
         )
 target_link_libraries(crossing_consoles_test crossing_consoles_lib)
 target_link_libraries(crossing_consoles_test gtest_main)
