@@ -105,5 +105,9 @@ std::shared_ptr<SocketByteStream> SocketByteServer::GetNewClient() {  // NOLINT(
     }
     throw std::runtime_error("accept failed");
   }
-  return std::make_shared<SocketByteStream>(socket_file_descriptor);
+
+  auto socket_byte_stream = std::make_shared<SocketByteStream>(socket_file_descriptor);
+  socket_byte_stream->ConfigureSocket();
+
+  return socket_byte_stream;
 }

@@ -29,6 +29,11 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
 
   static std::shared_ptr<SocketByteStream> CreateClientSide(port_t port = socket_default_port);
 
+  /**
+   * \brief Configure the os socket.
+   */
+  void ConfigureSocket();
+
   void Send(const uint8_t* send_buffer, size_t length) override;
   void SendString(const std::string& message);
 
