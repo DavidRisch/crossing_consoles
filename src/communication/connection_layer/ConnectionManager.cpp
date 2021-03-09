@@ -1,5 +1,6 @@
 #include "ConnectionManager.h"
 
+#include <chrono>
 #include <utility>
 
 #include "../message_layer/message/KeepAliveMessage.h"
@@ -7,13 +8,12 @@
 using namespace communication;
 using namespace connection_layer;
 
-ConnectionManager::ConnectionManager(time_t timeout)
+ConnectionManager::ConnectionManager(ProtocolDefinition::ms_count_t timeout)
     : timeout(timeout) {
   connection_map = {};
 }
 
 void ConnectionManager::Broadcast(const std::vector<uint8_t>& payload) {
-  std::map<message_layer::address_t, connection_layer::Connection>::iterator connection_it;
   for (auto& connection_entry : connection_map) {
     SendToConnection(connection_entry.first, payload);
   }
@@ -35,11 +35,38 @@ void ConnectionManager::AddConnection(const std::shared_ptr<Connection>& connect
   if (!connection_map.empty()) {
     id = connection_map.rbegin()->first;
   }
-  connection_map.insert({id, ConnectionParameters{connection, std::time(nullptr)}});
+  connection_map.insert({id, ConnectionParameters{connection, std::chrono::steady_clock::now()}});
 }
 
-std::list<message_layer::Message> ConnectionManager::GetMessageQueue() {
+std::list<message_layer::Message> ConnectionManager::GetAndClearMessageQueue() {
   std::list<message_layer::Message> tmp(message_queue);
   message_queue.clear();
   return tmp;
+}
+
+void ConnectionManager::ReceiveMessages() {
+  // Handle received messages and timeouts
+  for (auto& connection_entry : connection_map) {
+    auto connection = connection_entry.second.connection;
+    auto address = connection_entry.first;
+
+    auto msg = message_layer::KeepAliveMessage(address);
+    connection->SendMessage(&msg);
+
+    std::shared_ptr<message_layer::Message> received_msg;
+    do {
+      received_msg = connection->ReceiveMessage();
+      if (received_msg != nullptr) {
+        connection_entry.second.timestamp_last_received = std::chrono::steady_clock::now();
+        if (received_msg->GetMessageType() == message_layer::MessageType::PAYLOAD) {
+          message_queue.push_back(*received_msg);
+        }
+      }
+    } while (received_msg != nullptr);
+
+    if (std::chrono::steady_clock::now() - connection_entry.second.timestamp_last_received >= timeout) {
+      // TODO handle timeout, reset connection
+      throw ConnectionManager::ConnectionTimeout();
+    }
+  }
 }

@@ -41,41 +41,41 @@ TEST(ByteServer, NoBlocking) {
   client_thread.join();
 }
 
-TEST(ByteServer, SuccessfullNoneBlocking) {
-  const char* server_to_client = "0123456789";
-  const char* client_to_server = "ABCDEFGHIJ";
-
-  std::string client_received;
+TEST(ByteServer, SuccessfulNoneBlocking) {
+  const char* server_to_client = "0";
+  const char* client_to_server = "A";
 
   SocketByteServer byte_server;
 
-  std::thread client_thread([client_to_server, &client_received] {
-    std::shared_ptr<SocketByteStream> b = SocketByteStream::CreateClientSide();
-    b->SendString(client_to_server);
-    std::this_thread::sleep_for(std::chrono::microseconds(1000));  // time for the message to arrive
-    client_received = b->ReadStringWithoutBlocking();
-  });
+  std::shared_ptr<SocketByteStream> client_byte_stream;
 
-  std::shared_ptr<SocketByteStream> byte_stream;
+  std::thread client_thread([&client_byte_stream] { client_byte_stream = SocketByteStream::CreateClientSide(); });
+
+  std::shared_ptr<SocketByteStream> server_byte_stream;
 
   int counter = 1000;
-  while (!byte_stream && counter > 0) {
-    byte_stream = byte_server.GetNewClient();
+  while (!server_byte_stream && counter > 0) {
+    server_byte_stream = byte_server.GetNewClient();
     std::this_thread::sleep_for(std::chrono::microseconds(100));
     counter--;
   }
 
   ASSERT_NE(counter, 0);
-  ASSERT_TRUE(byte_stream);
-
-  byte_stream->SendString(server_to_client);
-  std::this_thread::sleep_for(std::chrono::microseconds(1000));  // time for the message to arrive
-  std::string server_received = byte_stream->ReadStringWithoutBlocking();
+  ASSERT_TRUE(server_byte_stream);
 
   client_thread.join();
+  ASSERT_TRUE(client_byte_stream);
 
-  EXPECT_EQ(server_to_client, client_received);
-  EXPECT_EQ(client_to_server, server_received);
+  for (int i = 0; i < 1000; ++i) {
+    server_byte_stream->SendString(server_to_client);
+    client_byte_stream->SendString(client_to_server);
+    std::this_thread::sleep_for(std::chrono::microseconds(100));  // time for the messages to arrive
+    std::string client_received = client_byte_stream->ReadStringWithoutBlocking();
+    std::string server_received = server_byte_stream->ReadStringWithoutBlocking();
+
+    EXPECT_EQ(server_to_client, client_received);
+    EXPECT_EQ(client_to_server, server_received);
+  }
 }
 
 TEST(ByteServer, SingleClient) {

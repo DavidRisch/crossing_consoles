@@ -1,7 +1,6 @@
 #include "Connection.h"
 
 #include <cassert>
-#include <iostream>
 #include <memory>
 #include <thread>
 #include <utility>
@@ -15,9 +14,11 @@ using namespace communication;
 using namespace communication::connection_layer;
 
 std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout(
-    const std::shared_ptr<message_layer::MessageInputStream> &message_input_stream) {
-  time_t start_time = std::time(nullptr);
-  while (std::time(nullptr) - start_time <= ProtocolDefinition::timeout) {
+    const std::shared_ptr<message_layer::MessageInputStream> &message_input_stream,
+    ProtocolDefinition::ms_count_t timeout) {
+  const auto start_time = std::chrono::steady_clock::now();
+
+  while (std::chrono::steady_clock::now() - start_time <= timeout) {
     auto message = message_input_stream->ReceiveMessage(false);
 
     if (message != nullptr) {
@@ -29,14 +30,14 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout(
 
 std::shared_ptr<Connection> Connection::CreateClientSide(
     std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
-    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream) {
+    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, ProtocolDefinition::ms_count_t timeout) {
   ProtocolDefinition::sequence_t client_sequence = 7;    // start with an arbitrary chosen sequence
   message_layer::ConnectionRequestMessage step_1(1234);  // TODO: address
   step_1.SetMessageSequence(client_sequence);
   client_sequence++;
   message_output_stream->SendMessage(&step_1);
 
-  auto step_2 = ReceiveWithTimeout(message_input_stream);
+  auto step_2 = ReceiveWithTimeout(message_input_stream, timeout);
   assert(step_2 != nullptr);
   if (step_2->GetMessageType() != message_layer::MessageType::CONNECTION_RESPONSE) {
     throw ConnectionCreationFailed();
@@ -52,9 +53,9 @@ std::shared_ptr<Connection> Connection::CreateClientSide(
 
 std::shared_ptr<Connection> Connection::CreateServerSide(
     std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
-    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream) {
+    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, ProtocolDefinition::ms_count_t timeout) {
   ProtocolDefinition::sequence_t server_sequence = 146;  // start with an arbitrary chosen sequence
-  auto step_1 = ReceiveWithTimeout(message_input_stream);
+  auto step_1 = ReceiveWithTimeout(message_input_stream, timeout);
   if (step_1->GetMessageType() != message_layer::MessageType::CONNECTION_REQUEST) {
     throw ConnectionCreationFailed();
   }
@@ -64,7 +65,7 @@ std::shared_ptr<Connection> Connection::CreateServerSide(
   server_sequence++;
   message_output_stream->SendMessage(&step_2);
 
-  auto step_3 = ReceiveWithTimeout(message_input_stream);
+  auto step_3 = ReceiveWithTimeout(message_input_stream, timeout);
   if (step_3->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
     throw ConnectionCreationFailed();
   } else {

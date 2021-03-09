@@ -2,6 +2,7 @@
 #define CROSSING_CONSOLES_SERVERSIDECONNECTIONMANAGER_H
 
 #include "ConnectionManager.h"
+
 namespace communication {
 namespace connection_layer {
 
@@ -14,7 +15,8 @@ class ServerSideConnectionManager : public ConnectionManager {
   /**
    * \brief Create Connection Manager for usage on server side.
    */
-  static std::shared_ptr<ServerSideConnectionManager> CreateServerSide(time_t timeout = ProtocolDefinition::timeout);
+  static std::shared_ptr<ServerSideConnectionManager> CreateServerSide(
+      ProtocolDefinition::ms_count_t timeout = ProtocolDefinition::timeout);
 
   /**
    * \brief Returns true if server has connected clients.
@@ -22,7 +24,7 @@ class ServerSideConnectionManager : public ConnectionManager {
   bool HasConnections();
 
  private:
-  ServerSideConnectionManager(time_t timeout);
+  ServerSideConnectionManager(ProtocolDefinition::ms_count_t timeout);
   std::shared_ptr<byte_layer::SocketByteServer> byte_server;
 };
 }  // namespace connection_layer

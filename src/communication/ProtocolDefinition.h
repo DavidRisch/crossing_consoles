@@ -3,6 +3,7 @@
 
 #include <time.h>
 
+#include <chrono>
 #include <cstdint>
 
 namespace communication {
@@ -29,8 +30,11 @@ class ProtocolDefinition {
   /// A type large enough to hold message `sequence`.
   typedef uint16_t sequence_t;
 
+  typedef std::chrono::duration<int64_t, std::milli> ms_count_t;
+
   /// Set timeout duration
-  static const time_t timeout = static_cast<time_t>(1);  // TODO: set higher?
+  // TODO Set higher?
+  static constexpr const ms_count_t timeout = std::chrono::milliseconds(100);  // timeout in milliseconds
 };
 
 }  // namespace communication

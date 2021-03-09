@@ -18,7 +18,7 @@ TEST(ConnectionManager, ConnectClient) {
     int counter = 10;
     while (counter > 0) {
       server_manager->HandleConnections();
-      std::this_thread::sleep_for(std::chrono::microseconds(100));
+      std::this_thread::sleep_for(std::chrono::microseconds(10));
       counter--;
     }
   });
@@ -29,27 +29,30 @@ TEST(ConnectionManager, ConnectClient) {
 
 TEST(ConnectionManager, ServerTimeout) {
   // Server becomes unreachable
-  std::shared_ptr<ServerSideConnectionManager> server_manager = ServerSideConnectionManager::CreateServerSide();
+  std::shared_ptr<ServerSideConnectionManager> server_manager =
+      ServerSideConnectionManager::CreateServerSide(std::chrono::milliseconds(10));
   std::thread server_thread([&server_manager] {
     int counter = 10;
-    while (counter > 0) {
+    while (counter > 0 && !server_manager->HasConnections()) {
       server_manager->HandleConnections();
       std::this_thread::sleep_for(std::chrono::microseconds(10));
-      std::list<Message> queue = server_manager->GetMessageQueue();
+      std::list<Message> queue = server_manager->GetAndClearMessageQueue();
       counter--;
     }
   });
 
   // set low timeout
-  auto client_manager = ClientSideConnectionManager::CreateClientSide(static_cast<time_t>(0.01));
+  auto client_manager = ClientSideConnectionManager::CreateClientSide(std::chrono::milliseconds(10));
   server_thread.join();
+  client_manager->HandleConnections();
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
   ASSERT_THROW(client_manager->HandleConnections(), ConnectionManager::ConnectionTimeout);
 }
 
 TEST(ConnectionManager, ClientTimeout) {
   // Client becomes unreachable
   std::shared_ptr<ServerSideConnectionManager> server_manager =
-      ServerSideConnectionManager::CreateServerSide(static_cast<time_t>(0.01));
+      ServerSideConnectionManager::CreateServerSide(std::chrono::milliseconds(10));
   std::thread server_thread([&server_manager] {
     int counter = 10;
     while (counter > 0) {
@@ -59,7 +62,7 @@ TEST(ConnectionManager, ClientTimeout) {
         // timeout should only occur if connection has been established
         ASSERT_TRUE(server_manager->HasConnections());
       }
-      std::this_thread::sleep_for(std::chrono::microseconds(100));
+      std::this_thread::sleep_for(std::chrono::microseconds(10));
       counter--;
     }
   });
