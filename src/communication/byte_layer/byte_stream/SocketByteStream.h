@@ -38,11 +38,6 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
    */
   void ConfigureSocket();
 
-  /**
-   * \brief Configure the os socket.
-   */
-  void ConfigureSocket();
-
   void Send(const uint8_t* send_buffer, size_t length) override;
   void SendString(const std::string& message);
 
