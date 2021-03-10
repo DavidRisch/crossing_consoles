@@ -11,12 +11,10 @@ class AcknowledgeMessage : public Message {
   static MessageType message_type;
 
   // Draft message
-  explicit AcknowledgeMessage(ProtocolDefinition::address_t address,
-                              ProtocolDefinition::sequence_t acknowledged_msg_sequence);
+  explicit AcknowledgeMessage(ProtocolDefinition::sequence_t acknowledged_msg_sequence);
 
   // Received message
-  AcknowledgeMessage(ProtocolDefinition::address_t address, ProtocolDefinition::sequence_t acknowledged_msg_sequence,
-                     ProtocolDefinition::sequence_t sequence);
+  AcknowledgeMessage(ProtocolDefinition::sequence_t acknowledged_msg_sequence, ProtocolDefinition::sequence_t sequence);
 
   [[nodiscard]] MessageType GetMessageType() const override;
 

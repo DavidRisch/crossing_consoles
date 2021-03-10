@@ -116,8 +116,11 @@ TEST_F(ConnectionManagers, ServerTimeout) {
   auto client_manager = ClientSideConnectionManager::CreateClientSide(std::chrono::milliseconds(10));
   server_thread.join();
   client_manager->HandleConnections();
+  ASSERT_EQ(client_manager->PopAndGetOldestEvent()->GetType(), EventType::CONNECT);
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  ASSERT_THROW(client_manager->HandleConnections(), ConnectionManager::TimeoutException);
+
+  client_manager->HandleConnections();
+  ASSERT_EQ(client_manager->PopAndGetOldestEvent()->GetType(), EventType::DISCONNECT);
 }
 
 TEST_F(ConnectionManagers, ClientTimeout) {
@@ -128,12 +131,23 @@ TEST_F(ConnectionManagers, ClientTimeout) {
   std::thread server_thread([&server_manager] {
     int counter = 10;
     while (counter > 0) {
-      try {
+      server_manager->HandleConnections();
+
+      if (server_manager->ConnectionCount()) {
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+        auto event = server_manager->PopAndGetOldestEvent();
+        if (event) {
+          ASSERT_EQ(event->GetType(), EventType::CONNECT);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         server_manager->HandleConnections();
-      } catch (ConnectionManager::TimeoutException &e) {
-        // timeout should only occur if connection has been established
-        ASSERT_TRUE(server_manager->ConnectionCount());
+        event = server_manager->PopAndGetOldestEvent();
+        if (event) {
+          ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
+          ASSERT_FALSE(server_manager->ConnectionCount());
+        }
       }
+
       std::this_thread::sleep_for(std::chrono::microseconds(10));
       counter--;
     }

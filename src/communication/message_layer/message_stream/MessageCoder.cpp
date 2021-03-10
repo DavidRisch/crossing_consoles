@@ -115,8 +115,7 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
   return output;
 }
 
-std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stream,
-                                              ProtocolDefinition::address_t address, bool expect_start_sequence) {
+std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stream, bool expect_start_sequence) {
   CRCHandler crc_handler = CRCHandler();
   if (expect_start_sequence) {
     auto found_start_sequence =
@@ -137,19 +136,19 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
 
   switch (message_type) {
     case MessageType::KEEP_ALIVE:
-      message = std::make_shared<KeepAliveMessage>(address, message_sequence);
+      message = std::make_shared<KeepAliveMessage>(message_sequence);
       break;
     case MessageType::CONNECTION_REQUEST:
-      message = std::make_shared<ConnectionRequestMessage>(address, message_sequence);
+      message = std::make_shared<ConnectionRequestMessage>(message_sequence);
       break;
     case MessageType::CONNECTION_RESPONSE:
-      message = std::make_shared<ConnectionResponseMessage>(address, message_sequence);
+      message = std::make_shared<ConnectionResponseMessage>(message_sequence);
       break;
     case MessageType::ACKNOWLEDGE: {
       auto ack_sequence = ReadFromStreamWithCRC<ProtocolDefinition::sequence_t>(
           stream, sizeof(ProtocolDefinition::sequence_t), &crc_handler);
 
-      message = std::make_shared<AcknowledgeMessage>(address, ack_sequence, message_sequence);
+      message = std::make_shared<AcknowledgeMessage>(ack_sequence, message_sequence);
       break;
     }
     case MessageType::PAYLOAD: {
@@ -176,7 +175,7 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
         payload.push_back(byte);
       }
 
-      message = std::make_shared<PayloadMessage>(address, payload, message_sequence);
+      message = std::make_shared<PayloadMessage>(payload, message_sequence);
       break;
     }
     default:

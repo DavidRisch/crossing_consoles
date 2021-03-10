@@ -25,8 +25,7 @@ class MessageCoder {
   /**
    * \brief Decode message of any type.
    */
-  static std::shared_ptr<Message> Decode(byte_layer::IInputByteStream& stream, ProtocolDefinition::address_t address,
-                                         bool expect_start_sequence = true);
+  static std::shared_ptr<Message> Decode(byte_layer::IInputByteStream& stream, bool expect_start_sequence = true);
 
   /**
    * \brief Thrown if message en-/ or decoding fails for any reason.

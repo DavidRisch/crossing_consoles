@@ -9,7 +9,6 @@
 #include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
 #include "../src/communication/connection_layer/connection/ConnectionManager.h"
 #include "../src/communication/message_layer/message/KeepAliveMessage.h"
-#include "../src/communication/message_layer/message/PayloadMessage.h"
 
 using namespace communication;
 using namespace communication::byte_layer;
@@ -23,18 +22,15 @@ void test_connection(std::shared_ptr<MessageInputStream> client_message_input_st
   std::shared_ptr<Connection> server_connection;
 
   std::thread server_thread([&server_connection, &server_message_input_stream, &server_message_output_stream] {
-    ProtocolDefinition::address_t client_address = 1234;  // set to arbitrary address
-    server_connection =
-        Connection::CreateServerSide(server_message_input_stream, server_message_output_stream, client_address);
+    server_connection = Connection::CreateServerSide(server_message_input_stream, server_message_output_stream);
   });
 
   auto client_connection =
       Connection::CreateClientSide(std::move(client_message_input_stream), std::move(client_message_output_stream));
   server_thread.join();
 
-  address_t target_address = ProtocolDefinition::server_partner_id;
   {
-    KeepAliveMessage original_message(target_address);
+    KeepAliveMessage original_message = KeepAliveMessage();
 
     client_connection->SendMessage(&original_message);
 
@@ -48,7 +44,7 @@ void test_connection(std::shared_ptr<MessageInputStream> client_message_input_st
     std::vector<uint8_t> payload;
     payload.push_back(123);
     payload.push_back(45);
-    PayloadMessage original_message(target_address, payload);
+    PayloadMessage original_message(payload);
 
     server_connection->SendMessage(&original_message);
 
@@ -112,9 +108,7 @@ TEST(Connection, FailedHandshakeServer) {
   auto server_message_input_stream = std::make_shared<MessageInputStream>(server_side);
   auto server_message_output_stream = std::make_shared<MessageOutputStream>(server_side);
 
-  ProtocolDefinition::address_t client_id = 1234;  // set to arbitrary address
-
-  ASSERT_THROW(Connection::CreateServerSide(std::move(server_message_input_stream),
-                                            std::move(server_message_output_stream), client_id),
-               ConnectionManager::TimeoutException);
+  ASSERT_THROW(
+      Connection::CreateServerSide(std::move(server_message_input_stream), std::move(server_message_output_stream)),
+      ConnectionManager::TimeoutException);
 }

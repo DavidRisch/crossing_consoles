@@ -17,21 +17,21 @@ enum class MessageType : char {
   PAYLOAD,
   ACKNOWLEDGE,
   KEEP_ALIVE,
-  HIGHEST_ELEMENT = KEEP_ALIVE
+  RESET,
+  HIGHEST_ELEMENT = RESET
 };
 
 class Message {
  public:
   // Draft message
-  Message(ProtocolDefinition::address_t address);
+  Message();
 
   // Received message
-  Message(ProtocolDefinition::address_t address, ProtocolDefinition::sequence_t sequence);
+  Message(ProtocolDefinition::sequence_t sequence);
 
   ProtocolDefinition::sequence_t GetMessageSequence() const;
   void SetMessageSequence(ProtocolDefinition::sequence_t new_sequence);
 
-  [[nodiscard]] ProtocolDefinition::address_t GetAddress() const;
   [[nodiscard]] virtual MessageType GetMessageType() const;
   [[nodiscard]] MessageMetaData GetMessageMetaData() const;
 

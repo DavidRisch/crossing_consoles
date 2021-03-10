@@ -45,12 +45,12 @@ class ConnectionManager {
    * \brief Add connection to `connection_map`.
    * \details all connections on `connection_map` are managed by `HandleConnections`.
    */
-  void AddConnection(const std::shared_ptr<Connection>& connection, address_t new_partner_id);
+  void AddConnection(const std::shared_ptr<Connection>& connection);
 
   /**
    * \brief Reset connection after timeout.
    */
-  void ResetConnection(address_t partner_id, const Connection& connection);
+  void ResetConnection(address_t partner_id);
 
   /**
    * \brief Return and pop the oldest `Event`.

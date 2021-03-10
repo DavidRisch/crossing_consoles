@@ -17,7 +17,7 @@ std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::Create
   std::shared_ptr<Connection> connection =
       Connection::CreateClientSide(std::move(message_input_stream), std::move(message_output_stream), timeout);
   auto manager = std::shared_ptr<ClientSideConnectionManager>(new ClientSideConnectionManager(timeout));
-  manager->AddConnection(connection, ProtocolDefinition::server_partner_id);
+  manager->AddConnection(connection);
   return manager;
 }
 

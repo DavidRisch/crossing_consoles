@@ -13,22 +13,20 @@ using namespace communication;
 using namespace communication::message_layer;
 
 TEST(MessageCoder, KeepAliveMessage) {
-  ProtocolDefinition::address_t target_address = 1234;
-  KeepAliveMessage original_message(target_address);
+  KeepAliveMessage original_message = KeepAliveMessage();
 
   auto encoded_message = MessageCoder::Encode(&original_message);
 
   MockInputStream mock_input_stream;
   mock_input_stream.AddData(encoded_message);
 
-  auto decoded_message = MessageCoder::Decode(mock_input_stream, target_address);
+  auto decoded_message = MessageCoder::Decode(mock_input_stream);
   EXPECT_TRUE(mock_input_stream.IsEmpty());
 
   EXPECT_EQ(original_message.GetMessageType(), decoded_message->GetMessageType());
 }
 
 TEST(MessageCoder, PayloadMessage) {
-  ProtocolDefinition::address_t target_address = 1234;
   std::vector<uint8_t> original_payload;
 
   int original_payload_length = 123;
@@ -36,13 +34,13 @@ TEST(MessageCoder, PayloadMessage) {
   for (int i = 0; i < original_payload_length; ++i) {
     original_payload.push_back(i);
   }
-  PayloadMessage original_message(target_address, original_payload);
+  PayloadMessage original_message(original_payload);
 
   auto encoded_message = MessageCoder::Encode(&original_message);
 
   MockInputStream mock_input_stream;
   mock_input_stream.AddData(encoded_message);
-  auto decoded_message = MessageCoder::Decode(mock_input_stream, target_address);
+  auto decoded_message = MessageCoder::Decode(mock_input_stream);
   EXPECT_TRUE(mock_input_stream.IsEmpty());
 
   EXPECT_EQ(original_message.GetMessageType(), decoded_message->GetMessageType());
@@ -57,16 +55,15 @@ TEST(MessageCoder, PayloadMessage) {
 }
 
 TEST(MessageCoder, AcknowledgeMessage) {
-  ProtocolDefinition::address_t target_address = 1234;
   ProtocolDefinition::sequence_t sequence = 70;
-  AcknowledgeMessage original_message(target_address, sequence);
+  AcknowledgeMessage original_message(sequence);
 
   auto encoded_message = MessageCoder::Encode(&original_message);
 
   MockInputStream mock_input_stream;
   mock_input_stream.AddData(encoded_message);
 
-  auto decoded_message = MessageCoder::Decode(mock_input_stream, target_address);
+  auto decoded_message = MessageCoder::Decode(mock_input_stream);
   EXPECT_TRUE(mock_input_stream.IsEmpty());
 
   EXPECT_EQ(original_message.GetMessageType(), decoded_message->GetMessageType());
@@ -75,7 +72,6 @@ TEST(MessageCoder, AcknowledgeMessage) {
 }
 
 TEST(MessageCoder, CrcIncorrectException) {
-  ProtocolDefinition::address_t target_address = 1234;
   std::vector<uint8_t> original_payload;
 
   int original_payload_length = 185;
@@ -83,7 +79,7 @@ TEST(MessageCoder, CrcIncorrectException) {
   for (int i = 0; i < original_payload_length; ++i) {
     original_payload.push_back(i % 20);
   }
-  PayloadMessage original_message(target_address, original_payload);
+  PayloadMessage original_message(original_payload);
   auto encoded_message = MessageCoder::Encode(&original_message);
 
   // only payload is manipulated, other cases are tested separately
@@ -96,13 +92,12 @@ TEST(MessageCoder, CrcIncorrectException) {
 
     MockInputStream mock_input_stream;
     mock_input_stream.AddData(bad_encoded_message);
-    EXPECT_THROW(MessageCoder::Decode(mock_input_stream, target_address), MessageCoder::CrcIncorrectException);
+    EXPECT_THROW(MessageCoder::Decode(mock_input_stream), MessageCoder::CrcIncorrectException);
   }
 }
 
 TEST(MessageCoder, InvalidMessageExceptionNoEndFlag) {
   // test for missing end flag
-  ProtocolDefinition::address_t target_address = 1234;
   std::vector<uint8_t> original_payload;
 
   int original_payload_length = 185;
@@ -110,7 +105,7 @@ TEST(MessageCoder, InvalidMessageExceptionNoEndFlag) {
   for (int i = 0; i < original_payload_length; ++i) {
     original_payload.push_back(i);
   }
-  PayloadMessage original_message(target_address, original_payload);
+  PayloadMessage original_message(original_payload);
   auto encoded_message = MessageCoder::Encode(&original_message);
 
   std::vector<uint8_t> bad_encoded_message(encoded_message);
@@ -118,13 +113,12 @@ TEST(MessageCoder, InvalidMessageExceptionNoEndFlag) {
 
   MockInputStream mock_input_stream;
   mock_input_stream.AddData(bad_encoded_message);
-  EXPECT_THROW(MessageCoder::Decode(mock_input_stream, target_address), MessageCoder::InvalidMessageException);
+  EXPECT_THROW(MessageCoder::Decode(mock_input_stream), MessageCoder::InvalidMessageException);
 }
 
 class InvalidMessageCoder : public ::testing::Test {
  public:
   static void ReplaceWithSequence(uint8_t sequence, size_t offset = 0) {
-    ProtocolDefinition::address_t target_address = 1234;
     std::vector<uint8_t> original_payload;
 
     int original_payload_length = 185;
@@ -132,7 +126,7 @@ class InvalidMessageCoder : public ::testing::Test {
     for (int i = 0; i < original_payload_length; ++i) {
       original_payload.push_back(i);
     }
-    PayloadMessage original_message(target_address, original_payload);
+    PayloadMessage original_message(original_payload);
     auto encoded_message = MessageCoder::Encode(&original_message);
 
     for (size_t i = sizeof(sequence); i < encoded_message.size() - offset; ++i) {
@@ -153,7 +147,7 @@ class InvalidMessageCoder : public ::testing::Test {
         bad_encoded_message.at(i) = sequence;  // change to sequence
         MockInputStream mock_input_stream;
         mock_input_stream.AddData(bad_encoded_message);
-        EXPECT_THROW(MessageCoder::Decode(mock_input_stream, target_address), MessageCoder::InvalidMessageException);
+        EXPECT_THROW(MessageCoder::Decode(mock_input_stream), MessageCoder::InvalidMessageException);
       }
     }
   }

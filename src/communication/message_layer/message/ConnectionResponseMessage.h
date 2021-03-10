@@ -10,10 +10,10 @@ class ConnectionResponseMessage : public Message {
   static MessageType message_type;
 
   // Draft message
-  explicit ConnectionResponseMessage(ProtocolDefinition::address_t address);
+  explicit ConnectionResponseMessage();
 
   // Received message
-  ConnectionResponseMessage(ProtocolDefinition::address_t address, ProtocolDefinition::sequence_t sequence);
+  explicit ConnectionResponseMessage(ProtocolDefinition::sequence_t sequence);
 
   [[nodiscard]] MessageType GetMessageType() const override;
 };

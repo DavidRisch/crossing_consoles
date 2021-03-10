@@ -29,7 +29,7 @@ class Connection {
   static std::shared_ptr<Connection> CreateServerSide(
       std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
       std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
-      ProtocolDefinition::address_t client_id, ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
+      ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
 
   /**
    * \brief Send message
@@ -47,8 +47,6 @@ class Connection {
     }
   };
 
-  void SetId(ProtocolDefinition::address_t new_id);
-
  private:
   Connection(std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
              std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
@@ -57,7 +55,7 @@ class Connection {
   /**
    * \brief Send acknowledge message for a received message identified by its sequence to the specified address.
    */
-  void SendAcknowledge(ProtocolDefinition::address_t address, ProtocolDefinition::sequence_t sequence);
+  void SendAcknowledge(ProtocolDefinition::sequence_t sequence);
 
   /**
    * \brief Return current sequence count and increment sequence counter.
@@ -71,12 +69,10 @@ class Connection {
    */
   static std::shared_ptr<message_layer::Message> ReceiveWithTimeout(
       const std::shared_ptr<message_layer::MessageInputStream>& message_input_stream,
-      ProtocolDefinition::address_t address, ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
+      ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
 
   std::shared_ptr<message_layer::MessageInputStream> message_input_stream;
   std::shared_ptr<message_layer::MessageOutputStream> message_output_stream;
-
-  ProtocolDefinition::address_t id;
 };
 
 }  // namespace connection_layer

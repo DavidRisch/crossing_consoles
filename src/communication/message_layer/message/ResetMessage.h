@@ -1,20 +1,20 @@
-#ifndef CROSSING_CONSOLES_KEEPALIVEMESSAGE_H
-#define CROSSING_CONSOLES_KEEPALIVEMESSAGE_H
+#ifndef CROSSING_CONSOLES_RESETMESSAGE_H
+#define CROSSING_CONSOLES_RESETMESSAGE_H
 
 #include "Message.h"
 
 namespace communication {
 namespace message_layer {
 
-class KeepAliveMessage : public Message {
+class ResetMessage : public Message {
  public:
   static MessageType message_type;
 
   // Draft message
-  explicit KeepAliveMessage();
+  explicit ResetMessage();
 
   // Received message
-  KeepAliveMessage(ProtocolDefinition::sequence_t sequence);
+  explicit ResetMessage(ProtocolDefinition::sequence_t sequence);
 
   [[nodiscard]] MessageType GetMessageType() const override;
 };
@@ -22,4 +22,4 @@ class KeepAliveMessage : public Message {
 }  // namespace message_layer
 }  // namespace communication
 
-#endif  // CROSSING_CONSOLES_KEEPALIVEMESSAGE_H
+#endif  // CROSSING_CONSOLES_RESETMESSAGE_H

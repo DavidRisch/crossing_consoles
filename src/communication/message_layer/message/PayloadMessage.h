@@ -11,11 +11,10 @@ class PayloadMessage : public Message {
   static MessageType message_type;
 
   // Draft message
-  explicit PayloadMessage(ProtocolDefinition::address_t address, std::vector<uint8_t> payload);
+  explicit PayloadMessage(std::vector<uint8_t> payload);
 
   // Received message
-  PayloadMessage(ProtocolDefinition::address_t address, std::vector<uint8_t> payload,
-                 ProtocolDefinition::sequence_t sequence);
+  PayloadMessage(std::vector<uint8_t> payload, ProtocolDefinition::sequence_t sequence);
 
   [[nodiscard]] MessageType GetMessageType() const override;
   [[nodiscard]] std::vector<uint8_t> GetPayload() const;

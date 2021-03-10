@@ -30,17 +30,21 @@ void ConnectionManager::SendToConnection(ProtocolDefinition::address_t partner_i
   }
   assert(connection_it->first == partner_id);
   auto connection = connection_it->second.connection;
-  message_layer::PayloadMessage msg = message_layer::PayloadMessage(partner_id, std::move(data));
+  message_layer::PayloadMessage msg = message_layer::PayloadMessage(std::move(data));
   connection->SendMessage(&msg);
 }
 
-void ConnectionManager::ResetConnection(ProtocolDefinition::address_t partner_id, const Connection& client_connection) {
-  // TODO  (only call this line if the connection exists):
+void ConnectionManager::ResetConnection(ProtocolDefinition::address_t partner_id) {
+  auto connection_it = connection_map.find(partner_id);
+  if (connection_it == connection_map.end()) {
+    throw UnknownPartnerException();
+  }
   event_queue.push_back(std::make_shared<DisconnectEvent>(partner_id));
-  // TODO Reset connection
+  connection_map.erase(partner_id);
 }
 
-void ConnectionManager::AddConnection(const std::shared_ptr<Connection>& connection, address_t new_partner_id) {
+void ConnectionManager::AddConnection(const std::shared_ptr<Connection>& connection) {
+  auto new_partner_id = GetNextPartnerId();
   connection_map.insert({new_partner_id, ConnectionParameters{connection, std::chrono::steady_clock::now()}});
   event_queue.push_back(std::make_shared<ConnectEvent>(new_partner_id));
 }
@@ -60,7 +64,7 @@ void ConnectionManager::ReceiveMessages() {
     auto connection = connection_entry.second.connection;
     auto partner_id = connection_entry.first;
 
-    auto msg = message_layer::KeepAliveMessage(partner_id);
+    auto msg = message_layer::KeepAliveMessage();
     connection->SendMessage(&msg);
 
     std::shared_ptr<message_layer::Message> received_msg;
@@ -72,13 +76,14 @@ void ConnectionManager::ReceiveMessages() {
           const auto payload = std::dynamic_pointer_cast<message_layer::PayloadMessage>(received_msg)->GetPayload();
           event_queue.push_back(std::make_shared<PayloadEvent>(partner_id, payload));
         }
+        if (received_msg->GetMessageType() == message_layer::MessageType::RESET) {
+          ResetConnection(partner_id);
+        }
       }
     } while (received_msg != nullptr);
 
     if (std::chrono::steady_clock::now() - connection_entry.second.timestamp_last_received >= timeout) {
-      // TODO: event_queue.push_back(std::make_shared<DisconnectEvent>(partner_id));
-      // TODO handle timeout, reset connection
-      throw ConnectionManager::TimeoutException();
+      ResetConnection(partner_id);
     }
   }
 }

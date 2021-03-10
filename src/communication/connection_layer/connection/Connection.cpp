@@ -15,11 +15,11 @@ using namespace communication::connection_layer;
 
 std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout(
     const std::shared_ptr<message_layer::MessageInputStream> &message_input_stream,
-    ProtocolDefinition::address_t address, ProtocolDefinition::timeout_t timeout) {
+    ProtocolDefinition::timeout_t timeout) {
   const auto start_time = std::chrono::steady_clock::now();
 
   while (std::chrono::steady_clock::now() - start_time <= timeout) {
-    auto message = message_input_stream->ReceiveMessage(address, false);
+    auto message = message_input_stream->ReceiveMessage(false);
 
     if (message != nullptr) {
       message->SetTimestampReceived(std::chrono::steady_clock::now());
@@ -33,46 +33,41 @@ std::shared_ptr<Connection> Connection::CreateClientSide(
     std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
     std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, ProtocolDefinition::timeout_t timeout) {
   ProtocolDefinition::sequence_t client_sequence = 7;  // start with an arbitrary chosen sequence
-  message_layer::ConnectionRequestMessage step_1(ProtocolDefinition::server_partner_id);
+  auto step_1 = message_layer::ConnectionRequestMessage();
   step_1.SetMessageSequence(client_sequence);
   client_sequence++;
   message_output_stream->SendMessage(&step_1);
 
-  address_t arbitrary_address = 100;  // address is unknown, use arbitrary address
-  auto step_2 = ReceiveWithTimeout(message_input_stream, arbitrary_address, timeout);
+  auto step_2 = ReceiveWithTimeout(message_input_stream, timeout);
   assert(step_2 != nullptr);
   if (step_2->GetMessageType() != message_layer::MessageType::CONNECTION_RESPONSE) {
     throw ConnectionCreationFailed();
   }
-  address_t id = step_2->GetAddress();
 
-  message_layer::AcknowledgeMessage step_3(ProtocolDefinition::server_partner_id, step_2->GetMessageSequence());
+  message_layer::AcknowledgeMessage step_3(step_2->GetMessageSequence());
   step_3.SetMessageSequence(client_sequence);
   client_sequence++;
   message_output_stream->SendMessage(&step_3);
 
-  auto connection = std::shared_ptr<Connection>(
+  return std::shared_ptr<Connection>(
       new Connection(std::move(message_input_stream), std::move(message_output_stream), client_sequence));
-  connection->SetId(id);
-  return connection;
 }
 
 std::shared_ptr<Connection> Connection::CreateServerSide(
     std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
-    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, address_t client_id,
-    ProtocolDefinition::timeout_t timeout) {
+    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, ProtocolDefinition::timeout_t timeout) {
   ProtocolDefinition::sequence_t server_sequence = 146;  // start with an arbitrary chosen sequence
-  auto step_1 = ReceiveWithTimeout(message_input_stream, ProtocolDefinition::server_partner_id, timeout);
+  auto step_1 = ReceiveWithTimeout(message_input_stream, timeout);
   if (step_1->GetMessageType() != message_layer::MessageType::CONNECTION_REQUEST) {
     throw ConnectionCreationFailed();
   }
 
-  message_layer::ConnectionResponseMessage step_2(client_id);
+  auto step_2 = message_layer::ConnectionResponseMessage();
   step_2.SetMessageSequence(server_sequence);
   server_sequence++;
   message_output_stream->SendMessage(&step_2);
 
-  auto step_3 = ReceiveWithTimeout(message_input_stream, ProtocolDefinition::server_partner_id, timeout);
+  auto step_3 = ReceiveWithTimeout(message_input_stream, timeout);
   if (step_3->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
     throw ConnectionCreationFailed();
   } else {
@@ -82,10 +77,8 @@ std::shared_ptr<Connection> Connection::CreateServerSide(
     }
   }
 
-  auto connection = std::shared_ptr<Connection>(
+  return std::shared_ptr<Connection>(
       new Connection(std::move(message_input_stream), std::move(message_output_stream), server_sequence));
-  connection->SetId(ProtocolDefinition::server_partner_id);
-  return connection;
 }
 
 void Connection::SendMessage(message_layer::Message *message) {
@@ -95,13 +88,13 @@ void Connection::SendMessage(message_layer::Message *message) {
 }
 
 std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
-  auto received_message = message_input_stream->ReceiveMessage(id, false);
+  auto received_message = message_input_stream->ReceiveMessage(false);
 
   // Send acknowledge for every received message except for other acknowledges
   if (received_message) {
     received_message->SetTimestampReceived(std::chrono::steady_clock::now());
     if (received_message->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
-      SendAcknowledge(received_message->GetAddress(), received_message->GetMessageSequence());
+      SendAcknowledge(received_message->GetMessageSequence());
     }
   }
 
@@ -121,12 +114,7 @@ ProtocolDefinition::sequence_t Connection::GenerateSequence() {
   sequence_counter++;
   return current_counter;
 }
-void Connection::SendAcknowledge(ProtocolDefinition::address_t address,
-                                 ProtocolDefinition::sequence_t acknowledged_msg_sequence) {
-  auto ack_msg = message_layer::AcknowledgeMessage(address, acknowledged_msg_sequence);
+void Connection::SendAcknowledge(ProtocolDefinition::sequence_t acknowledged_msg_sequence) {
+  auto ack_msg = message_layer::AcknowledgeMessage(acknowledged_msg_sequence);
   SendMessage(&ack_msg);
-}
-
-void Connection::SetId(ProtocolDefinition::address_t new_id) {
-  id = new_id;
 }

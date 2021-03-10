@@ -3,11 +3,11 @@
 using namespace communication;
 using namespace communication::message_layer;
 
-KeepAliveMessage::KeepAliveMessage(ProtocolDefinition::address_t address, ProtocolDefinition::sequence_t sequence)
-    : Message(address, sequence) {
+KeepAliveMessage::KeepAliveMessage(ProtocolDefinition::sequence_t sequence)
+    : Message(sequence) {
 }
-KeepAliveMessage::KeepAliveMessage(ProtocolDefinition::address_t address)
-    : Message(address) {
+KeepAliveMessage::KeepAliveMessage()
+    : Message() {
 }
 
 MessageType KeepAliveMessage::message_type = MessageType::KEEP_ALIVE;
