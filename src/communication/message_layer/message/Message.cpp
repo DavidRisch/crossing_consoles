@@ -5,18 +5,19 @@
 using namespace communication;
 using namespace communication::message_layer;
 
-Message::Message(address_t address)
+Message::Message(ProtocolDefinition::address_t address)
     : address(address) {
   sequence = 0;
 }
 
-Message::Message(address_t address, ProtocolDefinition::sequence_t sequence, MessageMetaData meta_data)
+Message::Message(ProtocolDefinition::address_t address, ProtocolDefinition::sequence_t sequence,
+                 MessageMetaData meta_data)
     : address(address)
     , meta_data(meta_data)
     , sequence(sequence) {
 }
 
-address_t Message::GetAddress() const {
+ProtocolDefinition::address_t Message::GetAddress() const {
   return address;
 }
 

@@ -3,11 +3,11 @@
 using namespace communication;
 using namespace communication::message_layer;
 
-ConnectionResponseMessage::ConnectionResponseMessage(address_t address, MessageMetaData meta_data,
+ConnectionResponseMessage::ConnectionResponseMessage(ProtocolDefinition::address_t address, MessageMetaData meta_data,
                                                      ProtocolDefinition::sequence_t sequence)
     : Message(address, sequence, meta_data) {
 }
-ConnectionResponseMessage::ConnectionResponseMessage(address_t address)
+ConnectionResponseMessage::ConnectionResponseMessage(ProtocolDefinition::address_t address)
     : Message(address) {
 }
 

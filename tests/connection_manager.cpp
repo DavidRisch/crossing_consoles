@@ -22,9 +22,9 @@ class ConnectionManagers : public ::testing::Test {
   std::shared_ptr<ClientSideConnectionManager> client_manager;
   std::shared_ptr<ClientSideConnectionManager> second_client_manager;
 
-  ProtocolDefinition::partner_id_t client_id{};         // from server perspective
-  ProtocolDefinition::partner_id_t second_client_id{};  // from server perspective
-  ProtocolDefinition::partner_id_t server_id{};         // from client perspective
+  ProtocolDefinition::address_t client_id{};         // from server perspective
+  ProtocolDefinition::address_t second_client_id{};  // from server perspective
+  ProtocolDefinition::address_t server_id{};         // from client perspective
 
   void create_server_and_client() {
     server_manager = ServerSideConnectionManager::CreateServerSide();

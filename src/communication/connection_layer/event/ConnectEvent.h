@@ -7,7 +7,7 @@ namespace communication::connection_layer {
 
 class ConnectEvent : public Event {
  public:
-  explicit ConnectEvent(ProtocolDefinition::partner_id_t partner_id);
+  explicit ConnectEvent(ProtocolDefinition::address_t partner_id);
 
   [[nodiscard]] EventType GetType() const override;
 };

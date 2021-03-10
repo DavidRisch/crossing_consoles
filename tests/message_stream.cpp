@@ -30,7 +30,7 @@ TEST(MessageStream, Simple) {
   MessageInputStream message_input_stream(stream_pair.first);
   MessageOutputStream message_output_stream(stream_pair.second);
 
-  address_t target_address = 1234;
+  ProtocolDefinition::address_t target_address = 1234;
   KeepAliveMessage original_message(target_address);
 
   message_output_stream.SendMessage(&original_message);
@@ -46,7 +46,7 @@ TEST(MessageStream, WithPadding) {
   MessageInputStream message_input_stream(stream_pair.first);
   MessageOutputStream message_output_stream(stream_pair.second);
 
-  address_t target_address = 1234;
+  ProtocolDefinition::address_t target_address = 1234;
   KeepAliveMessage original_message(target_address);
 
   uint8_t padding[10] = {};
@@ -65,7 +65,7 @@ TEST(MessageStream, Multiple) {
   MessageInputStream message_input_stream(stream_pair.first);
   MessageOutputStream message_output_stream(stream_pair.second);
 
-  address_t target_address = 1234;
+  ProtocolDefinition::address_t target_address = 1234;
   for (int i = 0; i < 10; ++i) {
     std::vector<uint8_t> payload;
     payload.push_back(i);
@@ -92,7 +92,7 @@ TEST(MessageStream, Threaded) {
   auto b_message_input_stream = std::make_shared<MessageInputStream>(stream_pair.first);
   auto a_message_output_stream = std::make_shared<MessageOutputStream>(stream_pair.second);
 
-  address_t target_address = 1234;
+  ProtocolDefinition::address_t target_address = 1234;
 
   int test_message_count = 100;
 

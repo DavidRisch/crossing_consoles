@@ -20,25 +20,23 @@ enum class MessageType : char {
   HIGHEST_ELEMENT = KEEP_ALIVE
 };
 
-typedef uint16_t address_t;
-
 class Message {
  public:
   // Draft message
-  Message(address_t address);
+  Message(ProtocolDefinition::address_t address);
 
   // Received message
-  Message(address_t address, ProtocolDefinition::sequence_t sequence, MessageMetaData meta_data);
+  Message(ProtocolDefinition::address_t address, ProtocolDefinition::sequence_t sequence, MessageMetaData meta_data);
 
   ProtocolDefinition::sequence_t GetMessageSequence() const;
   void SetMessageSequence(ProtocolDefinition::sequence_t new_sequence);
 
-  [[nodiscard]] address_t GetAddress() const;
+  [[nodiscard]] ProtocolDefinition::address_t GetAddress() const;
   [[nodiscard]] virtual MessageType GetMessageType() const;
   [[nodiscard]] MessageMetaData GetMessageMetaData() const;
 
  private:
-  address_t address;
+  ProtocolDefinition::address_t address;
   MessageMetaData meta_data = MessageMetaData(0, 0);
   ProtocolDefinition::sequence_t sequence;
 };

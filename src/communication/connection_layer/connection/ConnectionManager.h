@@ -20,7 +20,7 @@ struct ConnectionParameters {
   std::chrono::time_point<std::chrono::steady_clock> timestamp_last_received;
 };
 
-using partner_id_t = ProtocolDefinition::partner_id_t;
+using address_t = ProtocolDefinition::address_t;
 
 class ConnectionManager {
  public:
@@ -34,7 +34,7 @@ class ConnectionManager {
   /**
    * \brief Send data to specified client.
    */
-  void SendToConnection(partner_id_t partner_id, std::vector<uint8_t> data);
+  void SendToConnection(address_t partner_id, std::vector<uint8_t> data);
 
   /**
    * \brief Needs to be implemented on Server and Client side separately.
@@ -45,12 +45,12 @@ class ConnectionManager {
    * \brief Add connection to `connection_map`.
    * \details all connections on `connection_map` are managed by `HandleConnections`.
    */
-  void AddConnection(const std::shared_ptr<Connection>& connection);
+  void AddConnection(const std::shared_ptr<Connection>& connection, address_t new_partner_id);
 
   /**
    * \brief Reset connection after timeout.
    */
-  void ResetConnection(partner_id_t partner_id, const Connection& connection);
+  void ResetConnection(address_t partner_id, const Connection& connection);
 
   /**
    * \brief Return and pop the oldest `Event`.
@@ -82,10 +82,10 @@ class ConnectionManager {
   void ReceiveMessages();
 
   /// connection_map of connection id/ address : ConnectionParameters<connection, timestamp_last_received>
-  std::unordered_map<partner_id_t, ConnectionParameters> connection_map;
+  std::unordered_map<address_t, ConnectionParameters> connection_map;
 
  private:
-  virtual partner_id_t GetNextPartnerId() = 0;
+  virtual address_t GetNextPartnerId() = 0;
 
   /// Unprocessed events ordered from oldest to newest.
   std::list<std::shared_ptr<Event>> event_queue;

@@ -23,14 +23,16 @@ void test_connection(std::shared_ptr<MessageInputStream> client_message_input_st
   std::shared_ptr<Connection> server_connection;
 
   std::thread server_thread([&server_connection, &server_message_input_stream, &server_message_output_stream] {
-    server_connection = Connection::CreateServerSide(server_message_input_stream, server_message_output_stream);
+    ProtocolDefinition::address_t client_address = 1234;  // set to arbitrary address
+    server_connection =
+        Connection::CreateServerSide(server_message_input_stream, server_message_output_stream, client_address);
   });
 
   auto client_connection =
       Connection::CreateClientSide(std::move(client_message_input_stream), std::move(client_message_output_stream));
   server_thread.join();
 
-  address_t target_address = 1234;
+  address_t target_address = ProtocolDefinition::server_partner_id;
   {
     KeepAliveMessage original_message(target_address);
 
@@ -110,7 +112,9 @@ TEST(Connection, FailedHandshakeServer) {
   auto server_message_input_stream = std::make_shared<MessageInputStream>(server_side);
   auto server_message_output_stream = std::make_shared<MessageOutputStream>(server_side);
 
-  ASSERT_THROW(
-      Connection::CreateServerSide(std::move(server_message_input_stream), std::move(server_message_output_stream)),
-      ConnectionManager::TimeoutException);
+  ProtocolDefinition::address_t client_id = 1234;  // set to arbitrary address
+
+  ASSERT_THROW(Connection::CreateServerSide(std::move(server_message_input_stream),
+                                            std::move(server_message_output_stream), client_id),
+               ConnectionManager::TimeoutException);
 }

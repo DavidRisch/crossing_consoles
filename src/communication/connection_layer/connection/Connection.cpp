@@ -31,8 +31,8 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout(
 std::shared_ptr<Connection> Connection::CreateClientSide(
     std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
     std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, ProtocolDefinition::timeout_t timeout) {
-  ProtocolDefinition::sequence_t client_sequence = 7;    // start with an arbitrary chosen sequence
-  message_layer::ConnectionRequestMessage step_1(1234);  // TODO: address
+  ProtocolDefinition::sequence_t client_sequence = 7;  // start with an arbitrary chosen sequence
+  message_layer::ConnectionRequestMessage step_1(ProtocolDefinition::server_partner_id);
   step_1.SetMessageSequence(client_sequence);
   client_sequence++;
   message_output_stream->SendMessage(&step_1);
@@ -43,7 +43,7 @@ std::shared_ptr<Connection> Connection::CreateClientSide(
     throw ConnectionCreationFailed();
   }
 
-  message_layer::AcknowledgeMessage step_3(1234, step_2->GetMessageSequence());  // TODO: address
+  message_layer::AcknowledgeMessage step_3(ProtocolDefinition::server_partner_id, step_2->GetMessageSequence());
   step_3.SetMessageSequence(client_sequence);
   client_sequence++;
   message_output_stream->SendMessage(&step_3);
@@ -53,14 +53,15 @@ std::shared_ptr<Connection> Connection::CreateClientSide(
 
 std::shared_ptr<Connection> Connection::CreateServerSide(
     std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
-    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, ProtocolDefinition::timeout_t timeout) {
+    std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, address_t client_id,
+    ProtocolDefinition::timeout_t timeout) {
   ProtocolDefinition::sequence_t server_sequence = 146;  // start with an arbitrary chosen sequence
   auto step_1 = ReceiveWithTimeout(message_input_stream, timeout);
   if (step_1->GetMessageType() != message_layer::MessageType::CONNECTION_REQUEST) {
     throw ConnectionCreationFailed();
   }
 
-  message_layer::ConnectionResponseMessage step_2(1234);  // TODO: address
+  message_layer::ConnectionResponseMessage step_2(client_id);
   step_2.SetMessageSequence(server_sequence);
   server_sequence++;
   message_output_stream->SendMessage(&step_2);
@@ -111,7 +112,7 @@ ProtocolDefinition::sequence_t Connection::GenerateSequence() {
   sequence_counter++;
   return current_counter;
 }
-void Connection::SendAcknowledge(message_layer::address_t address,
+void Connection::SendAcknowledge(ProtocolDefinition::address_t address,
                                  ProtocolDefinition::sequence_t acknowledged_msg_sequence) {
   auto ack_msg = message_layer::AcknowledgeMessage(address, acknowledged_msg_sequence);
   SendMessage(&ack_msg);

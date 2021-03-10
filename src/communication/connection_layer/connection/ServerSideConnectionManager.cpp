@@ -15,9 +15,10 @@ void ServerSideConnectionManager::HandleConnections() {
   if (new_client != nullptr) {
     auto message_input_stream = std::make_shared<message_layer::MessageInputStream>(new_client);
     auto message_output_stream = std::make_shared<message_layer::MessageOutputStream>(new_client);
+    auto new_partner_id = GetNextPartnerId();
     std::shared_ptr<Connection> connection =
-        Connection::CreateServerSide(std::move(message_input_stream), std::move(message_output_stream));
-    AddConnection(connection);
+        Connection::CreateServerSide(std::move(message_input_stream), std::move(message_output_stream), new_partner_id);
+    AddConnection(connection, new_partner_id);
   }
   ReceiveMessages();
 }
@@ -34,6 +35,6 @@ int ServerSideConnectionManager::ConnectionCount() {
   return connection_map.size();
 }
 
-partner_id_t ServerSideConnectionManager::GetNextPartnerId() {
+address_t ServerSideConnectionManager::GetNextPartnerId() {
   return next_partner_id++;
 }

@@ -16,17 +16,17 @@ enum class EventType : char {
  */
 class Event {
  public:
-  [[nodiscard]] ProtocolDefinition::partner_id_t GetPartnerId() const;
+  [[nodiscard]] ProtocolDefinition::address_t GetPartnerId() const;
 
   [[nodiscard]] virtual EventType GetType() const = 0;
 
-  explicit Event(ProtocolDefinition::partner_id_t partner_id);
+  explicit Event(ProtocolDefinition::address_t partner_id);
 
  private:
   /**
    * Id of the partner to which this event relates.
    */
-  ProtocolDefinition::partner_id_t partner_id;
+  ProtocolDefinition::address_t partner_id;
 };
 
 }  // namespace communication::connection_layer

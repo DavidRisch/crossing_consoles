@@ -3,7 +3,7 @@
 using namespace communication;
 using namespace communication::connection_layer;
 
-ConnectEvent::ConnectEvent(ProtocolDefinition::partner_id_t partner_id)
+ConnectEvent::ConnectEvent(ProtocolDefinition::address_t partner_id)
     : Event(partner_id) {
 }
 

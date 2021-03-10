@@ -23,7 +23,7 @@ void ConnectionManager::Broadcast(const std::vector<uint8_t>& payload) {
   }
 }
 
-void ConnectionManager::SendToConnection(ProtocolDefinition::partner_id_t partner_id, std::vector<uint8_t> data) {
+void ConnectionManager::SendToConnection(ProtocolDefinition::address_t partner_id, std::vector<uint8_t> data) {
   auto connection_it = connection_map.find(partner_id);
   if (connection_it == connection_map.end()) {
     throw UnknownPartnerException();
@@ -34,15 +34,13 @@ void ConnectionManager::SendToConnection(ProtocolDefinition::partner_id_t partne
   connection->SendMessage(&msg);
 }
 
-void ConnectionManager::ResetConnection(ProtocolDefinition::partner_id_t partner_id,
-                                        const Connection& client_connection) {
+void ConnectionManager::ResetConnection(ProtocolDefinition::address_t partner_id, const Connection& client_connection) {
   // TODO  (only call this line if the connection exists):
   event_queue.push_back(std::make_shared<DisconnectEvent>(partner_id));
   // TODO Reset connection
 }
 
-void ConnectionManager::AddConnection(const std::shared_ptr<Connection>& connection) {
-  auto new_partner_id = GetNextPartnerId();
+void ConnectionManager::AddConnection(const std::shared_ptr<Connection>& connection, address_t new_partner_id) {
   connection_map.insert({new_partner_id, ConnectionParameters{connection, std::chrono::steady_clock::now()}});
   event_queue.push_back(std::make_shared<ConnectEvent>(new_partner_id));
 }

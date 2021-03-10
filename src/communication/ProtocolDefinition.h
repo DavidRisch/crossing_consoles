@@ -36,9 +36,9 @@ class ProtocolDefinition {
   static constexpr const timeout_t timeout = std::chrono::milliseconds(100);
 
   /// Used to reference connection partners.
-  typedef unsigned int partner_id_t;
+  typedef unsigned int address_t;
   /// partner id of the server. A constant because there is only a single server.
-  static constexpr partner_id_t server_partner_id = 0;
+  static constexpr address_t server_partner_id = 0;
 };
 
 }  // namespace communication

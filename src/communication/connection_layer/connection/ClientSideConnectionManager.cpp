@@ -17,7 +17,7 @@ std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::Create
   std::shared_ptr<Connection> connection =
       Connection::CreateClientSide(std::move(message_input_stream), std::move(message_output_stream), timeout);
   auto manager = std::shared_ptr<ClientSideConnectionManager>(new ClientSideConnectionManager(timeout));
-  manager->AddConnection(connection);
+  manager->AddConnection(connection, ProtocolDefinition::server_partner_id);
   return manager;
 }
 
@@ -25,6 +25,6 @@ void ClientSideConnectionManager::HandleConnections() {
   ReceiveMessages();
 }
 
-partner_id_t ClientSideConnectionManager::GetNextPartnerId() {
+address_t ClientSideConnectionManager::GetNextPartnerId() {
   return ProtocolDefinition::server_partner_id;  // constant because only a single server can exist.
 }
