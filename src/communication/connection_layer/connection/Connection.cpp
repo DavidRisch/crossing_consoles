@@ -63,7 +63,7 @@ bool Connection::TryEstablish() {
       message_layer::AcknowledgeMessage step_3(1234, step_2->GetMessageSequence());
       message_output_stream->SendMessage(&step_3);
 
-      state = ConnectionState::ESTABLISHED;
+      state = ConnectionState::READY;
       break;
     }
     case (ConnectionState::SERVER_WAITING_FOR_FIRST): {
@@ -90,20 +90,20 @@ bool Connection::TryEstablish() {
           throw ConnectionCreationFailed();
         }
       }
-      state = ConnectionState::ESTABLISHED;
+      state = ConnectionState::READY;
       break;
     }
     default:
       throw std::runtime_error("Invalid ConnectionState");
   }
 
-  return state == ConnectionState::ESTABLISHED;
+  return state == ConnectionState::READY;
 }
 
 void Connection::BlockingEstablish() {
   for (int i = 0; i < 100; ++i) {
     if (TryEstablish()) {
-      assert(state == ConnectionState::ESTABLISHED);
+      assert(state == ConnectionState::READY);
       return;
     }
     std::this_thread::sleep_for(std::chrono::microseconds(10));
@@ -112,7 +112,7 @@ void Connection::BlockingEstablish() {
 }
 
 void Connection::SendMessage(const std::shared_ptr<message_layer::Message> &message) {
-  assert(state == ConnectionState::ESTABLISHED);
+  assert(state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE);
 
   send_message_queue.push(message);
 
@@ -120,15 +120,24 @@ void Connection::SendMessage(const std::shared_ptr<message_layer::Message> &mess
 }
 
 std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
-  assert(state == ConnectionState::ESTABLISHED);
+  assert(state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE);
 
   auto received_message = message_input_stream->ReceiveMessage(false);
 
   // TODO: Set MetaData
 
-  // Send acknowledge for every received message except for other acknowledges
   if (received_message != nullptr) {
-    if (received_message->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
+    if (received_message->GetMessageType() == message_layer::MessageType::ACKNOWLEDGE) {
+      if (state != ConnectionState::WAITING_FOR_ACKNOWLEDGE) {
+        throw BadAcknowledgeException();
+      }
+      auto acknowledge_message = std::dynamic_pointer_cast<message_layer::AcknowledgeMessage>(received_message);
+      if (acknowledge_message->GetAcknowledgedMessageSequence() != last_send_sequence) {
+        throw BadAcknowledgeException();
+      }
+      state = ConnectionState::READY;
+    } else {
+      // Send acknowledge for every received message except for other acknowledges
       SendAcknowledge(received_message->GetAddress(), received_message->GetMessageSequence());
     }
   }
@@ -153,23 +162,34 @@ sequence_t Connection::GenerateSequence() {
 }
 
 void Connection::SendMessageNow(message_layer::Message *message) {
-  assert(state == ConnectionState::ESTABLISHED);
+  assert(state == ConnectionState::READY || (message->GetMessageType() == message_layer::MessageType::ACKNOWLEDGE &&
+                                             state == ConnectionState::WAITING_FOR_ACKNOWLEDGE));
 
-  last_send_sequence = GenerateSequence();
-  message->SetMessageSequence(last_send_sequence);
+  auto send_sequence = GenerateSequence();
+  if (message->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
+    last_send_sequence = send_sequence;
+  }
+  message->SetMessageSequence(send_sequence);
+
   message_output_stream->SendMessage(message);
+
+  if (message->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
+    state = ConnectionState::WAITING_FOR_ACKNOWLEDGE;
+  }
 }
 
 void Connection::SendAcknowledge(message_layer::address_t address, sequence_t acknowledged_msg_sequence) {
-  auto ack_msg = std::make_shared<message_layer::AcknowledgeMessage>(address, acknowledged_msg_sequence);
-  SendMessage(ack_msg);
+  auto ack_msg = message_layer::AcknowledgeMessage(address, acknowledged_msg_sequence);
+  SendMessageNow(&ack_msg);
 }
 
 void Connection::Handle() {
-  assert(state == ConnectionState::ESTABLISHED);
+  assert(state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE);
 
-  if (!send_message_queue.empty()) {
-    SendMessageNow(send_message_queue.front().get());
-    send_message_queue.pop();
+  if (state == ConnectionState::READY) {
+    if (!send_message_queue.empty()) {
+      SendMessageNow(send_message_queue.front().get());
+      send_message_queue.pop();
+    }
   }
 }

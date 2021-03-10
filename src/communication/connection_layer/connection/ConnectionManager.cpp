@@ -4,7 +4,6 @@
 #include <chrono>
 #include <utility>
 
-#include "../../message_layer/message/KeepAliveMessage.h"
 #include "../event/ConnectEvent.h"
 #include "../event/DisconnectEvent.h"
 #include "../event/PayloadEvent.h"
@@ -62,8 +61,12 @@ void ConnectionManager::ReceiveMessages() {
     auto connection = connection_entry.second.connection;
     auto partner_id = connection_entry.first;
 
+    /*
+     TODO: send keep alive less frequently
+     TODO: does not belong in this method
     auto msg = std::make_shared<message_layer::KeepAliveMessage>(partner_id);
-    connection->SendMessage(msg);
+    TODO: connection->SendMessage(msg);
+     */
 
     std::shared_ptr<message_layer::Message> received_msg;
     do {

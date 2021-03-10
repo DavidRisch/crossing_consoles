@@ -8,8 +8,8 @@
 #include "../src/communication/byte_layer/byte_stream/MockBidirectionalByteStream.h"
 #include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
 #include "../src/communication/connection_layer/connection/ConnectionManager.h"
+#include "../src/communication/message_layer/message/AcknowledgeMessage.h"
 #include "../src/communication/message_layer/message/KeepAliveMessage.h"
-#include "../src/communication/message_layer/message/PayloadMessage.h"
 
 using namespace communication;
 using namespace communication::byte_layer;
@@ -47,8 +47,11 @@ class Connections : public ::testing::Test {
       client_connection->SendMessage(original_message);
 
       auto received_message = server_connection->ReceiveMessage();
+      ASSERT_NE(received_message, nullptr);
       EXPECT_EQ(original_message->GetMessageType(), received_message->GetMessageType());
+
       auto ack_message = client_connection->ReceiveMessage();
+      ASSERT_NE(ack_message, nullptr);
       EXPECT_EQ(ack_message->GetMessageType(), MessageType::ACKNOWLEDGE);
     }
 
@@ -61,10 +64,15 @@ class Connections : public ::testing::Test {
       server_connection->SendMessage(original_message);
 
       auto received_message = client_connection->ReceiveMessage();
+      ASSERT_NE(received_message, nullptr);
       EXPECT_EQ(original_message->GetMessageType(), received_message->GetMessageType());
       auto &received_payload_message = dynamic_cast<PayloadMessage &>(*received_message);
       EXPECT_EQ(received_payload_message.GetPayload().size(), original_message->GetPayload().size());
       EXPECT_EQ(received_payload_message.GetPayload().at(0), original_message->GetPayload().at(0));
+
+      auto ack_message = server_connection->ReceiveMessage();
+      ASSERT_NE(ack_message, nullptr);
+      EXPECT_EQ(ack_message->GetMessageType(), MessageType::ACKNOWLEDGE);
     }
   }
 };
@@ -157,9 +165,14 @@ TEST_F(Connections, SendQueue) {
 
     for (int i = 0; i < count; ++i) {
       auto received_message = server_connection->ReceiveMessage();
+      ASSERT_NE(received_message, nullptr);
       EXPECT_EQ(original_message->GetMessageType(), received_message->GetMessageType());
+
       auto ack_message = client_connection->ReceiveMessage();
       EXPECT_EQ(ack_message->GetMessageType(), MessageType::ACKNOWLEDGE);
+
+      // send next message from queue
+      client_connection->Handle();
     }
   }
 
@@ -182,10 +195,37 @@ TEST_F(Connections, SendQueue) {
 
     for (const auto &original_message : messages) {
       auto received_message = client_connection->ReceiveMessage();
+      ASSERT_NE(received_message, nullptr);
       EXPECT_EQ(original_message->GetMessageType(), received_message->GetMessageType());
       auto &received_payload_message = dynamic_cast<PayloadMessage &>(*received_message);
       EXPECT_EQ(received_payload_message.GetPayload().size(), original_message->GetPayload().size());
       EXPECT_EQ(received_payload_message.GetPayload().at(0), original_message->GetPayload().at(0));
+
+      auto ack_message = server_connection->ReceiveMessage();
+      EXPECT_EQ(ack_message->GetMessageType(), MessageType::ACKNOWLEDGE);
+
+      // send next message from queue
+      server_connection->Handle();
     }
   }
+}
+
+TEST_F(Connections, BadAcknowledgeException) {
+  auto stream_pair = MockBidirectionalByteStream::CreatePair();
+  auto &server_side = stream_pair.first;
+  auto &client_side = stream_pair.second;
+
+  auto client_message_input_stream = std::make_shared<MessageInputStream>(client_side);
+  auto server_message_output_stream = std::make_shared<MessageOutputStream>(server_side);
+
+  auto server_message_input_stream = std::make_shared<MessageInputStream>(server_side);
+  auto client_message_output_stream = std::make_shared<MessageOutputStream>(client_side);
+
+  make_connections(client_message_input_stream, client_message_output_stream, server_message_input_stream,
+                   server_message_output_stream);
+
+  auto message = std::make_shared<AcknowledgeMessage>(0, 1234);
+
+  server_connection->SendMessage(message);
+  EXPECT_THROW(client_connection->ReceiveMessage(), Connection::BadAcknowledgeException);
 }

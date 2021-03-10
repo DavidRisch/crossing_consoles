@@ -22,7 +22,12 @@ void ServerSideConnectionManager::HandleConnections() {
 
     AddConnection(connection);
   }
+
   ReceiveMessages();
+
+  for (auto& entry : connection_map) {
+    entry.second.connection->Handle();
+  }
 }
 
 std::shared_ptr<ServerSideConnectionManager> ServerSideConnectionManager::CreateServerSide(

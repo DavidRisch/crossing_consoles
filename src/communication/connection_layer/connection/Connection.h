@@ -15,7 +15,8 @@ enum class ConnectionState {
   CLIENT_CONNECTION_REQUEST_SEND,
   SERVER_WAITING_FOR_FIRST,
   SERVER_CONNECTION_REQUEST_SEND,
-  ESTABLISHED,
+  READY,
+  WAITING_FOR_ACKNOWLEDGE,
 };
 
 using sequence_t = ProtocolDefinition::sequence_t;
@@ -72,6 +73,15 @@ class Connection {
     }
   };
 
+  /**
+   * \brief Thrown if an acknowledge is received at the wrong time or with the wrong content.
+   */
+  class BadAcknowledgeException : public std::exception {
+    [[nodiscard]] const char* what() const noexcept override {
+      return "Bad acknowledge received.";
+    }
+  };
+
  private:
   Connection(std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
              std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
@@ -101,6 +111,7 @@ class Connection {
       const std::shared_ptr<message_layer::MessageInputStream>& message_input_stream,
       timeout_t timeout = ProtocolDefinition::timeout);
 
+  /// The sequence number of the last send message not including acknowledge messages.
   sequence_t last_send_sequence{};
 
   ConnectionState state;
