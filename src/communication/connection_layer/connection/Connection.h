@@ -10,26 +10,46 @@
 namespace communication {
 namespace connection_layer {
 
+enum class ConnectionState {
+  CLIENT_CONNECTION_REQUEST_SEND,
+  SERVER_WAITING_FOR_FIRST,
+  SERVER_CONNECTION_REQUEST_SEND,
+  ESTABLISHED,
+};
+
+using sequence_t = ProtocolDefinition::sequence_t;
+using timeout_t = ProtocolDefinition::timeout_t;
+
 /**
  * \brief Layer which is responsible for most of the TCP features.
  */
 class Connection {
  public:
   /**
-   * \brief Perform 3-way handshake as the client.
+   * \brief Start the 3-way handshake as the client.
    */
   static std::shared_ptr<Connection> CreateClientSide(
       std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
       std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
-      ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
+      timeout_t timeout = ProtocolDefinition::timeout);
 
   /**
-   * \brief Perform 3-way handshake as the server.
+   * \brief Start the 3-way handshake as the server.
    */
   static std::shared_ptr<Connection> CreateServerSide(
       std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
       std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
-      ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
+      timeout_t timeout = ProtocolDefinition::timeout);
+
+  /**
+   * \brief Perform a step in the 3-way handshake, must be called until it returns true.
+   */
+  bool TryEstablish();
+
+  /**
+   * \brief Perform the complete 3-way handshake, intended for testing.
+   */
+  void BlockingEstablish();
 
   /**
    * \brief Send message
@@ -50,18 +70,18 @@ class Connection {
  private:
   Connection(std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
              std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
-             ProtocolDefinition::sequence_t sequence_counter);
+             ConnectionState connection_state, sequence_t sequence_counter, timeout_t timeout);
 
   /**
    * \brief Send acknowledge message for a received message identified by its sequence to the specified address.
    */
-  void SendAcknowledge(message_layer::address_t address, ProtocolDefinition::sequence_t sequence);
+  void SendAcknowledge(message_layer::address_t address, sequence_t sequence);
 
   /**
    * \brief Return current sequence count and increment sequence counter.
    */
-  ProtocolDefinition::sequence_t GenerateSequence();
-  ProtocolDefinition::sequence_t sequence_counter;
+  sequence_t GenerateSequence();
+  sequence_t sequence_counter;
 
   /**
    *
@@ -69,7 +89,13 @@ class Connection {
    */
   static std::shared_ptr<message_layer::Message> ReceiveWithTimeout(
       const std::shared_ptr<message_layer::MessageInputStream>& message_input_stream,
-      ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
+      timeout_t timeout = ProtocolDefinition::timeout);
+
+  sequence_t last_send_sequence{};
+
+  ConnectionState state;
+
+  timeout_t timeout;
 
   std::shared_ptr<message_layer::MessageInputStream> message_input_stream;
   std::shared_ptr<message_layer::MessageOutputStream> message_output_stream;

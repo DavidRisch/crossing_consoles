@@ -20,14 +20,15 @@ void test_connection(std::shared_ptr<MessageInputStream> client_message_input_st
                      std::shared_ptr<MessageOutputStream> client_message_output_stream,
                      std::shared_ptr<MessageInputStream> server_message_input_stream,
                      std::shared_ptr<MessageOutputStream> server_message_output_stream) {
-  std::shared_ptr<Connection> server_connection;
+  std::shared_ptr<Connection> server_connection =
+      Connection::CreateServerSide(std::move(server_message_input_stream), std::move(server_message_output_stream));
 
-  std::thread server_thread([&server_connection, &server_message_input_stream, &server_message_output_stream] {
-    server_connection = Connection::CreateServerSide(server_message_input_stream, server_message_output_stream);
-  });
+  std::thread server_thread([&server_connection] { server_connection->BlockingEstablish(); });
 
   auto client_connection =
       Connection::CreateClientSide(std::move(client_message_input_stream), std::move(client_message_output_stream));
+
+  client_connection->BlockingEstablish();
   server_thread.join();
 
   address_t target_address = 1234;
@@ -91,26 +92,30 @@ TEST(Connection, Integration) {
 
 TEST(Connection, FailedHandshakeClient) {
   // Server unreachable, Client throws timeout exception
+
   auto stream_pair = MockBidirectionalByteStream::CreatePair();
   auto &client_side = stream_pair.second;
 
   auto client_message_input_stream = std::make_shared<MessageInputStream>(client_side);
   auto client_message_output_stream = std::make_shared<MessageOutputStream>(client_side);
 
-  ASSERT_THROW(
-      Connection::CreateClientSide(std::move(client_message_input_stream), std::move(client_message_output_stream)),
-      ConnectionManager::TimeoutException);
+  auto connection = Connection::CreateClientSide(std::move(client_message_input_stream),
+                                                 std::move(client_message_output_stream), std::chrono::milliseconds(1));
+
+  ASSERT_THROW(connection->BlockingEstablish(), ConnectionManager::TimeoutException);
 }
 
 TEST(Connection, FailedHandshakeServer) {
   // Client unreachable, Server throws timeout exception
+
   auto stream_pair = MockBidirectionalByteStream::CreatePair();
   auto &server_side = stream_pair.second;
 
   auto server_message_input_stream = std::make_shared<MessageInputStream>(server_side);
   auto server_message_output_stream = std::make_shared<MessageOutputStream>(server_side);
 
-  ASSERT_THROW(
-      Connection::CreateServerSide(std::move(server_message_input_stream), std::move(server_message_output_stream)),
-      ConnectionManager::TimeoutException);
+  auto connection = Connection::CreateServerSide(std::move(server_message_input_stream),
+                                                 std::move(server_message_output_stream), std::chrono::milliseconds(1));
+
+  ASSERT_THROW(connection->BlockingEstablish(), ConnectionManager::TimeoutException);
 }
