@@ -30,11 +30,15 @@ class ProtocolDefinition {
   /// A type large enough to hold message `sequence`.
   typedef uint16_t sequence_t;
 
-  typedef std::chrono::duration<int64_t, std::milli> ms_count_t;
+  typedef std::chrono::duration<int64_t, std::milli> timeout_t;
 
   /// Set timeout duration
-  // TODO Set higher?
-  static constexpr const ms_count_t timeout = std::chrono::milliseconds(100);  // timeout in milliseconds
+  static constexpr const timeout_t timeout = std::chrono::milliseconds(100);
+
+  /// Used to reference connection partners.
+  typedef unsigned int partner_id_t;
+  /// partner id of the server. A constant because there is only a single server.
+  static constexpr partner_id_t server_partner_id = 0;
 };
 
 }  // namespace communication

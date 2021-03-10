@@ -1,4 +1,4 @@
-#include "../src/communication/connection_layer/Connection.h"
+#include "../src/communication/connection_layer/connection/Connection.h"
 
 #include <gtest/gtest.h>
 
@@ -7,7 +7,7 @@
 
 #include "../src/communication/byte_layer/byte_stream/MockBidirectionalByteStream.h"
 #include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
-#include "../src/communication/connection_layer/ConnectionManager.h"
+#include "../src/communication/connection_layer/connection/ConnectionManager.h"
 #include "../src/communication/message_layer/message/KeepAliveMessage.h"
 #include "../src/communication/message_layer/message/PayloadMessage.h"
 
@@ -99,7 +99,7 @@ TEST(Connection, FailedHandshakeClient) {
 
   ASSERT_THROW(
       Connection::CreateClientSide(std::move(client_message_input_stream), std::move(client_message_output_stream)),
-      ConnectionManager::ConnectionTimeout);
+      ConnectionManager::TimeoutException);
 }
 
 TEST(Connection, FailedHandshakeServer) {
@@ -112,5 +112,5 @@ TEST(Connection, FailedHandshakeServer) {
 
   ASSERT_THROW(
       Connection::CreateServerSide(std::move(server_message_input_stream), std::move(server_message_output_stream)),
-      ConnectionManager::ConnectionTimeout);
+      ConnectionManager::TimeoutException);
 }

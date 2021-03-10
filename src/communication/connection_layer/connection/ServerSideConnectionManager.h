@@ -16,15 +16,20 @@ class ServerSideConnectionManager : public ConnectionManager {
    * \brief Create Connection Manager for usage on server side.
    */
   static std::shared_ptr<ServerSideConnectionManager> CreateServerSide(
-      ProtocolDefinition::ms_count_t timeout = ProtocolDefinition::timeout);
+      ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
 
   /**
-   * \brief Returns true if server has connected clients.
+   * \brief Returns the number of connected clients.
    */
-  bool HasConnections();
+  int ConnectionCount();
 
  private:
-  ServerSideConnectionManager(ProtocolDefinition::ms_count_t timeout);
+  ServerSideConnectionManager(ProtocolDefinition::timeout_t timeout);
+
+  partner_id_t GetNextPartnerId() override;
+
+  partner_id_t next_partner_id = ProtocolDefinition::server_partner_id + 1;
+
   std::shared_ptr<byte_layer::SocketByteServer> byte_server;
 };
 }  // namespace connection_layer

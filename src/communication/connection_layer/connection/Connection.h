@@ -3,9 +3,9 @@
 
 #include <memory>
 
-#include "../message_layer/message/Message.h"
-#include "../message_layer/message_stream/MessageInputStream.h"
-#include "../message_layer/message_stream/MessageOutputStream.h"
+#include "../../message_layer/message/Message.h"
+#include "../../message_layer/message_stream/MessageInputStream.h"
+#include "../../message_layer/message_stream/MessageOutputStream.h"
 
 namespace communication {
 namespace connection_layer {
@@ -21,7 +21,7 @@ class Connection {
   static std::shared_ptr<Connection> CreateClientSide(
       std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
       std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
-      ProtocolDefinition::ms_count_t timeout = ProtocolDefinition::timeout);
+      ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
 
   /**
    * \brief Perform 3-way handshake as the server.
@@ -29,7 +29,7 @@ class Connection {
   static std::shared_ptr<Connection> CreateServerSide(
       std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
       std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
-      ProtocolDefinition::ms_count_t timeout = ProtocolDefinition::timeout);
+      ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
 
   /**
    * \brief Send message
@@ -69,7 +69,7 @@ class Connection {
    */
   static std::shared_ptr<message_layer::Message> ReceiveWithTimeout(
       const std::shared_ptr<message_layer::MessageInputStream>& message_input_stream,
-      ProtocolDefinition::ms_count_t timeout = ProtocolDefinition::timeout);
+      ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
 
   std::shared_ptr<message_layer::MessageInputStream> message_input_stream;
   std::shared_ptr<message_layer::MessageOutputStream> message_output_stream;
