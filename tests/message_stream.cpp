@@ -30,7 +30,7 @@ TEST(MessageStream, Simple) {
   MessageInputStream message_input_stream(stream_pair.first);
   MessageOutputStream message_output_stream(stream_pair.second);
 
-  KeepAliveMessage original_message = KeepAliveMessage();
+  auto original_message = KeepAliveMessage();
 
   message_output_stream.SendMessage(&original_message);
 
@@ -45,7 +45,7 @@ TEST(MessageStream, WithPadding) {
   MessageInputStream message_input_stream(stream_pair.first);
   MessageOutputStream message_output_stream(stream_pair.second);
 
-  KeepAliveMessage original_message = KeepAliveMessage();
+  auto original_message = KeepAliveMessage();
 
   uint8_t padding[10] = {};
   stream_pair.second->Send(padding, sizeof(padding));

@@ -19,11 +19,11 @@ ConnectionManager::ConnectionManager(ProtocolDefinition::timeout_t timeout)
 
 void ConnectionManager::Broadcast(const std::vector<uint8_t>& payload) {
   for (auto& connection_entry : connection_map) {
-    SendToConnection(connection_entry.first, payload);
+    SendDataToConnection(connection_entry.first, payload);
   }
 }
 
-void ConnectionManager::SendToConnection(ProtocolDefinition::address_t partner_id, std::vector<uint8_t> data) {
+void ConnectionManager::SendDataToConnection(ProtocolDefinition::address_t partner_id, std::vector<uint8_t> data) {
   auto connection_it = connection_map.find(partner_id);
   if (connection_it == connection_map.end()) {
     throw UnknownPartnerException();
@@ -72,12 +72,20 @@ void ConnectionManager::ReceiveMessages() {
       received_msg = connection->ReceiveMessage();
       if (received_msg != nullptr) {
         connection_entry.second.timestamp_last_received = std::chrono::steady_clock::now();
-        if (received_msg->GetMessageType() == message_layer::MessageType::PAYLOAD) {
-          const auto payload = std::dynamic_pointer_cast<message_layer::PayloadMessage>(received_msg)->GetPayload();
-          event_queue.push_back(std::make_shared<PayloadEvent>(partner_id, payload));
-        }
-        if (received_msg->GetMessageType() == message_layer::MessageType::RESET) {
-          ResetConnection(partner_id);
+
+        switch (received_msg->GetMessageType()) {
+          case message_layer::MessageType::PAYLOAD: {
+            const auto payload = std::dynamic_pointer_cast<message_layer::PayloadMessage>(received_msg)->GetPayload();
+            event_queue.push_back(std::make_shared<PayloadEvent>(partner_id, payload));
+            break;
+          }
+          case message_layer::MessageType::RESET: {
+            ResetConnection(partner_id);
+            break;
+          }
+          default: {
+            continue;
+          }
         }
       }
     } while (received_msg != nullptr);
@@ -86,4 +94,15 @@ void ConnectionManager::ReceiveMessages() {
       ResetConnection(partner_id);
     }
   }
+}
+
+void ConnectionManager::SendToConnection(address_t partner_id, message_layer::Message* msg) {
+  auto connection_it = connection_map.find(partner_id);
+  if (connection_it == connection_map.end()) {
+    throw UnknownPartnerException();
+  }
+  assert(connection_it->first == partner_id);
+  auto connection = connection_it->second.connection;
+
+  connection->SendMessage(msg);
 }

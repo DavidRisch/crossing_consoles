@@ -34,7 +34,12 @@ class ConnectionManager {
   /**
    * \brief Send data to specified client.
    */
-  void SendToConnection(address_t partner_id, std::vector<uint8_t> data);
+  void SendDataToConnection(address_t partner_id, std::vector<uint8_t> data);
+
+  /**
+   * \brief Send message to specified client.
+   */
+  void SendToConnection(address_t partner_id, message_layer::Message* message);
 
   /**
    * \brief Needs to be implemented on Server and Client side separately.
