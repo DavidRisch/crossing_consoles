@@ -16,50 +16,60 @@ using namespace communication::byte_layer;
 using namespace communication::connection_layer;
 using namespace communication::message_layer;
 
-void test_connection(std::shared_ptr<MessageInputStream> client_message_input_stream,
-                     std::shared_ptr<MessageOutputStream> client_message_output_stream,
-                     std::shared_ptr<MessageInputStream> server_message_input_stream,
-                     std::shared_ptr<MessageOutputStream> server_message_output_stream) {
-  std::shared_ptr<Connection> server_connection =
-      Connection::CreateServerSide(std::move(server_message_input_stream), std::move(server_message_output_stream));
+class Connections : public ::testing::Test {
+ public:
+  Connections() = default;
 
-  std::thread server_thread([&server_connection] { server_connection->BlockingEstablish(); });
+  std::shared_ptr<Connection> server_connection;
+  std::shared_ptr<Connection> client_connection;
 
-  auto client_connection =
-      Connection::CreateClientSide(std::move(client_message_input_stream), std::move(client_message_output_stream));
+  void make_connections(std::shared_ptr<MessageInputStream> client_message_input_stream,
+                        std::shared_ptr<MessageOutputStream> client_message_output_stream,
+                        std::shared_ptr<MessageInputStream> server_message_input_stream,
+                        std::shared_ptr<MessageOutputStream> server_message_output_stream) {
+    server_connection =
+        Connection::CreateServerSide(std::move(server_message_input_stream), std::move(server_message_output_stream));
 
-  client_connection->BlockingEstablish();
-  server_thread.join();
+    std::thread server_thread([this] { server_connection->BlockingEstablish(); });
 
-  address_t target_address = 1234;
-  {
-    KeepAliveMessage original_message(target_address);
+    client_connection =
+        Connection::CreateClientSide(std::move(client_message_input_stream), std::move(client_message_output_stream));
 
-    client_connection->SendMessage(&original_message);
-
-    auto received_message = server_connection->ReceiveMessage();
-    EXPECT_EQ(original_message.GetMessageType(), received_message->GetMessageType());
-    auto ack_message = client_connection->ReceiveMessage();
-    EXPECT_EQ(ack_message->GetMessageType(), MessageType::ACKNOWLEDGE);
+    client_connection->BlockingEstablish();
+    server_thread.join();
   }
 
-  {
-    std::vector<uint8_t> payload;
-    payload.push_back(123);
-    payload.push_back(45);
-    PayloadMessage original_message(target_address, payload);
+  void test_connections() {
+    address_t target_address = 1234;
+    {
+      auto original_message = std::make_shared<KeepAliveMessage>(target_address);
 
-    server_connection->SendMessage(&original_message);
+      client_connection->SendMessage(original_message);
 
-    auto received_message = client_connection->ReceiveMessage();
-    EXPECT_EQ(original_message.GetMessageType(), received_message->GetMessageType());
-    auto &received_payload_message = dynamic_cast<PayloadMessage &>(*received_message);
-    EXPECT_EQ(received_payload_message.GetPayload().size(), original_message.GetPayload().size());
-    EXPECT_EQ(received_payload_message.GetPayload().at(0), original_message.GetPayload().at(0));
+      auto received_message = server_connection->ReceiveMessage();
+      EXPECT_EQ(original_message->GetMessageType(), received_message->GetMessageType());
+      auto ack_message = client_connection->ReceiveMessage();
+      EXPECT_EQ(ack_message->GetMessageType(), MessageType::ACKNOWLEDGE);
+    }
+
+    {
+      std::vector<uint8_t> payload;
+      payload.push_back(123);
+      payload.push_back(45);
+      auto original_message = std::make_shared<PayloadMessage>(target_address, payload);
+
+      server_connection->SendMessage(original_message);
+
+      auto received_message = client_connection->ReceiveMessage();
+      EXPECT_EQ(original_message->GetMessageType(), received_message->GetMessageType());
+      auto &received_payload_message = dynamic_cast<PayloadMessage &>(*received_message);
+      EXPECT_EQ(received_payload_message.GetPayload().size(), original_message->GetPayload().size());
+      EXPECT_EQ(received_payload_message.GetPayload().at(0), original_message->GetPayload().at(0));
+    }
   }
-}
+};
 
-TEST(Connection, Simple) {
+TEST_F(Connections, Simple) {
   auto stream_pair = MockBidirectionalByteStream::CreatePair();
   auto &server_side = stream_pair.first;
   auto &client_side = stream_pair.second;
@@ -70,11 +80,12 @@ TEST(Connection, Simple) {
   auto server_message_input_stream = std::make_shared<MessageInputStream>(server_side);
   auto client_message_output_stream = std::make_shared<MessageOutputStream>(client_side);
 
-  test_connection(client_message_input_stream, client_message_output_stream, server_message_input_stream,
-                  server_message_output_stream);
+  make_connections(client_message_input_stream, client_message_output_stream, server_message_input_stream,
+                   server_message_output_stream);
+  test_connections();
 }
 
-TEST(Connection, Integration) {
+TEST_F(Connections, Integration) {
   auto byte_server = std::make_shared<byte_layer::SocketByteServer>();
 
   auto client_byte_stream = byte_layer::SocketByteStream::CreateClientSide();
@@ -86,11 +97,12 @@ TEST(Connection, Integration) {
   auto server_message_input_stream = std::make_shared<message_layer::MessageInputStream>(new_client);
   auto server_message_output_stream = std::make_shared<message_layer::MessageOutputStream>(new_client);
 
-  test_connection(client_message_input_stream, client_message_output_stream, server_message_input_stream,
-                  server_message_output_stream);
+  make_connections(client_message_input_stream, client_message_output_stream, server_message_input_stream,
+                   server_message_output_stream);
+  test_connections();
 }
 
-TEST(Connection, FailedHandshakeClient) {
+TEST_F(Connections, FailedHandshakeClient) {
   // Server unreachable, Client throws timeout exception
 
   auto stream_pair = MockBidirectionalByteStream::CreatePair();
@@ -105,7 +117,7 @@ TEST(Connection, FailedHandshakeClient) {
   ASSERT_THROW(connection->BlockingEstablish(), ConnectionManager::TimeoutException);
 }
 
-TEST(Connection, FailedHandshakeServer) {
+TEST_F(Connections, FailedHandshakeServer) {
   // Client unreachable, Server throws timeout exception
 
   auto stream_pair = MockBidirectionalByteStream::CreatePair();
@@ -118,4 +130,62 @@ TEST(Connection, FailedHandshakeServer) {
                                                  std::move(server_message_output_stream), std::chrono::milliseconds(1));
 
   ASSERT_THROW(connection->BlockingEstablish(), ConnectionManager::TimeoutException);
+}
+
+TEST_F(Connections, SendQueue) {
+  auto stream_pair = MockBidirectionalByteStream::CreatePair();
+  auto &server_side = stream_pair.first;
+  auto &client_side = stream_pair.second;
+
+  auto client_message_input_stream = std::make_shared<MessageInputStream>(client_side);
+  auto server_message_output_stream = std::make_shared<MessageOutputStream>(server_side);
+
+  auto server_message_input_stream = std::make_shared<MessageInputStream>(server_side);
+  auto client_message_output_stream = std::make_shared<MessageOutputStream>(client_side);
+
+  make_connections(client_message_input_stream, client_message_output_stream, server_message_input_stream,
+                   server_message_output_stream);
+
+  address_t target_address = 1234;
+  int count = 20;
+  {
+    auto original_message = std::make_shared<KeepAliveMessage>(target_address);
+
+    for (int i = 0; i < count; ++i) {
+      client_connection->SendMessage(original_message);
+    }
+
+    for (int i = 0; i < count; ++i) {
+      auto received_message = server_connection->ReceiveMessage();
+      EXPECT_EQ(original_message->GetMessageType(), received_message->GetMessageType());
+      auto ack_message = client_connection->ReceiveMessage();
+      EXPECT_EQ(ack_message->GetMessageType(), MessageType::ACKNOWLEDGE);
+    }
+  }
+
+  {
+    std::vector<std::shared_ptr<PayloadMessage>> messages;
+
+    for (int i = 0; i < count; ++i) {
+      std::vector<uint8_t> payload;
+      payload.push_back(123);
+      payload.push_back(i);
+      payload.push_back(45);
+      auto original_message = std::make_shared<PayloadMessage>(target_address, payload);
+
+      messages.push_back(original_message);
+    }
+
+    for (const auto &original_message : messages) {
+      server_connection->SendMessage(original_message);
+    }
+
+    for (const auto &original_message : messages) {
+      auto received_message = client_connection->ReceiveMessage();
+      EXPECT_EQ(original_message->GetMessageType(), received_message->GetMessageType());
+      auto &received_payload_message = dynamic_cast<PayloadMessage &>(*received_message);
+      EXPECT_EQ(received_payload_message.GetPayload().size(), original_message->GetPayload().size());
+      EXPECT_EQ(received_payload_message.GetPayload().at(0), original_message->GetPayload().at(0));
+    }
+  }
 }

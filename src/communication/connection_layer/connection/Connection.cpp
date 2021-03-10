@@ -111,12 +111,12 @@ void Connection::BlockingEstablish() {
   throw std::runtime_error("BlockingEstablish() took to long");
 }
 
-void Connection::SendMessage(message_layer::Message *message) {
+void Connection::SendMessage(const std::shared_ptr<message_layer::Message> &message) {
   assert(state == ConnectionState::ESTABLISHED);
 
-  last_send_sequence = GenerateSequence();
-  message->SetMessageSequence(last_send_sequence);
-  message_output_stream->SendMessage(message);
+  send_message_queue.push(message);
+
+  Handle();
 }
 
 std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
@@ -152,7 +152,24 @@ sequence_t Connection::GenerateSequence() {
   return current_counter;
 }
 
+void Connection::SendMessageNow(message_layer::Message *message) {
+  assert(state == ConnectionState::ESTABLISHED);
+
+  last_send_sequence = GenerateSequence();
+  message->SetMessageSequence(last_send_sequence);
+  message_output_stream->SendMessage(message);
+}
+
 void Connection::SendAcknowledge(message_layer::address_t address, sequence_t acknowledged_msg_sequence) {
-  auto ack_msg = message_layer::AcknowledgeMessage(address, acknowledged_msg_sequence);
-  SendMessage(&ack_msg);
+  auto ack_msg = std::make_shared<message_layer::AcknowledgeMessage>(address, acknowledged_msg_sequence);
+  SendMessage(ack_msg);
+}
+
+void Connection::Handle() {
+  assert(state == ConnectionState::ESTABLISHED);
+
+  if (!send_message_queue.empty()) {
+    SendMessageNow(send_message_queue.front().get());
+    send_message_queue.pop();
+  }
 }

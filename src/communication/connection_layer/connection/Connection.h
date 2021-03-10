@@ -2,6 +2,7 @@
 #define CROSSING_CONSOLES_CONNECTION_H
 
 #include <memory>
+#include <queue>
 
 #include "../../message_layer/message/Message.h"
 #include "../../message_layer/message_stream/MessageInputStream.h"
@@ -51,10 +52,14 @@ class Connection {
    */
   void BlockingEstablish();
 
+  void Handle();
+
   /**
-   * \brief Send message
+   * \brief Add a message to the send queue and call Handle.
+   * \details Iff the `send_message_queue` is empty, the message will be send immediately.
    */
-  void SendMessage(message_layer::Message* message);
+  void SendMessage(const std::shared_ptr<message_layer::Message>& message);
+
   /**
    * \brief Receive and message and send acknowledge message.
    * \details Sends acknowledge message only if received message type is not acknowledge.
@@ -71,6 +76,11 @@ class Connection {
   Connection(std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
              std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
              ConnectionState connection_state, sequence_t sequence_counter, timeout_t timeout);
+
+  /**
+   * \brief Send a message.
+   */
+  void SendMessageNow(message_layer::Message* message);
 
   /**
    * \brief Send acknowledge message for a received message identified by its sequence to the specified address.
@@ -96,6 +106,9 @@ class Connection {
   ConnectionState state;
 
   timeout_t timeout;
+
+  /// Unprocessed events ordered from oldest to newest.
+  std::queue<std::shared_ptr<message_layer::Message>> send_message_queue;
 
   std::shared_ptr<message_layer::MessageInputStream> message_input_stream;
   std::shared_ptr<message_layer::MessageOutputStream> message_output_stream;
