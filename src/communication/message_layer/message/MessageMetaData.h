@@ -1,20 +1,22 @@
 #ifndef CROSSING_CONSOLES_MESSAGEMETADATA_H
 #define CROSSING_CONSOLES_MESSAGEMETADATA_H
 
-#include <ctime>
+#include <chrono>
 
 namespace communication {
 namespace message_layer {
 
 class MessageMetaData {
  public:
-  MessageMetaData(time_t timestamp_received, time_t timestamp_sent);
-  [[nodiscard]] time_t GetTimestampReceived() const;
-  [[nodiscard]] time_t GetTimestampSent() const;
+  MessageMetaData();
+  [[nodiscard]] std::chrono::steady_clock::time_point GetTimestampReceived() const;
+  [[nodiscard]] std::chrono::steady_clock::time_point GetTimestampSent() const;
+  void SetTimestampReceived(std::chrono::steady_clock::time_point timestamp_received);
+  void SetTimestampSent(std::chrono::steady_clock::time_point timestamp);
 
  private:
-  time_t timestamp_received{};
-  time_t timestamp_sent{};
+  std::chrono::steady_clock::time_point timestamp_received{};
+  std::chrono::steady_clock::time_point timestamp_sent{};
 };
 
 }  // namespace message_layer

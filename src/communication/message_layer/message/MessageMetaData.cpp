@@ -3,13 +3,18 @@
 using namespace communication;
 using namespace communication::message_layer;
 
-MessageMetaData::MessageMetaData(time_t timestamp_received, time_t timestamp_sent)
-    : timestamp_sent(timestamp_sent)
-    , timestamp_received(timestamp_received) {
-}
-time_t MessageMetaData::GetTimestampSent() const {
+std::chrono::steady_clock::time_point MessageMetaData::GetTimestampSent() const {
   return timestamp_sent;
 }
-time_t MessageMetaData::GetTimestampReceived() const {
+std::chrono::steady_clock::time_point MessageMetaData::GetTimestampReceived() const {
   return timestamp_received;
 }
+
+void MessageMetaData::SetTimestampSent(std::chrono::steady_clock::time_point timestamp) {
+  timestamp_sent = timestamp;
+}
+
+void MessageMetaData::SetTimestampReceived(std::chrono::steady_clock::time_point timestamp) {
+  timestamp_received = timestamp;
+}
+MessageMetaData::MessageMetaData() = default;

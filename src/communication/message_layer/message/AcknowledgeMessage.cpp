@@ -10,8 +10,8 @@ AcknowledgeMessage::AcknowledgeMessage(ProtocolDefinition::address_t address,
 
 AcknowledgeMessage::AcknowledgeMessage(ProtocolDefinition::address_t address,
                                        ProtocolDefinition::sequence_t acknowledged_msg_sequence,
-                                       MessageMetaData meta_data, ProtocolDefinition::sequence_t sequence)
-    : Message(address, sequence, meta_data)
+                                       ProtocolDefinition::sequence_t sequence)
+    : Message(address, sequence)
     , acknowledged_msg_sequence(acknowledged_msg_sequence) {
 }
 

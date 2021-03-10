@@ -11,7 +11,7 @@ MessageInputStream::MessageInputStream(std::shared_ptr<byte_layer::IInputByteStr
     : input_stream(std::move(input_stream)) {
 }
 
-std::shared_ptr<Message> MessageInputStream::ReceiveMessage(bool blocking) {
+std::shared_ptr<Message> MessageInputStream::ReceiveMessage(ProtocolDefinition::address_t id, bool blocking) {
   while (true) {
     uint8_t current_byte = 0;
     auto read_count = input_stream->ReadWithoutBlocking(&current_byte, 1);
@@ -21,7 +21,7 @@ std::shared_ptr<Message> MessageInputStream::ReceiveMessage(bool blocking) {
     }
 
     if (current_byte == ProtocolDefinition::flag) {
-      return MessageCoder::Decode(*input_stream, false);
+      return MessageCoder::Decode(*input_stream, id, false);
     }
   }
 }

@@ -47,6 +47,8 @@ class Connection {
     }
   };
 
+  void SetId(ProtocolDefinition::address_t new_id);
+
  private:
   Connection(std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
              std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
@@ -69,10 +71,12 @@ class Connection {
    */
   static std::shared_ptr<message_layer::Message> ReceiveWithTimeout(
       const std::shared_ptr<message_layer::MessageInputStream>& message_input_stream,
-      ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
+      ProtocolDefinition::address_t address, ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
 
   std::shared_ptr<message_layer::MessageInputStream> message_input_stream;
   std::shared_ptr<message_layer::MessageOutputStream> message_output_stream;
+
+  ProtocolDefinition::address_t id;
 };
 
 }  // namespace connection_layer

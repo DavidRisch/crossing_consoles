@@ -26,7 +26,7 @@ class Message {
   Message(ProtocolDefinition::address_t address);
 
   // Received message
-  Message(ProtocolDefinition::address_t address, ProtocolDefinition::sequence_t sequence, MessageMetaData meta_data);
+  Message(ProtocolDefinition::address_t address, ProtocolDefinition::sequence_t sequence);
 
   ProtocolDefinition::sequence_t GetMessageSequence() const;
   void SetMessageSequence(ProtocolDefinition::sequence_t new_sequence);
@@ -35,9 +35,12 @@ class Message {
   [[nodiscard]] virtual MessageType GetMessageType() const;
   [[nodiscard]] MessageMetaData GetMessageMetaData() const;
 
+  void SetTimestampReceived(std::chrono::steady_clock::time_point timestamp);
+  void SetTimestampSent(std::chrono::steady_clock::time_point timestamp);
+
  private:
   ProtocolDefinition::address_t address;
-  MessageMetaData meta_data = MessageMetaData(0, 0);
+  MessageMetaData meta_data;
   ProtocolDefinition::sequence_t sequence;
 };
 

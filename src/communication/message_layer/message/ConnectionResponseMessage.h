@@ -13,8 +13,7 @@ class ConnectionResponseMessage : public Message {
   explicit ConnectionResponseMessage(ProtocolDefinition::address_t address);
 
   // Received message
-  ConnectionResponseMessage(ProtocolDefinition::address_t address, MessageMetaData meta_data,
-                            ProtocolDefinition::sequence_t sequence = 0);
+  ConnectionResponseMessage(ProtocolDefinition::address_t address, ProtocolDefinition::sequence_t sequence);
 
   [[nodiscard]] MessageType GetMessageType() const override;
 };

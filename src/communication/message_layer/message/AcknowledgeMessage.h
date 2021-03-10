@@ -16,7 +16,7 @@ class AcknowledgeMessage : public Message {
 
   // Received message
   AcknowledgeMessage(ProtocolDefinition::address_t address, ProtocolDefinition::sequence_t acknowledged_msg_sequence,
-                     MessageMetaData meta_data, ProtocolDefinition::sequence_t sequence = 0);
+                     ProtocolDefinition::sequence_t sequence);
 
   [[nodiscard]] MessageType GetMessageType() const override;
 

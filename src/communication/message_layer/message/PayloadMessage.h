@@ -14,8 +14,8 @@ class PayloadMessage : public Message {
   explicit PayloadMessage(ProtocolDefinition::address_t address, std::vector<uint8_t> payload);
 
   // Received message
-  PayloadMessage(ProtocolDefinition::address_t address, std::vector<uint8_t> payload, MessageMetaData meta_data,
-                 ProtocolDefinition::sequence_t sequence = 0);
+  PayloadMessage(ProtocolDefinition::address_t address, std::vector<uint8_t> payload,
+                 ProtocolDefinition::sequence_t sequence);
 
   [[nodiscard]] MessageType GetMessageType() const override;
   [[nodiscard]] std::vector<uint8_t> GetPayload() const;

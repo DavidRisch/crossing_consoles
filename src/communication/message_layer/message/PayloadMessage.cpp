@@ -6,8 +6,8 @@ using namespace communication;
 using namespace communication::message_layer;
 
 PayloadMessage::PayloadMessage(ProtocolDefinition::address_t address, std::vector<uint8_t> payload,
-                               MessageMetaData meta_data, ProtocolDefinition::sequence_t sequence)
-    : Message(address, sequence, meta_data)
+                               ProtocolDefinition::sequence_t sequence)
+    : Message(address, sequence)
     , payload(std::move(payload)) {
 }
 PayloadMessage::PayloadMessage(ProtocolDefinition::address_t address, std::vector<uint8_t> payload)

@@ -18,7 +18,8 @@ TEST(MessageStream, NoBlocking) {
 
   MessageInputStream message_input_stream(stream_pair.first);
 
-  auto received_message = message_input_stream.ReceiveMessage(false);
+  ProtocolDefinition::address_t address = 1234;
+  auto received_message = message_input_stream.ReceiveMessage(address, false);
 
   // assert that no message was received
   EXPECT_FALSE(received_message);
@@ -35,7 +36,7 @@ TEST(MessageStream, Simple) {
 
   message_output_stream.SendMessage(&original_message);
 
-  auto received_message = message_input_stream.ReceiveMessage();
+  auto received_message = message_input_stream.ReceiveMessage(target_address);
 
   EXPECT_EQ(original_message.GetMessageType(), received_message->GetMessageType());
 }
@@ -54,7 +55,7 @@ TEST(MessageStream, WithPadding) {
   message_output_stream.SendMessage(&original_message);
   stream_pair.second->Send(padding, sizeof(padding));
 
-  auto received_message = message_input_stream.ReceiveMessage();
+  auto received_message = message_input_stream.ReceiveMessage(target_address);
 
   EXPECT_EQ(original_message.GetMessageType(), received_message->GetMessageType());
 }
@@ -73,7 +74,7 @@ TEST(MessageStream, Multiple) {
 
     message_output_stream.SendMessage(&original_message);
 
-    auto received_message = message_input_stream.ReceiveMessage();
+    auto received_message = message_input_stream.ReceiveMessage(target_address);
 
     EXPECT_EQ(original_message.GetMessageType(), received_message->GetMessageType());
     auto &payload_message = dynamic_cast<PayloadMessage &>(*received_message);
@@ -105,7 +106,7 @@ TEST(MessageStream, Threaded) {
       a_message_output_stream->SendMessage(&original_message);
     }
     for (int i = 0; i < test_message_count; ++i) {
-      auto received_message = a_message_input_stream->ReceiveMessage();
+      auto received_message = a_message_input_stream->ReceiveMessage(target_address);
 
       EXPECT_EQ(received_message->GetMessageType(), MessageType::PAYLOAD);
       auto &payload_message = dynamic_cast<PayloadMessage &>(*received_message);
@@ -116,7 +117,7 @@ TEST(MessageStream, Threaded) {
   });
 
   for (int i = 0; i < test_message_count; ++i) {
-    auto received_message = b_message_input_stream->ReceiveMessage();
+    auto received_message = b_message_input_stream->ReceiveMessage(target_address);
 
     EXPECT_EQ(received_message->GetMessageType(), MessageType::PAYLOAD);
     auto &payload_message = dynamic_cast<PayloadMessage &>(*received_message);

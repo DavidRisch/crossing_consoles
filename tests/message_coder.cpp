@@ -21,7 +21,7 @@ TEST(MessageCoder, KeepAliveMessage) {
   MockInputStream mock_input_stream;
   mock_input_stream.AddData(encoded_message);
 
-  auto decoded_message = MessageCoder::Decode(mock_input_stream);
+  auto decoded_message = MessageCoder::Decode(mock_input_stream, target_address);
   EXPECT_TRUE(mock_input_stream.IsEmpty());
 
   EXPECT_EQ(original_message.GetMessageType(), decoded_message->GetMessageType());
@@ -42,7 +42,7 @@ TEST(MessageCoder, PayloadMessage) {
 
   MockInputStream mock_input_stream;
   mock_input_stream.AddData(encoded_message);
-  auto decoded_message = MessageCoder::Decode(mock_input_stream);
+  auto decoded_message = MessageCoder::Decode(mock_input_stream, target_address);
   EXPECT_TRUE(mock_input_stream.IsEmpty());
 
   EXPECT_EQ(original_message.GetMessageType(), decoded_message->GetMessageType());
@@ -66,7 +66,7 @@ TEST(MessageCoder, AcknowledgeMessage) {
   MockInputStream mock_input_stream;
   mock_input_stream.AddData(encoded_message);
 
-  auto decoded_message = MessageCoder::Decode(mock_input_stream);
+  auto decoded_message = MessageCoder::Decode(mock_input_stream, target_address);
   EXPECT_TRUE(mock_input_stream.IsEmpty());
 
   EXPECT_EQ(original_message.GetMessageType(), decoded_message->GetMessageType());
@@ -96,7 +96,7 @@ TEST(MessageCoder, CrcIncorrectException) {
 
     MockInputStream mock_input_stream;
     mock_input_stream.AddData(bad_encoded_message);
-    EXPECT_THROW(MessageCoder::Decode(mock_input_stream), MessageCoder::CrcIncorrectException);
+    EXPECT_THROW(MessageCoder::Decode(mock_input_stream, target_address), MessageCoder::CrcIncorrectException);
   }
 }
 
@@ -118,7 +118,7 @@ TEST(MessageCoder, InvalidMessageExceptionNoEndFlag) {
 
   MockInputStream mock_input_stream;
   mock_input_stream.AddData(bad_encoded_message);
-  EXPECT_THROW(MessageCoder::Decode(mock_input_stream), MessageCoder::InvalidMessageException);
+  EXPECT_THROW(MessageCoder::Decode(mock_input_stream, target_address), MessageCoder::InvalidMessageException);
 }
 
 class InvalidMessageCoder : public ::testing::Test {
@@ -153,7 +153,7 @@ class InvalidMessageCoder : public ::testing::Test {
         bad_encoded_message.at(i) = sequence;  // change to sequence
         MockInputStream mock_input_stream;
         mock_input_stream.AddData(bad_encoded_message);
-        EXPECT_THROW(MessageCoder::Decode(mock_input_stream), MessageCoder::InvalidMessageException);
+        EXPECT_THROW(MessageCoder::Decode(mock_input_stream, target_address), MessageCoder::InvalidMessageException);
       }
     }
   }
