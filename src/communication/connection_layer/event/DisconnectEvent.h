@@ -7,7 +7,7 @@ namespace communication::connection_layer {
 
 class DisconnectEvent : public Event {
  public:
-  explicit DisconnectEvent(ProtocolDefinition::address_t partner_id);
+  explicit DisconnectEvent(ProtocolDefinition::partner_id_t partner_id);
 
   [[nodiscard]] EventType GetType() const override;
 };

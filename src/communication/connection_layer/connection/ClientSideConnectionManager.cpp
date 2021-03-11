@@ -25,6 +25,6 @@ void ClientSideConnectionManager::HandleConnections() {
   ReceiveMessages();
 }
 
-address_t ClientSideConnectionManager::GetNextPartnerId() {
+partner_id_t ClientSideConnectionManager::GetNextPartnerId() {
   return ProtocolDefinition::server_partner_id;  // constant because only a single server can exist.
 }

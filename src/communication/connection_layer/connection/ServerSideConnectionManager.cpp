@@ -35,6 +35,6 @@ int ServerSideConnectionManager::ConnectionCount() {
   return connection_map.size();
 }
 
-address_t ServerSideConnectionManager::GetNextPartnerId() {
+partner_id_t ServerSideConnectionManager::GetNextPartnerId() {
   return next_partner_id++;
 }

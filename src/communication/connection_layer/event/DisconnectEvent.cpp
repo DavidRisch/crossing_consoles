@@ -7,6 +7,6 @@ EventType DisconnectEvent::GetType() const {
   return EventType::DISCONNECT;
 }
 
-DisconnectEvent::DisconnectEvent(ProtocolDefinition::address_t partner_id)
+DisconnectEvent::DisconnectEvent(ProtocolDefinition::partner_id_t partner_id)
     : Event(partner_id) {
 }

@@ -17,8 +17,8 @@ enum class MessageType : char {
   PAYLOAD,
   ACKNOWLEDGE,
   KEEP_ALIVE,
-  RESET,
-  HIGHEST_ELEMENT = RESET
+  CONNECTION_RESET,
+  HIGHEST_ELEMENT = CONNECTION_RESET
 };
 
 class Message {
@@ -39,7 +39,7 @@ class Message {
   void SetTimestampSent(std::chrono::steady_clock::time_point timestamp);
 
  private:
-  ProtocolDefinition::address_t address;
+  ProtocolDefinition::partner_id_t address;
   MessageMetaData meta_data;
   ProtocolDefinition::sequence_t sequence;
 };

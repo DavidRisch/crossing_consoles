@@ -5,7 +5,7 @@
 using namespace communication;
 using namespace communication::connection_layer;
 
-PayloadEvent::PayloadEvent(ProtocolDefinition::address_t clientId, std::vector<uint8_t> payload)
+PayloadEvent::PayloadEvent(ProtocolDefinition::partner_id_t clientId, std::vector<uint8_t> payload)
     : Event(clientId)
     , payload(std::move(payload)) {
 }

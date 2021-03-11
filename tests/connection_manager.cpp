@@ -23,9 +23,9 @@ class ConnectionManagers : public ::testing::Test {
   std::shared_ptr<ClientSideConnectionManager> client_manager;
   std::shared_ptr<ClientSideConnectionManager> second_client_manager;
 
-  ProtocolDefinition::address_t client_id{};         // from server perspective
-  ProtocolDefinition::address_t second_client_id{};  // from server perspective
-  ProtocolDefinition::address_t server_id{};         // from client perspective
+  ProtocolDefinition::partner_id_t client_id{};         // from server perspective
+  ProtocolDefinition::partner_id_t second_client_id{};  // from server perspective
+  ProtocolDefinition::partner_id_t server_id{};         // from client perspective
 
   void create_server_and_client() {
     server_manager = ServerSideConnectionManager::CreateServerSide();
@@ -303,7 +303,7 @@ TEST_F(ConnectionManagers, ClientConnectionReset) {
 
   // reset Connection
   auto reset_message = ConnectionResetMessage();
-  client_manager->SendToConnection(ProtocolDefinition::server_partner_id, &reset_message);
+  client_manager->SendMessageToConnection(ProtocolDefinition::server_partner_id, &reset_message);
   server_thread.join();
 }
 
@@ -330,7 +330,7 @@ TEST_F(ConnectionManagers, ServerConnectionReset) {
 
     // reset Connection
     auto reset_message = ConnectionResetMessage();
-    server_manager->SendToConnection(1, &reset_message);
+    server_manager->SendMessageToConnection(1, &reset_message);
   });
   auto client_manager = ClientSideConnectionManager::CreateClientSide(timeout);
   server_thread.join();

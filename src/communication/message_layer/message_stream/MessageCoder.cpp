@@ -144,6 +144,9 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
     case MessageType::CONNECTION_RESPONSE:
       message = std::make_shared<ConnectionResponseMessage>(message_sequence);
       break;
+    case MessageType::CONNECTION_RESET:
+      message = std::make_shared<ConnectionRequestMessage>(message_sequence);
+      break;
     case MessageType::ACKNOWLEDGE: {
       auto ack_sequence = ReadFromStreamWithCRC<ProtocolDefinition::sequence_t>(
           stream, sizeof(ProtocolDefinition::sequence_t), &crc_handler);

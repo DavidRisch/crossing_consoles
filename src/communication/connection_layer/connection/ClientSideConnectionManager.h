@@ -19,7 +19,7 @@ class ClientSideConnectionManager : public ConnectionManager {
  private:
   ClientSideConnectionManager(ProtocolDefinition::timeout_t timeout);
 
-  address_t GetNextPartnerId() override;
+  partner_id_t GetNextPartnerId() override;
 };
 }  // namespace connection_layer
 }  // namespace communication

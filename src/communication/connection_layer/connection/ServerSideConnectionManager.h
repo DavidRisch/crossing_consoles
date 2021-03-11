@@ -26,9 +26,9 @@ class ServerSideConnectionManager : public ConnectionManager {
  private:
   ServerSideConnectionManager(ProtocolDefinition::timeout_t timeout);
 
-  address_t GetNextPartnerId() override;
+  partner_id_t GetNextPartnerId() override;
 
-  address_t next_partner_id = ProtocolDefinition::server_partner_id + 1;
+  partner_id_t next_partner_id = ProtocolDefinition::server_partner_id + 1;
 
   std::shared_ptr<byte_layer::SocketByteServer> byte_server;
 };

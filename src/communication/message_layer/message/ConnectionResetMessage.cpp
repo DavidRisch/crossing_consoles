@@ -11,7 +11,7 @@ ConnectionResetMessage::ConnectionResetMessage(communication::ProtocolDefinition
     : Message(sequence) {
 }
 
-MessageType ConnectionResetMessage::message_type = MessageType::KEEP_ALIVE;
+MessageType ConnectionResetMessage::message_type = MessageType::CONNECTION_RESET;
 
 MessageType ConnectionResetMessage::GetMessageType() const {
   return message_type;
