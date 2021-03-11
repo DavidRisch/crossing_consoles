@@ -37,7 +37,7 @@ std::shared_ptr<Connection> Connection::CreateClientSide(
   message_output_stream->SendMessage(&step_1);
 
   return std::shared_ptr<Connection>(new Connection(std::move(message_input_stream), std::move(message_output_stream),
-                                                    ConnectionState::CLIENT_CONNECTION_REQUEST_SEND, client_sequence,
+                                                    ConnectionState::CLIENT_CONNECTION_REQUEST_SENT, client_sequence,
                                                     timeout));
 }
 
@@ -53,7 +53,7 @@ std::shared_ptr<Connection> Connection::CreateServerSide(
 bool Connection::TryEstablish() {
   // TODO: implement in a none blocking way
   switch (state) {
-    case (ConnectionState::CLIENT_CONNECTION_REQUEST_SEND): {
+    case (ConnectionState::CLIENT_CONNECTION_REQUEST_SENT): {
       auto step_2 = ReceiveWithTimeout(message_input_stream, timeout);
       assert(step_2 != nullptr);
       if (step_2->GetMessageType() != message_layer::MessageType::CONNECTION_RESPONSE) {
@@ -77,10 +77,10 @@ bool Connection::TryEstablish() {
       step_2.SetMessageSequence(last_send_sequence);
       message_output_stream->SendMessage(&step_2);
 
-      state = ConnectionState::SERVER_CONNECTION_REQUEST_SEND;
+      state = ConnectionState::SERVER_CONNECTION_RESPONSE_SENT;
       break;
     }
-    case (ConnectionState::SERVER_CONNECTION_REQUEST_SEND): {
+    case (ConnectionState::SERVER_CONNECTION_RESPONSE_SENT): {
       auto step_3 = ReceiveWithTimeout(message_input_stream, timeout);
       if (step_3->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
         throw ConnectionCreationFailed();
