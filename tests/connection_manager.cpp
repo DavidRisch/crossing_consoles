@@ -27,8 +27,16 @@ class ConnectionManagers : public ::testing::Test {
   ProtocolDefinition::partner_id_t second_client_id{};  // from server perspective
   ProtocolDefinition::partner_id_t server_id{};         // from client perspective
 
-  void create_server_and_client() {
-    server_manager = ServerSideConnectionManager::CreateServerSide();
+  /*Event WaitForEvent(ConnectionManager& manager) {
+    int counter = 10;
+    do {
+      manager.HandleConnections();
+      auto event = server_manager->PopAndGetOldestEvent();
+    }
+  }*/
+
+  void create_server_and_client(ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout) {
+    server_manager = ServerSideConnectionManager::CreateServerSide(timeout);
     std::thread server_thread([this] {
       int counter = 10;
       while (counter > 0 && server_manager->ConnectionCount() == 0) {
@@ -38,7 +46,7 @@ class ConnectionManagers : public ::testing::Test {
       }
     });
 
-    client_manager = ClientSideConnectionManager::CreateClientSide();
+    client_manager = ClientSideConnectionManager::CreateClientSide(timeout);
     server_thread.join();
 
     {
@@ -134,27 +142,38 @@ TEST_F(ConnectionManagers, ClientTimeout) {
       ServerSideConnectionManager::CreateServerSide(std::chrono::milliseconds(10));
   std::thread server_thread([&server_manager] {
     int counter = 10;
-    while (!server_manager->ConnectionCount() || counter > 0) {
+    while (!server_manager->ConnectionCount() && counter > 0) {
       server_manager->HandleConnections();
       std::this_thread::sleep_for(std::chrono::microseconds(10));
       counter--;
     }
-
+    ASSERT_TRUE(counter > 0);  // if counter is 0, no Connection has been established
     // Server is connected to client
     std::this_thread::sleep_for(std::chrono::microseconds(10));
     auto event = server_manager->PopAndGetOldestEvent();
     if (event) {
       EXPECT_EQ(event->GetType(), EventType::CONNECT);
+    } else {
+      // Test should fail, after connection establishment CONNECT event must exist
+      ASSERT_FALSE(true);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     // Client disconnects
-    server_manager->HandleConnections();
-    event = server_manager->PopAndGetOldestEvent();
-    if (event) {
-      ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
-      ASSERT_FALSE(server_manager->ConnectionCount());
-    }
+    counter = 10;
+    do {
+      server_manager->HandleConnections();
+      event = server_manager->PopAndGetOldestEvent();
+      if (event) {
+        ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
+        ASSERT_FALSE(server_manager->ConnectionCount());
+      } else {
+        // Test should fail, after received disconnection message DISCONNECT event must exist
+        ASSERT_FALSE(true);
+      }
+      counter--;
+    } while (!event && counter > 0);
+    ASSERT_TRUE(counter > 0);  // if counter is 0, no Disconnection wasn't received
   });
   auto client_manager = ClientSideConnectionManager::CreateClientSide();
   server_thread.join();
@@ -275,36 +294,23 @@ TEST_F(ConnectionManagers, LongQueue) {
 
 TEST_F(ConnectionManagers, ClientConnectionReset) {
   // Client sends message of type ConnectionResetMessage
-  // set very high timeout, Connection Reset is triggered by message
-  ProtocolDefinition::timeout_t timeout = std::chrono::milliseconds(7000);
+  create_server_and_client();
 
-  std::shared_ptr<ServerSideConnectionManager> server_manager = ServerSideConnectionManager::CreateServerSide(timeout);
-  std::thread server_thread([&server_manager] {
-    int counter = 10;
-    while (counter > 0 && !server_manager->ConnectionCount()) {
-      server_manager->HandleConnections();
-      std::this_thread::sleep_for(std::chrono::microseconds(10));
-      auto event = server_manager->PopAndGetOldestEvent();
-      if (event) {
-        if (event->GetType() == EventType::DISCONNECT) {
-          ASSERT_FALSE(server_manager->ConnectionCount());
-        }
-      }
-      counter--;
-    }
-  });
-
-  auto client_manager = ClientSideConnectionManager::CreateClientSide(timeout);
-  client_manager->HandleConnections();
-
-  // client is successfully connected
-  EXPECT_EQ(client_manager->PopAndGetOldestEvent()->GetType(), EventType::CONNECT);
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-  // reset Connection
   auto reset_message = ConnectionResetMessage();
   client_manager->SendMessageToConnection(ProtocolDefinition::server_partner_id, &reset_message);
-  server_thread.join();
+  int counter = 10;
+  while (counter > 0 && !server_manager->ConnectionCount()) {
+    server_manager->HandleConnections();
+    std::this_thread::sleep_for(std::chrono::microseconds(10));
+    auto event = server_manager->PopAndGetOldestEvent();
+    if (event) {
+      if (event->GetType() == EventType::DISCONNECT) {
+        ASSERT_FALSE(server_manager->ConnectionCount());
+      }
+    }
+    counter--;
+  }
+  ASSERT_TRUE(counter > 0);  // server_manager did not trigger ConnectionReset
 }
 
 TEST_F(ConnectionManagers, ServerConnectionReset) {
@@ -315,34 +321,35 @@ TEST_F(ConnectionManagers, ServerConnectionReset) {
   std::shared_ptr<ServerSideConnectionManager> server_manager = ServerSideConnectionManager::CreateServerSide(timeout);
   std::thread server_thread([&server_manager] {
     int counter = 10;
-    while (!server_manager->ConnectionCount() || counter > 0) {
+    while (!server_manager->ConnectionCount() && counter > 0) {
       server_manager->HandleConnections();
       std::this_thread::sleep_for(std::chrono::microseconds(10));
       counter--;
     }
 
-    // Server is connected to client
-    std::this_thread::sleep_for(std::chrono::microseconds(10));
-    auto event = server_manager->PopAndGetOldestEvent();
-    if (event) {
-      ASSERT_EQ(event->GetType(), EventType::CONNECT);
-    }
-
     // reset Connection
     auto reset_message = ConnectionResetMessage();
     server_manager->SendMessageToConnection(1, &reset_message);
+    server_manager->HandleConnections();
   });
   auto client_manager = ClientSideConnectionManager::CreateClientSide(timeout);
-  server_thread.join();
+  auto event = client_manager->PopAndGetOldestEvent();
+  if (event) {
+    ASSERT_EQ(event->GetType(), EventType::CONNECT);
+  }
+
   int count = 10;
   while (count > 0) {
     client_manager->HandleConnections();
-    auto event = client_manager->PopAndGetOldestEvent();
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    event = client_manager->PopAndGetOldestEvent();
     if (event) {
       if (event->GetType() == EventType::DISCONNECT) {
-        ASSERT_TRUE(true);
+        break;
       }
     }
     count--;
   }
+  server_thread.join();
+  ASSERT_TRUE(count > 0);  // connection_manager did not trigger ConnectionReset
 }
