@@ -16,6 +16,9 @@ std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::Create
   auto message_output_stream = std::make_shared<message_layer::MessageOutputStream>(byte_stream);
   std::shared_ptr<Connection> connection =
       Connection::CreateClientSide(std::move(message_input_stream), std::move(message_output_stream), timeout);
+
+  connection->BlockingEstablish();
+
   auto manager = std::shared_ptr<ClientSideConnectionManager>(new ClientSideConnectionManager(timeout));
   manager->AddConnection(connection);
   return manager;

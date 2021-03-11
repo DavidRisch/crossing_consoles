@@ -17,9 +17,17 @@ void ServerSideConnectionManager::HandleConnections() {
     auto message_output_stream = std::make_shared<message_layer::MessageOutputStream>(new_client);
     std::shared_ptr<Connection> connection =
         Connection::CreateServerSide(std::move(message_input_stream), std::move(message_output_stream));
+
+    connection->BlockingEstablish();
+
     AddConnection(connection);
   }
+
   ReceiveMessages();
+
+  for (auto& entry : connection_map) {
+    entry.second.connection->Handle();
+  }
 }
 
 std::shared_ptr<ServerSideConnectionManager> ServerSideConnectionManager::CreateServerSide(

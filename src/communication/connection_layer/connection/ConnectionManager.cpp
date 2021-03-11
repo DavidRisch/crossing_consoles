@@ -4,7 +4,6 @@
 #include <chrono>
 #include <utility>
 
-#include "../../message_layer/message/KeepAliveMessage.h"
 #include "../event/ConnectEvent.h"
 #include "../event/DisconnectEvent.h"
 #include "../event/PayloadEvent.h"
@@ -30,8 +29,8 @@ void ConnectionManager::SendToConnection(ProtocolDefinition::partner_id_t partne
   }
   assert(connection_it->first == partner_id);
   auto connection = connection_it->second.connection;
-  message_layer::PayloadMessage msg = message_layer::PayloadMessage(partner_id, std::move(data));
-  connection->SendMessage(&msg);
+  auto msg = std::make_shared<message_layer::PayloadMessage>(partner_id, std::move(data));
+  connection->SendMessage(msg);
 }
 
 void ConnectionManager::ResetConnection(ProtocolDefinition::partner_id_t partner_id,
@@ -62,8 +61,12 @@ void ConnectionManager::ReceiveMessages() {
     auto connection = connection_entry.second.connection;
     auto partner_id = connection_entry.first;
 
-    auto msg = message_layer::KeepAliveMessage(partner_id);
-    connection->SendMessage(&msg);
+    /*
+     TODO: send keep alive less frequently
+     TODO: does not belong in this method
+    auto msg = std::make_shared<message_layer::KeepAliveMessage>(partner_id);
+    TODO: connection->SendMessage(msg);
+     */
 
     std::shared_ptr<message_layer::Message> received_msg;
     do {
