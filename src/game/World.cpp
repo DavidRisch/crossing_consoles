@@ -2,8 +2,8 @@
 
 #include <algorithm>
 
-World::World(int width, int height)
-    : size(Position(width, height)) {
+World::World(coordinate_size_t size)
+    : size(size) {
 }
 
 void World::AddPlayer(Player* player) {
@@ -12,8 +12,10 @@ void World::AddPlayer(Player* player) {
 }
 
 void World::AddWall(const Position& position) {
-  walls.emplace_back(new Wall(position));
-  updated = true;
+  if (position > Position(0, 0) && position < size) {
+    walls.emplace_back(new Wall(position));
+    updated = true;
+  }
 }
 
 bool World::IsBlocked(const Position& position) {

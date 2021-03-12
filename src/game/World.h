@@ -14,7 +14,7 @@ class World {
   std::list<Wall*> walls{};
   bool updated = false;
 
-  World(int width, int height);
+  explicit World(coordinate_size_t size);
 
   void AddPlayer(Player* player);
   void AddWall(const Position& position);
