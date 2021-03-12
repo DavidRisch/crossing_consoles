@@ -60,6 +60,7 @@ std::shared_ptr<Event> ConnectionManager::PopAndGetOldestEvent() {
 
 void ConnectionManager::ReceiveMessages() {
   // Handle received messages and timeouts
+  std::list<partner_id_t> connection_reset_list = {};
   for (auto& connection_entry : connection_map) {
     auto connection = connection_entry.second.connection;
     auto partner_id = connection_entry.first;
@@ -80,7 +81,7 @@ void ConnectionManager::ReceiveMessages() {
             break;
           }
           case message_layer::MessageType::CONNECTION_RESET: {
-            ResetConnection(partner_id);
+            connection_reset_list.push_back(partner_id);
             break;
           }
           default: {
@@ -91,8 +92,11 @@ void ConnectionManager::ReceiveMessages() {
     } while (received_msg != nullptr);
 
     if (std::chrono::steady_clock::now() - connection_entry.second.timestamp_last_received >= timeout) {
-      ResetConnection(partner_id);
+      connection_reset_list.push_back(partner_id);
     }
+  }
+  for (auto& partner_id : connection_reset_list) {
+    ResetConnection(partner_id);
   }
 }
 
