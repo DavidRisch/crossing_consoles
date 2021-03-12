@@ -4,5 +4,5 @@
 
 int main() {
   std::cout << "main server" << std::endl;
-  GameServer server(coordinate_size_t(100,50));
+  GameServer server(coordinate_size_t(100, 50));
 }
