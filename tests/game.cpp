@@ -9,7 +9,7 @@ char escape_key = 27;
 
 TEST(Game, NoAction) {
   Player player("player name", Position(2, 2));
-  World world(5, 5);
+  World world(coordinate_size_t(5, 5));
   world.AddWall(Position(4, 4));
 
   auto mock_terminal = std::make_shared<MockTerminal>();
@@ -22,7 +22,7 @@ TEST(Game, NoAction) {
 
 TEST(Game, Actions) {
   Player player("player name", Position(2, 2));
-  World world(5, 5);
+  World world(coordinate_size_t(5, 5));
   world.AddWall(Position(4, 4));
 
   auto mock_terminal = std::make_shared<MockTerminal>();
