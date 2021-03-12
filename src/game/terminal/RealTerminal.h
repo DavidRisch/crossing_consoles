@@ -3,6 +3,10 @@
 
 #include <string>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "ITerminal.h"
 
 /**
@@ -10,6 +14,10 @@
  */
 class RealTerminal : public ITerminal {
  public:
+  static std::string title;
+#ifdef _WIN32
+  static HANDLE console;
+#endif
   RealTerminal();
 
   bool HasInput() override;
@@ -28,7 +36,7 @@ class RealTerminal : public ITerminal {
   /**
    * \brief Clear terminal output.
    */
-  static void Clear();
+  void Clear() const;
 };
 
 #endif  // CROSSING_CONSOLES_REAL_TERMINAL_H
