@@ -24,6 +24,10 @@ class Player {
   void MoveTo(const Position& new_position);
 
   void Attack();
+
+  void Serialize(std::vector<uint8_t>& into) const;
+
+  static Player Deserialize(std::vector<uint8_t>::iterator& from);
 };
 
 #endif  // CROSSING_CONSOLES_PLAYER_H

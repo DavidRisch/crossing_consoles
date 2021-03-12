@@ -10,6 +10,18 @@ void Position::Set(int x_new, int y_new) {
   y = y_new;
 }
 
+Position Position::Deserialize(std::vector<uint8_t>::iterator &from) {
+  coordinate_t x = *from++;
+  coordinate_t y = *from++;
+  return Position(x, y);
+}
+
+void Position::Serialize(std::vector<uint8_t> &into) const {
+  // TODO: use two bytes each
+  into.push_back(x);
+  into.push_back(y);
+}
+
 Position Position::operator+(const Position &other_position) const {
   return Position(x + other_position.x, y + other_position.y);
 }
