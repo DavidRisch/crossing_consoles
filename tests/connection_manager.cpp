@@ -92,6 +92,36 @@ class ConnectionManagers : public ::testing::Test {
     }
     ASSERT_EQ(second_client_manager->PopAndGetOldestEvent(), nullptr);
   }
+
+  void assert_payload_received(const std::shared_ptr<Event> &event, const std::vector<uint8_t> &payload) {
+    ASSERT_NE(event, nullptr);
+    ASSERT_EQ(event->GetType(), EventType::PAYLOAD);
+    auto payload_event = std::dynamic_pointer_cast<PayloadEvent>(event);
+    ASSERT_EQ(payload_event->GetPayload().size(), payload.size());
+    for (size_t i = 0; i < payload.size(); ++i) {
+      EXPECT_EQ(payload_event->GetPayload().at(i), payload.at(i));
+    }
+  }
+
+  void send_and_check_messages(int count) {
+    for (int i = 0; i < count; ++i) {
+      std::vector<uint8_t> payload_server_to_client{1, 2, 3, static_cast<uint8_t>(i)};
+      std::vector<uint8_t> payload_client_to_server{5, 6, 7, static_cast<uint8_t>(i)};
+
+      server_manager->SendToConnection(client_id, payload_server_to_client);
+      client_manager->SendToConnection(server_id, payload_client_to_server);
+      std::this_thread::sleep_for(std::chrono::microseconds(100));
+      server_manager->HandleConnections();
+      client_manager->HandleConnections();
+
+      assert_payload_received(server_manager->PopAndGetOldestEvent(), payload_client_to_server);
+      assert_payload_received(client_manager->PopAndGetOldestEvent(), payload_server_to_client);
+
+      // all events should have been processed by now
+      EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
+      EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
+    }
+  }
 };
 
 TEST_F(ConnectionManagers, ConnectClient) {
@@ -149,35 +179,14 @@ TEST_F(ConnectionManagers, UnknownPartnerException) {
   EXPECT_THROW(client_manager->SendToConnection(server_id + 1, payload), ConnectionManager::UnknownPartnerException);
 }
 
-void assert_payload_received(const std::shared_ptr<Event> &event, const std::vector<uint8_t> &payload) {
-  ASSERT_NE(event, nullptr);
-  ASSERT_EQ(event->GetType(), EventType::PAYLOAD);
-  auto payload_event = std::dynamic_pointer_cast<PayloadEvent>(event);
-  ASSERT_EQ(payload_event->GetPayload().size(), payload.size());
-  for (size_t i = 0; i < payload.size(); ++i) {
-    EXPECT_EQ(payload_event->GetPayload().at(i), payload.at(i));
-  }
-}
-
 TEST_F(ConnectionManagers, SendMessages) {
   create_server_and_client();
-  for (int i = 0; i < 10; ++i) {
-    std::vector<uint8_t> payload_server_to_client{1, 2, 3, static_cast<uint8_t>(i)};
-    std::vector<uint8_t> payload_client_to_server{5, 6, 7, static_cast<uint8_t>(i)};
+  send_and_check_messages(10);
+}
 
-    server_manager->SendToConnection(client_id, payload_server_to_client);
-    client_manager->SendToConnection(server_id, payload_client_to_server);
-    std::this_thread::sleep_for(std::chrono::microseconds(100));
-    server_manager->HandleConnections();
-    client_manager->HandleConnections();
-
-    assert_payload_received(server_manager->PopAndGetOldestEvent(), payload_client_to_server);
-    assert_payload_received(client_manager->PopAndGetOldestEvent(), payload_server_to_client);
-
-    // all events should have been processed by now
-    EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
-    EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
-  }
+TEST_F(ConnectionManagers, DISABLED_SendManyMessages) {  // TODO: fix issue causing this test to fail
+  create_server_and_client();
+  send_and_check_messages(10000);
 }
 
 TEST_F(ConnectionManagers, TwoClients) {
