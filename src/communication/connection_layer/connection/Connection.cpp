@@ -141,7 +141,7 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
       state = ConnectionState::READY;
     } else {
       // Send acknowledge for every received message except for other acknowledges
-      SendAcknowledge(received_message->GetAddress(), received_message->GetMessageSequence());
+      SendAcknowledge(received_message->GetMessageSequence());
     }
   }
 
@@ -183,8 +183,8 @@ void Connection::SendMessageNow(message_layer::Message *message) {
   }
 }
 
-void Connection::SendAcknowledge(message_layer::address_t address, sequence_t acknowledged_msg_sequence) {
-  auto ack_msg = message_layer::AcknowledgeMessage(address, acknowledged_msg_sequence);
+void Connection::SendAcknowledge(sequence_t acknowledged_msg_sequence) {
+  auto ack_msg = message_layer::AcknowledgeMessage(acknowledged_msg_sequence);
   // TODO: CloseConnection should wait for acknowledge before closing any sockets
   SendMessageNow(&ack_msg);
 }

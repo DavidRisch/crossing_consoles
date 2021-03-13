@@ -153,10 +153,9 @@ TEST_F(Connections, SendQueue) {
   make_connections(client_message_input_stream, client_message_output_stream, server_message_input_stream,
                    server_message_output_stream);
 
-  address_t target_address = 1234;
   int count = 20;
   {
-    auto original_message = std::make_shared<KeepAliveMessage>(target_address);
+    auto original_message = std::make_shared<KeepAliveMessage>();
 
     for (int i = 0; i < count; ++i) {
       client_connection->SendMessage(original_message);
@@ -183,7 +182,7 @@ TEST_F(Connections, SendQueue) {
       payload.push_back(123);
       payload.push_back(i);
       payload.push_back(45);
-      auto original_message = std::make_shared<PayloadMessage>(target_address, payload);
+      auto original_message = std::make_shared<PayloadMessage>(payload);
 
       messages.push_back(original_message);
     }

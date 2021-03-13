@@ -119,8 +119,8 @@ void ConnectionManager::SendMessageToConnection(partner_id_t partner_id, std::sh
 
 void ConnectionManager::CloseConnection(partner_id_t partner_id) {
   // notify connection partner
-  auto reset_msg = message_layer::ConnectionResetMessage();
-  SendMessageToConnection(partner_id, &reset_msg);
+  auto reset_msg = std::make_shared<message_layer::ConnectionResetMessage>();
+  SendMessageToConnection(partner_id, reset_msg);
   // TODO wait for acknowledge message from partner before calling Reset Connection
   RemoveConnection(partner_id);
 }
