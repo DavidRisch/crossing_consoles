@@ -64,8 +64,8 @@ class Connection {
   std::shared_ptr<message_layer::MessageOutputStream> message_output_stream;
 
   /**
-  * \brief Send acknowledge message for a received message identified by its sequence to the specified address.
-  */
+   * \brief Send acknowledge message for a received message identified by its sequence to the specified address.
+   */
   void SendAcknowledge(ProtocolDefinition::sequence_t sequence);
 
   /**

@@ -25,12 +25,6 @@ void ConnectionManager::Broadcast(const std::vector<uint8_t>& payload) {
 }
 
 void ConnectionManager::SendDataToConnection(ProtocolDefinition::partner_id_t partner_id, std::vector<uint8_t> data) {
-  auto connection_it = connection_map.find(partner_id);
-  if (connection_it == connection_map.end()) {
-    throw UnknownPartnerException();
-  }
-  assert(connection_it->first == partner_id);
-  auto connection = connection_it->second.connection;
   message_layer::PayloadMessage msg = message_layer::PayloadMessage(std::move(data));
   SendMessageToConnection(partner_id, &msg);
 }
