@@ -53,9 +53,10 @@ class ConnectionManager {
   void AddConnection(const std::shared_ptr<Connection>& connection);
 
   /**
-   * \brief Reset connection after timeout.
+   * \brief Notify communication partner and call `RemoveConnection`.
+   * \details Send ResetConnection message, queue disconnect event and close connection
    */
-  void ResetConnection(partner_id_t partner_id);
+  void CloseConnection(partner_id_t partner_id);
 
   /**
    * \brief Return and pop the oldest `Event`.
@@ -90,6 +91,12 @@ class ConnectionManager {
   std::unordered_map<partner_id_t, ConnectionParameters> connection_map;
 
  private:
+  /**
+   * \brief Remove connection from `connection_map` .
+   * \details sets `DisconnectEvent` in `event_queue`.
+   */
+  void RemoveConnection(partner_id_t partner_id);
+
   virtual partner_id_t GetNextPartnerId() = 0;
 
   /// Unprocessed events ordered from oldest to newest.

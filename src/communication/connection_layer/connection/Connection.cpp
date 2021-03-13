@@ -116,5 +116,6 @@ ProtocolDefinition::sequence_t Connection::GenerateSequence() {
 }
 void Connection::SendAcknowledge(ProtocolDefinition::sequence_t acknowledged_msg_sequence) {
   auto ack_msg = message_layer::AcknowledgeMessage(acknowledged_msg_sequence);
+  // TODO: CloseConnection should wait for acknowledge before closing any sockets
   SendMessage(&ack_msg);
 }

@@ -4,6 +4,7 @@
 #include <chrono>
 #include <utility>
 
+#include "../../message_layer/message/ConnectionResetMessage.h"
 #include "../../message_layer/message/KeepAliveMessage.h"
 #include "../event/ConnectEvent.h"
 #include "../event/DisconnectEvent.h"
@@ -34,7 +35,7 @@ void ConnectionManager::SendDataToConnection(ProtocolDefinition::partner_id_t pa
   SendMessageToConnection(partner_id, &msg);
 }
 
-void ConnectionManager::ResetConnection(ProtocolDefinition::partner_id_t partner_id) {
+void ConnectionManager::RemoveConnection(ProtocolDefinition::partner_id_t partner_id) {
   auto connection_it = connection_map.find(partner_id);
   if (connection_it == connection_map.end()) {
     throw UnknownPartnerException();
@@ -61,6 +62,8 @@ std::shared_ptr<Event> ConnectionManager::PopAndGetOldestEvent() {
 void ConnectionManager::ReceiveMessages() {
   // Handle received messages and timeouts
   std::list<partner_id_t> connection_reset_list = {};
+  std::list<partner_id_t> connection_close_list = {};
+
   for (auto& connection_entry : connection_map) {
     auto connection = connection_entry.second.connection;
     auto partner_id = connection_entry.first;
@@ -92,11 +95,16 @@ void ConnectionManager::ReceiveMessages() {
     } while (received_msg != nullptr);
 
     if (std::chrono::steady_clock::now() - connection_entry.second.timestamp_last_received >= timeout) {
-      connection_reset_list.push_back(partner_id);
+      connection_close_list.push_back(partner_id);
     }
   }
+  for (auto& partner_id : connection_close_list) {
+    CloseConnection(partner_id);
+  }
+
   for (auto& partner_id : connection_reset_list) {
-    ResetConnection(partner_id);
+    // only called if Connection Reset Message was received, connection can be removed immediately
+    RemoveConnection(partner_id);
   }
 }
 
@@ -109,4 +117,12 @@ void ConnectionManager::SendMessageToConnection(partner_id_t partner_id, message
   auto connection = connection_it->second.connection;
 
   connection->SendMessage(msg);
+}
+
+void ConnectionManager::CloseConnection(partner_id_t partner_id) {
+  // notify connection partner
+  auto reset_msg = message_layer::ConnectionResetMessage();
+  SendMessageToConnection(partner_id, &reset_msg);
+  // TODO wait for acknowledge message from partner before calling Reset Connection
+  RemoveConnection(partner_id);
 }
