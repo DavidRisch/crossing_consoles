@@ -50,6 +50,8 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
   void SetConnectionSimulatorIncoming(IConnectionSimulator& ConnectionSimulator);
   void SetConnectionSimulatorOutgoing(IConnectionSimulator& ConnectionSimulator);
 
+  void SetParamCatchSendFailed(bool catch_failed_param);
+
   /**
    * \brief Thrown if a client tries to connect to a server which does not exist.
    */
@@ -61,6 +63,7 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
 
  private:
   std::shared_ptr<SocketHolder> socket_holder;
+  bool catch_send_failed = true;
 
   IConnectionSimulator* connection_simulator_incoming;
   IConnectionSimulator* connection_simulator_outgoing;

@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <climits>
+#include <csignal>
 #include <cstring>
 
 #include "socket_libs.h"
@@ -76,13 +77,18 @@ void SocketByteStream::Send(  // NOLINT(readability-make-member-function-const)
     modified_send_buffer[i] = connection_simulator_outgoing->Filter(send_buffer[i]);
   }
 
-  ssize_t send_count = send(socket_holder->file_descriptor, reinterpret_cast<char *>(modified_send_buffer), length, 0);
+  if (!catch_send_failed) {
+    // broken pipe is handled in Connection / Connection Manager, connection will be closed there
+    send(socket_holder->file_descriptor, reinterpret_cast<char *>(modified_send_buffer), length, MSG_NOSIGNAL);
+  } else {
+    ssize_t send_count =
+        send(socket_holder->file_descriptor, reinterpret_cast<char *>(modified_send_buffer), length, 0);
+    if (send_count < 0) {
+      throw std::runtime_error("send failed");
+    }
+  }
 
   delete[] modified_send_buffer;
-
-  if (send_count < 0) {
-    throw std::runtime_error("send failed");
-  }
 }
 
 void SocketByteStream::SendString(const std::string &message) {
@@ -127,4 +133,8 @@ void SocketByteStream::ConfigureSocket() {
     throw std::runtime_error("setsockopt failed");
   }
 #endif
+}
+
+void SocketByteStream::SetParamCatchSendFailed(bool catch_failed_param) {
+  catch_send_failed = catch_failed_param;
 }
