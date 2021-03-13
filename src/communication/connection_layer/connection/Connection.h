@@ -53,17 +53,6 @@ class Connection {
              ProtocolDefinition::sequence_t sequence_counter);
 
   /**
-   * \brief Send acknowledge message for a received message identified by its sequence to the specified address.
-   */
-  void SendAcknowledge(ProtocolDefinition::sequence_t sequence);
-
-  /**
-   * \brief Return current sequence count and increment sequence counter.
-   */
-  ProtocolDefinition::sequence_t GenerateSequence();
-  ProtocolDefinition::sequence_t sequence_counter;
-
-  /**
    *
    * \brief Check for timeout while receiving messages
    */
@@ -73,6 +62,17 @@ class Connection {
 
   std::shared_ptr<message_layer::MessageInputStream> message_input_stream;
   std::shared_ptr<message_layer::MessageOutputStream> message_output_stream;
+
+  /**
+  * \brief Send acknowledge message for a received message identified by its sequence to the specified address.
+  */
+  void SendAcknowledge(ProtocolDefinition::sequence_t sequence);
+
+  /**
+   * \brief Return current sequence count and increment sequence counter.
+   */
+  ProtocolDefinition::sequence_t GenerateSequence();
+  ProtocolDefinition::sequence_t sequence_counter;
 };
 
 }  // namespace connection_layer
