@@ -7,7 +7,7 @@
 
 enum Direction : char { NORTH, EAST, SOUTH, WEST };
 
-class Player {
+class Player : public ISerializable {
  public:
   std::string name;
   int score = 0;
@@ -25,9 +25,9 @@ class Player {
 
   void Attack();
 
-  void Serialize(std::vector<uint8_t>& into) const;
+  void Serialize(std::vector<uint8_t>& output_vector) const override;
 
-  static Player Deserialize(std::vector<uint8_t>::iterator& from);
+  static Player Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 };
 
 #endif  // CROSSING_CONSOLES_PLAYER_H

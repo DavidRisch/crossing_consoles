@@ -18,9 +18,9 @@ class Position : public ISerializable {
 
   void Set(int x_new, int y_new);
 
-  void Serialize(std::vector<uint8_t>& into) const override;
+  void Serialize(std::vector<uint8_t>& output_vector) const override;
 
-  static Position Deserialize(std::vector<uint8_t>::iterator& from);
+  static Position Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 
   Position operator+(const Position& other_position) const;
   Position operator-(const Position& other_position) const;

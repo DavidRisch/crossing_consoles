@@ -20,22 +20,22 @@ void Player::MoveTo(const Position &new_position) {
 void Player::Attack() {
 }
 
-void Player::Serialize(std::vector<uint8_t> &into) const {
+void Player::Serialize(std::vector<uint8_t> &output_vector) const {
   assert(name.size() <= 255);
-  into.push_back(name.size());
+  output_vector.push_back(name.size());
   for (const auto &character : name) {
-    into.push_back(character);
+    output_vector.push_back(character);
   }
-  position.Serialize(into);
+  position.Serialize(output_vector);
 }
 
-Player Player::Deserialize(std::vector<uint8_t>::iterator &from) {
+Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
   std::string name;
-  auto name_length = *from++;
+  auto name_length = *input_iterator++;
   for (int i = 0; i < name_length; ++i) {
-    name += (char)*from++;
+    name += (char)*input_iterator++;
   }
-  auto position = Position::Deserialize(from);
+  auto position = Position::Deserialize(input_iterator);
 
   return Player(name, position);
 }

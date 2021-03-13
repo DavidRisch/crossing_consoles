@@ -22,9 +22,9 @@ class World : public ISerializable {
 
   bool IsBlocked(const Position& position);
 
-  void Serialize(std::vector<uint8_t>& into) const;
+  void Serialize(std::vector<uint8_t>& output_vector) const override;
 
-  static World Deserialize(std::vector<uint8_t>::iterator& from);
+  static World Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 };
 
 #endif  // CROSSING_CONSOLES_WORLD_H
