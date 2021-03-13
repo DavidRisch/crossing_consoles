@@ -17,29 +17,29 @@ enum class MessageType : char {
   PAYLOAD,
   ACKNOWLEDGE,
   KEEP_ALIVE,
-  HIGHEST_ELEMENT = KEEP_ALIVE
+  CONNECTION_RESET,
+  HIGHEST_ELEMENT = CONNECTION_RESET
 };
-
-typedef uint16_t address_t;
 
 class Message {
  public:
   // Draft message
-  Message(address_t address);
+  Message();
 
   // Received message
-  Message(address_t address, ProtocolDefinition::sequence_t sequence, MessageMetaData meta_data);
+  Message(ProtocolDefinition::sequence_t sequence);
 
   ProtocolDefinition::sequence_t GetMessageSequence() const;
   void SetMessageSequence(ProtocolDefinition::sequence_t new_sequence);
 
-  [[nodiscard]] address_t GetAddress() const;
   [[nodiscard]] virtual MessageType GetMessageType() const;
   [[nodiscard]] MessageMetaData GetMessageMetaData() const;
 
+  void SetTimestampReceived(std::chrono::steady_clock::time_point timestamp);
+  void SetTimestampSent(std::chrono::steady_clock::time_point timestamp);
+
  private:
-  address_t address;
-  MessageMetaData meta_data = MessageMetaData(0, 0);
+  MessageMetaData meta_data;
   ProtocolDefinition::sequence_t sequence;
 };
 

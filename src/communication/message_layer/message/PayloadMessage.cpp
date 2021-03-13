@@ -5,13 +5,12 @@
 using namespace communication;
 using namespace communication::message_layer;
 
-PayloadMessage::PayloadMessage(address_t address, std::vector<uint8_t> payload, MessageMetaData meta_data,
-                               ProtocolDefinition::sequence_t sequence)
-    : Message(address, sequence, meta_data)
+PayloadMessage::PayloadMessage(std::vector<uint8_t> payload, ProtocolDefinition::sequence_t sequence)
+    : Message(sequence)
     , payload(std::move(payload)) {
 }
-PayloadMessage::PayloadMessage(address_t address, std::vector<uint8_t> payload)
-    : Message(address)
+PayloadMessage::PayloadMessage(std::vector<uint8_t> payload)
+    : Message()
     , payload(std::move(payload)) {
 }
 

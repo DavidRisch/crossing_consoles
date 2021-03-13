@@ -40,9 +40,8 @@ class Connections : public ::testing::Test {
   }
 
   void test_connections() {
-    address_t target_address = 1234;
     {
-      auto original_message = std::make_shared<KeepAliveMessage>(target_address);
+      auto original_message = std::make_shared<KeepAliveMessage>();
 
       client_connection->SendMessage(original_message);
 
@@ -59,7 +58,7 @@ class Connections : public ::testing::Test {
       std::vector<uint8_t> payload;
       payload.push_back(123);
       payload.push_back(45);
-      auto original_message = std::make_shared<PayloadMessage>(target_address, payload);
+      auto original_message = std::make_shared<PayloadMessage>(payload);
 
       server_connection->SendMessage(original_message);
 

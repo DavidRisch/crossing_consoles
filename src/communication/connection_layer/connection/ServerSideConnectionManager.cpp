@@ -15,6 +15,7 @@ void ServerSideConnectionManager::HandleConnections() {
   if (new_client != nullptr) {
     auto message_input_stream = std::make_shared<message_layer::MessageInputStream>(new_client);
     auto message_output_stream = std::make_shared<message_layer::MessageOutputStream>(new_client);
+
     std::shared_ptr<Connection> connection =
         Connection::CreateServerSide(std::move(message_input_stream), std::move(message_output_stream));
 

@@ -6,6 +6,7 @@
 
 #include "../message/AcknowledgeMessage.h"
 #include "../message/ConnectionRequestMessage.h"
+#include "../message/ConnectionResetMessage.h"
 #include "../message/ConnectionResponseMessage.h"
 #include "../message/KeepAliveMessage.h"
 #include "../message/PayloadMessage.h"
@@ -76,6 +77,7 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
   switch (message->GetMessageType()) {
     case MessageType::KEEP_ALIVE:
     case MessageType::CONNECTION_REQUEST:
+    case MessageType::CONNECTION_RESET:
     case MessageType::CONNECTION_RESPONSE:
       // no payload necessary
       break;
@@ -132,28 +134,26 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
   auto message_sequence = ReadFromStreamWithCRC<ProtocolDefinition::sequence_t>(
       stream, sizeof(ProtocolDefinition::sequence_t), &crc_handler);
 
-  // TODO: create real metadata
-  MessageMetaData message_meta_data(123, 456);
-
   std::shared_ptr<Message> message;
 
   switch (message_type) {
     case MessageType::KEEP_ALIVE:
-      // TODO: use real address (also applies to lines below
-      message = std::make_shared<KeepAliveMessage>(0, message_meta_data, message_sequence);
-
+      message = std::make_shared<KeepAliveMessage>(message_sequence);
       break;
     case MessageType::CONNECTION_REQUEST:
-      message = std::make_shared<ConnectionRequestMessage>(0, message_meta_data, message_sequence);
+      message = std::make_shared<ConnectionRequestMessage>(message_sequence);
       break;
     case MessageType::CONNECTION_RESPONSE:
-      message = std::make_shared<ConnectionResponseMessage>(0, message_meta_data, message_sequence);
+      message = std::make_shared<ConnectionResponseMessage>(message_sequence);
+      break;
+    case MessageType::CONNECTION_RESET:
+      message = std::make_shared<ConnectionResetMessage>(message_sequence);
       break;
     case MessageType::ACKNOWLEDGE: {
       auto ack_sequence = ReadFromStreamWithCRC<ProtocolDefinition::sequence_t>(
           stream, sizeof(ProtocolDefinition::sequence_t), &crc_handler);
 
-      message = std::make_shared<AcknowledgeMessage>(0, ack_sequence, message_meta_data, message_sequence);
+      message = std::make_shared<AcknowledgeMessage>(ack_sequence, message_sequence);
       break;
     }
     case MessageType::PAYLOAD: {
@@ -180,7 +180,7 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
         payload.push_back(byte);
       }
 
-      message = std::make_shared<PayloadMessage>(0, payload, message_meta_data, message_sequence);
+      message = std::make_shared<PayloadMessage>(payload, message_sequence);
       break;
     }
     default:

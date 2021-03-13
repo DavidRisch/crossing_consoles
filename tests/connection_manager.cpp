@@ -26,8 +26,8 @@ class ConnectionManagers : public ::testing::Test {
   ProtocolDefinition::partner_id_t second_client_id{};  // from server perspective
   ProtocolDefinition::partner_id_t server_id{};         // from client perspective
 
-  void create_server_and_client() {
-    server_manager = ServerSideConnectionManager::CreateServerSide();
+  void create_server_and_client(ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout) {
+    server_manager = ServerSideConnectionManager::CreateServerSide(timeout);
     std::thread server_thread([this] {
       int counter = 10;
       while (counter > 0 && server_manager->ConnectionCount() == 0) {
@@ -37,7 +37,7 @@ class ConnectionManagers : public ::testing::Test {
       }
     });
 
-    client_manager = ClientSideConnectionManager::CreateClientSide();
+    client_manager = ClientSideConnectionManager::CreateClientSide(timeout);
     server_thread.join();
 
     {
@@ -108,8 +108,8 @@ class ConnectionManagers : public ::testing::Test {
       std::vector<uint8_t> payload_server_to_client{1, 2, 3, static_cast<uint8_t>(i)};
       std::vector<uint8_t> payload_client_to_server{5, 6, 7, static_cast<uint8_t>(i)};
 
-      server_manager->SendToConnection(client_id, payload_server_to_client);
-      client_manager->SendToConnection(server_id, payload_client_to_server);
+      server_manager->SendDataToConnection(client_id, payload_server_to_client);
+      client_manager->SendDataToConnection(server_id, payload_client_to_server);
       std::this_thread::sleep_for(std::chrono::microseconds(100));
       server_manager->HandleConnections();
       client_manager->HandleConnections();
@@ -146,8 +146,16 @@ TEST_F(ConnectionManagers, ServerTimeout) {
   auto client_manager = ClientSideConnectionManager::CreateClientSide(std::chrono::milliseconds(10));
   server_thread.join();
   client_manager->HandleConnections();
+
+  // client is successfully connected
+  auto event = client_manager->PopAndGetOldestEvent();
+  ASSERT_NE(event, nullptr);
+  ASSERT_EQ(event->GetType(), EventType::CONNECT);
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  ASSERT_THROW(client_manager->HandleConnections(), ConnectionManager::TimeoutException);
+
+  // client should be disconnected from timeout
+  client_manager->HandleConnections();
+  ASSERT_EQ(client_manager->PopAndGetOldestEvent()->GetType(), EventType::DISCONNECT);
 }
 
 TEST_F(ConnectionManagers, ClientTimeout) {
@@ -157,16 +165,32 @@ TEST_F(ConnectionManagers, ClientTimeout) {
       ServerSideConnectionManager::CreateServerSide(std::chrono::milliseconds(10));
   std::thread server_thread([&server_manager] {
     int counter = 10;
-    while (counter > 0) {
-      try {
-        server_manager->HandleConnections();
-      } catch (ConnectionManager::TimeoutException &e) {
-        // timeout should only occur if connection has been established
-        ASSERT_TRUE(server_manager->ConnectionCount());
-      }
+    while (!server_manager->ConnectionCount() && counter > 0) {
+      server_manager->HandleConnections();
       std::this_thread::sleep_for(std::chrono::microseconds(10));
       counter--;
     }
+    ASSERT_TRUE(counter > 0);  // if counter is 0, no Connection has been established
+
+    // Server is connected to client
+    auto event = server_manager->PopAndGetOldestEvent();
+    ASSERT_NE(event, nullptr);
+    EXPECT_EQ(event->GetType(), EventType::CONNECT);
+
+    // Client disconnects
+    counter = 10;
+    do {
+      server_manager->HandleConnections();
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      event = server_manager->PopAndGetOldestEvent();
+      if (event) {
+        ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
+        ASSERT_EQ(server_manager->ConnectionCount(), 0);
+        break;
+      }
+      counter--;
+    } while (counter > 0);
+    ASSERT_TRUE(counter > 0);  // if counter is 0, no Disconnection msg has been received
   });
   auto client_manager = ClientSideConnectionManager::CreateClientSide();
   server_thread.join();
@@ -175,8 +199,10 @@ TEST_F(ConnectionManagers, ClientTimeout) {
 TEST_F(ConnectionManagers, UnknownPartnerException) {
   create_server_and_client();
   std::vector<uint8_t> payload;
-  EXPECT_THROW(server_manager->SendToConnection(client_id + 1, payload), ConnectionManager::UnknownPartnerException);
-  EXPECT_THROW(client_manager->SendToConnection(server_id + 1, payload), ConnectionManager::UnknownPartnerException);
+  EXPECT_THROW(server_manager->SendDataToConnection(client_id + 1, payload),
+               ConnectionManager::UnknownPartnerException);
+  EXPECT_THROW(client_manager->SendDataToConnection(server_id + 1, payload),
+               ConnectionManager::UnknownPartnerException);
 }
 
 TEST_F(ConnectionManagers, SendMessages) {
@@ -199,14 +225,14 @@ TEST_F(ConnectionManagers, TwoClients) {
     std::vector<uint8_t> payload_client1_to_server{5, 6, static_cast<uint8_t>(i)};
     std::vector<uint8_t> payload_client2_to_server{7, 8, static_cast<uint8_t>(i)};
 
-    server_manager->SendToConnection(client_id, payload_server_to_client1);
-    server_manager->SendToConnection(second_client_id, payload_server_to_client2);
-    client_manager->SendToConnection(server_id, payload_client1_to_server);
+    server_manager->SendDataToConnection(client_id, payload_server_to_client1);
+    server_manager->SendDataToConnection(second_client_id, payload_server_to_client2);
+    client_manager->SendDataToConnection(server_id, payload_client1_to_server);
 
     std::this_thread::sleep_for(std::chrono::microseconds(100));
     server_manager->HandleConnections();
 
-    second_client_manager->SendToConnection(server_id, payload_client2_to_server);
+    second_client_manager->SendDataToConnection(server_id, payload_client2_to_server);
 
     std::this_thread::sleep_for(std::chrono::microseconds(100));
     server_manager->HandleConnections();
@@ -245,8 +271,8 @@ TEST_F(ConnectionManagers, LongQueue) {
   }
 
   for (int i = 0; i < count; ++i) {
-    server_manager->SendToConnection(client_id, payloads_server_to_client.at(i));
-    client_manager->SendToConnection(server_id, payloads_client_to_server.at(i));
+    server_manager->SendDataToConnection(client_id, payloads_server_to_client.at(i));
+    client_manager->SendDataToConnection(server_id, payloads_client_to_server.at(i));
     std::this_thread::sleep_for(std::chrono::microseconds(100));
     server_manager->HandleConnections();
     client_manager->HandleConnections();
@@ -260,4 +286,47 @@ TEST_F(ConnectionManagers, LongQueue) {
   // all events should have been processed by now
   EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
   EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
+}
+
+TEST_F(ConnectionManagers, ClientConnectionReset) {
+  // Client sends message of type ConnectionResetMessage
+  create_server_and_client();
+
+  client_manager->CloseConnection(ProtocolDefinition::server_partner_id);
+
+  int counter = 10;
+  while (counter > 0 && !server_manager->ConnectionCount()) {
+    server_manager->HandleConnections();
+    std::this_thread::sleep_for(std::chrono::microseconds(10));
+    auto event = server_manager->PopAndGetOldestEvent();
+    if (event) {
+      ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
+      ASSERT_EQ(server_manager->ConnectionCount(), 0);
+      break;
+    }
+    counter--;
+  }
+  ASSERT_TRUE(counter > 0);  // server_manager did not trigger ConnectionReset
+}
+
+TEST_F(ConnectionManagers, ServerConnectionReset) {
+  // Server sends message of type ConnectionResetMessage
+  create_server_and_client();
+
+  // reset Connection
+  partner_id_t client_id = 1;  // only 1 client is connected at this point
+  server_manager->CloseConnection(client_id);
+
+  int count = 10;
+  while (count > 0) {
+    client_manager->HandleConnections();
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    auto event = client_manager->PopAndGetOldestEvent();
+    if (event) {
+      ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
+      break;
+    }
+    count--;
+  }
+  ASSERT_TRUE(count > 0);  // no event has been triggered
 }

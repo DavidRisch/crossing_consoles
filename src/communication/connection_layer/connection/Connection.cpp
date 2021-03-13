@@ -21,6 +21,7 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout(
     auto message = message_input_stream->ReceiveMessage(false);
 
     if (message != nullptr) {
+      message->SetTimestampReceived(std::chrono::steady_clock::now());
       return message;
     }
   }
@@ -30,8 +31,8 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout(
 std::shared_ptr<Connection> Connection::CreateClientSide(
     std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
     std::shared_ptr<message_layer::MessageOutputStream> message_output_stream, timeout_t timeout) {
-  sequence_t client_sequence = 1200;                     // start with an arbitrarily chosen sequence
-  message_layer::ConnectionRequestMessage step_1(1234);  // TODO: address
+  sequence_t client_sequence = 1200;  // start with an arbitrarily chosen sequence
+  auto step_1 = message_layer::ConnectionRequestMessage();
   step_1.SetMessageSequence(client_sequence);
   client_sequence++;
   message_output_stream->SendMessage(&step_1);
@@ -60,7 +61,7 @@ bool Connection::TryEstablish() {
         throw ConnectionCreationFailed();
       }
 
-      message_layer::AcknowledgeMessage step_3(1234, step_2->GetMessageSequence());
+      message_layer::AcknowledgeMessage step_3(step_2->GetMessageSequence());
       message_output_stream->SendMessage(&step_3);
 
       state = ConnectionState::READY;
@@ -72,7 +73,7 @@ bool Connection::TryEstablish() {
         throw ConnectionCreationFailed();
       }
 
-      message_layer::ConnectionResponseMessage step_2(1234);
+      message_layer::ConnectionResponseMessage step_2;
       last_send_sequence = GenerateSequence();
       step_2.SetMessageSequence(last_send_sequence);
       message_output_stream->SendMessage(&step_2);
@@ -127,6 +128,8 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
   // TODO: Set MetaData
 
   if (received_message != nullptr) {
+    received_message->SetTimestampReceived(std::chrono::steady_clock::now());
+
     if (received_message->GetMessageType() == message_layer::MessageType::ACKNOWLEDGE) {
       if (state != ConnectionState::WAITING_FOR_ACKNOWLEDGE) {
         throw BadAcknowledgeException();
@@ -171,6 +174,8 @@ void Connection::SendMessageNow(message_layer::Message *message) {
   }
   message->SetMessageSequence(send_sequence);
 
+  message->SetTimestampSent(std::chrono::steady_clock::now());
+
   message_output_stream->SendMessage(message);
 
   if (message->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
@@ -180,6 +185,7 @@ void Connection::SendMessageNow(message_layer::Message *message) {
 
 void Connection::SendAcknowledge(message_layer::address_t address, sequence_t acknowledged_msg_sequence) {
   auto ack_msg = message_layer::AcknowledgeMessage(address, acknowledged_msg_sequence);
+  // TODO: CloseConnection should wait for acknowledge before closing any sockets
   SendMessageNow(&ack_msg);
 }
 

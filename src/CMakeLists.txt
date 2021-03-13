@@ -44,6 +44,7 @@ add_library(crossing_consoles_lib
         communication/connection_layer/event/ConnectEvent.cpp
         communication/connection_layer/event/DisconnectEvent.cpp
         communication/connection_layer/event/PayloadEvent.cpp
+        communication/message_layer/message/ConnectionResetMessage.cpp
         )
 
 add_executable(crossing_consoles_main_server

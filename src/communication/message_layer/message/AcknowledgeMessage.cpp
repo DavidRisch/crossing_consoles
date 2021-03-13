@@ -2,14 +2,14 @@
 
 using namespace communication;
 using namespace communication::message_layer;
-AcknowledgeMessage::AcknowledgeMessage(address_t address, ProtocolDefinition::sequence_t acknowledged_msg_sequence)
-    : Message(address)
+AcknowledgeMessage::AcknowledgeMessage(ProtocolDefinition::sequence_t acknowledged_msg_sequence)
+    : Message()
     , acknowledged_msg_sequence(acknowledged_msg_sequence) {
 }
 
-AcknowledgeMessage::AcknowledgeMessage(address_t address, ProtocolDefinition::sequence_t acknowledged_msg_sequence,
-                                       MessageMetaData meta_data, ProtocolDefinition::sequence_t sequence)
-    : Message(address, sequence, meta_data)
+AcknowledgeMessage::AcknowledgeMessage(ProtocolDefinition::sequence_t acknowledged_msg_sequence,
+                                       ProtocolDefinition::sequence_t sequence)
+    : Message(sequence)
     , acknowledged_msg_sequence(acknowledged_msg_sequence) {
 }
 

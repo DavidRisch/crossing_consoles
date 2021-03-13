@@ -13,8 +13,7 @@ using namespace communication;
 using namespace communication::message_layer;
 
 TEST(MessageCoder, KeepAliveMessage) {
-  address_t target_address = 1234;
-  KeepAliveMessage original_message(target_address);
+  KeepAliveMessage original_message = KeepAliveMessage();
 
   auto encoded_message = MessageCoder::Encode(&original_message);
 
@@ -28,7 +27,6 @@ TEST(MessageCoder, KeepAliveMessage) {
 }
 
 TEST(MessageCoder, PayloadMessage) {
-  address_t target_address = 1234;
   std::vector<uint8_t> original_payload;
 
   int original_payload_length = 123;
@@ -36,7 +34,7 @@ TEST(MessageCoder, PayloadMessage) {
   for (int i = 0; i < original_payload_length; ++i) {
     original_payload.push_back(i);
   }
-  PayloadMessage original_message(target_address, original_payload);
+  PayloadMessage original_message(original_payload);
 
   auto encoded_message = MessageCoder::Encode(&original_message);
 
@@ -57,9 +55,8 @@ TEST(MessageCoder, PayloadMessage) {
 }
 
 TEST(MessageCoder, AcknowledgeMessage) {
-  address_t target_address = 1234;
   ProtocolDefinition::sequence_t sequence = 70;
-  AcknowledgeMessage original_message(target_address, sequence);
+  AcknowledgeMessage original_message(sequence);
 
   auto encoded_message = MessageCoder::Encode(&original_message);
 
@@ -75,7 +72,6 @@ TEST(MessageCoder, AcknowledgeMessage) {
 }
 
 TEST(MessageCoder, CrcIncorrectException) {
-  address_t target_address = 1234;
   std::vector<uint8_t> original_payload;
 
   int original_payload_length = 185;
@@ -83,7 +79,7 @@ TEST(MessageCoder, CrcIncorrectException) {
   for (int i = 0; i < original_payload_length; ++i) {
     original_payload.push_back(i % 20);
   }
-  PayloadMessage original_message(target_address, original_payload);
+  PayloadMessage original_message(original_payload);
   auto encoded_message = MessageCoder::Encode(&original_message);
 
   // only payload is manipulated, other cases are tested separately
@@ -102,7 +98,6 @@ TEST(MessageCoder, CrcIncorrectException) {
 
 TEST(MessageCoder, InvalidMessageExceptionNoEndFlag) {
   // test for missing end flag
-  address_t target_address = 1234;
   std::vector<uint8_t> original_payload;
 
   int original_payload_length = 185;
@@ -110,7 +105,7 @@ TEST(MessageCoder, InvalidMessageExceptionNoEndFlag) {
   for (int i = 0; i < original_payload_length; ++i) {
     original_payload.push_back(i);
   }
-  PayloadMessage original_message(target_address, original_payload);
+  PayloadMessage original_message(original_payload);
   auto encoded_message = MessageCoder::Encode(&original_message);
 
   std::vector<uint8_t> bad_encoded_message(encoded_message);
@@ -124,7 +119,6 @@ TEST(MessageCoder, InvalidMessageExceptionNoEndFlag) {
 class InvalidMessageCoder : public ::testing::Test {
  public:
   static void ReplaceWithSequence(uint8_t sequence, size_t offset = 0) {
-    address_t target_address = 1234;
     std::vector<uint8_t> original_payload;
 
     int original_payload_length = 185;
@@ -132,7 +126,7 @@ class InvalidMessageCoder : public ::testing::Test {
     for (int i = 0; i < original_payload_length; ++i) {
       original_payload.push_back(i);
     }
-    PayloadMessage original_message(target_address, original_payload);
+    PayloadMessage original_message(original_payload);
     auto encoded_message = MessageCoder::Encode(&original_message);
 
     for (size_t i = sizeof(sequence); i < encoded_message.size() - offset; ++i) {
