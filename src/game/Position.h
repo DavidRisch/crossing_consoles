@@ -1,9 +1,15 @@
 #ifndef CROSSING_CONSOLES_POSITION_H
 #define CROSSING_CONSOLES_POSITION_H
 
+#include <cstdint>
+#include <iterator>
+#include <vector>
+
+#include "networking/ISerializable.h"
+
 typedef int coordinate_t;
 
-class Position {
+class Position : public ISerializable {
  public:
   coordinate_t x;
   coordinate_t y;
@@ -11,6 +17,10 @@ class Position {
   Position(int x, int y);
 
   void Set(int x_new, int y_new);
+
+  void Serialize(std::vector<uint8_t>& output_vector) const override;
+
+  static Position Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 
   Position operator+(const Position& other_position) const;
   Position operator-(const Position& other_position) const;
