@@ -129,6 +129,7 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
 
   if (received_message != nullptr) {
     received_message->SetTimestampReceived(std::chrono::steady_clock::now());
+    statistics.AddReceivedMessage(*received_message);
 
     if (received_message->GetMessageType() == message_layer::MessageType::ACKNOWLEDGE) {
       if (state != ConnectionState::WAITING_FOR_ACKNOWLEDGE) {
@@ -175,7 +176,7 @@ void Connection::SendMessageNow(message_layer::Message *message) {
   message->SetMessageSequence(send_sequence);
 
   message->SetTimestampSent(std::chrono::steady_clock::now());
-
+  statistics.AddSentMessage(*message);
   message_output_stream->SendMessage(message);
 
   if (message->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
@@ -198,4 +199,8 @@ void Connection::Handle() {
       send_message_queue.pop();
     }
   }
+}
+
+void Connection::PrintStatistics() {
+  statistics.PrintStatistics();
 }

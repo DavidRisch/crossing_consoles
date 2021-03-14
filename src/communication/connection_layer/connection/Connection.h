@@ -7,6 +7,7 @@
 #include "../../message_layer/message/Message.h"
 #include "../../message_layer/message_stream/MessageInputStream.h"
 #include "../../message_layer/message_stream/MessageOutputStream.h"
+#include "ConnectionStatistics.h"
 
 namespace communication {
 namespace connection_layer {
@@ -82,6 +83,11 @@ class Connection {
     }
   };
 
+  /**
+   * Print connection statistics
+   */
+  void PrintStatistics();
+
  private:
   Connection(std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
              std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
@@ -123,6 +129,8 @@ class Connection {
    */
   sequence_t GenerateSequence();
   sequence_t sequence_counter;
+
+  ConnectionStatistics statistics = ConnectionStatistics();
 };
 
 }  // namespace connection_layer

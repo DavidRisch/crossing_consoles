@@ -35,6 +35,7 @@ void ConnectionManager::RemoveConnection(ProtocolDefinition::partner_id_t partne
     throw UnknownPartnerException();
   }
   event_queue.push_back(std::make_shared<DisconnectEvent>(partner_id));
+  connection_it->second.connection->PrintStatistics();
   connection_map.erase(partner_id);
 }
 

@@ -39,6 +39,7 @@ add_library(crossing_consoles_lib
         communication/connection_layer/connection/ConnectionManager.cpp
         communication/connection_layer/connection/ServerSideConnectionManager.cpp
         communication/connection_layer/connection/ClientSideConnectionManager.cpp
+        communication/connection_layer/connection/ConnectionStatistics.cpp
 
         communication/connection_layer/event/Event.cpp
         communication/connection_layer/event/ConnectEvent.cpp
