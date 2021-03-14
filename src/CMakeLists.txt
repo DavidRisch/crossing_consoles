@@ -10,6 +10,7 @@ add_library(crossing_consoles_lib
         game/Sprite.cpp
         game/GameServer.cpp
         game/WorldGenerator.cpp
+        game/networking/Change.cpp
 
         game/terminal/RealTerminal.cpp
         game/terminal/MockTerminal.cpp

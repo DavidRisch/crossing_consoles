@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "../communication/connection_layer/connection/ClientSideConnectionManager.h"
 #include "Compositor.h"
 #include "Player.h"
 #include "World.h"
@@ -12,9 +13,9 @@ enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' 
 
 class GameClient {
  public:
-  GameClient(Player player, World world, std::shared_ptr<ITerminal> terminal);
+  GameClient(Player player, World world, std::shared_ptr<ITerminal> terminal, bool multiplayer = false);
 
-  void RunGame();
+  void Run();
   void ProcessInput();
 
  private:
@@ -22,7 +23,9 @@ class GameClient {
   World world;
   std::shared_ptr<ITerminal> terminal;
   std::unique_ptr<Compositor> compositor;
+  std::shared_ptr<communication::connection_layer::ClientSideConnectionManager> client_manager;
   bool keep_running = true;
+  bool multiplayer;
 };
 
 #endif  // CROSSING_CONSOLES_GAMECLIENT_H

@@ -10,6 +10,7 @@ add_executable(crossing_consoles_test
         game.cpp
         connection_manager.cpp
         game_serialization.cpp
+        game_networking.cpp
         )
 
 target_link_libraries(crossing_consoles_test crossing_consoles_lib)

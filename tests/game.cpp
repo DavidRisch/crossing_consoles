@@ -14,6 +14,7 @@ TEST(Game, NoAction) {
   mock_terminal->AddInput((char)KeyCode::ESCAPE);
 
   GameClient gc(player, world, mock_terminal);
+  gc.Run();
 
   ASSERT_FALSE(mock_terminal->GetLastOutput().empty());
 }
@@ -31,6 +32,7 @@ TEST(Game, Actions) {
   mock_terminal->AddInput((char)KeyCode::ESCAPE);
 
   GameClient gc(player, world, mock_terminal);
+  gc.Run();
 
   ASSERT_FALSE(mock_terminal->GetLastOutput().empty());
 }
