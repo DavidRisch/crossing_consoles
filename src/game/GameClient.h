@@ -8,20 +8,21 @@
 #include "World.h"
 #include "terminal/ITerminal.h"
 
+enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' ' };
+
 class GameClient {
  public:
-  Player player;
-  World world;
-  std::unique_ptr<Compositor> compositor;
-  int keypress = 0;
-
   GameClient(Player player, World world, std::shared_ptr<ITerminal> terminal);
 
   void RunGame();
   void ProcessInput();
 
  private:
+  Player player;
+  World world;
   std::shared_ptr<ITerminal> terminal;
+  std::unique_ptr<Compositor> compositor;
+  bool keep_running = true;
 };
 
 #endif  // CROSSING_CONSOLES_GAMECLIENT_H
