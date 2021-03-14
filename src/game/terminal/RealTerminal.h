@@ -3,6 +3,10 @@
 
 #include <string>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "ITerminal.h"
 
 /**
@@ -18,6 +22,7 @@ class RealTerminal : public ITerminal {
   void SetScreen(const std::wstring &content) override;
 
  private:
+  static std::string title;
   /**
    * \brief Set new terminal i/o settings
    * \details Required for `GetCharacter()` and `CharacterWaiting()`.
@@ -28,7 +33,7 @@ class RealTerminal : public ITerminal {
   /**
    * \brief Clear terminal output.
    */
-  static void Clear();
+  void Clear() const;
 };
 
 #endif  // CROSSING_CONSOLES_REAL_TERMINAL_H

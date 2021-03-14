@@ -10,7 +10,7 @@
 
 class Compositor {
  public:
-  const coordinate_size_t block_size = Position(2, 2);
+  const coordinate_size_t block_size = coordinate_size_t(2, 2);
   coordinate_size_t viewport_size;
   std::unique_ptr<Renderer> renderer;
   World* world;
