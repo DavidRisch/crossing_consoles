@@ -14,10 +14,6 @@
  */
 class RealTerminal : public ITerminal {
  public:
-  static std::string title;
-#ifdef _WIN32
-  static HANDLE console;
-#endif
   RealTerminal();
 
   bool HasInput() override;
@@ -26,6 +22,7 @@ class RealTerminal : public ITerminal {
   void SetScreen(const std::wstring &content) override;
 
  private:
+  static std::string title;
   /**
    * \brief Set new terminal i/o settings
    * \details Required for `GetCharacter()` and `CharacterWaiting()`.

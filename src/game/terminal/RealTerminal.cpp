@@ -18,10 +18,6 @@
 
 std::string RealTerminal::title = "Crossing Consoles";
 
-#ifdef _WIN32
-HANDLE RealTerminal::console = GetStdHandle(STD_OUTPUT_HANDLE);
-#endif
-
 RealTerminal::RealTerminal() {
   Initialise();
 }
@@ -59,10 +55,12 @@ void RealTerminal::Initialise() {
 #ifdef _WIN32
   SetConsoleTitle(title.c_str());
   _setmode(_fileno(stdout), _O_U16TEXT);
+  HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+  // contains information about the console cursor
   CONSOLE_CURSOR_INFO info;
-  info.dwSize = 100;
+  // visibility of the cursor
   info.bVisible = FALSE;
-  SetConsoleCursorInfo(console, &info);
+  SetConsoleCursorInfo(console_handle, &info);
 #else
   // https://stackoverflow.com/a/7469410/13623303
   struct termios current {};
@@ -75,7 +73,8 @@ void RealTerminal::Initialise() {
 
 void RealTerminal::Clear() const {
 #ifdef _WIN32
-  SetConsoleCursorPosition(console, {0, 0});
+  HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+  SetConsoleCursorPosition(console_handle, {0, 0});
 #else
   system("clear");
 #endif
