@@ -43,16 +43,11 @@ class GameNetworking : public ::testing::Test {
   void create_server_and_client() {
     game_server = std::make_shared<GameServer>(coordinate_size_t(20, 15));
 
-    World world(coordinate_size_t(20, 15));
-    world.AddWall(Position(1, 1));
-    world.AddWall(Position(2, 1));
-    world.AddWall(Position(3, 1));
-    world.AddWall(Position(3, 2));
     Player player("user", Position(0, 0));
     mock_terminal = std::make_shared<MockTerminal>();
 
     start_server();
-    game_client = std::make_shared<GameClient>(player, world, mock_terminal, true);
+    game_client = std::make_shared<GameClient>(player, mock_terminal, coordinate_size_t(1, 1), true);
     stop_server();
   }
 };

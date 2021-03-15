@@ -29,7 +29,7 @@ bool World::IsBlocked(const Position& position) {
 }
 
 void World::Update(const World& server_world) {
-  assert(size == server_world.size);
+  size = server_world.size;
 
   walls = server_world.walls;
 

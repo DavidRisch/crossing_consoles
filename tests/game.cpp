@@ -13,7 +13,7 @@ TEST(Game, NoAction) {
   auto mock_terminal = std::make_shared<MockTerminal>();
   mock_terminal->AddInput((char)KeyCode::ESCAPE);
 
-  GameClient gc(player, world, mock_terminal);
+  GameClient gc(player, mock_terminal, coordinate_size_t(10, 10));
   gc.Run();
 
   ASSERT_FALSE(mock_terminal->GetLastOutput().empty());
@@ -31,7 +31,7 @@ TEST(Game, Actions) {
   mock_terminal->AddInput((char)KeyCode::D);
   mock_terminal->AddInput((char)KeyCode::ESCAPE);
 
-  GameClient gc(player, world, mock_terminal);
+  GameClient gc(player, mock_terminal, coordinate_size_t(10, 10));
   gc.Run();
 
   ASSERT_FALSE(mock_terminal->GetLastOutput().empty());

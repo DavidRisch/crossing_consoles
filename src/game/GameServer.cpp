@@ -31,6 +31,7 @@ void GameServer::RunIteration() {
 void GameServer::HandleEvent(const std::shared_ptr<communication::connection_layer::Event> &event) {
   switch (event->GetType()) {
     case communication::connection_layer::EventType::CONNECT: {
+      assert(world->players.empty());  // TODO: support multiple players
       world->AddPlayer(new Player("?", Position(0, 0)));
       break;
     }

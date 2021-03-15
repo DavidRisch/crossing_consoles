@@ -13,7 +13,8 @@ enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' 
 
 class GameClient {
  public:
-  GameClient(Player player, World world, std::shared_ptr<ITerminal> terminal, bool multiplayer = false);
+  GameClient(Player player, std::shared_ptr<ITerminal> terminal, const coordinate_size_t& world,
+             bool multiplayer = false);
 
   void Run();
   void ProcessInput();

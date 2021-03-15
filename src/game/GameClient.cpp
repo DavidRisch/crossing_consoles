@@ -5,11 +5,13 @@
 #include <utility>
 
 #include "../communication/connection_layer/event/PayloadEvent.h"
+#include "WorldGenerator.h"
 #include "networking/Change.h"
 
-GameClient::GameClient(Player player, World world, std::shared_ptr<ITerminal> terminal, bool multiplayer)
+GameClient::GameClient(Player player, std::shared_ptr<ITerminal> terminal, const coordinate_size_t& world_size,
+                       bool multiplayer)
     : player(std::move(player))
-    , world(std::move(world))
+    , world(world_size)
     , terminal(std::move(terminal))
     , multiplayer(multiplayer) {
   this->world.AddPlayer(&this->player);
@@ -18,6 +20,8 @@ GameClient::GameClient(Player player, World world, std::shared_ptr<ITerminal> te
 
   if (multiplayer) {
     client_manager = communication::connection_layer::ClientSideConnectionManager::CreateClientSide();
+  } else {
+    world = *WorldGenerator::GenerateWorld(world_size);
   }
 }
 
