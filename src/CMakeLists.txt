@@ -53,7 +53,13 @@ add_library(crossing_consoles_lib
 add_executable(crossing_consoles_main_server
         main_server.cpp)
 target_link_libraries(crossing_consoles_main_server crossing_consoles_lib)
+if (WIN32)
+    target_link_libraries(crossing_consoles_main_server ws2_32)
+endif (WIN32)
 
 add_executable(crossing_consoles_main_client
         main_client.cpp)
 target_link_libraries(crossing_consoles_main_client crossing_consoles_lib)
+if (WIN32)
+    target_link_libraries(crossing_consoles_main_client ws2_32)
+endif (WIN32)
