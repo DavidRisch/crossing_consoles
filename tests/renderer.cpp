@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "../src/game/visual/Renderer.h"
+#include "../src/game/visual/symbols.h"
 
 using namespace game::visual;
 using namespace game::common;
