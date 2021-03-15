@@ -4,6 +4,11 @@
 #include "game/terminal/RealTerminal.h"
 #include "game/world/Player.h"
 
+using namespace game;
+using namespace game::common;
+using namespace game::world;
+using namespace game::terminal;
+
 int main() {
   std::cout << "main client" << std::endl;
   Player player("user", Position(0, 0));
