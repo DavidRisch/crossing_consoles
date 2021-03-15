@@ -2,6 +2,9 @@
 
 #include <cassert>
 
+using namespace game;
+using namespace game::networking;
+
 Change::Change(ChangeType change_type)
     : change_type(change_type) {
   payload.push_back(static_cast<uint8_t>(change_type));

@@ -5,8 +5,13 @@
 #include <thread>
 
 #include "../communication/connection_layer/event/PayloadEvent.h"
-#include "WorldGenerator.h"
 #include "networking/Change.h"
+#include "world/WorldGenerator.h"
+
+using namespace game;
+using namespace game::common;
+using namespace game::world;
+using namespace game::networking;
 
 GameServer::GameServer(const coordinate_size_t &world_size) {
   world = WorldGenerator::GenerateWorld(world_size);

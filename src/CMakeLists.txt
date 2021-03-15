@@ -1,15 +1,15 @@
 add_library(crossing_consoles_lib
 
         game/GameClient.cpp
-        game/Player.cpp
-        game/Position.cpp
-        game/World.cpp
-        game/Wall.cpp
-        game/Renderer.cpp
-        game/Compositor.cpp
-        game/Sprite.cpp
+        game/world/Player.cpp
+        game/common/Position.cpp
+        game/world/World.cpp
+        game/world/Wall.cpp
+        game/visual/Renderer.cpp
+        game/visual/Compositor.cpp
+        game/visual/Sprite.cpp
         game/GameServer.cpp
-        game/WorldGenerator.cpp
+        game/world/WorldGenerator.cpp
         game/networking/Change.cpp
 
         game/terminal/RealTerminal.cpp

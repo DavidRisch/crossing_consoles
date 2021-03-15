@@ -5,9 +5,13 @@
 
 #include "World.h"
 
+namespace game::world {
+
 class WorldGenerator {
  public:
-  static std::shared_ptr<World> GenerateWorld(const coordinate_size_t& world_size);
+  static std::shared_ptr<World> GenerateWorld(const common::coordinate_size_t& world_size);
 };
+
+}  // namespace game::world
 
 #endif  // CROSSING_CONSOLES_WORLDGENERATOR_H

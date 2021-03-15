@@ -1,5 +1,8 @@
 #include "Position.h"
 
+using namespace game;
+using namespace game::common;
+
 Position::Position(int x, int y) {
   this->x = x;
   this->y = y;

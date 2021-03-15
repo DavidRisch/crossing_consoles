@@ -5,6 +5,11 @@
 #include "../src/game/GameClient.h"
 #include "../src/game/terminal/MockTerminal.h"
 
+using namespace game;
+using namespace game::common;
+using namespace game::world;
+using namespace game::terminal;
+
 TEST(Game, NoAction) {
   Player player("player name", Position(2, 2));
   World world(coordinate_size_t(5, 5));

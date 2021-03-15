@@ -4,23 +4,25 @@
 #include <list>
 #include <vector>
 
+#include "../common/Position.h"
 #include "Player.h"
-#include "Position.h"
 #include "Wall.h"
 
-class World : public ISerializable {
+namespace game::world {
+
+class World : public networking::ISerializable {
  public:
-  coordinate_size_t size;
+  common::coordinate_size_t size;
   std::list<Player*> players{};
   std::list<Wall*> walls{};
   bool updated = false;
 
-  explicit World(coordinate_size_t size);
+  explicit World(common::coordinate_size_t size);
 
   void AddPlayer(Player* player);
-  void AddWall(const Position& position);
+  void AddWall(const common::Position& position);
 
-  bool IsBlocked(const Position& position);
+  bool IsBlocked(const common::Position& position);
 
   /**
    * \brief Replace some data with newer data contained in `server_world`.
@@ -31,5 +33,7 @@ class World : public ISerializable {
 
   static World Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 };
+
+}  // namespace game::world
 
 #endif  // CROSSING_CONSOLES_WORLD_H

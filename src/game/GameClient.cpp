@@ -5,8 +5,16 @@
 #include <utility>
 
 #include "../communication/connection_layer/event/PayloadEvent.h"
-#include "WorldGenerator.h"
 #include "networking/Change.h"
+#include "terminal/ITerminal.h"
+#include "world/WorldGenerator.h"
+
+using namespace game;
+using namespace game::common;
+using namespace game::world;
+using namespace game::terminal;
+using namespace game::networking;
+using namespace game::visual;
 
 GameClient::GameClient(Player player, std::shared_ptr<ITerminal> terminal, const coordinate_size_t& world_size,
                        bool multiplayer)

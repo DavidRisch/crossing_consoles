@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include "game/GameClient.h"
-#include "game/Player.h"
 #include "game/terminal/RealTerminal.h"
+#include "game/world/Player.h"
 
 int main() {
   std::cout << "main client" << std::endl;

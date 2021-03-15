@@ -3,6 +3,8 @@
 
 #include <list>
 
+namespace game::networking {
+
 /**
  * \brief Interface for objects which can be serialize to bytes.
  * \details Any object `T` implementing this interface should a static method with the signature
@@ -33,5 +35,7 @@ class ISerializable {
     return *from++;  // TODO: use two bytes
   }
 };
+
+}  // namespace game::networking
 
 #endif  // CROSSING_CONSOLES_I_SERIALIZABLE_H

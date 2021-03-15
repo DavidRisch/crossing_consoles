@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace game::networking {
+
 enum class ChangeType : uint8_t {
   // client -> server
   SET_NAME = 0,
@@ -35,5 +37,7 @@ class Change {
  private:
   ChangeType change_type;
 };
+
+}  // namespace game::networking
 
 #endif  // CROSSING_CONSOLES_CHANGE_H

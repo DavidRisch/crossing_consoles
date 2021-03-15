@@ -1,17 +1,21 @@
 #ifndef CROSSING_CONSOLES_WALL_H
 #define CROSSING_CONSOLES_WALL_H
 
-#include "Position.h"
+#include "../common/Position.h"
 
-class Wall : public ISerializable {
+namespace game::world {
+
+class Wall : public networking::ISerializable {
  public:
-  Position position;
+  common::Position position;
 
-  explicit Wall(Position position);
+  explicit Wall(common::Position position);
 
   void Serialize(std::vector<uint8_t>& output_vector) const override;
 
   static Wall Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 };
+
+}  // namespace game::world
 
 #endif  // CROSSING_CONSOLES_WALL_H

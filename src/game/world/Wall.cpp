@@ -1,5 +1,9 @@
 #include "Wall.h"
 
+using namespace game;
+using namespace game::common;
+using namespace game::world;
+
 Wall::Wall(Position position)
     : position(position) {
 }

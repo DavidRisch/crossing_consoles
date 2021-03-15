@@ -9,6 +9,8 @@
 
 #include "ITerminal.h"
 
+namespace game::terminal {
+
 /**
  * \brief Uniform interface for the terminal input and output
  */
@@ -35,5 +37,7 @@ class RealTerminal : public ITerminal {
    */
   void Clear() const;
 };
+
+}  // namespace game::terminal
 
 #endif  // CROSSING_CONSOLES_REAL_TERMINAL_H

@@ -3,6 +3,10 @@
 #include <cassert>
 #include <utility>
 
+using namespace game;
+using namespace game::common;
+using namespace game::world;
+
 Player::Player(std::string name, Position position)
     : name(std::move(name))
     , position(position) {

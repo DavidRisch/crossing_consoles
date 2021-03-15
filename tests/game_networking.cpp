@@ -7,6 +7,11 @@
 #include "../src/game/GameServer.h"
 #include "../src/game/terminal/MockTerminal.h"
 
+using namespace game;
+using namespace game::common;
+using namespace game::world;
+using namespace game::terminal;
+
 class GameNetworking : public ::testing::Test {
  public:
   GameNetworking() = default;

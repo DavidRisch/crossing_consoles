@@ -16,6 +16,9 @@
 #include <locale>
 #endif
 
+using namespace game;
+using namespace game::terminal;
+
 std::string RealTerminal::title = "Crossing Consoles";
 
 RealTerminal::RealTerminal() {

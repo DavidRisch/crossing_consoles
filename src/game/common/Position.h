@@ -5,11 +5,13 @@
 #include <iterator>
 #include <vector>
 
-#include "networking/ISerializable.h"
+#include "../networking/ISerializable.h"
+
+namespace game::common {
 
 typedef int coordinate_t;
 
-class Position : public ISerializable {
+class Position : public networking::ISerializable {
  public:
   coordinate_t x;
   coordinate_t y;
@@ -38,4 +40,7 @@ class Position : public ISerializable {
 typedef Position coordinate_size_t;
 typedef Position coordinate_distance_t;
 typedef Position coordinate_factor_t;
+
+}  // namespace game::common
+
 #endif  // CROSSING_CONSOLES_POSITION_H

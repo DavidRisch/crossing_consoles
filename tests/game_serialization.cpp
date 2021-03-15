@@ -2,7 +2,11 @@
 
 #include <cstring>
 
-#include "../src/game/World.h"
+#include "../src/game/world/World.h"
+
+using namespace game;
+using namespace game::common;
+using namespace game::world;
 
 template <typename T>
 bool are_objects_identical(const T &a, const T &b) {
