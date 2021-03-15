@@ -41,8 +41,8 @@ TEST(Sprite, GetLine3x3) {
 }
 
 TEST(Sprite, GetLineUnicode) {
-  Sprite sprite(std::wstring(2, box_drawings_double_horizontal) + L"\n"
-                + std::wstring(2, box_drawings_double_vertical));
+  Sprite sprite(std::wstring(2, box_drawings_double_horizontal) + L"\n" +
+                std::wstring(2, box_drawings_double_vertical));
 
   ASSERT_EQ(sprite.GetLine(0), std::wstring(2, box_drawings_double_horizontal));
   ASSERT_EQ(sprite.GetLine(1), std::wstring(2, box_drawings_double_vertical));
