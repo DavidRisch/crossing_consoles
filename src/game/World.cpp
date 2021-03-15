@@ -1,6 +1,6 @@
 #include "World.h"
 
-#include <algorithm>
+#include <cassert>
 #include <utility>
 
 World::World(coordinate_size_t size)
@@ -26,6 +26,21 @@ bool World::IsBlocked(const Position& position) {
     }
   }
   return false;
+}
+
+void World::Update(const World& server_world) {
+  size = server_world.size;
+
+  walls = server_world.walls;
+
+  // TODO: more advanced setup require to handle multiple players
+  assert(players.size() == 1);
+  if (!server_world.players.empty()) {
+    assert(server_world.players.size() == 1);
+    players.front() = server_world.players.front();
+  }
+
+  updated = true;
 }
 
 void World::Serialize(std::vector<uint8_t>& output_vector) const {

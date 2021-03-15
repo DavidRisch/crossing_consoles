@@ -22,6 +22,11 @@ class World : public ISerializable {
 
   bool IsBlocked(const Position& position);
 
+  /**
+   * \brief Replace some data with newer data contained in `server_world`.
+   */
+  void Update(const World& server_world);
+
   void Serialize(std::vector<uint8_t>& output_vector) const override;
 
   static World Deserialize(std::vector<uint8_t>::iterator& input_iterator);

@@ -5,17 +5,16 @@
 #include "../src/game/GameClient.h"
 #include "../src/game/terminal/MockTerminal.h"
 
-char escape_key = 27;
-
 TEST(Game, NoAction) {
   Player player("player name", Position(2, 2));
   World world(coordinate_size_t(5, 5));
   world.AddWall(Position(4, 4));
 
   auto mock_terminal = std::make_shared<MockTerminal>();
-  mock_terminal->AddInput(escape_key);
+  mock_terminal->AddInput((char)KeyCode::ESCAPE);
 
-  GameClient gc(player, world, mock_terminal);
+  GameClient gc(player, mock_terminal, coordinate_size_t(10, 10));
+  gc.Run();
 
   ASSERT_FALSE(mock_terminal->GetLastOutput().empty());
 }
@@ -26,13 +25,14 @@ TEST(Game, Actions) {
   world.AddWall(Position(4, 4));
 
   auto mock_terminal = std::make_shared<MockTerminal>();
-  mock_terminal->AddInput('w');
-  mock_terminal->AddInput('a');
-  mock_terminal->AddInput('s');
-  mock_terminal->AddInput('d');
-  mock_terminal->AddInput(escape_key);
+  mock_terminal->AddInput((char)KeyCode::W);
+  mock_terminal->AddInput((char)KeyCode::A);
+  mock_terminal->AddInput((char)KeyCode::S);
+  mock_terminal->AddInput((char)KeyCode::D);
+  mock_terminal->AddInput((char)KeyCode::ESCAPE);
 
-  GameClient gc(player, world, mock_terminal);
+  GameClient gc(player, mock_terminal, coordinate_size_t(10, 10));
+  gc.Run();
 
   ASSERT_FALSE(mock_terminal->GetLastOutput().empty());
 }
