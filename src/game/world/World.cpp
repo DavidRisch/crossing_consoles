@@ -11,33 +11,26 @@ World::World(coordinate_size_t size)
     : size(std::move(size)) {
 }
 
-void World::AddPlayer(Player* player) {
-  players.emplace_back(player);
+void World::AddPlayer(const std::shared_ptr<Player>& player) {
+  assert(player != nullptr);
+  players.push_back(player);
   updated = true;
 }
 
 void World::AddWall(const Position& position) {
   if (position >= Position(0, 0) && position < size) {
-    bool exists = false;
-    for (auto const& i_wall : walls) {
-      if (i_wall->position == position) {
-        exists = true;
-      }
+    if (walls.find(position) != walls.end()) {
+      walls.at(position) = Wall(position);
+    } else {
+      walls.emplace(position, position);
     }
-    if (!exists) {
-      walls.emplace_back(new Wall(position));
-      updated = true;
-    }
+
+    updated = true;
   }
 }
 
 bool World::IsBlocked(const Position& position) {
-  for (auto const& i_wall : walls) {
-    if (i_wall->position == position) {
-      return true;
-    }
-  }
-  return false;
+  return walls.find(position) != walls.end();
 }
 
 void World::Update(const World& server_world) {
@@ -58,7 +51,7 @@ void World::Update(const World& server_world) {
 void World::Serialize(std::vector<uint8_t>& output_vector) const {
   size.Serialize(output_vector);
 
-  ISerializable::SerializeList(output_vector, walls);
+  ISerializable::SerializeMap(output_vector, walls);
 
   ISerializable::SerializeList(output_vector, players);
 }
@@ -67,14 +60,18 @@ World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
   auto size = coordinate_size_t::Deserialize(input_iterator);
   auto world = World(size);
 
-  auto wall_count = ISerializable::DeserializeListLength(input_iterator);
+  auto wall_count = ISerializable::DeserializeContainerLength(input_iterator);
   for (size_t i = 0; i < wall_count; ++i) {
-    world.AddWall(Wall::Deserialize(input_iterator).position);
+    auto position = Position::Deserialize(input_iterator);
+    auto wall = Wall::Deserialize(input_iterator);
+    assert(position == wall.position);
+    // TODO: this needs to be extended when Wall has any attributes in addition to position
+    world.AddWall(position);
   }
 
-  auto player_count = ISerializable::DeserializeListLength(input_iterator);
+  auto player_count = ISerializable::DeserializeContainerLength(input_iterator);
   for (size_t i = 0; i < player_count; ++i) {
-    auto* player = new Player(Player::Deserialize(input_iterator));  // TODO: fix memory leak
+    auto player = std::make_shared<Player>(Player::Deserialize(input_iterator));  // TODO: fix memory leak
     world.AddPlayer(player);
   }
 

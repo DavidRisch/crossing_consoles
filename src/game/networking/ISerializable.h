@@ -2,6 +2,7 @@
 #define CROSSING_CONSOLES_I_SERIALIZABLE_H
 
 #include <list>
+#include <unordered_map>
 
 namespace game::networking {
 
@@ -29,9 +30,22 @@ class ISerializable {
   }
 
   /**
-   * \brief Extract a list length encoded by `SerializeList()` from the iterator.
+   * \brief Place the map size and serialized versions of all contents with keys into the vector.
    */
-  static size_t DeserializeListLength(std::vector<uint8_t>::iterator& from) {
+  template <typename K, typename V>
+  static void SerializeMap(std::vector<uint8_t>& output_vector,
+                           std::unordered_map<K, V, typename K::HashFunction> objects) {
+    output_vector.push_back(objects.size());  // TODO: use two bytes
+    for (const auto& pair : objects) {
+      pair.first.Serialize(output_vector);
+      pair.second.Serialize(output_vector);
+    }
+  }
+
+  /**
+   * \brief Extract a container(list, map, etc.) length encoded by `Serialize[...]()` from the iterator.
+   */
+  static size_t DeserializeContainerLength(std::vector<uint8_t>::iterator& from) {
     return *from++;  // TODO: use two bytes
   }
 };

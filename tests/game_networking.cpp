@@ -48,7 +48,7 @@ class GameNetworking : public ::testing::Test {
   void create_server_and_client() {
     game_server = std::make_shared<GameServer>(coordinate_size_t(20, 15));
 
-    Player player("user", Position(0, 0));
+    auto player = std::make_shared<Player>("user", Position(1, 2));
     mock_terminal = std::make_shared<MockTerminal>();
 
     start_server();

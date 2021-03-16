@@ -37,7 +37,7 @@ void GameServer::HandleEvent(const std::shared_ptr<communication::connection_lay
   switch (event->GetType()) {
     case communication::connection_layer::EventType::CONNECT: {
       assert(world->players.empty());  // TODO: support multiple players
-      world->AddPlayer(new Player("?", Position(0, 0)));
+      world->AddPlayer(std::make_shared<Player>("?", Position(0, 0)));
       break;
     }
     case communication::connection_layer::EventType::DISCONNECT: {

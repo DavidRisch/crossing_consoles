@@ -48,10 +48,11 @@ std::wstring Renderer::RenderWorld() const {
     positive_repetition = (viewport_end + world->size - Position(1, 1)) / world->size;
   }
 
-  for (auto const& i_wall : world->walls) {
+  for (auto const& pair : world->walls) {
+    auto wall = pair.second;
     for (int y_factor = negative_repetition.y; y_factor < positive_repetition.y; y_factor++) {
       for (int x_factor = negative_repetition.x; x_factor < positive_repetition.x; x_factor++) {
-        Position position = i_wall->position + (world->size * Position(x_factor, y_factor));
+        Position position = wall.position + (world->size * Position(x_factor, y_factor));
         if (position >= viewport_start && position <= viewport_end) {
           Position relative_position = position - viewport_start;
           for (int y = 0; y < block_size.y; y++) {

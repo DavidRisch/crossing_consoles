@@ -55,10 +55,12 @@ TEST(GameSerialization, World) {
   EXPECT_TRUE(are_objects_identical(original.size, deserialized.size));
 
   ASSERT_EQ(original.walls.size(), deserialized.walls.size());
-  for (const auto &wall_original : original.walls) {
+  for (const auto &pair_original : original.walls) {
+    auto wall_original = pair_original.second;
     int identical_count = 0;
-    for (const auto &wall_deserialized : deserialized.walls) {
-      if (are_objects_identical(wall_original->position, wall_deserialized->position)) {
+    for (const auto &pair_deserialized : deserialized.walls) {
+      auto wall_deserialized = pair_deserialized.second;
+      if (are_objects_identical(wall_original.position, wall_deserialized.position)) {
         identical_count++;
       }
     }
