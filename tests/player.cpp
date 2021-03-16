@@ -1,7 +1,6 @@
-#include "../src/game/world/Player.h"
-#include "../src/game/common/Position.h"
-
 #include <gtest/gtest.h>
+
+#include "../src/game/world/Player.h"
 
 using namespace game::world;
 using namespace game::common;
