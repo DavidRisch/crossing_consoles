@@ -30,6 +30,7 @@ GameClient::GameClient(Player player, std::shared_ptr<ITerminal> terminal, const
     client_manager = communication::connection_layer::ClientSideConnectionManager::CreateClientSide();
   } else {
     world = *WorldGenerator::GenerateWorld(world_size);
+    world.AddPlayer(&this->player);
   }
 }
 

@@ -17,9 +17,17 @@ void World::AddPlayer(Player* player) {
 }
 
 void World::AddWall(const Position& position) {
-  if (position > Position(0, 0) && position < size) {
-    walls.emplace_back(new Wall(position));
-    updated = true;
+  if (position >= Position(0, 0) && position < size) {
+    bool exists = false;
+    for (auto const& i_wall : walls) {
+      if (i_wall->position == position) {
+        exists = true;
+      }
+    }
+    if (!exists) {
+      walls.emplace_back(new Wall(position));
+      updated = true;
+    }
   }
 }
 
