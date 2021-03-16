@@ -1,6 +1,7 @@
+#include "../src/game/visual/Sprite.h"
+
 #include <gtest/gtest.h>
 
-#include "../src/game/visual/Sprite.h"
 #include "../src/game/visual/symbols.h"
 
 using namespace game::visual;

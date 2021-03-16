@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "../src/game/world/Wall.h"
+
+#include <gtest/gtest.h>
 
 using namespace game::world;
 using namespace game::common;

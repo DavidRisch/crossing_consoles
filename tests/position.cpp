@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "../src/game/common/Position.h"
+
+#include <gtest/gtest.h>
 
 using namespace game::common;
 
