@@ -12,10 +12,7 @@ TEST(World, AddPlayer) {
   world.AddPlayer(&player);
 
   ASSERT_TRUE(world.players.size() == 1);
-
-  for (auto const& i_player : world.players) {
-    EXPECT_EQ(i_player, &player);
-  }
+  EXPECT_EQ(world.players.front(), &player);
 }
 
 TEST(World, AddWall) {
@@ -24,10 +21,7 @@ TEST(World, AddWall) {
   world.AddWall(Position(10, 5));
 
   ASSERT_TRUE(world.walls.size() == 1);
-
-  for (auto const& i_wall : world.walls) {
-    EXPECT_EQ(i_wall->position, Position(10, 5));
-  }
+  EXPECT_EQ(world.walls.front()->position, Position(10, 5));
 }
 
 TEST(World, AddWallRepeated) {
@@ -37,10 +31,7 @@ TEST(World, AddWallRepeated) {
   world.AddWall(Position(10, 5));
 
   ASSERT_TRUE(world.walls.size() == 1);
-
-  for (auto const& i_wall : world.walls) {
-    EXPECT_EQ(i_wall->position, Position(10, 5));
-  }
+  EXPECT_EQ(world.walls.front()->position, Position(10, 5));
 }
 
 TEST(World, AddWalls) {

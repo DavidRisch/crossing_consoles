@@ -20,7 +20,7 @@ TEST(Renderer, EmptyWorld) {
 
   std::wstring rendered_world = renderer.RenderWorld();
 
-  ASSERT_TRUE(!rendered_world.empty());
+  ASSERT_TRUE((int)rendered_world.size() == (viewport_size.x * block_size.x + 1) * viewport_size.y * block_size.y);
 
   int n;
   for (int y = 0; y < viewport_size.y * block_size.y; y++) {
