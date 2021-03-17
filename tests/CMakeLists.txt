@@ -17,7 +17,7 @@ add_executable(crossing_consoles_test
         wall.cpp
         player.cpp
         world.cpp
-        rendered_world.cpp
+        colored_string_matrix.cpp
         )
 
 target_link_libraries(crossing_consoles_test crossing_consoles_lib)
