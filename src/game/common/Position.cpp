@@ -50,17 +50,17 @@ bool Position::operator!=(const Position &other_position) const {
 }
 
 bool Position::operator<(const Position &other_position) const {
-  return (*this != other_position && x <= other_position.x && y <= other_position.y);
+  return (x < other_position.x && y < other_position.y);
 }
 
 bool Position::operator<=(const Position &other_position) const {
-  return (*this < other_position || *this == other_position);
+  return (x <= other_position.x && y <= other_position.y);
 }
 
 bool Position::operator>(const Position &other_position) const {
-  return (*this != other_position && x >= other_position.x && y >= other_position.y);
+  return (x > other_position.x && y > other_position.y);
 }
 
 bool Position::operator>=(const Position &other_position) const {
-  return (*this > other_position || *this == other_position);
+  return (x >= other_position.x && y >= other_position.y);
 }
