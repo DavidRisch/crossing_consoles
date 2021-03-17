@@ -8,6 +8,7 @@
 #include "../../message_layer/message_stream/MessageInputStream.h"
 #include "../../message_layer/message_stream/MessageOutputStream.h"
 #include "statistics/ConnectionStatistics.h"
+#include "statistics/StatisticPrinter.h"
 
 namespace communication {
 namespace connection_layer {
@@ -87,6 +88,11 @@ class Connection {
    * Print connection statistics
    */
   void PrintStatistics();
+
+  /**
+   * Return connection statistics
+   */
+  ConnectionStatistics GetConnectionStatistics();
 
  private:
   Connection(std::shared_ptr<message_layer::MessageInputStream> message_input_stream,

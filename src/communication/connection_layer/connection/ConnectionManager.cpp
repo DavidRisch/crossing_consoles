@@ -125,3 +125,13 @@ void ConnectionManager::CloseConnection(partner_id_t partner_id) {
   // TODO wait for acknowledge message from partner before calling Reset Connection
   RemoveConnection(partner_id);
 }
+ConnectionStatistics ConnectionManager::GetStatisticsFromPartnerConnection(partner_id_t partner_id) {
+  auto connection_it = connection_map.find(partner_id);
+  if (connection_it == connection_map.end()) {
+    throw UnknownPartnerException();
+  }
+  assert(connection_it->first == partner_id);
+  auto connection = connection_it->second.connection;
+
+  return connection->GetConnectionStatistics();
+}

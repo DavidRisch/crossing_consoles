@@ -207,3 +207,7 @@ void Connection::Handle() {
 void Connection::PrintStatistics() {
   StatisticPrinter::PrintStatistics(statistics);
 }
+
+ConnectionStatistics Connection::GetConnectionStatistics() {
+  return statistics;
+}

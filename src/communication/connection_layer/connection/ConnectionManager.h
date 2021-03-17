@@ -90,6 +90,11 @@ class ConnectionManager {
   /// connection_map of connection id/ address : ConnectionParameters<connection, timestamp_last_received>
   std::unordered_map<partner_id_t, ConnectionParameters> connection_map;
 
+  /**
+   * Return connection statistics of partner connection
+   */
+  ConnectionStatistics GetStatisticsFromPartnerConnection(partner_id_t partner_id);
+
  private:
   /**
    * \brief Remove connection from `connection_map` .
