@@ -72,7 +72,7 @@ void GameClient::ProcessInput() {
         movement.Set(0, -1);
         if (multiplayer) {
           Change change(ChangeType::MOVE_UP);
-          client_manager->SendDataToConnection(communication::ProtocolDefinition::server_partner_id, change.payload);
+          client_manager->SendDataToServer(change.payload);
         }
         break;
       }
@@ -80,7 +80,7 @@ void GameClient::ProcessInput() {
         movement.Set(-1, 0);
         if (multiplayer) {
           Change change(ChangeType::MOVE_LEFT);
-          client_manager->SendDataToConnection(communication::ProtocolDefinition::server_partner_id, change.payload);
+          client_manager->SendDataToServer(change.payload);
         }
         break;
       }
@@ -89,7 +89,7 @@ void GameClient::ProcessInput() {
         if (multiplayer) {
           Change change(ChangeType::MOVE_DOWN);
 
-          client_manager->SendDataToConnection(communication::ProtocolDefinition::server_partner_id, change.payload);
+          client_manager->SendDataToServer(change.payload);
         }
         break;
       }
@@ -98,7 +98,7 @@ void GameClient::ProcessInput() {
         if (multiplayer) {
           Change change(ChangeType::MOVE_RIGHT);
 
-          client_manager->SendDataToConnection(communication::ProtocolDefinition::server_partner_id, change.payload);
+          client_manager->SendDataToServer(change.payload);
         }
         break;
       }

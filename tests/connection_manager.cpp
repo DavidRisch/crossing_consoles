@@ -109,7 +109,7 @@ class ConnectionManagers : public ::testing::Test {
       std::vector<uint8_t> payload_client_to_server{5, 6, 7, static_cast<uint8_t>(i)};
 
       server_manager->SendDataToConnection(client_id, payload_server_to_client);
-      client_manager->SendDataToConnection(server_id, payload_client_to_server);
+      client_manager->SendDataToServer(payload_client_to_server);
       std::this_thread::sleep_for(std::chrono::microseconds(100));
       server_manager->HandleConnections();
       client_manager->HandleConnections();
@@ -227,12 +227,12 @@ TEST_F(ConnectionManagers, TwoClients) {
 
     server_manager->SendDataToConnection(client_id, payload_server_to_client1);
     server_manager->SendDataToConnection(second_client_id, payload_server_to_client2);
-    client_manager->SendDataToConnection(server_id, payload_client1_to_server);
+    client_manager->SendDataToServer(payload_client1_to_server);
 
     std::this_thread::sleep_for(std::chrono::microseconds(100));
     server_manager->HandleConnections();
 
-    second_client_manager->SendDataToConnection(server_id, payload_client2_to_server);
+    second_client_manager->SendDataToServer(payload_client2_to_server);
 
     std::this_thread::sleep_for(std::chrono::microseconds(100));
     server_manager->HandleConnections();
@@ -272,7 +272,7 @@ TEST_F(ConnectionManagers, LongQueue) {
 
   for (int i = 0; i < count; ++i) {
     server_manager->SendDataToConnection(client_id, payloads_server_to_client.at(i));
-    client_manager->SendDataToConnection(server_id, payloads_client_to_server.at(i));
+    client_manager->SendDataToServer(payloads_client_to_server.at(i));
     std::this_thread::sleep_for(std::chrono::microseconds(100));
     server_manager->HandleConnections();
     client_manager->HandleConnections();
