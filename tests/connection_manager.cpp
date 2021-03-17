@@ -210,9 +210,9 @@ TEST_F(ConnectionManagers, SendMessages) {
   send_and_check_messages(10);
 }
 
-TEST_F(ConnectionManagers, DISABLED_SendManyMessages) {  // TODO: fix issue causing this test to fail
+TEST_F(ConnectionManagers, SendManyMessages) {
   create_server_and_client();
-  send_and_check_messages(10000);
+  send_and_check_messages(1000);
 }
 
 TEST_F(ConnectionManagers, TwoClients) {

@@ -43,6 +43,10 @@ static T ReadFromStreamWithCRC(byte_layer::IInputByteStream &stream, unsigned in
     if (escape_flags) {
       // remove escape sequence if needed
       if (byte == ProtocolDefinition::escape) {
+        // escape sequence is included in crc calculation
+        if (crc_handler != nullptr) {
+          crc_handler->AppendByte(byte);
+        }
         stream.Read(reinterpret_cast<uint8_t *>(&byte), 1);
         if (!(byte == ProtocolDefinition::escape || byte == ProtocolDefinition::flag)) {
           throw MessageCoder::InvalidMessageException();

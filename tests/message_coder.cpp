@@ -164,3 +164,31 @@ TEST_F(InvalidMessageCoder, ExceptionEscape) {
   size_t offset = sizeof(ProtocolDefinition::flag) + sizeof(crc_value_t);
   ReplaceWithSequence(ProtocolDefinition::escape, offset);
 }
+
+TEST_F(InvalidMessageCoder, MessageSequenceisFlag) {
+  // test value of flag as msg sequence - needs to be properly escaped
+  ProtocolDefinition::sequence_t sequence = ProtocolDefinition::flag;
+  KeepAliveMessage original_message(sequence);
+
+  auto encoded_message = MessageCoder::Encode(&original_message);
+
+  MockInputStream mock_input_stream;
+  mock_input_stream.AddData(encoded_message);
+
+  auto decoded_message = MessageCoder::Decode(mock_input_stream);
+  EXPECT_EQ(decoded_message->GetMessageSequence(), sequence);
+}
+
+TEST_F(InvalidMessageCoder, MessageSequenceisEscape) {
+  // test value of escape as msg sequence - needs to be properly escaped
+  ProtocolDefinition::sequence_t sequence = ProtocolDefinition::escape;
+  KeepAliveMessage original_message(sequence);
+
+  auto encoded_message = MessageCoder::Encode(&original_message);
+
+  MockInputStream mock_input_stream;
+  mock_input_stream.AddData(encoded_message);
+
+  auto decoded_message = MessageCoder::Decode(mock_input_stream);
+  EXPECT_EQ(decoded_message->GetMessageSequence(), sequence);
+}
