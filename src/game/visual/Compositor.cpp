@@ -2,7 +2,11 @@
 
 #include "symbols.h"
 
-using namespace symbols;
+using namespace game;
+using namespace game::common;
+using namespace game::world;
+using namespace game::visual;
+using namespace game::visual::symbols;
 
 Compositor::Compositor(coordinate_size_t viewport_size, World &world, Player &player)
     : viewport_size(viewport_size)

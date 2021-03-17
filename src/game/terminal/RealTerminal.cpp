@@ -6,6 +6,7 @@
 #ifdef _WIN32
 #include <conio.h>
 #include <fcntl.h>
+
 #else
 
 #include <sys/ioctl.h>
@@ -14,6 +15,11 @@
 #include <codecvt>
 #include <locale>
 #endif
+
+using namespace game;
+using namespace game::terminal;
+
+std::string RealTerminal::title = "Crossing Consoles";
 
 RealTerminal::RealTerminal() {
   Initialise();
@@ -50,8 +56,14 @@ void RealTerminal::SetScreen(const std::wstring& content) {
 
 void RealTerminal::Initialise() {
 #ifdef _WIN32
+  SetConsoleTitle(title.c_str());
   _setmode(_fileno(stdout), _O_U16TEXT);
-  std::ios_base::sync_with_stdio(false);
+  HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+  // contains information about the console cursor
+  CONSOLE_CURSOR_INFO info;
+  // visibility of the cursor
+  info.bVisible = FALSE;
+  SetConsoleCursorInfo(console_handle, &info);
 #else
   // https://stackoverflow.com/a/7469410/13623303
   struct termios current {};
@@ -62,9 +74,10 @@ void RealTerminal::Initialise() {
 #endif
 }
 
-void RealTerminal::Clear() {
+void RealTerminal::Clear() const {
 #ifdef _WIN32
-  system("cls");
+  HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+  SetConsoleCursorPosition(console_handle, {0, 0});
 #else
   system("clear");
 #endif

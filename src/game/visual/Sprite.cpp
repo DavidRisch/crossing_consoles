@@ -4,6 +4,9 @@
 #include <sstream>
 #include <utility>
 
+using namespace game;
+using namespace game::visual;
+
 Sprite::Sprite(const std::wstring& sprite) {
   std::wstringstream ss(sprite);
   std::wstring value;

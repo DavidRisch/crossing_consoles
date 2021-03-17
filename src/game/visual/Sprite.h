@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+namespace game::visual {
+
 class Sprite {
  public:
   explicit Sprite(const std::wstring& sprite);
@@ -13,5 +15,7 @@ class Sprite {
  private:
   std::vector<std::wstring> lines{};
 };
+
+}  // namespace game::visual
 
 #endif  // CROSSING_CONSOLES_SPRITE_H

@@ -4,25 +4,60 @@
 #include <thread>
 #include <utility>
 
-enum Keys : int { KEY_ESCAPE = 27, KEY_W = 'w', KEY_A = 'a', KEY_S = 's', KEY_D = 'd', KEY_SPACE = ' ' };
+#include "../communication/connection_layer/event/PayloadEvent.h"
+#include "networking/Change.h"
+#include "terminal/ITerminal.h"
+#include "world/WorldGenerator.h"
 
-GameClient::GameClient(Player player, World world, std::shared_ptr<ITerminal> terminal)
+using namespace game;
+using namespace game::common;
+using namespace game::world;
+using namespace game::terminal;
+using namespace game::networking;
+using namespace game::visual;
+
+GameClient::GameClient(Player player, std::shared_ptr<ITerminal> terminal, const coordinate_size_t& world_size,
+                       bool multiplayer)
     : player(std::move(player))
-    , world(std::move(world))
-    , terminal(std::move(terminal)) {
+    , world(world_size)
+    , terminal(std::move(terminal))
+    , multiplayer(multiplayer) {
   this->world.AddPlayer(&this->player);
-  coordinate_size_t viewport_size = Position(51, 31);
+  coordinate_size_t viewport_size = Position(51, 25);
   compositor = std::make_unique<Compositor>(viewport_size, this->world, this->player);
 
-  RunGame();
+  if (multiplayer) {
+    client_manager = communication::connection_layer::ClientSideConnectionManager::CreateClientSide();
+  } else {
+    world = *WorldGenerator::GenerateWorld(world_size);
+    world.AddPlayer(&this->player);
+  }
 }
 
-void GameClient::RunGame() {
-  while (keypress != KEY_ESCAPE) {
+void GameClient::Run() {
+  while (keep_running) {
     ProcessInput();
     if (world.updated || player.updated) {
       terminal->SetScreen(compositor->CompositeViewport());
       std::this_thread::sleep_for(std::chrono::microseconds(500));
+    }
+
+    if (multiplayer) {
+      client_manager->HandleConnections();
+
+      auto event = client_manager->PopAndGetOldestEvent();
+      if (event != nullptr) {
+        if (event->GetType() == communication::connection_layer::EventType::PAYLOAD) {
+          Change change(std::dynamic_pointer_cast<communication::connection_layer::PayloadEvent>(event)->GetPayload());
+          if (change.GetChangeType() == ChangeType::SET_WORLD) {
+            auto iterator = change.payload.begin();
+            ++iterator;
+            world.Update(World::Deserialize(iterator));
+          } else {
+            throw std::runtime_error("Unexpected ChangeType");
+          }
+        }
+      }
     }
   }
 }
@@ -31,23 +66,49 @@ void GameClient::ProcessInput() {
   coordinate_distance_t movement(0, 0);
 
   if (terminal->HasInput()) {
-    keypress = terminal->GetInput();
-    switch (keypress) {
-      case KEY_W:
+    int keypress = terminal->GetInput();
+    switch (static_cast<KeyCode>(keypress)) {
+      case KeyCode::W: {
         movement.Set(0, -1);
+        if (multiplayer) {
+          Change change(ChangeType::MOVE_UP);
+          client_manager->SendDataToConnection(communication::ProtocolDefinition::server_partner_id, change.payload);
+        }
         break;
-      case KEY_A:
+      }
+      case KeyCode::A: {
         movement.Set(-1, 0);
+        if (multiplayer) {
+          Change change(ChangeType::MOVE_LEFT);
+          client_manager->SendDataToConnection(communication::ProtocolDefinition::server_partner_id, change.payload);
+        }
         break;
-      case KEY_S:
+      }
+      case KeyCode::S: {
         movement.Set(0, 1);
+        if (multiplayer) {
+          Change change(ChangeType::MOVE_DOWN);
+
+          client_manager->SendDataToConnection(communication::ProtocolDefinition::server_partner_id, change.payload);
+        }
         break;
-      case KEY_D:
+      }
+      case KeyCode::D: {
         movement.Set(1, 0);
+        if (multiplayer) {
+          Change change(ChangeType::MOVE_RIGHT);
+
+          client_manager->SendDataToConnection(communication::ProtocolDefinition::server_partner_id, change.payload);
+        }
         break;
+      }
+      case KeyCode::ESCAPE:
+        keep_running = false;
+      default:
+        return;
     }
 
-    if (keypress) {
+    if (!multiplayer) {
       Position new_position = player.position + movement;
 
       if (new_position.x < 0) {

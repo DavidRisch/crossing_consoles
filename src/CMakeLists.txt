@@ -1,13 +1,16 @@
 add_library(crossing_consoles_lib
 
         game/GameClient.cpp
-        game/Player.cpp
-        game/Position.cpp
-        game/World.cpp
-        game/Wall.cpp
-        game/Renderer.cpp
-        game/Compositor.cpp
-        game/Sprite.cpp
+        game/world/Player.cpp
+        game/common/Position.cpp
+        game/world/World.cpp
+        game/world/Wall.cpp
+        game/visual/Renderer.cpp
+        game/visual/Compositor.cpp
+        game/visual/Sprite.cpp
+        game/GameServer.cpp
+        game/world/WorldGenerator.cpp
+        game/networking/Change.cpp
 
         game/terminal/RealTerminal.cpp
         game/terminal/MockTerminal.cpp
@@ -51,7 +54,13 @@ add_library(crossing_consoles_lib
 add_executable(crossing_consoles_main_server
         main_server.cpp)
 target_link_libraries(crossing_consoles_main_server crossing_consoles_lib)
+if (WIN32)
+    target_link_libraries(crossing_consoles_main_server ws2_32)
+endif (WIN32)
 
 add_executable(crossing_consoles_main_client
         main_client.cpp)
 target_link_libraries(crossing_consoles_main_client crossing_consoles_lib)
+if (WIN32)
+    target_link_libraries(crossing_consoles_main_client ws2_32)
+endif (WIN32)

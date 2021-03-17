@@ -1,6 +1,8 @@
 #ifndef CROSSING_CONSOLES_SYMBOLS_H
 #define CROSSING_CONSOLES_SYMBOLS_H
 
+namespace game::visual {
+
 namespace symbols {
 const wchar_t box_drawings_double_horizontal = L'\u2550';
 const wchar_t box_drawings_double_vertical = L'\u2551';
@@ -12,5 +14,7 @@ const wchar_t box_drawings_double_vertical_and_right = L'\u2560';
 const wchar_t box_drawings_double_vertical_and_left = L'\u2563';
 const wchar_t full_block = L'\u2588';
 }  // namespace symbols
+
+}  // namespace game::visual
 
 #endif  // CROSSING_CONSOLES_SYMBOLS_H

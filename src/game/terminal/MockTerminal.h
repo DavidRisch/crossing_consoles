@@ -5,6 +5,8 @@
 
 #include "ITerminal.h"
 
+namespace game::terminal {
+
 /**
  * \brief Used for simulating input and capturing output during testing.
  */
@@ -23,5 +25,7 @@ class MockTerminal : public ITerminal {
   std::wstring last_output;
   std::wstring unused_inputs;
 };
+
+}  // namespace game::terminal
 
 #endif  // CROSSING_CONSOLES_MOCK_TERMINAL_H

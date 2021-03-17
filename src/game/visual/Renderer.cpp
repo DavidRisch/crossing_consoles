@@ -5,7 +5,11 @@
 #include "Sprite.h"
 #include "symbols.h"
 
-using namespace symbols;
+using namespace game;
+using namespace game::common;
+using namespace game::world;
+using namespace game::visual;
+using namespace game::visual::symbols;
 
 Sprite wall_sprite = Sprite(std::wstring(2, full_block) + L"\n" + std::wstring(2, full_block));
 Sprite player_sprite = Sprite(L"JL\n/\\");

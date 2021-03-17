@@ -1,5 +1,8 @@
 #include "MockTerminal.h"
 
+using namespace game;
+using namespace game::terminal;
+
 bool MockTerminal::HasInput() {
   return !unused_inputs.empty();
 }
