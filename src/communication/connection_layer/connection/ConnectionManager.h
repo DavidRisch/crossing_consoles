@@ -39,7 +39,7 @@ class ConnectionManager {
   /**
    * \brief Send message to specified client.
    */
-  void SendMessageToConnection(partner_id_t partner_id, std::shared_ptr<message_layer::Message> msg);
+  void SendMessageToConnection(partner_id_t partner_id, const std::shared_ptr<message_layer::Message>& msg);
 
   /**
    * \brief Needs to be implemented on Server and Client side separately.

@@ -106,7 +106,8 @@ void ConnectionManager::ReceiveMessages() {
   }
 }
 
-void ConnectionManager::SendMessageToConnection(partner_id_t partner_id, std::shared_ptr<message_layer::Message> msg) {
+void ConnectionManager::SendMessageToConnection(partner_id_t partner_id,
+                                                const std::shared_ptr<message_layer::Message>& msg) {
   auto connection_it = connection_map.find(partner_id);
   if (connection_it == connection_map.end()) {
     throw UnknownPartnerException();

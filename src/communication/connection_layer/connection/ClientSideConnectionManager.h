@@ -16,6 +16,16 @@ class ClientSideConnectionManager : public ConnectionManager {
    */
   void HandleConnections() override;
 
+  /**
+   * \brief Send a Message from a Client to the Server
+   */
+  void SendMessageToServer(const std::shared_ptr<message_layer::Message>& msg);
+
+  /**
+   * \brief Send data from a Client to the Server
+   */
+  void SendDataToServer(std::vector<uint8_t> data);
+
  private:
   ClientSideConnectionManager(ProtocolDefinition::timeout_t timeout);
 
