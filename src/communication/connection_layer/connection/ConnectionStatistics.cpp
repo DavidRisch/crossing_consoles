@@ -10,9 +10,9 @@ using namespace communication::connection_layer;
 using namespace communication;
 
 const std::unordered_map<message_layer::MessageType, const std::string>
+    // ConnectionRequest and ConnectionResponse messages are ignored
+
     ConnectionStatistics::map_message_type_to_string = {
-        {message_layer::MessageType::CONNECTION_REQUEST, "CONNECTION_REQUEST"},
-        {message_layer::MessageType::CONNECTION_RESPONSE, "CONNECTION_RESPONSE"},
         {message_layer::MessageType::CONNECTION_RESET, "CONNECTION_RESET"},
         {message_layer::MessageType::ACKNOWLEDGE, "ACKNOWLEDGE"},
         {message_layer::MessageType::PAYLOAD, "PAYLOAD"},
@@ -30,38 +30,16 @@ ConnectionStatistics::ConnectionStatistics() {
   connection_start_time = std::chrono::steady_clock::now();
 }
 
-// TODO: Include messages from Handshake
 void ConnectionStatistics::AddReceivedMessage(const message_layer::Message& message) {
-  received_message_count++;
-  if (message.GetMessageType() == message_layer::MessageType::ACKNOWLEDGE) {
-    received_acknowledge_count++;
-  }
-
-  if (received_message_map.find(message.GetMessageType()) == received_message_map.end()) {
-    received_message_map.insert_or_assign(message.GetMessageType(), 1);
-  } else {
-    auto value = received_message_map.find(message.GetMessageType());
-    value->second++;
-  }
+  UpdateStatisticData(received_message_statistics, message);
 }
 
-// TODO: Include messages from Handshake
 void ConnectionStatistics::AddSentMessage(const message_layer::Message& message) {
-  sent_message_count++;
+  UpdateStatisticData(sent_message_statistics, message);
 
-  if (message.GetMessageType() == message_layer::MessageType::ACKNOWLEDGE) {
-    sent_acknowledge_count++;
-  } else {
-    // TODO: Acknowledge ConnectionResetMessage
-    if (message.GetMessageType() != message_layer::MessageType::CONNECTION_RESET)
-      sent_message_list.push_back(message);
-  }
-
-  if (sent_message_map.find(message.GetMessageType()) == sent_message_map.end()) {
-    sent_message_map.insert_or_assign(message.GetMessageType(), 1);
-  } else {
-    auto value = sent_message_map.find(message.GetMessageType());
-    value->second++;
+  // Sent acknowledges and reset messages can not be used to measure response time
+  if (message.GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
+    sent_message_list.push_back(message);
   }
 }
 
@@ -97,12 +75,12 @@ void ConnectionStatistics::PrintMapStatistics() {
     int sent_entry = 0;
     int received_entry = 0;
 
-    if (sent_message_map.find(entry.first) != sent_message_map.end()) {
-      sent_entry = (sent_message_map.find(entry.first))->second;
+    if (sent_message_statistics.map.find(entry.first) != sent_message_statistics.map.end()) {
+      sent_entry = (sent_message_statistics.map.find(entry.first))->second;
     }
 
-    if (received_message_map.find(entry.first) != received_message_map.end()) {
-      received_entry = (received_message_map.find(entry.first))->second;
+    if (received_message_statistics.map.find(entry.first) != received_message_statistics.map.end()) {
+      received_entry = (received_message_statistics.map.find(entry.first))->second;
     }
 
     // calculate column width for better formatting
@@ -113,15 +91,35 @@ void ConnectionStatistics::PrintMapStatistics() {
   }
 
   std::cout << std::setfill('-') << std::setw(45) << "\n";
-  std::cout << std::setfill(' ') << "SUM" << std::setw(27) << sent_message_count << std::setw(8)
-            << received_message_count << "\n";
+  std::cout << std::setfill(' ') << "SUM" << std::setw(27) << sent_message_statistics.count << std::setw(8)
+            << received_message_statistics.count << "\n";
 }
 
 void ConnectionStatistics::CalculatePackageLoss() {
-  package_loss = (sent_message_count - sent_acknowledge_count) - received_acknowledge_count;
+  // get number of sent acknowledges
+  auto sent_acknowledge_entry = sent_message_statistics.map.find(message_layer::MessageType::ACKNOWLEDGE);
+  message_count_t sent_acknowledge_count = 0;
+  if (sent_acknowledge_entry != sent_message_statistics.map.end()) {
+    sent_acknowledge_count = sent_acknowledge_entry->second;
+  }
+
+  // get number of received acknowledges
+  auto received_acknowledge_entry = received_message_statistics.map.find(message_layer::MessageType::ACKNOWLEDGE);
+  message_count_t received_acknowledge_count = 0;
+  if (received_acknowledge_entry != received_message_statistics.map.end()) {
+    received_acknowledge_count = received_acknowledge_entry->second;
+  }
+
+  package_loss = (sent_message_statistics.count - sent_acknowledge_count) - received_acknowledge_count;
+
+  // a negative package loss is not possible
+  assert(package_loss >= 0);
 
   if (package_loss != 0) {
-    package_loss_percentage = static_cast<double>(package_loss) / (sent_message_count - sent_acknowledge_count) * 100;
+    package_loss_percentage =
+        static_cast<double>(package_loss) / (sent_message_statistics.count - sent_acknowledge_count) * 100;
+  } else {
+    package_loss_percentage = 0;
   }
 }
 
@@ -143,8 +141,10 @@ double ConnectionStatistics::CalculateAverageResponseTime() {
   std::chrono::duration<int64_t, std::micro> sum = std::chrono::microseconds(0);
   for (auto& message : sent_message_list) {
     auto meta_data = message.GetMessageMetaData();
-    sum += std::chrono::duration_cast<std::chrono::microseconds>(meta_data.GetTimestampReceived() -
-                                                                 meta_data.GetTimestampSent());
+    if (meta_data.GetTimestampReceived().has_value()) {
+      sum += std::chrono::duration_cast<std::chrono::microseconds>(*meta_data.GetTimestampReceived() -
+                                                                   *meta_data.GetTimestampSent());
+    }
   }
   return (static_cast<double>(sum.count()) / sent_message_list.size()) / 1000;
 }
@@ -161,4 +161,19 @@ double ConnectionStatistics::CalculateUptime() {
 
 void ConnectionStatistics::PrintUptime() {
   std::cout << "Uptime: " << CalculateUptime() << " ms\n";
+}
+void ConnectionStatistics::UpdateStatisticData(MessageStatisticData& message_statistics,
+                                               const message_layer::Message& message) {
+  assert(message.GetMessageType() != message_layer::MessageType::CONNECTION_RESPONSE);
+  assert(message.GetMessageType() != message_layer::MessageType::CONNECTION_REQUEST);
+
+  message_statistics.count++;
+
+  // increment counter for MessageType of message
+  if (message_statistics.map.find(message.GetMessageType()) == message_statistics.map.end()) {
+    message_statistics.map.insert_or_assign(message.GetMessageType(), 1);
+  } else {
+    auto value = message_statistics.map.find(message.GetMessageType());
+    value->second++;
+  }
 }
