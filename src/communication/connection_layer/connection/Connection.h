@@ -7,7 +7,7 @@
 #include "../../message_layer/message/Message.h"
 #include "../../message_layer/message_stream/MessageInputStream.h"
 #include "../../message_layer/message_stream/MessageOutputStream.h"
-#include "ConnectionStatistics.h"
+#include "statistics/ConnectionStatistics.h"
 
 namespace communication {
 namespace connection_layer {

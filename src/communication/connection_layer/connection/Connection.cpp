@@ -9,6 +9,7 @@
 #include "../../message_layer/message/ConnectionRequestMessage.h"
 #include "../../message_layer/message/ConnectionResponseMessage.h"
 #include "ConnectionManager.h"
+#include "statistics/StatisticPrinter.h"
 
 using namespace communication;
 using namespace communication::connection_layer;
@@ -204,5 +205,5 @@ void Connection::Handle() {
 }
 
 void Connection::PrintStatistics() {
-  statistics.PrintStatistics();
+  StatisticPrinter::PrintStatistics(statistics);
 }
