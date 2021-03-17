@@ -125,8 +125,6 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
 
   auto received_message = message_input_stream->ReceiveMessage(false);
 
-  // TODO: Set MetaData
-
   if (received_message != nullptr) {
     received_message->SetTimestampReceived(std::chrono::steady_clock::now());
     statistics.AddReceivedMessage(*received_message);
@@ -139,6 +137,10 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
       if (acknowledge_message->GetAcknowledgedMessageSequence() != last_send_sequence) {
         throw BadAcknowledgeException();
       }
+
+      // set timestamp_received for the last message that was sent after receiving the correct acknowledge
+      statistics.SetReceivedTimestampForSentMessage(last_send_sequence);
+
       state = ConnectionState::READY;
     } else {
       // Send acknowledge for every received message except for other acknowledges
