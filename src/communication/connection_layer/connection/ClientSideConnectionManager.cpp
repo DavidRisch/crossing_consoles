@@ -1,6 +1,7 @@
 #include "ClientSideConnectionManager.h"
 
 #include <iostream>
+#include <utility>
 
 using namespace communication;
 using namespace connection_layer;
@@ -31,4 +32,12 @@ void ClientSideConnectionManager::HandleConnections() {
 
 partner_id_t ClientSideConnectionManager::GetNextPartnerId() {
   return ProtocolDefinition::server_partner_id;  // constant because only a single server can exist.
+}
+
+void ClientSideConnectionManager::SendMessageToServer(const std::shared_ptr<message_layer::Message>& msg) {
+  SendMessageToConnection(ProtocolDefinition::server_partner_id, msg);
+}
+
+void ClientSideConnectionManager::SendDataToServer(std::vector<uint8_t> data) {
+  SendDataToConnection(ProtocolDefinition::server_partner_id, std::move(data));
 }

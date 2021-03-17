@@ -151,8 +151,8 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
 Connection::Connection(std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
                        std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
                        ConnectionState connection_state, sequence_t sequence_counter, timeout_t timeout)
-    : sequence_counter(sequence_counter)
-    , state(connection_state)
+    : state(connection_state)
+    , sequence_counter(sequence_counter)
     , timeout(timeout)
     , message_input_stream(std::move(message_input_stream))
     , message_output_stream(std::move(message_output_stream)) {
