@@ -19,7 +19,8 @@ class ColoredStringMatrix {
   void SetChar(wchar_t character, Color foreground = WHITE, Color background = BLACK);
   void SetChar(wchar_t character, const Position& position, Color foreground = WHITE, Color background = BLACK);
   void SetString(const std::wstring& string, Color foreground = WHITE, Color background = BLACK);
-  void SetString(const std::wstring& string, const Position& position, Color foreground = WHITE, Color background = BLACK);
+  void SetString(const std::wstring& string, const Position& position, Color foreground = WHITE,
+                 Color background = BLACK);
 
   std::tuple<wchar_t, Color, Color> GetChar();
   std::tuple<wchar_t, Color, Color> GetChar(const Position& position);

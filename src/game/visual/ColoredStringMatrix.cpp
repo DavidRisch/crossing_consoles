@@ -39,7 +39,8 @@ void ColoredStringMatrix::SetString(const std::wstring& string, Color foreground
   }
 }
 
-void ColoredStringMatrix::SetString(const std::wstring& string, const Position& position, Color foreground, Color background) {
+void ColoredStringMatrix::SetString(const std::wstring& string, const Position& position, Color foreground,
+                                    Color background) {
   SetChar(string[0], position, foreground, background);
   for (wchar_t i_string : string.substr(1)) {
     SetChar(i_string, foreground, background);

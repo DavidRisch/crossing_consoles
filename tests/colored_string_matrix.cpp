@@ -89,7 +89,6 @@ TEST(ColoredStringMatrix, SetString) {
   EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L'd', WHITE, BLACK));
 }
 
-
 TEST(ColoredStringMatrix, SetStringWithPosition) {
   ColoredStringMatrix colored_string_matrix(coordinate_size_t(10, 10));
 
