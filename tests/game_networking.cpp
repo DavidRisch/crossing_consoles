@@ -12,7 +12,7 @@ using namespace game::common;
 using namespace game::world;
 using namespace game::terminal;
 
-//class GameNetworking : public ::testing::Test {
+// class GameNetworking : public ::testing::Test {
 // public:
 //  GameNetworking() = default;
 //
@@ -57,7 +57,7 @@ using namespace game::terminal;
 //  }
 //};
 //
-//TEST_F(GameNetworking, NoAction) {
+// TEST_F(GameNetworking, NoAction) {
 //  create_server_and_client();
 //
 //  mock_terminal->AddInput((char)KeyCode::ESCAPE);
@@ -71,7 +71,7 @@ using namespace game::terminal;
 //  ASSERT_FALSE(mock_terminal->GetLastOutput().empty());
 //}
 //
-//TEST_F(GameNetworking, Actions) {
+// TEST_F(GameNetworking, Actions) {
 //  create_server_and_client();
 //
 //  mock_terminal->AddInput((char)KeyCode::W);
