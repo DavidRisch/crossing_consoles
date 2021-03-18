@@ -39,7 +39,7 @@ void GameClient::Run() {
     ProcessInput();
     if (world.updated || player.updated) {
       terminal->SetScreen(compositor->CompositeViewport());
-      std::this_thread::sleep_for(std::chrono::microseconds(500));
+      std::this_thread::sleep_for(std::chrono::microseconds(50));
     }
 
     if (multiplayer) {

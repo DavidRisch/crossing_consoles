@@ -1,6 +1,5 @@
 #include "ColoredStringMatrix.h"
 
-#include <iostream>
 #include <utility>
 
 using namespace game::visual;
@@ -51,8 +50,10 @@ std::tuple<wchar_t, Color, Color> ColoredStringMatrix::GetChar() {
   if (get_current.x == size.x) {
     get_current.x = 0;
     get_current.y++;
+    return std::make_tuple(L'\n', WHITE, BLACK);
+  } else {
+    return GetChar(get_current);
   }
-  return GetChar(get_current);
 }
 
 std::tuple<wchar_t, Color, Color> ColoredStringMatrix::GetChar(const Position& position) {

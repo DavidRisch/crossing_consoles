@@ -1,6 +1,10 @@
 #ifndef CROSSING_CONSOLES_I_TERMINAL_H
 #define CROSSING_CONSOLES_I_TERMINAL_H
 
+#include "../visual/ColoredStringMatrix.h"
+
+using namespace game::visual;
+
 namespace game::terminal {
 
 /**
@@ -21,7 +25,7 @@ class ITerminal {
   /**
    * \brief Clear the screen and set it to the specified content.
    */
-  virtual void SetScreen(const std::wstring &content) = 0;
+  virtual void SetScreen(ColoredStringMatrix content) = 0;
 };
 
 }  // namespace game::terminal

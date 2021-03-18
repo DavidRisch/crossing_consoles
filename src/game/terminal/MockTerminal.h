@@ -15,14 +15,14 @@ class MockTerminal : public ITerminal {
   bool HasInput() override;
   int GetInput() override;
 
-  void SetScreen(const std::wstring &content) override;
+  void SetScreen(ColoredStringMatrix content) override;
 
   void AddInput(char input);
 
-  [[nodiscard]] const std::wstring &GetLastOutput() const;
+  [[nodiscard]] const ColoredStringMatrix &GetLastOutput() const;
 
  private:
-  std::wstring last_output;
+  ColoredStringMatrix last_output;
   std::wstring unused_inputs;
 };
 
