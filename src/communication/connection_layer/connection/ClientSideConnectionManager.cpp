@@ -27,6 +27,9 @@ std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::Create
 }
 
 void ClientSideConnectionManager::HandleConnections() {
+  for (const auto& pair : connection_map) {
+    pair.second.connection->Handle();
+  }
   ReceiveMessages();
 }
 

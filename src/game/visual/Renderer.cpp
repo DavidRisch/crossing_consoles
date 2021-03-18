@@ -1,6 +1,7 @@
 #include "Renderer.h"
 
 #include <algorithm>
+#include <utility>
 
 #include "Sprite.h"
 #include "symbols.h"
@@ -14,16 +15,16 @@ using namespace game::visual::symbols;
 Sprite wall_sprite = Sprite(std::wstring(2, full_block) + L"\n" + std::wstring(2, full_block));
 Sprite player_sprite = Sprite(L"JL\n/\\");
 
-Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size, World& world, Player& player)
-    : block_size(block_size)
-    , viewport_size(viewport_size)
+Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size, World& world, Player& own_player)
+    : block_size(std::move(block_size))
+    , viewport_size(std::move(viewport_size))
     , world(&world)
-    , player(&player) {
+    , own_player(&own_player) {
 }
 
 std::wstring Renderer::RenderWorld() const {
   world->updated = false;
-  player->updated = false;
+  own_player->updated = false;
 
   std::wstring line(viewport_size.x * block_size.x, L' ');
   line += L'\n';
@@ -34,9 +35,9 @@ std::wstring Renderer::RenderWorld() const {
 
   coordinate_size_t viewport_size_delta(viewport_size.x / 2, viewport_size.y / 2);
   Position viewport_start =
-      Position(player->position.x - viewport_size_delta.x, player->position.y - viewport_size_delta.y);
+      Position(own_player->position.x - viewport_size_delta.x, own_player->position.y - viewport_size_delta.y);
   Position viewport_end =
-      Position(player->position.x + viewport_size_delta.x, player->position.y + viewport_size_delta.y);
+      Position(own_player->position.x + viewport_size_delta.x, own_player->position.y + viewport_size_delta.y);
 
   coordinate_factor_t negative_repetition = Position(0, 0);
   coordinate_factor_t positive_repetition = Position(1, 1);

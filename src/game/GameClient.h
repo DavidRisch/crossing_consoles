@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "../communication/connection_layer/connection/ClientSideConnectionManager.h"
+#include "networking/Change.h"
 #include "terminal/ITerminal.h"
 #include "visual/Compositor.h"
 #include "world/Player.h"
@@ -15,14 +16,18 @@ enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' 
 
 class GameClient {
  public:
-  GameClient(const std::shared_ptr<world::Player>& player, const std::shared_ptr<terminal::ITerminal>& terminal,
-             const common::coordinate_size_t& world_size, bool multiplayer = false);
+  GameClient(
+      const std::shared_ptr<world::Player>& player, const std::shared_ptr<terminal::ITerminal>& terminal,
+      const common::coordinate_size_t& world_size, bool multiplayer = false,
+      communication::ProtocolDefinition::timeout_t communication_timeout = communication::ProtocolDefinition::timeout);
 
   void Run();
   void ProcessInput();
 
+  const world::World& GetWorld() const;
+
  private:
-  std::shared_ptr<world::Player> player;
+  std::weak_ptr<world::Player> weak_player;
   world::World world;
   std::shared_ptr<terminal::ITerminal> terminal;
   std::unique_ptr<visual::Compositor> compositor;

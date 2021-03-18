@@ -1,5 +1,6 @@
 #include "World.h"
 
+#include <algorithm>
 #include <cassert>
 #include <utility>
 
@@ -8,7 +9,8 @@ using namespace game::common;
 using namespace game::world;
 
 World::World(coordinate_size_t size)
-    : size(std::move(size)) {
+    : size(std::move(size))
+    , spawner(this) {
 }
 
 void World::AddPlayer(const std::shared_ptr<Player>& player) {
@@ -30,7 +32,16 @@ void World::AddWall(const Position& position) {
 }
 
 bool World::IsBlocked(const Position& position) {
-  return walls.find(position) != walls.end();
+  if (walls.find(position) != walls.end()) {
+    return true;
+  }
+
+  if (std::any_of(players.begin(), players.end(),
+                  [&position](const std::shared_ptr<Player>& player) { return player->position == position; })) {
+    return true;
+  }
+
+  return false;
 }
 
 void World::Update(const World& server_world) {
@@ -38,14 +49,41 @@ void World::Update(const World& server_world) {
 
   walls = server_world.walls;
 
-  // TODO: more advanced setup require to handle multiple players
-  assert(players.size() == 1);
-  if (!server_world.players.empty()) {
-    assert(server_world.players.size() == 1);
-    players.front() = server_world.players.front();
+  for (const auto& server_player : server_world.players) {
+    auto player_id = server_player->player_id;
+    auto client_player = GetPlayerById(player_id);
+    if (client_player == nullptr) {
+      // add new player
+      players.push_back(server_player);
+    } else {
+      // modify existing player
+      assert(client_player->player_id == server_player->player_id);
+      *client_player = *server_player;
+    }
   }
 
+  // remove players no longer on the server
+  players.end() =
+      std::remove_if(players.begin(), players.end(), [&server_world](const std::shared_ptr<Player>& player) {
+        return server_world.GetPlayerById(player->player_id) == nullptr;
+      });
+
   updated = true;
+}
+
+std::shared_ptr<Player> World::GetPlayerById(int player_id) const {
+  auto client_player_it =
+      std::find_if(players.begin(), players.end(),
+                   [&player_id](const std::shared_ptr<Player>& player) { return player->player_id == player_id; });
+  if (client_player_it != players.end()) {
+    return *client_player_it;
+  } else {
+    return std::shared_ptr<Player>();
+  }
+}
+
+const Spawner& World::GetSpawner() const {
+  return spawner;
 }
 
 void World::Serialize(std::vector<uint8_t>& output_vector) const {
@@ -71,7 +109,7 @@ World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
 
   auto player_count = ISerializable::DeserializeContainerLength(input_iterator);
   for (size_t i = 0; i < player_count; ++i) {
-    auto player = std::make_shared<Player>(Player::Deserialize(input_iterator));  // TODO: fix memory leak
+    auto player = std::make_shared<Player>(Player::Deserialize(input_iterator));
     world.AddPlayer(player);
   }
 
