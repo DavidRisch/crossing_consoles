@@ -55,9 +55,16 @@ void RealTerminal::SetScreen(ColoredStringMatrix content) {
     character = content.GetChar();
   }
 #else
-  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-  std::string narrow = converter.to_bytes(content);
-  printf("%s", narrow.c_str());
+  std::tuple<wchar_t, Color, Color> character = content.GetChar();
+  while (std::get<0>(character) != L'\0') {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::string narrow = converter.to_bytes(std::wstring(1, std::get<0>(character)));
+    printf("\033[%d;%dm", std::get<1>(character), std::get<2>(character) + BACKGROUND_COLOR_OFFSET);
+    printf("%s", narrow.c_str());
+    printf("\033[0m");
+    character = content.GetChar();
+  }
+
 #endif
 }
 

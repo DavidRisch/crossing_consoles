@@ -20,7 +20,6 @@ enum Color {
   BRIGHT_MAGENTA,
   BRIGHT_YELLOW,
   BRIGHT_WHITE
-};
 #else
 enum Color {
   BLACK = 30,
@@ -40,6 +39,8 @@ enum Color {
   BRIGHT_CYAN,
   BRIGHT_WHITE
 };
+
+#define BACKGROUND_COLOR_OFFSET 10
 #endif
 }  // namespace game::terminal::colors
 
