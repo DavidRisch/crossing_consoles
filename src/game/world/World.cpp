@@ -1,5 +1,6 @@
 #include "World.h"
 
+#include <algorithm>
 #include <cassert>
 #include <utility>
 
@@ -8,7 +9,8 @@ using namespace game::common;
 using namespace game::world;
 
 World::World(coordinate_size_t size)
-    : size(std::move(size)) {
+    : size(std::move(size))
+    , spawner(this) {
 }
 
 void World::AddPlayer(const std::shared_ptr<Player>& player) {
@@ -30,7 +32,16 @@ void World::AddWall(const Position& position) {
 }
 
 bool World::IsBlocked(const Position& position) {
-  return walls.find(position) != walls.end();
+  if (walls.find(position) != walls.end()) {
+    return true;
+  }
+
+  if (std::any_of(players.begin(), players.end(),
+                  [&position](const std::shared_ptr<Player>& player) { return player->position == position; })) {
+    return true;
+  }
+
+  return false;
 }
 
 void World::Update(const World& server_world) {
@@ -46,6 +57,10 @@ void World::Update(const World& server_world) {
   }
 
   updated = true;
+}
+
+const Spawner& World::GetSpawner() const {
+  return spawner;
 }
 
 void World::Serialize(std::vector<uint8_t>& output_vector) const {

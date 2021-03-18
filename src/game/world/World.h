@@ -8,6 +8,7 @@
 
 #include "../common/Position.h"
 #include "Player.h"
+#include "Spawner.h"
 #include "Wall.h"
 
 namespace game::world {
@@ -31,9 +32,14 @@ class World : public networking::ISerializable {
    */
   void Update(const World& server_world);
 
+  const Spawner& GetSpawner() const;
+
   void Serialize(std::vector<uint8_t>& output_vector) const override;
 
   static World Deserialize(std::vector<uint8_t>::iterator& input_iterator);
+
+ private:
+  Spawner spawner;
 };
 
 }  // namespace game::world
