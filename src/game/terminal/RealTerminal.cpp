@@ -64,7 +64,6 @@ void RealTerminal::SetScreen(ColoredStringMatrix content) {
     printf("\033[0m");
     character = content.GetChar();
   }
-
 #endif
 }
 

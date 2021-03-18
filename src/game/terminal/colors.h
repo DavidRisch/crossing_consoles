@@ -20,6 +20,7 @@ enum Color {
   BRIGHT_MAGENTA,
   BRIGHT_YELLOW,
   BRIGHT_WHITE
+};
 #else
 enum Color {
   BLACK = 30,
