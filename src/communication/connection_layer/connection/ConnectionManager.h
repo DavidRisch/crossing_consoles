@@ -53,8 +53,8 @@ class ConnectionManager {
   void AddConnection(const std::shared_ptr<Connection>& connection);
 
   /**
-   * \brief Notify communication partner and call `RemoveConnection`.
-   * \details Send ResetConnection message, queue disconnect event and close connection
+   * \brief Notify connection partner that connection will be closed,
+   * \details Send ResetConnection message, wait for acknowledge message before actually closing the connection.
    */
   void CloseConnection(partner_id_t partner_id);
 
