@@ -11,7 +11,7 @@ using namespace game::world;
 using namespace game::terminal;
 
 TEST(Game, NoAction) {
-  Player player("player name", Position(2, 2));
+  auto player = std::make_shared<Player>("player name", Position(2, 2));
   World world(coordinate_size_t(5, 5));
   world.AddWall(Position(4, 4));
 
@@ -25,7 +25,7 @@ TEST(Game, NoAction) {
 }
 
 TEST(Game, Actions) {
-  Player player("player name", Position(2, 2));
+  auto player = std::make_shared<Player>("player name", Position(2, 2));
   World world(coordinate_size_t(5, 5));
   world.AddWall(Position(4, 4));
 

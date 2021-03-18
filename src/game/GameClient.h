@@ -15,14 +15,14 @@ enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' 
 
 class GameClient {
  public:
-  GameClient(world::Player player, std::shared_ptr<terminal::ITerminal> terminal,
-             const common::coordinate_size_t& world, bool multiplayer = false);
+  GameClient(const std::shared_ptr<world::Player>& player, const std::shared_ptr<terminal::ITerminal>& terminal,
+             const common::coordinate_size_t& world_size, bool multiplayer = false);
 
   void Run();
   void ProcessInput();
 
  private:
-  world::Player player;
+  std::shared_ptr<world::Player> player;
   world::World world;
   std::shared_ptr<terminal::ITerminal> terminal;
   std::unique_ptr<visual::Compositor> compositor;

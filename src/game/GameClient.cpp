@@ -1,8 +1,8 @@
 #include "GameClient.h"
 
+#include <cassert>
 #include <chrono>
 #include <thread>
-#include <utility>
 
 #include "../communication/connection_layer/event/PayloadEvent.h"
 #include "networking/Change.h"
@@ -16,28 +16,31 @@ using namespace game::terminal;
 using namespace game::networking;
 using namespace game::visual;
 
-GameClient::GameClient(Player player, std::shared_ptr<ITerminal> terminal, const coordinate_size_t& world_size,
-                       bool multiplayer)
-    : player(std::move(player))
+GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_ptr<ITerminal>& terminal,
+                       const coordinate_size_t& world_size, bool multiplayer)
+    : player(player)
     , world(world_size)
-    , terminal(std::move(terminal))
+    , terminal(terminal)
     , multiplayer(multiplayer) {
-  this->world.AddPlayer(&this->player);
+  assert(player != nullptr);
+  assert(terminal != nullptr);
+
   coordinate_size_t viewport_size = Position(51, 25);
-  compositor = std::make_unique<Compositor>(viewport_size, this->world, this->player);
+  compositor = std::make_unique<Compositor>(viewport_size, this->world, *this->player);
 
   if (multiplayer) {
     client_manager = communication::connection_layer::ClientSideConnectionManager::CreateClientSide();
   } else {
     world = *WorldGenerator::GenerateWorld(world_size);
-    world.AddPlayer(&this->player);
   }
+
+  world.AddPlayer(player);
 }
 
 void GameClient::Run() {
   while (keep_running) {
     ProcessInput();
-    if (world.updated || player.updated) {
+    if (world.updated || player->updated) {
       terminal->SetScreen(compositor->CompositeViewport());
       std::this_thread::sleep_for(std::chrono::microseconds(500));
     }
@@ -109,7 +112,7 @@ void GameClient::ProcessInput() {
     }
 
     if (!multiplayer) {
-      Position new_position = player.position + movement;
+      Position new_position = player->position + movement;
 
       if (new_position.x < 0) {
         new_position.x += world.size.x;
@@ -122,8 +125,8 @@ void GameClient::ProcessInput() {
         new_position.y -= world.size.y;
       }
 
-      if (new_position != player.position && !world.IsBlocked(new_position)) {
-        player.MoveTo(new_position);
+      if (new_position != player->position && !world.IsBlocked(new_position)) {
+        player->MoveTo(new_position);
       }
     }
   }
