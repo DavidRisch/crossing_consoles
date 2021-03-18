@@ -12,8 +12,8 @@ Compositor::Compositor(coordinate_size_t viewport_size, World &world, Player &pl
     : viewport_size(viewport_size)
     , world(&world)
     , player(&player) {
-  renderer = std::make_unique<Renderer>(viewport_size, block_size, composited_viewport_overhang,
-                                        rendered_viewport_offset, world, player);
+  renderer = std::make_unique<Renderer>(viewport_size, block_size, world, player, composited_viewport_overhang,
+                                        rendered_viewport_offset);
 }
 
 ColoredStringMatrix Compositor::CompositeViewport() const {

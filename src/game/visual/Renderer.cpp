@@ -15,15 +15,15 @@ using namespace game::visual::symbols;
 Sprite wall_sprite = Sprite(std::wstring(2, light_shade) + L"\n" + std::wstring(2, light_shade));
 Sprite player_sprite = Sprite(L"><\n/\\");
 
-Renderer::Renderer(common::coordinate_size_t viewport_size, common::coordinate_size_t block_size,
-                   common::coordinate_size_t composited_viewport_overhang,
-                   common::coordinate_size_t rendered_viewport_offset, World& world, Player& player)
+Renderer::Renderer(common::coordinate_size_t viewport_size, common::coordinate_size_t block_size, World& world,
+                   Player& player, common::coordinate_size_t composited_viewport_overhang,
+                   common::coordinate_size_t rendered_viewport_offset)
     : block_size(std::move(block_size))
     , viewport_size(std::move(viewport_size))
-    , composited_viewport_overhang(std::move(composited_viewport_overhang))
-    , rendered_viewport_offset(std::move(rendered_viewport_offset))
     , world(&world)
-    , player(&player) {
+    , player(&player)
+    , composited_viewport_overhang(std::move(composited_viewport_overhang))
+    , rendered_viewport_offset(std::move(rendered_viewport_offset)) {
 }
 
 ColoredStringMatrix Renderer::RenderWorld() const {
