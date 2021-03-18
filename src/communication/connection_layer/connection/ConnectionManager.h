@@ -64,6 +64,11 @@ class ConnectionManager {
   std::shared_ptr<Event> PopAndGetOldestEvent();
 
   /**
+   * \brief False if 'connection_map` is empty.
+   */
+  bool HasConnections();
+
+  /**
    * \brief Thrown if timeout occurred.
    */
   class TimeoutException : public std::exception {

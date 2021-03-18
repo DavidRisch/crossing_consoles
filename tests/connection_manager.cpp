@@ -322,6 +322,7 @@ TEST_F(ConnectionManagers, ClientConnectionReset) {
 
   ASSERT_TRUE(counter > 0);
   ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
+  ASSERT_FALSE(client_manager->HasConnections());
 }
 
 TEST_F(ConnectionManagers, ServerConnectionReset) {
@@ -339,7 +340,7 @@ TEST_F(ConnectionManagers, ServerConnectionReset) {
     auto event = client_manager->PopAndGetOldestEvent();
     if (event) {
       ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
-      ASSERT_NO_THROW(client_manager->HandleConnections());
+      ASSERT_FALSE(client_manager->HasConnections());
       break;
     }
     count--;

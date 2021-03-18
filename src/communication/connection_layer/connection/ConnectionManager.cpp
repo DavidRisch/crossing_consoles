@@ -125,3 +125,7 @@ void ConnectionManager::CloseConnection(partner_id_t partner_id) {
   auto reset_msg = std::make_shared<message_layer::ConnectionResetMessage>();
   SendMessageToConnection(partner_id, reset_msg);
 }
+
+bool ConnectionManager::HasConnections() {
+  return !connection_map.empty();
+}
