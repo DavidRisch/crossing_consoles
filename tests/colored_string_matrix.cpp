@@ -17,8 +17,10 @@ TEST(ColoredStringMatrix, GetCharRepeated) {
 
   EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L' ', WHITE, BLACK));
   EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L' ', WHITE, BLACK));
+  EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L'\n', WHITE, BLACK));
   EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L' ', WHITE, BLACK));
   EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L' ', WHITE, BLACK));
+  EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L'\n', WHITE, BLACK));
   EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L'\0', WHITE, BLACK));
   EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L'\0', WHITE, BLACK));
 }
@@ -42,8 +44,10 @@ TEST(ColoredStringMatrix, SetCharRepeated) {
 
   EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L'a', WHITE, BLACK));
   EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L'b', WHITE, BLACK));
+  EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L'\n', WHITE, BLACK));
   EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L'c', WHITE, BLACK));
   EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L'd', WHITE, BLACK));
+  EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L'\n', WHITE, BLACK));
   EXPECT_EQ(colored_string_matrix.GetChar(), std::make_tuple(L'\0', WHITE, BLACK));
 }
 

@@ -18,18 +18,14 @@ TEST(Renderer, EmptyWorld) {
   World world = World(world_size);
   Renderer renderer(viewport_size, block_size, world, player);
 
-  std::wstring rendered_world = renderer.RenderWorld();
+  ColoredStringMatrix rendered_world = renderer.RenderWorld();
 
-  ASSERT_TRUE((int)rendered_world.size() == (viewport_size.x * block_size.x + 1) * viewport_size.y * block_size.y);
-
-  int n;
   for (int y = 0; y < viewport_size.y * block_size.y; y++) {
     for (int x = 0; x < viewport_size.x * block_size.x + 1; x++) {
-      n = (viewport_size.x * block_size.x + 1) * y + x;
       if (x == viewport_size.x * block_size.x) {
-        EXPECT_EQ(rendered_world[n], L'\n');
+        EXPECT_EQ(rendered_world.GetChar(), std::make_tuple(L'\n', WHITE, BLACK));
       } else {
-        EXPECT_EQ(rendered_world[n], L' ');
+        EXPECT_EQ(rendered_world.GetChar(), std::make_tuple(L' ', WHITE, BLACK));
       }
     }
   }
