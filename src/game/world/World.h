@@ -32,6 +32,8 @@ class World : public networking::ISerializable {
    */
   void Update(const World& server_world);
 
+  std::shared_ptr<Player> GetPlayerById(int player_id) const;
+
   const Spawner& GetSpawner() const;
 
   void Serialize(std::vector<uint8_t>& output_vector) const override;

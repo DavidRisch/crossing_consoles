@@ -14,12 +14,16 @@ namespace game {
  */
 class GameServer {
  public:
-  explicit GameServer(const common::coordinate_size_t &world_size);
+  explicit GameServer(
+      const common::coordinate_size_t &world_size,
+      communication::ProtocolDefinition::timeout_t communication_timeout = communication::ProtocolDefinition::timeout);
 
   /**
    * \brief Handle connections to `GameClient`s. Should be called in a loop.
    */
   void RunIteration();
+
+  const world::World &GetWorld() const;
 
  private:
   /**
@@ -28,14 +32,14 @@ class GameServer {
   void HandleEvent(const std::shared_ptr<communication::connection_layer::Event> &event);
 
   /**
-   * \brief Handle a `Change` sent by a `GameClient`.
+   * \brief Handle a `Change` sent by a `GameClient` controlling the specific player.
    */
-  void HandleChange(const networking::Change &change);
+  void HandleChange(const std::shared_ptr<world::Player> &player, const networking::Change &change);
 
   /**
    * Move the player with the given `movement`.
    */
-  void MovePlayer(const common::coordinate_distance_t &movement);
+  void MovePlayer(const std::shared_ptr<world::Player> &player, const common::coordinate_distance_t &movement);
 
   std::shared_ptr<world::World> world;
 
@@ -43,7 +47,7 @@ class GameServer {
 
   /// Used to send world updates at a constant frequency.
   std::chrono::time_point<std::chrono::steady_clock> last_world_sent;
-  static constexpr auto send_world_interval = std::chrono::milliseconds(100);
+  static constexpr auto send_world_interval = std::chrono::milliseconds(10);
 };
 
 }  // namespace game

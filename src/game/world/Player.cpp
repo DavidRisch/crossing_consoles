@@ -7,9 +7,10 @@ using namespace game;
 using namespace game::common;
 using namespace game::world;
 
-Player::Player(std::string name, Position position)
+Player::Player(std::string name, Position position, int player_id)
     : name(std::move(name))
-    , position(position) {
+    , position(std::move(position))
+    , player_id(player_id) {
 }
 
 bool Player::IsAlive() const {
@@ -25,6 +26,8 @@ void Player::Attack() {
 }
 
 void Player::Serialize(std::vector<uint8_t> &output_vector) const {
+  output_vector.push_back(player_id);  // TODO: use 2 Bytes
+
   assert(name.size() <= 255);
   output_vector.push_back(name.size());
   for (const auto &character : name) {
@@ -34,6 +37,8 @@ void Player::Serialize(std::vector<uint8_t> &output_vector) const {
 }
 
 Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
+  int player_id = *input_iterator++;
+
   std::string name;
   auto name_length = *input_iterator++;
   for (int i = 0; i < name_length; ++i) {
@@ -41,5 +46,5 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
   }
   auto position = Position::Deserialize(input_iterator);
 
-  return Player(name, position);
+  return Player(name, position, player_id);
 }

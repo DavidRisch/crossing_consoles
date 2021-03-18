@@ -15,6 +15,7 @@ enum class ChangeType : uint8_t {
   MOVE_LEFT,
 
   // server -> client
+  SET_OWN_ID,
   SET_WORLD,
 
   HIGHEST_ELEMENT = SET_WORLD
