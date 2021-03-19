@@ -13,6 +13,7 @@ void ServerSideConnectionManager::HandleConnections() {
   // Check for and establish new connections
   auto new_client = byte_server->GetNewClient();
   if (new_client != nullptr) {
+    new_client->SetParamCatchSendFailed(false);
     auto message_input_stream = std::make_shared<message_layer::MessageInputStream>(new_client);
     auto message_output_stream = std::make_shared<message_layer::MessageOutputStream>(new_client);
 
