@@ -17,6 +17,8 @@ enum class ConnectionState {
   SERVER_CONNECTION_RESPONSE_SENT,
   READY,
   WAITING_FOR_ACKNOWLEDGE,
+  WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE,
+  CLOSED,
 };
 
 using sequence_t = ProtocolDefinition::sequence_t;
@@ -81,6 +83,9 @@ class Connection {
       return "Bad acknowledge received.";
     }
   };
+
+  /// Returns true if connection is in state `CLOSED`
+  bool ConnectionClosed() const;
 
  private:
   Connection(std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
