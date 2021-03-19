@@ -208,7 +208,8 @@ void Connection::SendAcknowledge(sequence_t acknowledged_msg_sequence) {
 }
 
 void Connection::Handle() {
-  assert(state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE);
+  assert(state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE ||
+         state == ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE);
 
   if (state == ConnectionState::READY) {
     if (!send_message_queue.empty()) {
