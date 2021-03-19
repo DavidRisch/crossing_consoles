@@ -55,9 +55,8 @@ std::shared_ptr<Event> ConnectionManager::PopAndGetOldestEvent() {
 
 void ConnectionManager::ReceiveMessages() {
   // Handle received messages and timeouts
-
-  // remove connections after timeout or acknowledged reset
-  std::list<partner_id_t> connection_remove_list = {};
+  std::list<partner_id_t> connection_reset_list = {};
+  std::list<partner_id_t> connection_close_list = {};
 
   for (auto& connection_entry : connection_map) {
     auto connection = connection_entry.second.connection;
@@ -83,8 +82,7 @@ void ConnectionManager::ReceiveMessages() {
             break;
           }
           case message_layer::MessageType::CONNECTION_RESET: {
-            // acknowledge is already sent to partner_id connection in connection->ReceiveMessage()
-            connection_remove_list.push_back(partner_id);
+            connection_reset_list.push_back(partner_id);
             break;
           }
           default: {
@@ -94,17 +92,16 @@ void ConnectionManager::ReceiveMessages() {
       }
     } while (received_msg != nullptr);
 
-    if (connection->ConnectionClosed()) {
-      // Connection Reset Message was sent previously and is acknowledged by the partner connection
-      connection_remove_list.push_back(partner_id);
-    }
-
     if (std::chrono::steady_clock::now() - connection_entry.second.timestamp_last_received >= timeout) {
-      connection_remove_list.push_back(partner_id);
+      connection_close_list.push_back(partner_id);
     }
   }
+  for (auto& partner_id : connection_close_list) {
+    CloseConnection(partner_id);
+  }
 
-  for (auto& partner_id : connection_remove_list) {
+  for (auto& partner_id : connection_reset_list) {
+    // only called if Connection Reset Message was received, connection can be removed immediately
     RemoveConnection(partner_id);
   }
 }
@@ -122,10 +119,9 @@ void ConnectionManager::SendMessageToConnection(partner_id_t partner_id,
 }
 
 void ConnectionManager::CloseConnection(partner_id_t partner_id) {
+  // notify connection partner
   auto reset_msg = std::make_shared<message_layer::ConnectionResetMessage>();
   SendMessageToConnection(partner_id, reset_msg);
-}
-
-bool ConnectionManager::HasConnections() {
-  return !connection_map.empty();
+  // TODO wait for acknowledge message from partner before calling Reset Connection
+  RemoveConnection(partner_id);
 }
