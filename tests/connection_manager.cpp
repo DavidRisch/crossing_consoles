@@ -8,11 +8,42 @@
 #include "../src/communication/connection_layer/connection/ClientSideConnectionManager.h"
 #include "../src/communication/connection_layer/connection/ServerSideConnectionManager.h"
 #include "../src/communication/connection_layer/event/PayloadEvent.h"
+#include "utils/detect_debugger.h"
 
 using namespace communication;
 using namespace communication::byte_layer;
 using namespace communication::connection_layer;
 using namespace communication::message_layer;
+
+bool CAUGHT_SIGNAL_BROKEN_PIPE = false;
+
+static void broken_pipe_handler(int signum) {
+  // Received signal of type SIGPIPE (Broken pipe)
+  CAUGHT_SIGNAL_BROKEN_PIPE = true;
+}
+
+static void setup_signal_handler() {
+  // setup signal handler to catch and handle signal SIGPIPE
+  // see https://pubs.opengroup.org/onlinepubs/9699919799/functions/sigaction.html
+
+  struct sigaction sa = {};  // sigaction used to handle signal
+  sa.sa_handler = broken_pipe_handler;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = SA_RESETHAND;  // reset to SIG_DFL and the SA_SIGINFO flag on entry to the signal handler
+  sigaction(SIGPIPE, &sa, nullptr);
+}
+
+static void reset_signal_handler() {
+  // reset signal handler to default behaviour
+  // needs to be called after every call of setup_signal_handler to ensure default behaviour in following tests.
+
+  struct sigaction sa = {};
+  sa.sa_handler = SIG_DFL;  // default behaviour
+  sigemptyset(&sa.sa_mask);
+  sigaction(SIGPIPE, &sa, nullptr);
+
+  CAUGHT_SIGNAL_BROKEN_PIPE = false;
+}
 
 class ConnectionManagers : public ::testing::Test {
  public:
@@ -263,6 +294,9 @@ TEST_F(ConnectionManagers, ClientConnectionReset) {
   // Client sends message of type ConnectionResetMessage
   create_server_and_client();
 
+  // setup signal handler to catch signal SIGPIPE and fail test
+  setup_signal_handler();
+
   client_manager->CloseConnection(ProtocolDefinition::server_partner_id);
 
   server_manager->HandleConnections();
@@ -277,6 +311,12 @@ TEST_F(ConnectionManagers, ClientConnectionReset) {
   ASSERT_NE(event, nullptr);
   EXPECT_EQ(event->GetType(), EventType::DISCONNECT);
 
+  // no broken pipe signal should be triggered
+  client_manager->HandleConnections();
+  server_manager->HandleConnections();
+
+  reset_signal_handler();
+
   // all events should have been processed by now
   EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
   EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
@@ -285,6 +325,9 @@ TEST_F(ConnectionManagers, ClientConnectionReset) {
 TEST_F(ConnectionManagers, ServerConnectionReset) {
   // Server sends message of type ConnectionResetMessage
   create_server_and_client();
+
+  // setup signal handler to catch signal SIGPIPE and fail test
+  setup_signal_handler();
 
   // reset Connection
   partner_id_t client_id = 1;  // only 1 client is connected at this point
@@ -301,7 +344,29 @@ TEST_F(ConnectionManagers, ServerConnectionReset) {
   ASSERT_NE(event, nullptr);
   ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
 
+  // no broken pipe signal should be triggered
+  client_manager->HandleConnections();
+  server_manager->HandleConnections();
+
+  reset_signal_handler();
+
   // all events should have been processed by now
   EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
   EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
+}
+
+TEST_F(ConnectionManagers, BrokenPipeSignal) {
+  // test that setup_signal_handler sets new handler for signal SIGPIPE in tests
+
+  if (runningUnderDebugger()) {
+    // signal is not caught in debugging mode
+    return;
+  }
+
+  setup_signal_handler();
+  raise(SIGPIPE);
+  ASSERT_TRUE(CAUGHT_SIGNAL_BROKEN_PIPE);
+
+  reset_signal_handler();
+  ASSERT_FALSE(CAUGHT_SIGNAL_BROKEN_PIPE);
 }

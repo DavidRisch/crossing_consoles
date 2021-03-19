@@ -18,6 +18,7 @@ add_executable(crossing_consoles_test
         player.cpp
         world.cpp
         spawner.cpp
+        utils/detect_debugger.h
         )
 
 target_link_libraries(crossing_consoles_test crossing_consoles_lib)
