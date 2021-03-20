@@ -14,9 +14,9 @@ TEST(Sprite, GetLine1x1) {
 }
 
 TEST(Sprite, GetLine2x1) {
-  Sprite sprite(L"b");
+  Sprite sprite(L"ab");
 
-  ASSERT_EQ(sprite.GetLine(0), L"b");
+  ASSERT_EQ(sprite.GetLine(0), L"ab");
 }
 
 TEST(Sprite, GetLine1x2) {
