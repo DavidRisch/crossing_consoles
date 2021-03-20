@@ -6,7 +6,7 @@
 #include "../common/Position.h"
 #include "../world/Player.h"
 #include "../world/World.h"
-#include "ColoredStringMatrix.h"
+#include "ColoredCharMatrix.h"
 #include "Renderer.h"
 
 namespace game::visual {
@@ -24,7 +24,7 @@ class Compositor {
 
   Compositor(common::coordinate_size_t viewport_size, world::World& world, world::Player& player);
 
-  [[nodiscard]] ColoredStringMatrix CompositeViewport() const;
+  [[nodiscard]] ColoredCharMatrix CompositeViewport() const;
 };
 
 }  // namespace game::visual

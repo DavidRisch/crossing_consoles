@@ -43,26 +43,26 @@ int RealTerminal::GetInput() {
 #endif
 }
 
-void RealTerminal::SetScreen(ColoredStringMatrix content) {
+void RealTerminal::SetScreen(ColoredCharMatrix content) {
   Clear();
 #ifdef _WIN32
   HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
 
-  std::tuple<wchar_t, Color, Color> character = content.GetChar();
-  while (std::get<0>(character) != L'\0') {
-    SetConsoleTextAttribute(console_handle, (std::get<2>(character) << 4) | std::get<1>(character));
-    _cwprintf(std::wstring(1, std::get<0>(character)).c_str());
-    character = content.GetChar();
+  ColoredString colored_string = content.GetString();
+  while (colored_string.string != std::wstring(1, L'\0')) {
+    SetConsoleTextAttribute(console_handle, (colored_string.background << 4) | colored_string.foreground);
+    _cwprintf(colored_string.string.c_str());
+    colored_string = content.GetString();
   }
 #else
-  std::tuple<wchar_t, Color, Color> character = content.GetChar();
-  while (std::get<0>(character) != L'\0') {
+  ColoredString colored_string = content.GetString();
+  while (colored_string.string != std::wstring(1, L'\0')) {
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::string narrow = converter.to_bytes(std::wstring(1, std::get<0>(character)));
-    printf("\033[%d;%dm", std::get<1>(character), std::get<2>(character) + BACKGROUND_COLOR_OFFSET);
+    std::string narrow = converter.to_bytes(colored_string.string);
+    printf("\033[%d;%dm", colored_string.foreground, colored_string.background + background_color_offset);
     printf("%s", narrow.c_str());
     printf("\033[0m");
-    character = content.GetChar();
+    colored_string = content.GetString();
   }
 #endif
 }

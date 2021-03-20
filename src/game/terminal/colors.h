@@ -41,7 +41,7 @@ enum Color {
   BRIGHT_WHITE
 };
 
-#define BACKGROUND_COLOR_OFFSET 10
+const char background_color_offset = 10;
 #endif
 }  // namespace game::terminal::colors
 

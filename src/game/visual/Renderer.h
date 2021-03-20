@@ -5,7 +5,7 @@
 
 #include "../world/Player.h"
 #include "../world/World.h"
-#include "ColoredStringMatrix.h"
+#include "ColoredCharMatrix.h"
 
 namespace game::visual {
 
@@ -23,7 +23,7 @@ class Renderer {
                     common::coordinate_size_t composited_viewport_overhang = coordinate_size_t(0, 0),
                     common::coordinate_size_t rendered_viewport_offset = coordinate_size_t(0, 0));
 
-  [[nodiscard]] ColoredStringMatrix RenderWorld() const;
+  [[nodiscard]] ColoredCharMatrix RenderWorld() const;
 };
 
 }  // namespace game::visual

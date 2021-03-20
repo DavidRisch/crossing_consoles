@@ -13,13 +13,13 @@ int MockTerminal::GetInput() {
   return input;
 }
 
-void MockTerminal::SetScreen(ColoredStringMatrix content) {
+void MockTerminal::SetScreen(ColoredCharMatrix content) {
   last_output = content;
 }
 
 void MockTerminal::AddInput(char input) {
   unused_inputs += input;
 }
-const ColoredStringMatrix& MockTerminal::GetLastOutput() const {
+const ColoredCharMatrix& MockTerminal::GetLastOutput() const {
   return last_output;
 }

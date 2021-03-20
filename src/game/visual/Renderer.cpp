@@ -26,11 +26,11 @@ Renderer::Renderer(common::coordinate_size_t viewport_size, common::coordinate_s
     , rendered_viewport_offset(std::move(rendered_viewport_offset)) {
 }
 
-ColoredStringMatrix Renderer::RenderWorld() const {
+ColoredCharMatrix Renderer::RenderWorld() const {
   world->updated = false;
   player->updated = false;
 
-  ColoredStringMatrix rendered_world(viewport_size * block_size + composited_viewport_overhang);
+  ColoredCharMatrix rendered_world(viewport_size * block_size + composited_viewport_overhang);
 
   // calculate delta between player and rendered viewport start/end
   coordinate_size_t viewport_size_delta(viewport_size.x / 2, viewport_size.y / 2);

@@ -16,8 +16,8 @@ Compositor::Compositor(coordinate_size_t viewport_size, World &world, Player &pl
                                         rendered_viewport_offset);
 }
 
-ColoredStringMatrix Compositor::CompositeViewport() const {
-  ColoredStringMatrix composited_viewport = renderer->RenderWorld();
+ColoredCharMatrix Compositor::CompositeViewport() const {
+  ColoredCharMatrix composited_viewport = renderer->RenderWorld();
   common::coordinate_size_t block_count = viewport_size * block_size;
 
   std::wstring frame_top_line = box_drawings_double_down_and_right +

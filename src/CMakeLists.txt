@@ -11,7 +11,9 @@ add_library(crossing_consoles_lib
         game/GameServer.cpp
         game/world/WorldGenerator.cpp
         game/networking/Change.cpp
-        game/visual/ColoredStringMatrix.cpp
+        game/visual/ColoredCharMatrix.cpp
+        game/visual/ColoredChar.cpp
+        game/visual/ColoredString.cpp
 
         game/terminal/RealTerminal.cpp
         game/terminal/MockTerminal.cpp
