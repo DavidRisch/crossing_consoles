@@ -1,10 +1,7 @@
 #ifndef CROSSING_CONSOLES_DETECT_DEBUGGER_H
 #define CROSSING_CONSOLES_DETECT_DEBUGGER_H
 
-static bool runningUnderDebugger();
-
 #ifndef _WIN32
-
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -12,7 +9,7 @@ static bool runningUnderDebugger();
 #include <cstring>
 
 // Detect debugger as described in https://stackoverflow.com/a/24969863
-bool runningUnderDebugger() {
+static bool runningUnderDebugger() {
   char buf[4096];
 
   const int status_fd = ::open("/proc/self/status", O_RDONLY);
@@ -38,11 +35,6 @@ bool runningUnderDebugger() {
   }
 
   return false;
-}
-
-#else
-bool runningUnderDebugger() {
-  return IsDebuggerPresent() == TRUE;
 }
 #endif
 

@@ -15,6 +15,8 @@ using namespace communication::byte_layer;
 using namespace communication::connection_layer;
 using namespace communication::message_layer;
 
+#ifndef _WIN32
+
 bool CAUGHT_SIGNAL_BROKEN_PIPE = false;
 
 static void broken_pipe_handler(int signum) {
@@ -44,6 +46,8 @@ static void reset_signal_handler() {
 
   CAUGHT_SIGNAL_BROKEN_PIPE = false;
 }
+
+#endif
 
 class ConnectionManagers : public ::testing::Test {
  public:
@@ -294,8 +298,10 @@ TEST_F(ConnectionManagers, ClientConnectionReset) {
   // Client sends message of type ConnectionResetMessage
   create_server_and_client();
 
+#ifndef _WIN32
   // setup signal handler to catch signal SIGPIPE and fail test
   setup_signal_handler();
+#endif
 
   client_manager->CloseConnection(ProtocolDefinition::server_partner_id);
 
@@ -315,8 +321,10 @@ TEST_F(ConnectionManagers, ClientConnectionReset) {
   client_manager->HandleConnections();
   server_manager->HandleConnections();
 
+#ifndef _WIN32
   ASSERT_FALSE(CAUGHT_SIGNAL_BROKEN_PIPE);
   reset_signal_handler();
+#endif
 
   // all events should have been processed by now
   EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
@@ -327,8 +335,10 @@ TEST_F(ConnectionManagers, ServerConnectionReset) {
   // Server sends message of type ConnectionResetMessage
   create_server_and_client();
 
+#ifndef _WIN32
   // setup signal handler to catch signal SIGPIPE and fail test
   setup_signal_handler();
+#endif
 
   // reset Connection
   partner_id_t client_id = 1;  // only 1 client is connected at this point
@@ -349,14 +359,17 @@ TEST_F(ConnectionManagers, ServerConnectionReset) {
   client_manager->HandleConnections();
   server_manager->HandleConnections();
 
+#ifndef _WIN32
   ASSERT_FALSE(CAUGHT_SIGNAL_BROKEN_PIPE);
   reset_signal_handler();
+#endif
 
   // all events should have been processed by now
   EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
   EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
 }
 
+#ifndef _WIN32
 TEST_F(ConnectionManagers, BrokenPipeSignal) {
   // test that setup_signal_handler sets new handler for signal SIGPIPE in tests
 
@@ -372,3 +385,4 @@ TEST_F(ConnectionManagers, BrokenPipeSignal) {
   reset_signal_handler();
   ASSERT_FALSE(CAUGHT_SIGNAL_BROKEN_PIPE);
 }
+#endif
