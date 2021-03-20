@@ -315,6 +315,7 @@ TEST_F(ConnectionManagers, ClientConnectionReset) {
   client_manager->HandleConnections();
   server_manager->HandleConnections();
 
+  ASSERT_FALSE(CAUGHT_SIGNAL_BROKEN_PIPE);
   reset_signal_handler();
 
   // all events should have been processed by now
@@ -348,6 +349,7 @@ TEST_F(ConnectionManagers, ServerConnectionReset) {
   client_manager->HandleConnections();
   server_manager->HandleConnections();
 
+  ASSERT_FALSE(CAUGHT_SIGNAL_BROKEN_PIPE);
   reset_signal_handler();
 
   // all events should have been processed by now
