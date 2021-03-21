@@ -7,7 +7,6 @@
 #include "../common/Position.h"
 #include "../terminal/colors.h"
 #include "ColoredChar.h"
-#include "ColoredString.h"
 
 using namespace game::common;
 using namespace game::terminal::colors;
@@ -24,17 +23,15 @@ class ColoredCharMatrix {
   void SetString(const std::wstring& string, const Position& position, Color foreground = WHITE,
                  Color background = BLACK);
 
-  ColoredChar GetChar();
-  ColoredChar GetChar(const Position& position);
-  ColoredString GetString();
-  ColoredString GetString(const Position& position);
+  const std::vector<std::vector<ColoredChar>>& GetMatrix() const;
+
+  bool operator==(const ColoredCharMatrix& colored_char_matrix);
 
  private:
   coordinate_size_t size;
   std::vector<std::vector<ColoredChar>> characters;
 
   Position set_current = Position(0, 0);
-  Position get_current = Position(0, 0);
 };
 
 }  // namespace game::visual

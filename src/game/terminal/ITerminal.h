@@ -25,7 +25,7 @@ class ITerminal {
   /**
    * \brief Clear the screen and set it to the specified content.
    */
-  virtual void SetScreen(ColoredCharMatrix content) = 0;
+  virtual void SetScreen(const ColoredCharMatrix& content) = 0;
 };
 
 }  // namespace game::terminal

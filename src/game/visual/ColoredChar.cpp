@@ -10,6 +10,6 @@ ColoredChar::ColoredChar(wchar_t character, Color foreground, Color background)
 }
 
 bool ColoredChar::operator==(const ColoredChar &colored_char) const {
-  return (this->character == colored_char.character && this->foreground == colored_char.foreground &&
-          this->background == colored_char.background);
+  return (character == colored_char.character && foreground == colored_char.foreground &&
+         background == colored_char.background);
 }

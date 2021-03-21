@@ -1,7 +1,6 @@
 #include "RealTerminal.h"
 
-#include <cstdlib>
-#include <iostream>
+#include "../visual/ColoredString.h"
 
 #ifdef _WIN32
 #include <conio.h>
@@ -43,27 +42,55 @@ int RealTerminal::GetInput() {
 #endif
 }
 
-void RealTerminal::SetScreen(ColoredCharMatrix content) {
+void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
   Clear();
+
+  // initialization of relevant objects
 #ifdef _WIN32
   HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-
-  ColoredString colored_string = content.GetString();
-  while (colored_string.string != std::wstring(1, L'\0')) {
-    SetConsoleTextAttribute(console_handle, (colored_string.background << 4) | colored_string.foreground);
-    _cwprintf(colored_string.string.c_str());
-    colored_string = content.GetString();
-  }
 #else
-  ColoredString colored_string = content.GetString();
-  while (colored_string.string != std::wstring(1, L'\0')) {
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::string narrow = converter.to_bytes(colored_string.string);
-    printf("\033[%d;%dm", colored_string.foreground, colored_string.background + background_color_offset);
-    printf("%s", narrow.c_str());
-    printf("\033[0m");
-    colored_string = content.GetString();
+  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+#endif
+
+  const std::vector<std::vector<ColoredChar>>& colored_characters = content.GetMatrix();
+
+  ColoredString colored_string(std::wstring(), colored_characters[0][0].foreground,
+                               colored_characters[0][0].background);
+  for (const auto& i_lines : colored_characters) {
+    for (const auto& i_characters : i_lines) {
+      // check if character colors are equal to string colors
+      if (i_characters.foreground == colored_string.foreground &&
+          i_characters.background == colored_string.background) {
+        // append current character
+        colored_string.string.push_back(i_characters.character);
+      } else {
+        // print current string
+#ifdef _WIN32
+        SetConsoleTextAttribute(console_handle, (colored_string.background << 4) | colored_string.foreground);
+        _cwprintf(colored_string.string.c_str());
+#else
+        std::string narrow = converter.to_bytes(colored_string.string);
+        printf("\033[%d;%dm", colored_string.foreground, colored_string.background + background_color_offset);
+        printf("%s", narrow.c_str());
+        printf("\033[0m");
+#endif
+        // reset string
+        colored_string.string = std::wstring(1, i_characters.character);
+        colored_string.foreground = i_characters.foreground;
+        colored_string.background = i_characters.background;
+      }
+    }
+    colored_string.string.push_back(L'\n');
   }
+  // print last string
+#ifdef _WIN32
+  SetConsoleTextAttribute(console_handle, (colored_string.background << 4) | colored_string.foreground);
+  _cwprintf(colored_string.string.c_str());
+#else
+  std::string narrow = converter.to_bytes(colored_string.string);
+  printf("\033[%d;%dm", colored_string.foreground, colored_string.background + background_color_offset);
+  printf("%s", narrow.c_str());
+  printf("\033[0m");
 #endif
 }
 

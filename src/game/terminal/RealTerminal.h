@@ -7,6 +7,7 @@
 #include <windows.h>
 #endif
 
+#include "../visual/ColoredString.h"
 #include "ITerminal.h"
 
 namespace game::terminal {
@@ -21,7 +22,7 @@ class RealTerminal : public ITerminal {
   bool HasInput() override;
   int GetInput() override;
 
-  void SetScreen(ColoredCharMatrix content) override;
+  void SetScreen(const ColoredCharMatrix& content) override;
 
  private:
   static std::string title;

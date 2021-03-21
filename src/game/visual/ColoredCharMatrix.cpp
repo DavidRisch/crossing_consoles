@@ -43,54 +43,25 @@ void ColoredCharMatrix::SetString(const std::wstring& string, const Position& po
   }
 }
 
-ColoredChar ColoredCharMatrix::GetChar() {
-  if (get_current.x == size.x) {
-    get_current.x = 0;
-    get_current.y++;
-    return ColoredChar(L'\n', WHITE, BLACK);
-  } else {
-    return GetChar(get_current);
-  }
+const std::vector<std::vector<ColoredChar>>& ColoredCharMatrix::GetMatrix() const {
+  return characters;
 }
 
-ColoredChar ColoredCharMatrix::GetChar(const Position& position) {
-  if (position < size) {
-    ColoredChar colored_character = characters[get_current.y][get_current.x];
-    get_current = position;
-    get_current.x++;
-    return colored_character;
-  }
-  return ColoredChar(L'\0', WHITE, BLACK);
-}
-
-ColoredString ColoredCharMatrix::GetString() {
-  if (get_current.x == size.x) {
-    get_current.x = 0;
-    get_current.y++;
-    return ColoredString(std::wstring(1, L'\n'), WHITE, BLACK);
-  } else {
-    return GetString(get_current);
-  }
-}
-
-ColoredString ColoredCharMatrix::GetString(const Position& position) {
-  if (position < size) {
-    ColoredChar colored_character = GetChar(position);
-    ColoredString colored_string(std::wstring(), colored_character.foreground, colored_character.background);
-    while (colored_character.character != L'\0' && colored_character.foreground == colored_string.foreground &&
-           colored_character.background == colored_string.background) {
-      colored_string.string.push_back(colored_character.character);
-      colored_character = GetChar();
+bool ColoredCharMatrix::operator==(const ColoredCharMatrix& colored_char_matrix) {
+  const std::vector<std::vector<ColoredChar>>& matrix = colored_char_matrix.GetMatrix();
+  if (characters.size() == matrix.size()) {
+    for (int y = 0; y < size.y; y++) {
+      for (int x = 0; x < size.x; x++) {
+        if (x == 0 && characters[y].size() != matrix[y].size()) {
+          return false;
+        }
+        if (!(characters[y][x] == matrix[y][x])) {
+          return false;
+        }
+      }
     }
-
-    if (get_current.x == 0) {
-      get_current.x = size.x;
-      get_current.y--;
-    } else {
-      get_current.x--;
-    }
-
-    return colored_string;
+    return true;
+  } else {
+    return false;
   }
-  return ColoredString(std::wstring(1, L'\0'), WHITE, BLACK);
 }
