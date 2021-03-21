@@ -11,5 +11,9 @@ ColoredChar::ColoredChar(wchar_t character, Color foreground, Color background)
 
 bool ColoredChar::operator==(const ColoredChar &colored_char) const {
   return (character == colored_char.character && foreground == colored_char.foreground &&
-         background == colored_char.background);
+          background == colored_char.background);
+}
+
+bool ColoredChar::operator!=(const ColoredChar &colored_char) const {
+  return !(*this == colored_char);
 }

@@ -16,6 +16,7 @@ class ColoredChar {
   ColoredChar(wchar_t character, Color foreground, Color background);
 
   bool operator==(const ColoredChar& colored_char) const;
+  bool operator!=(const ColoredChar& colored_char) const;
 };
 
 }  // namespace game::visual

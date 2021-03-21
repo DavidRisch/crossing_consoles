@@ -68,7 +68,16 @@ TEST_F(GameNetworking, NoAction) {
 
   stop_server();
 
-  ASSERT_FALSE(mock_terminal->GetLastOutput().empty());
+  bool empty = true;
+  for (const auto& i_lines : mock_terminal->GetLastOutput()) {
+    for (const auto& i_characters : i_lines) {
+      if (i_characters != ColoredChar(L' ', WHITE, BLACK)) {
+        empty = false;
+      }
+    }
+  }
+
+  ASSERT_FALSE(empty);
 }
 
 TEST_F(GameNetworking, Actions) {
@@ -86,5 +95,14 @@ TEST_F(GameNetworking, Actions) {
 
   stop_server();
 
-  ASSERT_FALSE(mock_terminal->GetLastOutput().empty());
+  bool empty = true;
+  for (const auto& i_lines : mock_terminal->GetLastOutput()) {
+    for (const auto& i_characters : i_lines) {
+      if (i_characters != ColoredChar(L' ', WHITE, BLACK)) {
+        empty = false;
+      }
+    }
+  }
+
+  ASSERT_FALSE(empty);
 }

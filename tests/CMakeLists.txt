@@ -7,10 +7,10 @@ add_executable(crossing_consoles_test
         mocks.cpp
         message_stream.cpp
         connection.cpp
-        #game.cpp
+        game.cpp
         connection_manager.cpp
         game_serialization.cpp
-        #game_networking.cpp
+        game_networking.cpp
         position.cpp
         sprite.cpp
         renderer.cpp
