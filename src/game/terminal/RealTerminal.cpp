@@ -101,12 +101,12 @@ void RealTerminal::Initialise() {
 
   SetConsoleTitle(title.c_str());
 
-  // contains information about the console cursor
+  // https://docs.microsoft.com/en-us/windows/console/console-cursor-info-str
   CONSOLE_CURSOR_INFO cursor_info;
-  // visibility of the cursor
   cursor_info.bVisible = FALSE;
   SetConsoleCursorInfo(console_handle, &cursor_info);
 
+  // https://docs.microsoft.com/en-us/windows/console/console-font-infoex
   CONSOLE_FONT_INFOEX font_info;
   font_info.cbSize = sizeof font_info;
   font_info.nFont = 0;
