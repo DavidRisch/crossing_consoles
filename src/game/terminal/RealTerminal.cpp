@@ -13,11 +13,14 @@
 
 #include <codecvt>
 #include <locale>
+
+#include "colors.h"
 #endif
 
 using namespace game;
 using namespace game::terminal;
 using namespace game::visual;
+using namespace game::terminal::colors;
 
 std::string RealTerminal::title = "Crossing Consoles";
 
