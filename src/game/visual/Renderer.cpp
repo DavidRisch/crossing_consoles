@@ -59,10 +59,8 @@ ColoredCharMatrix Renderer::RenderWorld() const {
         if (position >= viewport_start && position <= viewport_end) {
           // get wall position as rendered viewport coordinates
           Position relative_position = position - viewport_start;
-          // place each line of the wall sprite
-          for (int y = 0; y < block_size.y; y++) {
-            rendered_world.InsertMatrix(wall_sprite, relative_position * block_size);
-          }
+          // insert wall sprite
+          rendered_world.InsertMatrix(wall_sprite, relative_position * block_size);
         }
       }
     }
@@ -74,10 +72,8 @@ ColoredCharMatrix Renderer::RenderWorld() const {
     if (i_player->position >= viewport_start && i_player->position <= viewport_end) {
       // get player position as rendered viewport coordinates
       Position relative_position = i_player->position - viewport_start;
-      // place each line of the player sprite
-      for (int y = 0; y < block_size.y; y++) {
-        rendered_world.InsertMatrix(player_sprite, relative_position * block_size);
-      }
+      // insert player sprite
+      rendered_world.InsertMatrix(player_sprite, relative_position * block_size);
     }
   }
 

@@ -7,7 +7,6 @@ add_library(crossing_consoles_lib
         game/world/Wall.cpp
         game/visual/Renderer.cpp
         game/visual/Compositor.cpp
-        game/visual/Sprite.cpp
         game/GameServer.cpp
         game/world/WorldGenerator.cpp
         game/networking/Change.cpp
