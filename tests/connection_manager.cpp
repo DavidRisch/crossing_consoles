@@ -386,3 +386,45 @@ TEST_F(ConnectionManagers, BrokenPipeSignal) {
   ASSERT_FALSE(CAUGHT_SIGNAL_BROKEN_PIPE);
 }
 #endif
+
+TEST_F(ConnectionManagers, ClientKeepAlive) {
+  // Client sends KeepAlive to Server
+  auto timeout = std::chrono::milliseconds(10);
+  auto keep_alive_interval = timeout / ProtocolDefinition::keep_alive_numerator;
+
+  create_server_and_client(timeout);
+
+  std::this_thread::sleep_for(keep_alive_interval);
+  // send KeepAlive Message
+  client_manager->HandleConnections();
+
+  std::this_thread::sleep_for(keep_alive_interval);
+  // Acknowledge KeepAlive Message, no timeout is triggered
+  server_manager->HandleConnections();
+  client_manager->HandleConnections();
+
+  // no timeout events should have been triggered
+  EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
+  EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
+}
+
+TEST_F(ConnectionManagers, ServerKeepAlive) {
+  // Server sends KeepAlive to Client
+  auto timeout = std::chrono::milliseconds(10);
+  auto keep_alive_interval = timeout / ProtocolDefinition::keep_alive_numerator;
+
+  create_server_and_client(timeout);
+
+  std::this_thread::sleep_for(keep_alive_interval);
+  // sends KeepAlive Message
+  server_manager->HandleConnections();
+
+  std::this_thread::sleep_for(keep_alive_interval);
+  // Acknowledge KeepAlive Message, no timeout is triggered
+  client_manager->HandleConnections();
+  server_manager->HandleConnections();
+
+  // no timeout events should have been triggered
+  EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
+  EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
+}
