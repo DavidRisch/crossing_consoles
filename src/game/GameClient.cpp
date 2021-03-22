@@ -33,7 +33,8 @@ GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_
     client_manager =
         communication::connection_layer::ClientSideConnectionManager::CreateClientSide(communication_timeout);
   } else {
-    world = *WorldGenerator::GenerateWorld(world_size);
+    WorldGenerator world_generator;
+    world = *world_generator.GenerateWorld(world_size);
   }
 
   world.AddPlayer(player);
