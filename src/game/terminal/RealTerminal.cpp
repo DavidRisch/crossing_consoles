@@ -56,6 +56,10 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
 
   ColoredString colored_string(std::wstring(), colored_characters[0][0].foreground,
                                colored_characters[0][0].background);
+#ifndef _WIN32
+  std::string output;
+#endif
+
   for (const auto& i_lines : colored_characters) {
     for (const auto& i_characters : i_lines) {
       // check if character colors are equal to string colors
@@ -64,15 +68,18 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
         // append current character
         colored_string.string.push_back(i_characters.character);
       } else {
-        // print current string
 #ifdef _WIN32
+        // print current string
         SetConsoleTextAttribute(console_handle, (colored_string.background << 4) | colored_string.foreground);
         _cwprintf(colored_string.string.c_str());
 #else
-        std::string narrow = converter.to_bytes(colored_string.string);
-        printf("\033[%d;%dm", colored_string.foreground, colored_string.background + background_color_offset);
-        printf("%s", narrow.c_str());
-        printf("\033[0m");
+        // add current string to output, print later
+        output += "\033[";
+        output += std::to_string(colored_string.foreground);
+        output += ";";
+        output += std::to_string(colored_string.background + background_color_offset);
+        output += "m";
+        output += converter.to_bytes(colored_string.string);
 #endif
         // reset string
         colored_string.string = std::wstring(1, i_characters.character);
@@ -87,10 +94,15 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
   SetConsoleTextAttribute(console_handle, (colored_string.background << 4) | colored_string.foreground);
   _cwprintf(colored_string.string.c_str());
 #else
-  std::string narrow = converter.to_bytes(colored_string.string);
-  printf("\033[%d;%dm", colored_string.foreground, colored_string.background + background_color_offset);
-  printf("%s", narrow.c_str());
-  printf("\033[0m");
+  output += "\033[";
+  output += std::to_string(colored_string.foreground);
+  output += ";";
+  output += std::to_string(colored_string.background + background_color_offset);
+  output += "m";
+  output += converter.to_bytes(colored_string.string);
+
+  output += "\033[0m \n";  // reset colors to prevent flickering of background
+  printf("%s", output.c_str());
 #endif
 }
 
