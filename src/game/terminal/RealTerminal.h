@@ -22,7 +22,7 @@ class RealTerminal : public ITerminal {
   bool HasInput() override;
   int GetInput() override;
 
-  void SetScreen(const ColoredCharMatrix& content) override;
+  void SetScreen(const visual::ColoredCharMatrix& content) override;
 
  private:
   static std::string title;

@@ -15,13 +15,12 @@ class Renderer {
   common::coordinate_size_t viewport_size;
   world::World* world;
   world::Player* player;
-  common::coordinate_size_t composited_viewport_overhang;
-  common::coordinate_size_t rendered_viewport_offset;
+
+  ColoredCharMatrix wall_sprite;
+  ColoredCharMatrix player_sprite;
 
   explicit Renderer(common::coordinate_size_t viewport_size, common::coordinate_size_t block_size, world::World& world,
-                    world::Player& player,
-                    common::coordinate_size_t composited_viewport_overhang = coordinate_size_t(0, 0),
-                    common::coordinate_size_t rendered_viewport_offset = coordinate_size_t(0, 0));
+                    world::Player& player);
 
   [[nodiscard]] ColoredCharMatrix RenderWorld() const;
 };

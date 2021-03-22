@@ -17,6 +17,7 @@
 
 using namespace game;
 using namespace game::terminal;
+using namespace game::visual;
 
 std::string RealTerminal::title = "Crossing Consoles";
 

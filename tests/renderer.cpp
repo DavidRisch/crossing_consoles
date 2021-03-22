@@ -2,12 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../src/game/visual/symbols.h"
-
 using namespace game::visual;
 using namespace game::common;
 using namespace game::world;
-using namespace game::visual::symbols;
+using namespace game::terminal::colors;
 
 TEST(Renderer, EmptyWorld) {
   coordinate_size_t world_size = coordinate_size_t(101, 101);

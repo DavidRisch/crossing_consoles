@@ -5,17 +5,15 @@
 
 #include "../terminal/colors.h"
 
-using namespace game::terminal::colors;
-
 namespace game::visual {
 
 class ColoredString {
  public:
   std::wstring string;
-  Color foreground;
-  Color background;
+  terminal::colors::Color foreground;
+  terminal::colors::Color background;
 
-  ColoredString(std::wstring string, Color foreground, Color background);
+  ColoredString(std::wstring string, terminal::colors::Color foreground, terminal::colors::Color background);
 };
 
 }  // namespace game::visual

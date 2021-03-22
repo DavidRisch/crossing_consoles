@@ -2,6 +2,7 @@
 
 #include <utility>
 
+using namespace game;
 using namespace game::visual;
 using namespace game::terminal::colors;
 

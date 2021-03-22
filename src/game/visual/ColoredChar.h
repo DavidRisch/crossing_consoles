@@ -3,17 +3,15 @@
 
 #include "../terminal/colors.h"
 
-using namespace game::terminal::colors;
-
 namespace game::visual {
 
 class ColoredChar {
  public:
   wchar_t character;
-  Color foreground;
-  Color background;
+  terminal::colors::Color foreground;
+  terminal::colors::Color background;
 
-  ColoredChar(wchar_t character, Color foreground, Color background);
+  ColoredChar(wchar_t character, terminal::colors::Color foreground, terminal::colors::Color background);
 
   bool operator==(const ColoredChar& colored_char) const;
   bool operator!=(const ColoredChar& colored_char) const;

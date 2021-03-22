@@ -1,5 +1,6 @@
 #include "ColoredChar.h"
 
+using namespace game;
 using namespace game::visual;
 using namespace game::terminal::colors;
 

@@ -10,7 +10,9 @@
 using namespace game;
 using namespace game::common;
 using namespace game::world;
+using namespace game::visual;
 using namespace game::terminal;
+using namespace game::terminal::colors;
 
 class GameNetworking : public ::testing::Test {
  public:
@@ -55,6 +57,19 @@ class GameNetworking : public ::testing::Test {
     game_client = std::make_shared<GameClient>(player, mock_terminal, coordinate_size_t(1, 1), true);
     stop_server();
   }
+
+  void expect_terminal_not_empty() {
+    bool empty = true;
+    for (const auto& i_lines : mock_terminal->GetLastOutput()) {
+      for (const auto& i_characters : i_lines) {
+        if (i_characters != ColoredChar(L' ', WHITE, BLACK)) {
+          empty = false;
+        }
+      }
+    }
+
+    ASSERT_FALSE(empty);
+  }
 };
 
 TEST_F(GameNetworking, NoAction) {
@@ -68,16 +83,7 @@ TEST_F(GameNetworking, NoAction) {
 
   stop_server();
 
-  bool empty = true;
-  for (const auto& i_lines : mock_terminal->GetLastOutput()) {
-    for (const auto& i_characters : i_lines) {
-      if (i_characters != ColoredChar(L' ', WHITE, BLACK)) {
-        empty = false;
-      }
-    }
-  }
-
-  ASSERT_FALSE(empty);
+  expect_terminal_not_empty();
 }
 
 TEST_F(GameNetworking, Actions) {
@@ -95,14 +101,5 @@ TEST_F(GameNetworking, Actions) {
 
   stop_server();
 
-  bool empty = true;
-  for (const auto& i_lines : mock_terminal->GetLastOutput()) {
-    for (const auto& i_characters : i_lines) {
-      if (i_characters != ColoredChar(L' ', WHITE, BLACK)) {
-        empty = false;
-      }
-    }
-  }
-
-  ASSERT_FALSE(empty);
+  expect_terminal_not_empty();
 }

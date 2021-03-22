@@ -2,6 +2,7 @@
 
 using namespace game;
 using namespace game::terminal;
+using namespace game::visual;
 
 bool MockTerminal::HasInput() {
   return !unused_inputs.empty();

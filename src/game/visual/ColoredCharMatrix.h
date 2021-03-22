@@ -1,37 +1,41 @@
 #ifndef CROSSING_CONSOLES_COLOREDCHARMATRIX_H
 #define CROSSING_CONSOLES_COLOREDCHARMATRIX_H
 
-#include <tuple>
 #include <vector>
 
 #include "../common/Position.h"
 #include "../terminal/colors.h"
 #include "ColoredChar.h"
 
-using namespace game::common;
-using namespace game::terminal::colors;
-
 namespace game::visual {
 
 class ColoredCharMatrix {
  public:
-  explicit ColoredCharMatrix(coordinate_size_t size);
+  explicit ColoredCharMatrix(common::coordinate_size_t size);
 
-  void SetChar(wchar_t character, Color foreground = WHITE, Color background = BLACK);
-  void SetChar(wchar_t character, const Position& position, Color foreground = WHITE, Color background = BLACK);
-  void SetString(const std::wstring& string, Color foreground = WHITE, Color background = BLACK);
-  void SetString(const std::wstring& string, const Position& position, Color foreground = WHITE,
-                 Color background = BLACK);
+  void PlaceChar(wchar_t character, terminal::colors::Color foreground = terminal::colors::WHITE,
+                 terminal::colors::Color background = terminal::colors::BLACK);
+  void PlaceChar(wchar_t character, const common::Position& position,
+                 terminal::colors::Color foreground = terminal::colors::WHITE,
+                 terminal::colors::Color background = terminal::colors::BLACK);
+  void PlaceString(const std::wstring& string, terminal::colors::Color foreground = terminal::colors::WHITE,
+                   terminal::colors::Color background = terminal::colors::BLACK);
+  void PlaceString(const std::wstring& string, const common::Position& position,
+                   terminal::colors::Color foreground = terminal::colors::WHITE,
+                   terminal::colors::Color background = terminal::colors::BLACK);
+
+  void InsertMatrix(const ColoredCharMatrix& matrix);
+  void InsertMatrix(const ColoredCharMatrix& matrix, const common::Position& position);
 
   const std::vector<std::vector<ColoredChar>>& GetMatrix() const;
 
   bool operator==(const ColoredCharMatrix& colored_char_matrix);
 
  private:
-  coordinate_size_t size;
+  common::coordinate_size_t size;
   std::vector<std::vector<ColoredChar>> characters;
 
-  Position set_current = Position(0, 0);
+  common::Position set_current = common::Position(0, 0);
 };
 
 }  // namespace game::visual

@@ -8,7 +8,9 @@
 using namespace game;
 using namespace game::common;
 using namespace game::world;
+using namespace game::visual;
 using namespace game::terminal;
+using namespace game::terminal::colors;
 
 TEST(Game, NoAction) {
   Player player("player name", Position(2, 2));

@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <utility>
 
-#include "Sprite.h"
 #include "symbols.h"
 
 using namespace game;
@@ -11,26 +10,25 @@ using namespace game::common;
 using namespace game::world;
 using namespace game::visual;
 using namespace game::visual::symbols;
-
-Sprite wall_sprite = Sprite(std::wstring(2, light_shade) + L"\n" + std::wstring(2, light_shade));
-Sprite player_sprite = Sprite(L"><\n/\\");
+using namespace game::terminal::colors;
 
 Renderer::Renderer(common::coordinate_size_t viewport_size, common::coordinate_size_t block_size, World& world,
-                   Player& player, common::coordinate_size_t composited_viewport_overhang,
-                   common::coordinate_size_t rendered_viewport_offset)
+                   Player& player)
     : block_size(std::move(block_size))
     , viewport_size(std::move(viewport_size))
     , world(&world)
     , player(&player)
-    , composited_viewport_overhang(std::move(composited_viewport_overhang))
-    , rendered_viewport_offset(std::move(rendered_viewport_offset)) {
+    , wall_sprite(ColoredCharMatrix(block_size))
+    , player_sprite(ColoredCharMatrix(block_size)) {
+  wall_sprite.PlaceString(std::wstring(4, light_shade), WHITE, RED);
+  player_sprite.PlaceString(L"></\\");
 }
 
 ColoredCharMatrix Renderer::RenderWorld() const {
   world->updated = false;
   player->updated = false;
 
-  ColoredCharMatrix rendered_world(viewport_size * block_size + composited_viewport_overhang);
+  ColoredCharMatrix rendered_world(viewport_size * block_size);
 
   // calculate delta between player and rendered viewport start/end
   coordinate_size_t viewport_size_delta(viewport_size.x / 2, viewport_size.y / 2);
@@ -63,9 +61,7 @@ ColoredCharMatrix Renderer::RenderWorld() const {
           Position relative_position = position - viewport_start;
           // place each line of the wall sprite
           for (int y = 0; y < block_size.y; y++) {
-            rendered_world.SetString(wall_sprite.GetLine(y),
-                                     relative_position * block_size + Position(0, y) + rendered_viewport_offset, WHITE,
-                                     RED);
+            rendered_world.InsertMatrix(wall_sprite, relative_position * block_size);
           }
         }
       }
@@ -80,9 +76,7 @@ ColoredCharMatrix Renderer::RenderWorld() const {
       Position relative_position = i_player->position - viewport_start;
       // place each line of the player sprite
       for (int y = 0; y < block_size.y; y++) {
-        rendered_world.SetString(player_sprite.GetLine(y),
-                                 relative_position * block_size + Position(0, y) + rendered_viewport_offset, WHITE,
-                                 BLACK);
+        rendered_world.InsertMatrix(player_sprite, relative_position * block_size);
       }
     }
   }

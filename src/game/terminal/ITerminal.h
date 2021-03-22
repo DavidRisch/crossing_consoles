@@ -3,8 +3,6 @@
 
 #include "../visual/ColoredCharMatrix.h"
 
-using namespace game::visual;
-
 namespace game::terminal {
 
 /**
@@ -25,7 +23,7 @@ class ITerminal {
   /**
    * \brief Clear the screen and set it to the specified content.
    */
-  virtual void SetScreen(const ColoredCharMatrix& content) = 0;
+  virtual void SetScreen(const visual::ColoredCharMatrix& content) = 0;
 };
 
 }  // namespace game::terminal
