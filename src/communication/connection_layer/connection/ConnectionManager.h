@@ -107,6 +107,9 @@ class ConnectionManager {
   /// Unprocessed events ordered from oldest to newest.
   std::list<std::shared_ptr<Event>> event_queue;
   ProtocolDefinition::timeout_t timeout;  // timeout in milliseconds
+
+  /// Set the interval of sent KeepAliveMessages in dependency of `timeout`
+  ProtocolDefinition::timeout_t keep_alive_interval{};
 };
 
 }  // namespace connection_layer

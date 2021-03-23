@@ -16,6 +16,11 @@ using namespace connection_layer;
 ConnectionManager::ConnectionManager(ProtocolDefinition::timeout_t timeout)
     : timeout(timeout) {
   connection_map = {};
+  keep_alive_interval =
+      std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::keep_alive_numerator);
+
+  assert(timeout > std::chrono::milliseconds(0));
+  assert(keep_alive_interval < timeout);
 }
 
 void ConnectionManager::Broadcast(const std::vector<uint8_t>& payload) {
@@ -63,13 +68,6 @@ void ConnectionManager::ReceiveMessages() {
     auto connection = connection_entry.second.connection;
     auto partner_id = connection_entry.first;
 
-    /*
-     TODO: send keep alive less frequently
-     TODO: does not belong in this method
-    auto msg = std::make_shared<message_layer::KeepAliveMessage>(partner_id);
-    TODO: connection->SendMessage(msg);
-     */
-
     std::shared_ptr<message_layer::Message> received_msg;
     do {
       received_msg = connection->ReceiveMessage();
@@ -99,8 +97,13 @@ void ConnectionManager::ReceiveMessages() {
       connection_remove_list.push_back(partner_id);
     }
 
-    if (std::chrono::steady_clock::now() - connection_entry.second.timestamp_last_received >= timeout) {
+    auto current_time = std::chrono::steady_clock::now();
+    if (current_time - connection_entry.second.timestamp_last_received >= timeout) {
       connection_remove_list.push_back(partner_id);
+
+    } else if (current_time - connection_entry.second.timestamp_last_received >= keep_alive_interval) {
+      auto keep_alive_msg = std::make_shared<message_layer::KeepAliveMessage>(message_layer::KeepAliveMessage());
+      SendMessageToConnection(partner_id, keep_alive_msg);
     }
   }
 
