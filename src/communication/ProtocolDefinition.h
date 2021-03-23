@@ -37,7 +37,7 @@ class ProtocolDefinition {
 
   /// Set keep alive numerator
   /// `timeout` divided by `keep_alive_numerator` describes the interval after which a `KeepAliveMessage' is sent
-  constexpr static const uint8_t keep_alive_numerator = 2;
+  constexpr static const double keep_alive_numerator = 2;
 
   /// Used to reference connection partners.
   typedef unsigned int partner_id_t;

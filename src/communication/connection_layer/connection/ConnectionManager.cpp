@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <chrono>
-#include <iostream>
 #include <utility>
 
 #include "../../message_layer/message/ConnectionResetMessage.h"
@@ -17,7 +16,11 @@ using namespace connection_layer;
 ConnectionManager::ConnectionManager(ProtocolDefinition::timeout_t timeout)
     : timeout(timeout) {
   connection_map = {};
-  keep_alive_interval = timeout / ProtocolDefinition::keep_alive_numerator;
+  keep_alive_interval =
+      std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::keep_alive_numerator);
+
+  assert(timeout > std::chrono::milliseconds(0));
+  assert(keep_alive_interval < timeout);
 }
 
 void ConnectionManager::Broadcast(const std::vector<uint8_t>& payload) {
