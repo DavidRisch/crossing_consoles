@@ -61,7 +61,7 @@ void GameServer::HandleEvent(const std::shared_ptr<communication::connection_lay
       auto player_id = event->GetPartnerId();
       auto player = world->GetPlayerById(player_id);
       assert(player != nullptr);
-      GameLogic::HandleChange(player, change, world);
+      GameLogic::HandleChange(*player, change, *world);
       break;
     }
     default:

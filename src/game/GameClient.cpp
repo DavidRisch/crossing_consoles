@@ -95,7 +95,7 @@ void GameClient::ProcessInput() {
     } else {
       auto player = weak_player.lock();
       assert(player != nullptr);
-      GameLogic::HandleChange(player, change, std::make_shared<World>(world));
+      GameLogic::HandleChange(*player, change, world);
     }
   }
 }
