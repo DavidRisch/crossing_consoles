@@ -18,7 +18,7 @@ class GameLogic {
                          const std::shared_ptr<world::World> &world);
 
   /**
-   * \brief Handle a `Change` sent by a `GameClient` or received by `GameServer` controlling the specific player.
+   * \brief Handle a `Change` produced by a `GameClient` controlling the specific player or by keyboard input.
    */
   static void HandleChange(const std::shared_ptr<world::Player> &player, const networking::Change &change,
                            const std::shared_ptr<world::World> &world);
