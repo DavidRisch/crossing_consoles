@@ -1,5 +1,5 @@
-#ifndef CROSSING_CONSOLES_CONNECTION_SIMULATOR_FLAKEY_H
-#define CROSSING_CONSOLES_CONNECTION_SIMULATOR_FLAKEY_H
+#ifndef CROSSING_CONSOLES_CONNECTION_SIMULATOR_FLAKY_H
+#define CROSSING_CONSOLES_CONNECTION_SIMULATOR_FLAKY_H
 
 #include <cstdint>
 
@@ -11,9 +11,9 @@ namespace byte_layer {
 /**
  * \brief Changes each byte to a random value with a probability of error_rate.
  */
-class ConnectionSimulatorFlakey : public IConnectionSimulator {
+class ConnectionSimulatorFlaky : public IConnectionSimulator {
  public:
-  explicit ConnectionSimulatorFlakey(double error_rate);
+  explicit ConnectionSimulatorFlaky(double error_rate);
 
   uint8_t Filter(uint8_t input) override;
 
@@ -24,4 +24,4 @@ class ConnectionSimulatorFlakey : public IConnectionSimulator {
 }  // namespace byte_layer
 }  // namespace communication
 
-#endif  // CROSSING_CONSOLES_CONNECTION_SIMULATOR_FLAKEY_H
+#endif  // CROSSING_CONSOLES_CONNECTION_SIMULATOR_FLAKY_H

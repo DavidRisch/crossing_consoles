@@ -3,7 +3,7 @@
 #include <thread>
 
 #include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
-#include "../src/communication/byte_layer/connection_simulator/ConnectionSimulatorFlakey.h"
+#include "../src/communication/byte_layer/connection_simulator/ConnectionSimulatorFlaky.h"
 
 using namespace communication;
 using namespace communication::byte_layer;
@@ -11,13 +11,13 @@ using namespace communication::byte_layer;
 class ConnectionSimulator : public ::testing::Test {
  public:
   ConnectionSimulator()
-      : flakey_perfect(0.0)
-      , flakey(0.5) {
+      : flaky_perfect(0.0)
+      , flaky(0.5) {
   }
 
   ConnectionSimulatorPerfect perfect;
-  ConnectionSimulatorFlakey flakey_perfect;
-  ConnectionSimulatorFlakey flakey;
+  ConnectionSimulatorFlaky flaky_perfect;
+  ConnectionSimulatorFlaky flaky;
 
   const char *server_to_client = "abc123abc123abc123abc123abc123abc123abc123abc123";
   const char *client_to_server = "123ABC123ABC123ABC123ABC123ABC123ABC123ABC123ABC";
@@ -67,38 +67,38 @@ TEST_F(ConnectionSimulator, AllPerfect) {
   EXPECT_EQ(client_to_server, server_received);
 }
 
-TEST_F(ConnectionSimulator, AllFlakeyPerfect) {
-  TestWithConnectionSimulators(flakey_perfect, flakey_perfect, flakey_perfect, flakey_perfect);
+TEST_F(ConnectionSimulator, AllFlakyPerfect) {
+  TestWithConnectionSimulators(flaky_perfect, flaky_perfect, flaky_perfect, flaky_perfect);
   EXPECT_EQ(server_to_client, client_received);
   EXPECT_EQ(client_to_server, server_received);
 }
 
-TEST_F(ConnectionSimulator, FlakeyServerIncoming) {
-  TestWithConnectionSimulators(flakey, perfect, perfect, perfect);
-  EXPECT_EQ(server_to_client, client_received);
-  EXPECT_NE(client_to_server, server_received);
-}
-
-TEST_F(ConnectionSimulator, FlakeyServerOutgoing) {
-  TestWithConnectionSimulators(perfect, flakey, perfect, perfect);
-  EXPECT_NE(server_to_client, client_received);
-  EXPECT_EQ(client_to_server, server_received);
-}
-
-TEST_F(ConnectionSimulator, FlakeyClientIncoming) {
-  TestWithConnectionSimulators(perfect, perfect, flakey, perfect);
-  EXPECT_NE(server_to_client, client_received);
-  EXPECT_EQ(client_to_server, server_received);
-}
-
-TEST_F(ConnectionSimulator, FlakeyClientOutgoing) {
-  TestWithConnectionSimulators(perfect, perfect, perfect, flakey);
+TEST_F(ConnectionSimulator, FlakyServerIncoming) {
+  TestWithConnectionSimulators(flaky, perfect, perfect, perfect);
   EXPECT_EQ(server_to_client, client_received);
   EXPECT_NE(client_to_server, server_received);
 }
 
-TEST_F(ConnectionSimulator, AllFlakey) {
-  TestWithConnectionSimulators(flakey, flakey, flakey, flakey);
+TEST_F(ConnectionSimulator, FlakyServerOutgoing) {
+  TestWithConnectionSimulators(perfect, flaky, perfect, perfect);
+  EXPECT_NE(server_to_client, client_received);
+  EXPECT_EQ(client_to_server, server_received);
+}
+
+TEST_F(ConnectionSimulator, FlakyClientIncoming) {
+  TestWithConnectionSimulators(perfect, perfect, flaky, perfect);
+  EXPECT_NE(server_to_client, client_received);
+  EXPECT_EQ(client_to_server, server_received);
+}
+
+TEST_F(ConnectionSimulator, FlakyClientOutgoing) {
+  TestWithConnectionSimulators(perfect, perfect, perfect, flaky);
+  EXPECT_EQ(server_to_client, client_received);
+  EXPECT_NE(client_to_server, server_received);
+}
+
+TEST_F(ConnectionSimulator, AllFlaky) {
+  TestWithConnectionSimulators(flaky, flaky, flaky, flaky);
   EXPECT_NE(server_to_client, client_received);
   EXPECT_NE(client_to_server, server_received);
 }
