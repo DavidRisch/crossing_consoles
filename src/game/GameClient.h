@@ -21,7 +21,17 @@ class GameClient {
       const common::coordinate_size_t& world_size, bool multiplayer = false,
       communication::ProtocolDefinition::timeout_t communication_timeout = communication::ProtocolDefinition::timeout);
 
+  /**
+   * \brief Update world, player and process changes.
+   * \details In multiplayer node, events from 'ConnectionManager' are handled additionally.
+   */
   void Run();
+
+  /**
+   * \brief Handle keyboard input.
+   * \details In single player mode, changes are applied to the world. In multiplayer mode, changes are sent to
+   * `GameServer`.
+   */
   void ProcessInput();
 
   const world::World& GetWorld() const;

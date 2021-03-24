@@ -1,17 +1,22 @@
 add_library(crossing_consoles_lib
 
         game/GameClient.cpp
-        game/world/Player.cpp
+        game/GameLogic.cpp
+        game/GameServer.cpp
+
         game/common/Position.cpp
+
+        game/world/Player.cpp
         game/world/World.cpp
         game/world/Wall.cpp
+        game/world/WorldGenerator.cpp
+        game/world/Spawner.cpp
+
         game/visual/Renderer.cpp
         game/visual/Compositor.cpp
         game/visual/Sprite.cpp
-        game/GameServer.cpp
-        game/world/WorldGenerator.cpp
+
         game/networking/Change.cpp
-        game/world/Spawner.cpp
 
         game/terminal/RealTerminal.cpp
         game/terminal/MockTerminal.cpp
