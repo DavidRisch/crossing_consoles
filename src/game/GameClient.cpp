@@ -77,57 +77,25 @@ void GameClient::Run() {
 }
 
 void GameClient::ProcessInput() {
-  coordinate_distance_t movement(0, 0);
-
   if (terminal->HasInput()) {
     int keypress = terminal->GetInput();
-    std::optional<Change> change;
+    auto keycode = static_cast<KeyCode>(keypress);
+    auto change_type_it = map_key_to_change.find(keycode);
 
-    switch (static_cast<KeyCode>(keypress)) {
-      case KeyCode::W: {
-        movement.Set(0, -1);
-        if (multiplayer) {
-          change.emplace(ChangeType::MOVE_UP);
-          client_manager->SendDataToServer(change->payload);
-        }
-        break;
-      }
-      case KeyCode::A: {
-        movement.Set(-1, 0);
-        if (multiplayer) {
-          change.emplace(ChangeType::MOVE_LEFT);
-          client_manager->SendDataToServer(change->payload);
-        }
-        break;
-      }
-      case KeyCode::S: {
-        movement.Set(0, 1);
-        if (multiplayer) {
-          change.emplace(ChangeType::MOVE_DOWN);
-          client_manager->SendDataToServer(change->payload);
-        }
-        break;
-      }
-      case KeyCode::D: {
-        movement.Set(1, 0);
-        if (multiplayer) {
-          change.emplace(ChangeType::MOVE_RIGHT);
-          client_manager->SendDataToServer(change->payload);
-        }
-        break;
-      }
-      case KeyCode::ESCAPE:
+    if (change_type_it == map_key_to_change.end()) {
+      if (keycode == KeyCode::ESCAPE) {
         keep_running = false;
-      default:
-        return;
+      }
+      return;
     }
 
-    if (!multiplayer) {
+    auto change = change_type_it->second;
+    if (multiplayer) {
+      client_manager->SendDataToServer(change.payload);
+    } else {
       auto player = weak_player.lock();
       assert(player != nullptr);
-      if (change.has_value()) {
-        GameLogic::HandleChange(player, *change, std::make_shared<World>(world));
-      }
+      GameLogic::HandleChange(player, change, std::make_shared<World>(world));
     }
   }
 }

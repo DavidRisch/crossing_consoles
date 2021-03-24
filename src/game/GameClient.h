@@ -2,6 +2,7 @@
 #define CROSSING_CONSOLES_GAMECLIENT_H
 
 #include <memory>
+#include <unordered_map>
 
 #include "../communication/connection_layer/connection/ClientSideConnectionManager.h"
 #include "networking/Change.h"
@@ -23,7 +24,7 @@ class GameClient {
 
   /**
    * \brief Update world, player and process changes.
-   * \details In multiplayer node, events from 'ConnectionManager' are handled additionally.
+   * \details In multiplayer mode, events from 'ConnectionManager' are handled additionally.
    */
   void Run();
 
@@ -44,6 +45,13 @@ class GameClient {
   std::shared_ptr<communication::connection_layer::ClientSideConnectionManager> client_manager;
   bool keep_running = true;
   bool multiplayer;
+
+  /// Map keycode to associated change
+  std::unordered_map<const KeyCode, networking::Change> map_key_to_change = {
+      {KeyCode::W, networking::Change(networking::ChangeType::MOVE_UP)},
+      {KeyCode::S, networking::Change(networking::ChangeType::MOVE_DOWN)},
+      {KeyCode::A, networking::Change(networking::ChangeType::MOVE_LEFT)},
+      {KeyCode::D, networking::Change(networking::ChangeType::MOVE_RIGHT)}};
 };
 
 }  // namespace game
