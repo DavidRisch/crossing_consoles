@@ -2,6 +2,10 @@ import os
 import subprocess
 
 
+class Hpp2plantumlBug(Exception):
+    pass
+
+
 class UmlDirectory:
     def __init__(self, absolute_path: str, relative_path: str):
         self.absolute_path = absolute_path
@@ -72,8 +76,12 @@ def run_hpp2plantuml(uml_directory: UmlDirectory):
 
     process = subprocess.run(['hpp2plantuml'] + arguments)
 
-    if process.returncode != 0:
-        raise RuntimeError()
+    try:
+        process.check_returncode()
+    except subprocess.CalledProcessError as e:
+        # TODO: Temporary workaround for issue in hpp2plantuml:
+        # https://github.com/thibaultmarin/hpp2plantuml/issues/13)
+        raise Hpp2plantumlBug from e
 
 
 def run_plant_uml(uml_directory: UmlDirectory):
@@ -90,8 +98,7 @@ def run_plant_uml(uml_directory: UmlDirectory):
         '--verbose', uml_directory.get_puml_path()
     ], env=environment)
 
-    if process.returncode != 0:
-        raise RuntimeError()
+    process.check_returncode()
 
 
 def main():
@@ -99,7 +106,7 @@ def main():
     src_directory = os.path.realpath(src_directory)
 
     for absolute_path, child_directories, child_files in os.walk(src_directory):
-        print(absolute_path)
+        print("Generating UML for directory:", absolute_path)
         relative_path = os.path.relpath(absolute_path, os.path.dirname(src_directory))
 
         uml_directory = UmlDirectory(absolute_path, relative_path)
@@ -108,7 +115,7 @@ def main():
             run_hpp2plantuml(uml_directory)
             uml_directory.apply_hacks()
             run_plant_uml(uml_directory)
-        except RuntimeError as e:
+        except Hpp2plantumlBug as e:
             # TODO: Temporary workaround for issue in hpp2plantuml:
             # https://github.com/thibaultmarin/hpp2plantuml/issues/13)
             print('caught', e)
