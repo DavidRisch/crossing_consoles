@@ -1,11 +1,10 @@
 #include "GameServer.h"
 
-#include <algorithm>
 #include <cassert>
-#include <iostream>
 #include <thread>
 
 #include "../communication/connection_layer/event/PayloadEvent.h"
+#include "GameLogic.h"
 #include "networking/Change.h"
 #include "world/WorldGenerator.h"
 
@@ -62,53 +61,11 @@ void GameServer::HandleEvent(const std::shared_ptr<communication::connection_lay
       auto player_id = event->GetPartnerId();
       auto player = world->GetPlayerById(player_id);
       assert(player != nullptr);
-      HandleChange(player, change);
+      GameLogic::HandleChange(*player, change, *world);
       break;
     }
     default:
       throw std::runtime_error("Unexpected EventType");
-  }
-}
-
-void GameServer::HandleChange(const std::shared_ptr<Player> &player, const Change &change) {
-  switch (change.GetChangeType()) {
-    case ChangeType::MOVE_UP: {
-      MovePlayer(player, coordinate_distance_t(0, -1));
-      break;
-    }
-    case ChangeType::MOVE_LEFT: {
-      MovePlayer(player, coordinate_distance_t(-1, 0));
-      break;
-    }
-    case ChangeType::MOVE_RIGHT: {
-      MovePlayer(player, coordinate_distance_t(1, 0));
-      break;
-    }
-    case ChangeType::MOVE_DOWN: {
-      MovePlayer(player, coordinate_distance_t(0, 1));
-      break;
-    }
-    default:
-      throw std::runtime_error("Unexpected ChangeType");
-  }
-}
-
-void GameServer::MovePlayer(const std::shared_ptr<Player> &player, const coordinate_distance_t &movement) {
-  Position new_position = player->position + movement;
-
-  if (new_position.x < 0) {
-    new_position.x += world->size.x;
-  } else if (new_position.x >= world->size.x) {
-    new_position.x -= world->size.x;
-  }
-  if (new_position.y < 0) {
-    new_position.y += world->size.y;
-  } else if (new_position.y >= world->size.y) {
-    new_position.y -= world->size.y;
-  }
-
-  if (new_position != player->position && !world->IsBlocked(new_position)) {
-    player->MoveTo(new_position);
   }
 }
 
