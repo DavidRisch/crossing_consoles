@@ -117,7 +117,7 @@ TEST_F(ConnectionSimulator, Length) {
   ConnectionSimulatorFlaky::Parameters parameters(3, 10, 2);
   std::vector<u_int8_t> expected_output(input);
   for (size_t i = 0; i < input.size(); ++i) {
-    if ((i - parameters.first_error) % (parameters.error_interval) < parameters.error_length) {
+    if (static_cast<int>((i - parameters.first_error) % (parameters.error_interval)) < parameters.error_length) {
       expected_output.at(i) ^= 0xffu;
     }
   }

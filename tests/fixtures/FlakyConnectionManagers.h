@@ -44,30 +44,38 @@ class FlakyConnectionManagers : public ConnectionManagers {
 
   void run_test(bool bad_server_incoming, int bad_server_outgoing, bool bad_client_incoming, int bad_client_outgoing) {
     for (int next_error = 0; next_error < test_until; ++next_error) {
-      auto server_incoming_parameters = ConnectionSimulatorFlaky::Parameters::Perfect();
+      auto server_incoming_parameters =
+          std::make_unique<ConnectionSimulatorFlaky::Parameters>(ConnectionSimulatorFlaky::Parameters::Perfect());
       if (bad_server_incoming) {
-        server_incoming_parameters.first_error = next_error;
+        server_incoming_parameters =
+            std::make_unique<ConnectionSimulatorFlaky::Parameters>(ConnectionSimulatorFlaky::Parameters(next_error));
       }
 
-      auto server_outgoing_parameters = ConnectionSimulatorFlaky::Parameters::Perfect();
+      auto server_outgoing_parameters =
+          std::make_unique<ConnectionSimulatorFlaky::Parameters>(ConnectionSimulatorFlaky::Parameters::Perfect());
       if (bad_server_outgoing) {
-        server_outgoing_parameters.first_error = next_error;
+        server_outgoing_parameters =
+            std::make_unique<ConnectionSimulatorFlaky::Parameters>(ConnectionSimulatorFlaky::Parameters(next_error));
       }
 
-      auto client_incoming_parameters = ConnectionSimulatorFlaky::Parameters::Perfect();
+      auto client_incoming_parameters =
+          std::make_unique<ConnectionSimulatorFlaky::Parameters>(ConnectionSimulatorFlaky::Parameters::Perfect());
       if (bad_client_incoming) {
-        client_incoming_parameters.first_error = next_error;
+        client_incoming_parameters =
+            std::make_unique<ConnectionSimulatorFlaky::Parameters>(ConnectionSimulatorFlaky::Parameters(next_error));
       }
 
-      auto client_outgoing_parameters = ConnectionSimulatorFlaky::Parameters::Perfect();
+      auto client_outgoing_parameters =
+          std::make_unique<ConnectionSimulatorFlaky::Parameters>(ConnectionSimulatorFlaky::Parameters::Perfect());
       if (bad_client_outgoing) {
-        client_outgoing_parameters.first_error = next_error;
+        client_outgoing_parameters =
+            std::make_unique<ConnectionSimulatorFlaky::Parameters>(ConnectionSimulatorFlaky::Parameters(next_error));
       }
 
       server_connection_simulator_provider.reset(
-          new FlakyConnectionSimulatorProvider(server_incoming_parameters, server_outgoing_parameters));
+          new FlakyConnectionSimulatorProvider(*server_incoming_parameters, *server_outgoing_parameters));
       client_connection_simulator_provider.reset(
-          new FlakyConnectionSimulatorProvider(client_incoming_parameters, client_outgoing_parameters));
+          new FlakyConnectionSimulatorProvider(*client_incoming_parameters, *client_outgoing_parameters));
 
       create_server_and_client();
       send_and_check_messages(10);
