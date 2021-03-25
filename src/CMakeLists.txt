@@ -29,6 +29,7 @@ add_library(crossing_consoles_lib
 
         communication/byte_layer/connection_simulator/ConnectionSimulatorPerfect.cpp
         communication/byte_layer/connection_simulator/ConnectionSimulatorFlaky.cpp
+        communication/byte_layer/connection_simulator/PerfectConnectionSimulatorProvider.cpp
 
         communication/message_layer/message_stream/MessageInputStream.cpp
         communication/message_layer/message_stream/MessageOutputStream.cpp

@@ -16,7 +16,9 @@ class ServerSideConnectionManager : public ConnectionManager {
    * \brief Create Connection Manager for usage on server side.
    */
   static std::shared_ptr<ServerSideConnectionManager> CreateServerSide(
-      ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
+      ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout,
+      const std::shared_ptr<byte_layer::IConnectionSimulatorProvider>& connection_simulator_provider =
+          byte_layer::PerfectConnectionSimulatorProvider::instance);
 
   /**
    * \brief Returns the number of connected clients.
@@ -24,7 +26,9 @@ class ServerSideConnectionManager : public ConnectionManager {
   int ConnectionCount();
 
  private:
-  ServerSideConnectionManager(ProtocolDefinition::timeout_t timeout);
+  ServerSideConnectionManager(
+      ProtocolDefinition::timeout_t timeout,
+      const std::shared_ptr<byte_layer::IConnectionSimulatorProvider>& connection_simulator_provider);
 
   partner_id_t GetNextPartnerId() override;
 

@@ -5,6 +5,9 @@
 #include <unordered_map>
 
 #include "../../byte_layer/byte_stream/SocketByteServer.h"
+#include "../../byte_layer/connection_simulator/ConnectionSimulatorPerfect.h"
+#include "../../byte_layer/connection_simulator/IConnectionSimulatorProvider.h"
+#include "../../byte_layer/connection_simulator/PerfectConnectionSimulatorProvider.h"
 #include "../../message_layer/message/Message.h"
 #include "../../message_layer/message/PayloadMessage.h"
 #include "../event/Event.h"
@@ -24,7 +27,10 @@ using partner_id_t = ProtocolDefinition::partner_id_t;
 
 class ConnectionManager {
  public:
-  explicit ConnectionManager(ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout);
+  explicit ConnectionManager(
+      ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout,
+      const std::shared_ptr<byte_layer::IConnectionSimulatorProvider>& connection_simulator_provider =
+          byte_layer::PerfectConnectionSimulatorProvider::instance);
 
   /**
    * \brief Send data to all clients.
@@ -110,6 +116,9 @@ class ConnectionManager {
 
   /// Set the interval of sent KeepAliveMessages in dependency of `timeout`
   ProtocolDefinition::timeout_t keep_alive_interval{};
+
+ protected:
+  std::shared_ptr<byte_layer::IConnectionSimulatorProvider> connection_simulator_provider;
 };
 
 }  // namespace connection_layer

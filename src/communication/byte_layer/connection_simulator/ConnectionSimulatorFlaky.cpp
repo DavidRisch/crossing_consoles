@@ -1,18 +1,34 @@
 #include "ConnectionSimulatorFlaky.h"
 
-#include <cstdlib>
-
 using namespace communication;
 using namespace communication::byte_layer;
 
-ConnectionSimulatorFlaky::ConnectionSimulatorFlaky(double error_rate)
-    : error_rate(error_rate) {
+ConnectionSimulatorFlaky::ConnectionSimulatorFlaky(ConnectionSimulatorFlaky::Parameters parameters)
+    : parameters(parameters)
+    , next_error(parameters.first_error) {
 }
 
 uint8_t ConnectionSimulatorFlaky::Filter(uint8_t input) {
-  if (rand() % 100000 < error_rate * 100000) {
-    return static_cast<uint8_t>(rand() % 256);
+  if (next_error == -1) {
+    return input;
+  }
+
+  if (next_error == 0) {
+    current_error_length++;
+    if (current_error_length >= parameters.error_length) {
+      // last byte of current error
+
+      current_error_length = 0;
+      if (parameters.error_interval != 0) {
+        next_error = parameters.error_interval - parameters.error_length;
+      } else {
+        next_error = -1;
+      }
+    }
+
+    return input ^ 0xffu;
   } else {
+    next_error--;
     return input;
   }
 }
