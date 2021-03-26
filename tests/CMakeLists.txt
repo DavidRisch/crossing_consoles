@@ -18,6 +18,8 @@ add_executable(crossing_consoles_test
         player.cpp
         world.cpp
         spawner.cpp
+        flaky_connection.cpp
+
         utils/detect_debugger.h
         )
 

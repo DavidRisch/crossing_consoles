@@ -11,8 +11,9 @@ ClientSideConnectionManager::ClientSideConnectionManager(ProtocolDefinition::tim
 }
 
 std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::CreateClientSide(
-    ProtocolDefinition::timeout_t timeout) {
-  auto byte_stream = byte_layer::SocketByteStream::CreateClientSide();
+    ProtocolDefinition::timeout_t timeout,
+    std::shared_ptr<byte_layer::IConnectionSimulatorProvider> connection_simulator_provider) {
+  auto byte_stream = byte_layer::SocketByteStream::CreateClientSide(std::move(connection_simulator_provider));
   byte_stream->SetParamCatchSendFailed(false);
   auto message_input_stream = std::make_shared<message_layer::MessageInputStream>(byte_stream);
   auto message_output_stream = std::make_shared<message_layer::MessageOutputStream>(byte_stream);

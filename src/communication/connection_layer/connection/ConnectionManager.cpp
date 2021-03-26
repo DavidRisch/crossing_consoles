@@ -13,8 +13,11 @@
 using namespace communication;
 using namespace connection_layer;
 
-ConnectionManager::ConnectionManager(ProtocolDefinition::timeout_t timeout)
-    : timeout(timeout) {
+ConnectionManager::ConnectionManager(
+    ProtocolDefinition::timeout_t timeout,
+    const std::shared_ptr<byte_layer::IConnectionSimulatorProvider>& connection_simulator_provider)
+    : timeout(timeout)
+    , connection_simulator_provider(connection_simulator_provider) {
   connection_map = {};
   keep_alive_interval =
       std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::keep_alive_numerator);

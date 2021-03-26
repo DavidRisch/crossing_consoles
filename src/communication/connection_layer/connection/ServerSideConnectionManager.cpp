@@ -1,12 +1,16 @@
 #include "ServerSideConnectionManager.h"
 
+#include <utility>
+
 #include "ConnectionManager.h"
 
 using namespace communication;
 using namespace connection_layer;
 
-ServerSideConnectionManager::ServerSideConnectionManager(ProtocolDefinition::timeout_t timeout)
-    : ConnectionManager(timeout) {
+ServerSideConnectionManager::ServerSideConnectionManager(
+    ProtocolDefinition::timeout_t timeout,
+    const std::shared_ptr<byte_layer::IConnectionSimulatorProvider>& connection_simulator_provider)
+    : ConnectionManager(timeout, connection_simulator_provider) {
 }
 
 void ServerSideConnectionManager::HandleConnections() {
@@ -33,10 +37,11 @@ void ServerSideConnectionManager::HandleConnections() {
 }
 
 std::shared_ptr<ServerSideConnectionManager> ServerSideConnectionManager::CreateServerSide(
-    ProtocolDefinition::timeout_t timeout) {
-  std::shared_ptr<ServerSideConnectionManager> manager =
-      std::shared_ptr<ServerSideConnectionManager>(new ServerSideConnectionManager(timeout));
-  manager->byte_server = std::make_shared<byte_layer::SocketByteServer>();
+    ProtocolDefinition::timeout_t timeout,
+    const std::shared_ptr<byte_layer::IConnectionSimulatorProvider>& connection_simulator_provider) {
+  auto manager = std::shared_ptr<ServerSideConnectionManager>(
+      new ServerSideConnectionManager(timeout, connection_simulator_provider));
+  manager->byte_server = std::make_shared<byte_layer::SocketByteServer>(connection_simulator_provider);
   return manager;
 }
 
