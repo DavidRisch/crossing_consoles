@@ -32,7 +32,10 @@ class ConnectionSimulatorFlaky : public IConnectionSimulator {
       return Parameters(-1);
     }
 
-    /// Number of bytes until the first error should be generated.
+    /**
+     * \brief Number of bytes until the first error should be generated.
+     * \details -1 if no error should be made.
+     */
     const int first_error;
 
     /**
