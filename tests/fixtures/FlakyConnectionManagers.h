@@ -42,7 +42,8 @@ class FlakyConnectionManagers : public ConnectionManagers {
     }
   };
 
-  void run_test(bool bad_server_incoming, int bad_server_outgoing, bool bad_client_incoming, int bad_client_outgoing) {
+  void run_test(bool bad_server_incoming, bool bad_server_outgoing, bool bad_client_incoming,
+                bool bad_client_outgoing) {
     for (int next_error = 0; next_error < test_until; ++next_error) {
       auto server_incoming_parameters =
           std::make_unique<ConnectionSimulatorFlaky::Parameters>(ConnectionSimulatorFlaky::Parameters::Perfect());

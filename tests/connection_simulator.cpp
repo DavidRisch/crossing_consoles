@@ -63,6 +63,33 @@ class ConnectionSimulator : public ::testing::Test {
 
     client_thread.join();
   }
+
+  static void TestWithFlakyParameters(ConnectionSimulatorFlaky::Parameters parameters) {
+    std::vector<u_int8_t> input;
+    input.reserve(100);
+    for (int i = 0; i < 100; ++i) {
+      input.push_back(i);
+    }
+
+    std::vector<u_int8_t> expected_output(input);
+    for (size_t i = 0; i < input.size(); ++i) {
+      if (i >= static_cast<unsigned int>(parameters.first_error) &&
+          static_cast<int>((i - parameters.first_error) % (parameters.error_interval)) < parameters.error_length) {
+        expected_output.at(i) ^= 0xffu;
+      }
+    }
+
+    ConnectionSimulatorFlaky connection_simulator(parameters);
+
+    std::vector<u_int8_t> actual_output;
+    actual_output.reserve(input.size());
+
+    for (const auto &value : input) {
+      actual_output.push_back(connection_simulator.Filter(value));
+    }
+
+    EXPECT_EQ(actual_output, expected_output);
+  }
 };
 
 TEST_F(ConnectionSimulator, AllPerfect) {
@@ -107,29 +134,14 @@ TEST_F(ConnectionSimulator, AllFlaky) {
   EXPECT_NE(client_to_server, server_received);
 }
 
-TEST_F(ConnectionSimulator, Length) {
-  std::vector<u_int8_t> input;
-  input.reserve(100);
-  for (int i = 0; i < 100; ++i) {
-    input.push_back(i);
-  }
+TEST_F(ConnectionSimulator, ParamtersSimple) {
+  TestWithFlakyParameters(ConnectionSimulatorFlaky::Parameters(3, 10, 1));
+}
 
-  ConnectionSimulatorFlaky::Parameters parameters(3, 10, 2);
-  std::vector<u_int8_t> expected_output(input);
-  for (size_t i = 0; i < input.size(); ++i) {
-    if (static_cast<int>((i - parameters.first_error) % (parameters.error_interval)) < parameters.error_length) {
-      expected_output.at(i) ^= 0xffu;
-    }
-  }
+TEST_F(ConnectionSimulator, PatametersLength) {
+  TestWithFlakyParameters(ConnectionSimulatorFlaky::Parameters(3, 10, 2));
+}
 
-  ConnectionSimulatorFlaky connection_simulator(parameters);
-
-  std::vector<u_int8_t> actual_output;
-  actual_output.reserve(input.size());
-
-  for (const auto &value : input) {
-    actual_output.push_back(connection_simulator.Filter(value));
-  }
-
-  EXPECT_EQ(actual_output, expected_output);
+TEST_F(ConnectionSimulator, PatametersLate) {
+  TestWithFlakyParameters(ConnectionSimulatorFlaky::Parameters(30, 10, 2));
 }
