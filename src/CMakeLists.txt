@@ -21,6 +21,8 @@ add_library(crossing_consoles_lib
         game/terminal/RealTerminal.cpp
         game/terminal/MockTerminal.cpp
 
+        communication/debug.cpp
+
         communication/byte_layer/byte_stream/SocketByteStream.cpp
         communication/byte_layer/byte_stream/SocketByteServer.cpp
         communication/byte_layer/byte_stream/SocketHolder.cpp
