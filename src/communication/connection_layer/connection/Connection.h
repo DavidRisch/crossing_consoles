@@ -152,7 +152,7 @@ class Connection {
   sequence_t GenerateSequence();
   sequence_t sequence_counter;
 
-  /// How frequently Messages which might not have been received.
+  /// How frequently Messages which might not have been received by the other side should be resend.
   ProtocolDefinition::timeout_t resend_interval{};
   /// Reset every time a valid message (except NACK) is received, a message is send or a message is resend.
   std::chrono::time_point<std::chrono::steady_clock> timestamp_last_change;

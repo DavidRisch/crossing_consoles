@@ -192,8 +192,8 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
       } else {
         state = ConnectionState::READY;
       }
-    } else if (received_message->GetMessageType() == message_layer::MessageType::ACKNOWLEDGE) {
-      assert(false);  // Acknowledge are handled by TryReceive()
+    } else if (received_message->GetMessageType() == message_layer::MessageType::NOT_ACKNOWLEDGE) {
+      assert(false);  // NACKs are handled by TryReceive()
     } else {
       // Send acknowledge for every received message except for other (not-)acknowledges
       SendAcknowledge(received_message->GetMessageSequence());
