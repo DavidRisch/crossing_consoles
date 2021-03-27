@@ -53,6 +53,10 @@ void ConnectionManager::AddConnection(const std::shared_ptr<Connection>& connect
   event_queue.push_back(std::make_shared<ConnectEvent>(new_partner_id));
 }
 
+bool ConnectionManager::HasEvent() {
+  return !event_queue.empty();
+}
+
 std::shared_ptr<Event> ConnectionManager::PopAndGetOldestEvent() {
   if (event_queue.empty()) {
     return std::shared_ptr<Event>();
