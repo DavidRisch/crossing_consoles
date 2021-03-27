@@ -158,7 +158,7 @@ class Connection {
   std::chrono::time_point<std::chrono::steady_clock> timestamp_last_change;
 
   /**
-   * \brief Messages with might not have been received by the other side (no acknowledge received jet)
+   * \brief Messages which might not have been received by the other side (no acknowledge received yet)
    * ordered from oldest to newest.
    */
   std::list<std::shared_ptr<message_layer::Message>> unacknowledged_sent_message;

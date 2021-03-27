@@ -65,7 +65,7 @@ class ConnectionManager {
   void CloseConnection(partner_id_t partner_id);
 
   /**
-   * \brief Test if a new `Event` an be retrieved by `PopAndGetOldestEvent()`.
+   * \brief Test if a new `Event` can be retrieved by `PopAndGetOldestEvent()`.
    */
   bool HasEvent();
 

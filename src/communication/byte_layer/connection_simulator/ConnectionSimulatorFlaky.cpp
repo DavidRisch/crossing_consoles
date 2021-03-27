@@ -30,7 +30,7 @@ uint8_t ConnectionSimulatorFlaky::Filter(uint8_t input) {
 
     DEBUG_CONNECTION_LAYER(std::cout << " ConnectionSimulatorFlaky(" << this << ") making error " << (int)input
                                      << " \n")
-    return input + 15;  // Change is such a way that a second ConnectionSimulatorFlaky does not undo the change
+    return input + 15;  // Change in such a way that a second ConnectionSimulatorFlaky does not undo the change
   } else {
     next_error--;
     return input;

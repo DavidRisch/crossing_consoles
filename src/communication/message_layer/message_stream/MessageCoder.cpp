@@ -212,7 +212,7 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
   auto second_end_sequence =
       ReadFromStreamWithCRC<ProtocolDefinition::flag_t>(stream, sizeof(ProtocolDefinition::flag), nullptr, false);
   if (second_end_sequence != ProtocolDefinition::end_marker) {
-    throw InvalidMessageException("No end at end");
+    throw InvalidMessageException("No end_marker at end");
   }
 
   return message;

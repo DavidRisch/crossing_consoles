@@ -231,7 +231,7 @@ bool Connection::TryReceive() {
                                          << (int)received_message->GetMessageType()
                                          << "   \t seq: " << received_message->GetMessageSequence()
                                          << " expected: " << *last_received_sequence_counter + 1 << "\n")
-        return true;  // there might be more messages t be received
+        return true;  // there might be more messages which can be received
       }
     }
 
@@ -252,7 +252,7 @@ bool Connection::TryReceive() {
   timestamp_last_change = std::chrono::steady_clock::now();
   receive_message_queue.push(received_message);
 
-  return true;  // there might be more messages t be received
+  return true;  // there might be more messages which can be received
 }
 
 void Connection::ReceiveAll() {
