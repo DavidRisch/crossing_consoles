@@ -10,7 +10,7 @@ namespace communication {
 namespace byte_layer {
 
 /**
- * \brief Changes each byte to a random value with a probability of error_rate.
+ * \brief Changes some bytes in a deterministic way based on its parameters.
  */
 class ConnectionSimulatorFlaky : public IConnectionSimulator {
  public:
