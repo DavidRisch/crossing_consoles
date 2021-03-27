@@ -129,7 +129,8 @@ class ConnectionManagers : public ::testing::Test {
       server_manager->SendDataToConnection(client_id, payload_server_to_client);
       client_manager->SendDataToServer(payload_client_to_server);
       std::this_thread::sleep_for(std::chrono::microseconds(100));
-      for (int j = 0; j < 10; ++j) {
+      int counter;
+      for (counter = 0; counter < 1000 && (!server_manager->HasEvent() || !client_manager->HasEvent()); ++counter) {
         server_manager->HandleConnections();
         client_manager->HandleConnections();
         std::this_thread::sleep_for(std::chrono::microseconds(10));
