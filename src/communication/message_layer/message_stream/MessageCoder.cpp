@@ -70,9 +70,10 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
 
   WriteToStream(output, ProtocolDefinition::flag, sizeof(ProtocolDefinition::flag), false);
 
-  // MessageType is never flag or escape
+  // MessageType is never equal to a special value
   assert(static_cast<const unsigned char>(message->GetMessageType()) != ProtocolDefinition::flag);
   assert(static_cast<const unsigned char>(message->GetMessageType()) != ProtocolDefinition::escape);
+  assert(static_cast<const unsigned char>(message->GetMessageType()) != ProtocolDefinition::end_marker);
 
   output.push_back(static_cast<uint8_t>(message->GetMessageType()));
 
