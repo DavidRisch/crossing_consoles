@@ -317,3 +317,51 @@ TEST_F(ConnectionManagers, ServerKeepAlive) {
   EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
   EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
 }
+
+TEST_F(ConnectionManagers, NoMessagesStatistics) {
+  // no messages have been sent yet, statistics should be empty / zero
+  create_server_and_client();
+
+  ConnectionStatistics client_statistics =
+      client_manager->GetStatisticsFromPartnerConnection(ProtocolDefinition::server_partner_id);
+  ASSERT_EQ(client_statistics.GetSentMessageStatistics().count, 0);
+  ASSERT_EQ(client_statistics.GetReceivedMessageStatistics().count, 0);
+  ASSERT_EQ(client_statistics.CalculateAverageResponseTime(), 0);
+  ASSERT_EQ(client_statistics.CalculatePackageLoss().package_loss, 0);
+  ASSERT_EQ(client_statistics.CalculatePackageLoss().package_loss_percentage, 0);
+}
+
+TEST_F(ConnectionManagers, SendMessagesStatistics) {
+  int message_count = 10;
+  create_server_and_client();
+  send_and_check_messages(message_count);
+  ConnectionStatistics client_statistics =
+      client_manager->GetStatisticsFromPartnerConnection(ProtocolDefinition::server_partner_id);
+
+  ConnectionStatistics::message_count_map_t sent_map = client_statistics.GetSentMessageStatistics().map;
+  ASSERT_EQ(sent_map.at(MessageType::PAYLOAD), message_count);
+  ASSERT_EQ(sent_map.at(MessageType::ACKNOWLEDGE), message_count);
+
+  ConnectionStatistics::message_count_map_t received_map = client_statistics.GetReceivedMessageStatistics().map;
+  ASSERT_EQ(received_map.at(MessageType::PAYLOAD), message_count);
+  ASSERT_EQ(received_map.at(MessageType::ACKNOWLEDGE), message_count);
+
+  ASSERT_EQ(client_statistics.CalculatePackageLoss().package_loss, 0);
+  ASSERT_EQ(client_statistics.CalculatePackageLoss().package_loss_percentage, 0);
+}
+
+TEST_F(ConnectionManagers, PackageLossStatistics) {
+  // Server becomes unreachable, package loss is 100%
+  create_server_and_client();
+
+  std::vector<uint8_t> payload;
+  client_manager->SendDataToServer(payload);
+
+  ConnectionStatistics client_statistics =
+      client_manager->GetStatisticsFromPartnerConnection(ProtocolDefinition::server_partner_id);
+  ConnectionStatistics::message_count_map_t sent_map = client_statistics.GetSentMessageStatistics().map;
+
+  ASSERT_EQ(sent_map.at(MessageType::PAYLOAD), 1);
+  ASSERT_EQ(client_statistics.CalculatePackageLoss().package_loss, 1);
+  ASSERT_EQ(client_statistics.CalculatePackageLoss().package_loss_percentage, 100);
+}
