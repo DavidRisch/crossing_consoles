@@ -86,7 +86,8 @@ TEST(MessageCoder, CrcIncorrectException) {
   size_t payload_offset = sizeof(ProtocolDefinition::flag) + sizeof(MessageType) +
                           sizeof(ProtocolDefinition::payload_length_t) + sizeof(ProtocolDefinition::sequence_t);
 
-  for (size_t i = payload_offset; i < encoded_message.size() - sizeof(ProtocolDefinition::flag); ++i) {
+  for (size_t i = payload_offset;
+       i < encoded_message.size() - sizeof(ProtocolDefinition::flag) - sizeof(ProtocolDefinition::end_marker); ++i) {
     std::vector<uint8_t> bad_encoded_message(encoded_message);
     bad_encoded_message.at(i) ^= 1;  // change a single byte of the encoded message
 

@@ -65,6 +65,11 @@ class ConnectionManager {
   void CloseConnection(partner_id_t partner_id);
 
   /**
+   * \brief Test if a new `Event` can be retrieved by `PopAndGetOldestEvent()`.
+   */
+  bool HasEvent();
+
+  /**
    * \brief Return and pop the oldest `Event`.
    */
   std::shared_ptr<Event> PopAndGetOldestEvent();
@@ -116,6 +121,8 @@ class ConnectionManager {
 
   /// Set the interval of sent KeepAliveMessages in dependency of `timeout`
   ProtocolDefinition::timeout_t keep_alive_interval{};
+
+  ProtocolDefinition::timeout_t resend_interval{};
 
  protected:
   std::shared_ptr<byte_layer::IConnectionSimulatorProvider> connection_simulator_provider;

@@ -13,6 +13,7 @@
 #include "../src/communication/message_layer/message/ConnectionResetMessage.h"
 #include "../src/communication/message_layer/message/ConnectionResponseMessage.h"
 #include "../src/communication/message_layer/message/KeepAliveMessage.h"
+#include "../src/communication/message_layer/message/NotAcknowledgeMessage.h"
 
 using namespace communication;
 using namespace communication::byte_layer;
@@ -29,6 +30,7 @@ class Connections : public ::testing::Test {
       std::make_shared<KeepAliveMessage>(1000),          std::make_shared<ConnectionRequestMessage>(1200),
       std::make_shared<ConnectionResponseMessage>(1230), std::make_shared<PayloadMessage>(empty_payload, 123),
       std::make_shared<AcknowledgeMessage>(2000),        std::make_shared<ConnectionResetMessage>(3000),
+      std::make_shared<NotAcknowledgeMessage>(3000),
   };
 
   std::shared_ptr<Connection> server_connection;
@@ -325,6 +327,18 @@ TEST_F(Connections, NoConnectionReset) {
     if (message->GetMessageType() == MessageType::ACKNOWLEDGE) {
       // server throws exception if acknowledge is received in state ready
       EXPECT_THROW(server_connection->ReceiveMessage(), Connection::BadAcknowledgeException);
+      continue;
+    }
+
+    if (message->GetMessageType() == MessageType::NOT_ACKNOWLEDGE) {
+      // server resends last sent message
+      server_connection->ReceiveMessage();
+      auto received_message_client = client_connection->ReceiveMessage();
+      auto received_message_server = server_connection->ReceiveMessage();
+      ASSERT_EQ(received_message_server, nullptr);
+      ASSERT_EQ(received_message_client, nullptr);
+
+      ASSERT_FALSE(client_connection->ConnectionClosed());
       continue;
     }
 

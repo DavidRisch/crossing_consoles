@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "../../debug.h"
 #include "ConnectionManager.h"
 
 using namespace communication;
@@ -25,6 +26,7 @@ void ServerSideConnectionManager::HandleConnections() {
         Connection::CreateServerSide(std::move(message_input_stream), std::move(message_output_stream));
 
     connection->BlockingEstablish();
+    DEBUG_CONNECTION_LAYER(std::cout << "(" << connection.get() << ") Establish done (ServerSideConnectionManager)\n")
 
     AddConnection(connection);
   }

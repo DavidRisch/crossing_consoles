@@ -21,6 +21,8 @@ add_library(crossing_consoles_lib
         game/terminal/RealTerminal.cpp
         game/terminal/MockTerminal.cpp
 
+        communication/debug.cpp
+
         communication/byte_layer/byte_stream/SocketByteStream.cpp
         communication/byte_layer/byte_stream/SocketByteServer.cpp
         communication/byte_layer/byte_stream/SocketHolder.cpp
@@ -42,6 +44,7 @@ add_library(crossing_consoles_lib
         communication/message_layer/message/PayloadMessage.cpp
         communication/message_layer/message/MessageMetaData.cpp
         communication/message_layer/message/AcknowledgeMessage.cpp
+        communication/message_layer/message/NotAcknowledgeMessage.cpp
 
         communication/message_layer/crc/CRCHandler.cpp
 

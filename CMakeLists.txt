@@ -9,6 +9,9 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 add_compile_options(-Wall -Wextra -pedantic)
 
+# uncomment to enable verbose debug output
+# add_compile_definitions(CROSSING_CONSOLES_DO_DEBUG)
+
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(gtest)
 ADD_SUBDIRECTORY(tests)
