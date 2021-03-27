@@ -25,6 +25,9 @@ class ProtocolDefinition {
   /// Arbitrary constant, used as the `escape` sequence.
   constexpr static const escape_t escape = 0x87u;
 
+  ///  Arbitrary constant, used as the last byte of a message.
+  constexpr static const uint8_t end_marker = 0x88u;
+
   typedef uint16_t payload_length_t;
 
   /// A type large enough to hold message `sequence`.

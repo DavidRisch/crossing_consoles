@@ -50,10 +50,10 @@ static T ReadFromStreamWithCRC(byte_layer::IInputByteStream &stream, unsigned in
         }
         stream.Read(reinterpret_cast<uint8_t *>(&byte), 1);
         if (!(byte == ProtocolDefinition::escape || byte == ProtocolDefinition::flag)) {
-          throw MessageCoder::InvalidMessageException();
+          throw MessageCoder::InvalidMessageException("Invalid byte after escape");
         }
       } else if (byte == ProtocolDefinition::flag) {
-        throw MessageCoder::InvalidMessageException();
+        throw MessageCoder::InvalidMessageException("Unexpected flag");
       }
     }
     if (crc_handler != nullptr) {
@@ -119,6 +119,7 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
 
   // Write flag to mark end of message
   WriteToStream(output, ProtocolDefinition::flag, sizeof(ProtocolDefinition::flag), false);
+  WriteToStream(output, ProtocolDefinition::end_marker, sizeof(ProtocolDefinition::end_marker), false);
 
   return output;
 }
@@ -131,9 +132,9 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
     assert(found_start_sequence == ProtocolDefinition::flag);
   }
 
-  auto message_type_value = ReadFromStreamWithCRC<char>(stream, sizeof(char), &crc_handler);
-  if (message_type_value < 0 || (message_type_value > static_cast<uint8_t>(MessageType::HIGHEST_ELEMENT))) {
-    throw InvalidMessageException();
+  auto message_type_value = ReadFromStreamWithCRC<u_int8_t>(stream, sizeof(u_int8_t), &crc_handler);
+  if (message_type_value > static_cast<uint8_t>(MessageType::HIGHEST_ELEMENT)) {
+    throw InvalidMessageException("Invalid message_type: " + std::to_string(message_type_value));
   }
 
   auto message_type = static_cast<MessageType>(message_type_value);
@@ -181,10 +182,10 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
           stream.Read(reinterpret_cast<uint8_t *>(&byte), 1);
           crc_handler.AppendByte(byte);
           if (!(byte == ProtocolDefinition::escape || byte == ProtocolDefinition::flag)) {
-            throw MessageCoder::InvalidMessageException();
+            throw MessageCoder::InvalidMessageException("Invalid byte after escape while reading payload");
           }
         } else if (byte == ProtocolDefinition::flag) {
-          throw MessageCoder::InvalidMessageException();
+          throw MessageCoder::InvalidMessageException("Unexpected flag while reading payload");
         }
         payload.push_back(byte);
       }
@@ -202,10 +203,16 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
     throw CrcIncorrectException();
   }
 
-  auto end_sequence =
+  auto first_end_sequence =
       ReadFromStreamWithCRC<ProtocolDefinition::flag_t>(stream, sizeof(ProtocolDefinition::flag), nullptr, false);
-  if (end_sequence != ProtocolDefinition::flag) {
-    throw InvalidMessageException();
+  if (first_end_sequence != ProtocolDefinition::flag) {
+    throw InvalidMessageException("No flag at end");
+  }
+
+  auto second_end_sequence =
+      ReadFromStreamWithCRC<ProtocolDefinition::flag_t>(stream, sizeof(ProtocolDefinition::flag), nullptr, false);
+  if (second_end_sequence != ProtocolDefinition::end_marker) {
+    throw InvalidMessageException("No end at end");
   }
 
   return message;

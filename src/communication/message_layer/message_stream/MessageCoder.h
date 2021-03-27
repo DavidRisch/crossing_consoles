@@ -41,8 +41,15 @@ class MessageCoder {
   };
 
   class InvalidMessageException : public DecodeFailedException {
+   private:
+    std::string output_message;
+
+   public:
+    explicit InvalidMessageException(std::string reason)
+        : output_message("Invalid message: " + reason){};
+
     [[nodiscard]] const char* what() const noexcept override {
-      return "Unexpected sequence in message.";
+      return output_message.c_str();
     }
   };
 };
