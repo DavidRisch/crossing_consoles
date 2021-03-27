@@ -2,8 +2,10 @@
 #define CROSSING_CONSOLES_GAMECLIENT_H
 
 #include <memory>
+#include <unordered_map>
 
 #include "../communication/connection_layer/connection/ClientSideConnectionManager.h"
+#include "networking/Change.h"
 #include "terminal/ITerminal.h"
 #include "visual/Compositor.h"
 #include "world/Player.h"
@@ -15,20 +17,41 @@ enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' 
 
 class GameClient {
  public:
-  GameClient(world::Player player, std::shared_ptr<terminal::ITerminal> terminal,
-             const common::coordinate_size_t& world, bool multiplayer = false);
+  GameClient(
+      const std::shared_ptr<world::Player>& player, const std::shared_ptr<terminal::ITerminal>& terminal,
+      const common::coordinate_size_t& world_size, bool multiplayer = false,
+      communication::ProtocolDefinition::timeout_t communication_timeout = communication::ProtocolDefinition::timeout);
 
+  /**
+   * \brief Update world, player and process changes.
+   * \details In multiplayer mode, events from 'ConnectionManager' are handled additionally.
+   */
   void Run();
+
+  /**
+   * \brief Handle keyboard input.
+   * \details In single player mode, changes are applied to the world. In multiplayer mode, changes are sent to
+   * `GameServer`.
+   */
   void ProcessInput();
 
+  const world::World& GetWorld() const;
+
  private:
-  world::Player player;
+  std::weak_ptr<world::Player> weak_player;
   world::World world;
   std::shared_ptr<terminal::ITerminal> terminal;
   std::unique_ptr<visual::Compositor> compositor;
   std::shared_ptr<communication::connection_layer::ClientSideConnectionManager> client_manager;
   bool keep_running = true;
   bool multiplayer;
+
+  /// Map keycode to associated change
+  std::unordered_map<const KeyCode, networking::Change> map_key_to_change = {
+      {KeyCode::W, networking::Change(networking::ChangeType::MOVE_UP)},
+      {KeyCode::S, networking::Change(networking::ChangeType::MOVE_DOWN)},
+      {KeyCode::A, networking::Change(networking::ChangeType::MOVE_LEFT)},
+      {KeyCode::D, networking::Change(networking::ChangeType::MOVE_RIGHT)}};
 };
 
 }  // namespace game

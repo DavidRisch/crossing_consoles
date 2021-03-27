@@ -88,8 +88,10 @@ double ConnectionStatistics::CalculateUptime() {
 
 void ConnectionStatistics::UpdateStatisticData(MessageStatisticData& message_statistics,
                                                const message_layer::Message& message) {
-  assert(message.GetMessageType() != message_layer::MessageType::CONNECTION_RESPONSE);
-  assert(message.GetMessageType() != message_layer::MessageType::CONNECTION_REQUEST);
+  if (message.GetMessageType() == message_layer::MessageType::CONNECTION_RESPONSE ||
+      message.GetMessageType() == message_layer::MessageType::CONNECTION_REQUEST) {
+    return;
+  }
 
   message_statistics.count++;
 

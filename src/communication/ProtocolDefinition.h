@@ -35,6 +35,11 @@ class ProtocolDefinition {
   /// Set timeout duration
   static constexpr const timeout_t timeout = std::chrono::milliseconds(100);
 
+  /// Set keep alive numerator
+  /// `timeout` divided by `keep_alive_numerator` describes the interval after which a `KeepAliveMessage' is sent
+  constexpr static const double keep_alive_numerator = 2;
+  static_assert(keep_alive_numerator > 0);
+
   /// Used to reference connection partners.
   typedef unsigned int partner_id_t;
   /// partner id of the server. A constant because there is only a single server.

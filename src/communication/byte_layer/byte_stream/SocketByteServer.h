@@ -15,7 +15,10 @@ namespace byte_layer {
  */
 class SocketByteServer {
  public:
-  explicit SocketByteServer(uint16_t port = socket_default_port, int max_connections = 5);
+  explicit SocketByteServer(
+      const std::shared_ptr<byte_layer::IConnectionSimulatorProvider>& connection_simulator_provider =
+          byte_layer::PerfectConnectionSimulatorProvider::instance,
+      uint16_t port = socket_default_port, int max_connections = 5);
 
   /**
    * \brief Create `SocketByteStream` for a new client.
@@ -26,6 +29,8 @@ class SocketByteServer {
 
  private:
   std::shared_ptr<SocketHolder> socket_holder;
+
+  std::shared_ptr<byte_layer::IConnectionSimulatorProvider> connection_simulator_provider;
 };
 
 }  // namespace byte_layer

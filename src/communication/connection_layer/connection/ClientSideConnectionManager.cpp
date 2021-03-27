@@ -1,6 +1,7 @@
 #include "ClientSideConnectionManager.h"
 
 #include <iostream>
+#include <utility>
 
 using namespace communication;
 using namespace connection_layer;
@@ -10,8 +11,9 @@ ClientSideConnectionManager::ClientSideConnectionManager(ProtocolDefinition::tim
 }
 
 std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::CreateClientSide(
-    ProtocolDefinition::timeout_t timeout) {
-  auto byte_stream = byte_layer::SocketByteStream::CreateClientSide();
+    ProtocolDefinition::timeout_t timeout,
+    std::shared_ptr<byte_layer::IConnectionSimulatorProvider> connection_simulator_provider) {
+  auto byte_stream = byte_layer::SocketByteStream::CreateClientSide(std::move(connection_simulator_provider));
   byte_stream->SetParamCatchSendFailed(false);
   auto message_input_stream = std::make_shared<message_layer::MessageInputStream>(byte_stream);
   auto message_output_stream = std::make_shared<message_layer::MessageOutputStream>(byte_stream);
@@ -26,9 +28,20 @@ std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::Create
 }
 
 void ClientSideConnectionManager::HandleConnections() {
+  for (const auto& pair : connection_map) {
+    pair.second.connection->Handle();
+  }
   ReceiveMessages();
 }
 
 partner_id_t ClientSideConnectionManager::GetNextPartnerId() {
   return ProtocolDefinition::server_partner_id;  // constant because only a single server can exist.
+}
+
+void ClientSideConnectionManager::SendMessageToServer(const std::shared_ptr<message_layer::Message>& msg) {
+  SendMessageToConnection(ProtocolDefinition::server_partner_id, msg);
+}
+
+void ClientSideConnectionManager::SendDataToServer(std::vector<uint8_t> data) {
+  SendDataToConnection(ProtocolDefinition::server_partner_id, std::move(data));
 }

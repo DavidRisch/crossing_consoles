@@ -35,6 +35,12 @@ class Position : public networking::ISerializable {
   bool operator<=(const Position& other_position) const;
   bool operator>(const Position& other_position) const;
   bool operator>=(const Position& other_position) const;
+
+  struct HashFunction {
+    size_t operator()(const Position& pos) const {
+      return pos.x ^ (pos.y << (sizeof(size_t) / 2));
+    }
+  };
 };
 
 typedef Position coordinate_size_t;

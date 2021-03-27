@@ -2,6 +2,7 @@
 #define CROSSING_CONSOLES_CONNECTION_SIMULATOR_PERFECT_H
 
 #include <cstdint>
+#include <memory>
 
 #include "IConnectionSimulator.h"
 
@@ -19,7 +20,7 @@ class ConnectionSimulatorPerfect : public IConnectionSimulator {
    * \brief Required for the constructor of ByteStream.
    * \details Because this class holds no state this is ok here.
    */
-  static ConnectionSimulatorPerfect instance;
+  static const std::shared_ptr<ConnectionSimulatorPerfect> instance;
 };
 
 }  // namespace byte_layer

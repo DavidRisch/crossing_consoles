@@ -5,7 +5,10 @@
 using namespace communication;
 using namespace communication::byte_layer;
 
-SocketByteServer::SocketByteServer(port_t port, int max_connections) {
+SocketByteServer::SocketByteServer(
+    const std::shared_ptr<byte_layer::IConnectionSimulatorProvider> &connection_simulator_provider, port_t port,
+    int max_connections)
+    : connection_simulator_provider(connection_simulator_provider) {
   {
 #ifdef _WIN32
     WORD w_version_requested;
@@ -106,7 +109,9 @@ std::shared_ptr<SocketByteStream> SocketByteServer::GetNewClient() {  // NOLINT(
     throw std::runtime_error("accept failed");
   }
 
-  auto socket_byte_stream = std::make_shared<SocketByteStream>(socket_file_descriptor);
+  auto socket_byte_stream = std::make_shared<SocketByteStream>(
+      socket_file_descriptor, connection_simulator_provider->make_incoming_connection_simulator(),
+      connection_simulator_provider->make_outgoing_connection_simulator());
 
   socket_byte_stream->ConfigureSocket();
 

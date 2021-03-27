@@ -8,121 +8,47 @@
 #include "../src/communication/connection_layer/connection/ClientSideConnectionManager.h"
 #include "../src/communication/connection_layer/connection/ServerSideConnectionManager.h"
 #include "../src/communication/connection_layer/event/PayloadEvent.h"
+#include "fixtures/ConnectionManagers.h"
+#include "utils/detect_debugger.h"
 
 using namespace communication;
 using namespace communication::byte_layer;
 using namespace communication::connection_layer;
 using namespace communication::message_layer;
 
-class ConnectionManagers : public ::testing::Test {
- public:
-  ConnectionManagers() = default;
+#ifndef _WIN32
 
-  std::shared_ptr<ServerSideConnectionManager> server_manager;
-  std::shared_ptr<ClientSideConnectionManager> client_manager;
-  std::shared_ptr<ClientSideConnectionManager> second_client_manager;
+bool CAUGHT_SIGNAL_BROKEN_PIPE = false;
 
-  ProtocolDefinition::partner_id_t client_id{};         // from server perspective
-  ProtocolDefinition::partner_id_t second_client_id{};  // from server perspective
-  ProtocolDefinition::partner_id_t server_id{};         // from client perspective
+static void broken_pipe_handler(int signum) {
+  // Received signal of type SIGPIPE (Broken pipe)
+  CAUGHT_SIGNAL_BROKEN_PIPE = true;
+}
 
-  void create_server_and_client(ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout) {
-    server_manager = ServerSideConnectionManager::CreateServerSide(timeout);
-    std::thread server_thread([this] {
-      int counter = 10;
-      while (counter > 0 && server_manager->ConnectionCount() == 0) {
-        server_manager->HandleConnections();
-        std::this_thread::sleep_for(std::chrono::microseconds(10));
-        counter--;
-      }
-    });
+static void setup_signal_handler() {
+  // setup signal handler to catch and handle signal SIGPIPE
+  // see https://pubs.opengroup.org/onlinepubs/9699919799/functions/sigaction.html
 
-    client_manager = ClientSideConnectionManager::CreateClientSide(timeout);
-    server_thread.join();
+  struct sigaction sa = {};  // sigaction used to handle signal
+  sa.sa_handler = broken_pipe_handler;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = SA_RESETHAND;  // reset to SIG_DFL and the SA_SIGINFO flag on entry to the signal handler
+  sigaction(SIGPIPE, &sa, nullptr);
+}
 
-    {
-      auto event = server_manager->PopAndGetOldestEvent();
-      ASSERT_NE(event, nullptr);
-      ASSERT_EQ(event->GetType(), EventType::CONNECT);
-      client_id = event->GetPartnerId();
-      EXPECT_NE(client_id, ProtocolDefinition::server_partner_id);
-    }
-    ASSERT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
+static void reset_signal_handler() {
+  // reset signal handler to default behaviour
+  // needs to be called after every call of setup_signal_handler to ensure default behaviour in following tests.
 
-    {
-      auto event = client_manager->PopAndGetOldestEvent();
-      ASSERT_NE(event, nullptr);
-      ASSERT_EQ(event->GetType(), EventType::CONNECT);
-      server_id = event->GetPartnerId();
-      EXPECT_EQ(server_id, ProtocolDefinition::server_partner_id);
-    }
-    ASSERT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
-  }
+  struct sigaction sa = {};
+  sa.sa_handler = SIG_DFL;  // default behaviour
+  sigemptyset(&sa.sa_mask);
+  sigaction(SIGPIPE, &sa, nullptr);
 
-  void create_second_client() {
-    assert(server_manager->ConnectionCount() == 1);
+  CAUGHT_SIGNAL_BROKEN_PIPE = false;
+}
 
-    std::thread server_thread([this] {
-      int counter = 10;
-      while (counter > 0 && server_manager->ConnectionCount() == 1) {
-        server_manager->HandleConnections();
-        std::this_thread::sleep_for(std::chrono::microseconds(10));
-        counter--;
-      }
-    });
-
-    second_client_manager = ClientSideConnectionManager::CreateClientSide();
-    server_thread.join();
-
-    {
-      auto event = server_manager->PopAndGetOldestEvent();
-      ASSERT_NE(event, nullptr);
-      ASSERT_EQ(event->GetType(), EventType::CONNECT);
-      second_client_id = event->GetPartnerId();
-      EXPECT_NE(second_client_id, ProtocolDefinition::server_partner_id);
-    }
-    ASSERT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
-
-    {
-      auto event = second_client_manager->PopAndGetOldestEvent();
-      ASSERT_NE(event, nullptr);
-      ASSERT_EQ(event->GetType(), EventType::CONNECT);
-      auto new_server_id = event->GetPartnerId();
-      EXPECT_EQ(server_id, new_server_id);
-    }
-    ASSERT_EQ(second_client_manager->PopAndGetOldestEvent(), nullptr);
-  }
-
-  void assert_payload_received(const std::shared_ptr<Event> &event, const std::vector<uint8_t> &payload) {
-    ASSERT_NE(event, nullptr);
-    ASSERT_EQ(event->GetType(), EventType::PAYLOAD);
-    auto payload_event = std::dynamic_pointer_cast<PayloadEvent>(event);
-    ASSERT_EQ(payload_event->GetPayload().size(), payload.size());
-    for (size_t i = 0; i < payload.size(); ++i) {
-      EXPECT_EQ(payload_event->GetPayload().at(i), payload.at(i));
-    }
-  }
-
-  void send_and_check_messages(int count) {
-    for (int i = 0; i < count; ++i) {
-      std::vector<uint8_t> payload_server_to_client{1, 2, 3, static_cast<uint8_t>(i)};
-      std::vector<uint8_t> payload_client_to_server{5, 6, 7, static_cast<uint8_t>(i)};
-
-      server_manager->SendDataToConnection(client_id, payload_server_to_client);
-      client_manager->SendDataToConnection(server_id, payload_client_to_server);
-      std::this_thread::sleep_for(std::chrono::microseconds(100));
-      server_manager->HandleConnections();
-      client_manager->HandleConnections();
-
-      assert_payload_received(server_manager->PopAndGetOldestEvent(), payload_client_to_server);
-      assert_payload_received(client_manager->PopAndGetOldestEvent(), payload_server_to_client);
-
-      // all events should have been processed by now
-      EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
-      EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
-    }
-  }
-};
+#endif
 
 TEST_F(ConnectionManagers, ConnectClient) {
   create_server_and_client();
@@ -130,70 +56,39 @@ TEST_F(ConnectionManagers, ConnectClient) {
 
 TEST_F(ConnectionManagers, ServerTimeout) {
   // Server becomes unreachable
+  auto timeout = std::chrono::milliseconds(10);
+  create_server_and_client(timeout);
 
-  std::shared_ptr<ServerSideConnectionManager> server_manager =
-      ServerSideConnectionManager::CreateServerSide(std::chrono::milliseconds(10));
-  std::thread server_thread([&server_manager] {
-    int counter = 10;
-    while (counter > 0 && !server_manager->ConnectionCount()) {
-      server_manager->HandleConnections();
-      std::this_thread::sleep_for(std::chrono::microseconds(10));
-      counter--;
-    }
-  });
-
-  // set low timeout
-  auto client_manager = ClientSideConnectionManager::CreateClientSide(std::chrono::milliseconds(10));
-  server_thread.join();
   client_manager->HandleConnections();
-
-  // client is successfully connected
+  std::this_thread::sleep_for(timeout);
+  client_manager->HandleConnections();
   auto event = client_manager->PopAndGetOldestEvent();
-  ASSERT_NE(event, nullptr);
-  ASSERT_EQ(event->GetType(), EventType::CONNECT);
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-  // client should be disconnected from timeout
-  client_manager->HandleConnections();
-  ASSERT_EQ(client_manager->PopAndGetOldestEvent()->GetType(), EventType::DISCONNECT);
+  EXPECT_NE(event, nullptr);
+  ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
+
+  // all events should have been processed by now
+  EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
+  EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
 }
 
 TEST_F(ConnectionManagers, ClientTimeout) {
   // Client becomes unreachable
+  auto timeout = std::chrono::milliseconds(10);
+  create_server_and_client(timeout);
 
-  std::shared_ptr<ServerSideConnectionManager> server_manager =
-      ServerSideConnectionManager::CreateServerSide(std::chrono::milliseconds(10));
-  std::thread server_thread([&server_manager] {
-    int counter = 10;
-    while (!server_manager->ConnectionCount() && counter > 0) {
-      server_manager->HandleConnections();
-      std::this_thread::sleep_for(std::chrono::microseconds(10));
-      counter--;
-    }
-    ASSERT_TRUE(counter > 0);  // if counter is 0, no Connection has been established
+  server_manager->HandleConnections();
+  std::this_thread::sleep_for(timeout);
+  server_manager->HandleConnections();
 
-    // Server is connected to client
-    auto event = server_manager->PopAndGetOldestEvent();
-    ASSERT_NE(event, nullptr);
-    EXPECT_EQ(event->GetType(), EventType::CONNECT);
+  auto event = server_manager->PopAndGetOldestEvent();
+  EXPECT_NE(event, nullptr);
+  ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
+  ASSERT_EQ(server_manager->ConnectionCount(), 0);
 
-    // Client disconnects
-    counter = 10;
-    do {
-      server_manager->HandleConnections();
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
-      event = server_manager->PopAndGetOldestEvent();
-      if (event) {
-        ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
-        ASSERT_EQ(server_manager->ConnectionCount(), 0);
-        break;
-      }
-      counter--;
-    } while (counter > 0);
-    ASSERT_TRUE(counter > 0);  // if counter is 0, no Disconnection msg has been received
-  });
-  auto client_manager = ClientSideConnectionManager::CreateClientSide();
-  server_thread.join();
+  // all events should have been processed by now
+  EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
+  EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
 }
 
 TEST_F(ConnectionManagers, UnknownPartnerException) {
@@ -210,9 +105,9 @@ TEST_F(ConnectionManagers, SendMessages) {
   send_and_check_messages(10);
 }
 
-TEST_F(ConnectionManagers, DISABLED_SendManyMessages) {  // TODO: fix issue causing this test to fail
+TEST_F(ConnectionManagers, SendManyMessages) {
   create_server_and_client();
-  send_and_check_messages(10000);
+  send_and_check_messages(1000);
 }
 
 TEST_F(ConnectionManagers, TwoClients) {
@@ -227,12 +122,12 @@ TEST_F(ConnectionManagers, TwoClients) {
 
     server_manager->SendDataToConnection(client_id, payload_server_to_client1);
     server_manager->SendDataToConnection(second_client_id, payload_server_to_client2);
-    client_manager->SendDataToConnection(server_id, payload_client1_to_server);
+    client_manager->SendDataToServer(payload_client1_to_server);
 
     std::this_thread::sleep_for(std::chrono::microseconds(100));
     server_manager->HandleConnections();
 
-    second_client_manager->SendDataToConnection(server_id, payload_client2_to_server);
+    second_client_manager->SendDataToServer(payload_client2_to_server);
 
     std::this_thread::sleep_for(std::chrono::microseconds(100));
     server_manager->HandleConnections();
@@ -272,7 +167,7 @@ TEST_F(ConnectionManagers, LongQueue) {
 
   for (int i = 0; i < count; ++i) {
     server_manager->SendDataToConnection(client_id, payloads_server_to_client.at(i));
-    client_manager->SendDataToConnection(server_id, payloads_client_to_server.at(i));
+    client_manager->SendDataToServer(payloads_client_to_server.at(i));
     std::this_thread::sleep_for(std::chrono::microseconds(100));
     server_manager->HandleConnections();
     client_manager->HandleConnections();
@@ -292,41 +187,133 @@ TEST_F(ConnectionManagers, ClientConnectionReset) {
   // Client sends message of type ConnectionResetMessage
   create_server_and_client();
 
+#ifndef _WIN32
+  // setup signal handler to catch signal SIGPIPE and fail test
+  setup_signal_handler();
+#endif
+
   client_manager->CloseConnection(ProtocolDefinition::server_partner_id);
 
-  int counter = 10;
-  while (counter > 0 && !server_manager->ConnectionCount()) {
-    server_manager->HandleConnections();
-    std::this_thread::sleep_for(std::chrono::microseconds(10));
-    auto event = server_manager->PopAndGetOldestEvent();
-    if (event) {
-      ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
-      ASSERT_EQ(server_manager->ConnectionCount(), 0);
-      break;
-    }
-    counter--;
-  }
-  ASSERT_TRUE(counter > 0);  // server_manager did not trigger ConnectionReset
+  server_manager->HandleConnections();
+  client_manager->HandleConnections();
+
+  auto event = server_manager->PopAndGetOldestEvent();
+  ASSERT_NE(event, nullptr);
+  ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
+  ASSERT_EQ(server_manager->ConnectionCount(), 0);
+
+  event = client_manager->PopAndGetOldestEvent();
+  ASSERT_NE(event, nullptr);
+  EXPECT_EQ(event->GetType(), EventType::DISCONNECT);
+
+  // no broken pipe signal should be triggered
+  client_manager->HandleConnections();
+  server_manager->HandleConnections();
+
+#ifndef _WIN32
+  ASSERT_FALSE(CAUGHT_SIGNAL_BROKEN_PIPE);
+  reset_signal_handler();
+#endif
+
+  // all events should have been processed by now
+  EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
+  EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
 }
 
 TEST_F(ConnectionManagers, ServerConnectionReset) {
   // Server sends message of type ConnectionResetMessage
   create_server_and_client();
 
+#ifndef _WIN32
+  // setup signal handler to catch signal SIGPIPE and fail test
+  setup_signal_handler();
+#endif
+
   // reset Connection
   partner_id_t client_id = 1;  // only 1 client is connected at this point
   server_manager->CloseConnection(client_id);
 
-  int count = 10;
-  while (count > 0) {
-    client_manager->HandleConnections();
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    auto event = client_manager->PopAndGetOldestEvent();
-    if (event) {
-      ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
-      break;
-    }
-    count--;
+  client_manager->HandleConnections();
+  server_manager->HandleConnections();
+
+  auto event = client_manager->PopAndGetOldestEvent();
+  ASSERT_NE(event, nullptr);
+  ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
+
+  event = server_manager->PopAndGetOldestEvent();
+  ASSERT_NE(event, nullptr);
+  ASSERT_EQ(event->GetType(), EventType::DISCONNECT);
+
+  // no broken pipe signal should be triggered
+  client_manager->HandleConnections();
+  server_manager->HandleConnections();
+
+#ifndef _WIN32
+  ASSERT_FALSE(CAUGHT_SIGNAL_BROKEN_PIPE);
+  reset_signal_handler();
+#endif
+
+  // all events should have been processed by now
+  EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
+  EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
+}
+
+#ifndef _WIN32
+TEST_F(ConnectionManagers, BrokenPipeSignal) {
+  // test that setup_signal_handler sets new handler for signal SIGPIPE in tests
+
+  if (runningUnderDebugger()) {
+    // signal is not caught in debugging mode
+    return;
   }
-  ASSERT_TRUE(count > 0);  // no event has been triggered
+
+  setup_signal_handler();
+  raise(SIGPIPE);
+  ASSERT_TRUE(CAUGHT_SIGNAL_BROKEN_PIPE);
+
+  reset_signal_handler();
+  ASSERT_FALSE(CAUGHT_SIGNAL_BROKEN_PIPE);
+}
+#endif
+
+TEST_F(ConnectionManagers, ClientKeepAlive) {
+  // Client sends KeepAlive to Server
+  auto timeout = std::chrono::milliseconds(10);
+  auto keep_alive_interval = timeout / ProtocolDefinition::keep_alive_numerator;
+
+  create_server_and_client(timeout);
+
+  std::this_thread::sleep_for(keep_alive_interval);
+  // send KeepAlive Message
+  client_manager->HandleConnections();
+
+  std::this_thread::sleep_for(keep_alive_interval);
+  // Acknowledge KeepAlive Message, no timeout is triggered
+  server_manager->HandleConnections();
+  client_manager->HandleConnections();
+
+  // no timeout events should have been triggered
+  EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
+  EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
+}
+
+TEST_F(ConnectionManagers, ServerKeepAlive) {
+  // Server sends KeepAlive to Client
+  auto timeout = std::chrono::milliseconds(10);
+  auto keep_alive_interval = timeout / ProtocolDefinition::keep_alive_numerator;
+
+  create_server_and_client(timeout);
+
+  std::this_thread::sleep_for(keep_alive_interval);
+  // sends KeepAlive Message
+  server_manager->HandleConnections();
+
+  std::this_thread::sleep_for(keep_alive_interval);
+  // Acknowledge KeepAlive Message, no timeout is triggered
+  client_manager->HandleConnections();
+  server_manager->HandleConnections();
+
+  // no timeout events should have been triggered
+  EXPECT_EQ(server_manager->PopAndGetOldestEvent(), nullptr);
+  EXPECT_EQ(client_manager->PopAndGetOldestEvent(), nullptr);
 }

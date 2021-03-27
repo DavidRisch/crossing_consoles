@@ -114,35 +114,49 @@ void Connection::BlockingEstablish() {
 }
 
 void Connection::SendMessage(const std::shared_ptr<message_layer::Message> &message) {
+  if (state == ConnectionState::CLOSED) {
+    // do not send any messages if connection is closed
+    return;
+  }
   assert(state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE);
-
   send_message_queue.push(message);
 
   Handle();
 }
 
 std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
-  assert(state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE);
+  if (state == ConnectionState::CLOSED) {
+    // do not receive any messages if connection is closed
+    return nullptr;
+  }
+  assert(state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE ||
+         state == ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE);
 
   auto received_message = message_input_stream->ReceiveMessage(false);
 
   if (received_message != nullptr) {
+    // set Metadata
     received_message->SetTimestampReceived(std::chrono::steady_clock::now());
     statistics.AddReceivedMessage(*received_message);
 
     if (received_message->GetMessageType() == message_layer::MessageType::ACKNOWLEDGE) {
-      if (state != ConnectionState::WAITING_FOR_ACKNOWLEDGE) {
+      if (!(state == ConnectionState::WAITING_FOR_ACKNOWLEDGE ||
+            state == ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE)) {
         throw BadAcknowledgeException();
       }
       auto acknowledge_message = std::dynamic_pointer_cast<message_layer::AcknowledgeMessage>(received_message);
       if (acknowledge_message->GetAcknowledgedMessageSequence() != last_send_sequence) {
         throw BadAcknowledgeException();
       }
-
       // set timestamp_received for the last message that was sent after receiving the correct acknowledge
       statistics.SetReceivedTimestampForSentMessage(last_send_sequence);
+      if (state == ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE) {
+        // acknowledge of ConnectionResetMessage has been received, close connection
+        state = ConnectionState::CLOSED;
+      } else {
+        state = ConnectionState::READY;
+      }
 
-      state = ConnectionState::READY;
     } else {
       // Send acknowledge for every received message except for other acknowledges
       SendAcknowledge(received_message->GetMessageSequence());
@@ -155,8 +169,8 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
 Connection::Connection(std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
                        std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
                        ConnectionState connection_state, sequence_t sequence_counter, timeout_t timeout)
-    : sequence_counter(sequence_counter)
-    , state(connection_state)
+    : state(connection_state)
+    , sequence_counter(sequence_counter)
     , timeout(timeout)
     , message_input_stream(std::move(message_input_stream))
     , message_output_stream(std::move(message_output_stream)) {
@@ -183,18 +197,22 @@ void Connection::SendMessageNow(message_layer::Message *message) {
   message_output_stream->SendMessage(message);
 
   if (message->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
-    state = ConnectionState::WAITING_FOR_ACKNOWLEDGE;
+    if (message->GetMessageType() == message_layer::MessageType::CONNECTION_RESET) {
+      state = ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE;
+    } else {
+      state = ConnectionState::WAITING_FOR_ACKNOWLEDGE;
+    }
   }
 }
 
 void Connection::SendAcknowledge(sequence_t acknowledged_msg_sequence) {
   auto ack_msg = message_layer::AcknowledgeMessage(acknowledged_msg_sequence);
-  // TODO: CloseConnection should wait for acknowledge before closing any sockets
   SendMessageNow(&ack_msg);
 }
 
 void Connection::Handle() {
-  assert(state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE);
+  assert(state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE ||
+         state == ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE);
 
   if (state == ConnectionState::READY) {
     if (!send_message_queue.empty()) {
@@ -210,4 +228,8 @@ void Connection::PrintStatistics() {
 
 ConnectionStatistics Connection::GetConnectionStatistics() {
   return statistics;
+}
+
+bool Connection::ConnectionClosed() const {
+  return state == ConnectionState::CLOSED;
 }
