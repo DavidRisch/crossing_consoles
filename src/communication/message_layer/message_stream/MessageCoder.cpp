@@ -9,6 +9,7 @@
 #include "../message/ConnectionResetMessage.h"
 #include "../message/ConnectionResponseMessage.h"
 #include "../message/KeepAliveMessage.h"
+#include "../message/NotAcknowledgeMessage.h"
 #include "../message/PayloadMessage.h"
 
 using namespace communication;
@@ -83,6 +84,7 @@ std::vector<uint8_t> MessageCoder::Encode(Message *message) {
     case MessageType::CONNECTION_REQUEST:
     case MessageType::CONNECTION_RESET:
     case MessageType::CONNECTION_RESPONSE:
+    case MessageType::NOT_ACKNOWLEDGE:
       // no payload necessary
       break;
     case MessageType::ACKNOWLEDGE: {
@@ -152,6 +154,9 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
       break;
     case MessageType::CONNECTION_RESET:
       message = std::make_shared<ConnectionResetMessage>(message_sequence);
+      break;
+    case MessageType::NOT_ACKNOWLEDGE:
+      message = std::make_shared<NotAcknowledgeMessage>(message_sequence);
       break;
     case MessageType::ACKNOWLEDGE: {
       auto ack_sequence = ReadFromStreamWithCRC<ProtocolDefinition::sequence_t>(

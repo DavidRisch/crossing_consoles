@@ -44,6 +44,7 @@ add_library(crossing_consoles_lib
         communication/message_layer/message/PayloadMessage.cpp
         communication/message_layer/message/MessageMetaData.cpp
         communication/message_layer/message/AcknowledgeMessage.cpp
+        communication/message_layer/message/NotAcknowledgeMessage.cpp
 
         communication/message_layer/crc/CRCHandler.cpp
 
