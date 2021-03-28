@@ -13,16 +13,16 @@ class ColoredCharMatrix {
  public:
   explicit ColoredCharMatrix(common::coordinate_size_t size);
 
-  void PlaceChar(wchar_t character, terminal::colors::Color foreground = terminal::colors::WHITE,
-                 terminal::colors::Color background = terminal::colors::BLACK);
-  void PlaceChar(wchar_t character, const common::Position& position,
+  void AppendChar(wchar_t character, terminal::colors::Color foreground = terminal::colors::WHITE,
+                  terminal::colors::Color background = terminal::colors::BLACK);
+  void SetChar(wchar_t character, const common::Position& position,
+               terminal::colors::Color foreground = terminal::colors::WHITE,
+               terminal::colors::Color background = terminal::colors::BLACK);
+  void AppendString(const std::wstring& string, terminal::colors::Color foreground = terminal::colors::WHITE,
+                    terminal::colors::Color background = terminal::colors::BLACK);
+  void SetString(const std::wstring& string, const common::Position& position,
                  terminal::colors::Color foreground = terminal::colors::WHITE,
                  terminal::colors::Color background = terminal::colors::BLACK);
-  void PlaceString(const std::wstring& string, terminal::colors::Color foreground = terminal::colors::WHITE,
-                   terminal::colors::Color background = terminal::colors::BLACK);
-  void PlaceString(const std::wstring& string, const common::Position& position,
-                   terminal::colors::Color foreground = terminal::colors::WHITE,
-                   terminal::colors::Color background = terminal::colors::BLACK);
 
   void InsertMatrix(const ColoredCharMatrix& matrix);
   void InsertMatrix(const ColoredCharMatrix& matrix, const common::Position& position);

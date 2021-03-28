@@ -92,7 +92,7 @@ void GameServer::MovePlayer(const coordinate_distance_t &movement) {  // NOLINT(
     new_position.y -= world->size.y;
   }
 
-  if (new_position.IsNotEqual(player.position) && !world->IsBlocked(new_position)) {
+  if (new_position != player.position && !world->IsBlocked(new_position)) {
     player.MoveTo(new_position);
   }
 }

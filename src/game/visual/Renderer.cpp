@@ -20,8 +20,8 @@ Renderer::Renderer(common::coordinate_size_t viewport_size, common::coordinate_s
     , player(&player)
     , wall_sprite(ColoredCharMatrix(block_size))
     , player_sprite(ColoredCharMatrix(block_size)) {
-  wall_sprite.PlaceString(std::wstring(4, light_shade), WHITE, RED);
-  player_sprite.PlaceString(L"></\\");
+  wall_sprite.AppendString(std::wstring(4, light_shade), WHITE, RED);
+  player_sprite.AppendString(L"></\\");
 }
 
 ColoredCharMatrix Renderer::RenderWorld() const {

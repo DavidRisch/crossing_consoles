@@ -21,7 +21,7 @@ TEST(World, AddWall) {
   world.AddWall(Position(10, 5));
 
   ASSERT_TRUE(world.walls.size() == 1);
-  EXPECT_TRUE(world.walls.front()->position.IsEqual(Position(10, 5)));
+  EXPECT_EQ(world.walls.front()->position, Position(10, 5));
 }
 
 TEST(World, AddWallRepeated) {
@@ -31,7 +31,7 @@ TEST(World, AddWallRepeated) {
   world.AddWall(Position(10, 5));
 
   ASSERT_TRUE(world.walls.size() == 1);
-  EXPECT_TRUE(world.walls.front()->position.IsEqual(Position(10, 5)));
+  EXPECT_EQ(world.walls.front()->position, Position(10, 5));
 }
 
 TEST(World, AddWalls) {
@@ -43,7 +43,7 @@ TEST(World, AddWalls) {
   ASSERT_TRUE(world.walls.size() == 2);
 
   for (auto const& i_wall : world.walls) {
-    EXPECT_TRUE(i_wall->position.IsEqual(Position(10, 5)) || i_wall->position.IsEqual(Position(5, 10)));
+    EXPECT_TRUE(i_wall->position == Position(10, 5) || i_wall->position == Position(5, 10));
   }
 }
 

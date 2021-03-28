@@ -24,17 +24,17 @@ TEST(Position, Set) {
 }
 
 TEST(Position, EqualTo) {
-  ASSERT_TRUE(position_1.IsEqual(position_1));
-  ASSERT_TRUE(position_2.IsEqual(position_2));
-  ASSERT_FALSE(position_1.IsEqual(position_2));
-  ASSERT_FALSE(position_2.IsEqual(position_1));
+  ASSERT_TRUE(position_1 == position_1);
+  ASSERT_TRUE(position_2 == position_2);
+  ASSERT_FALSE(position_1 == position_2);
+  ASSERT_FALSE(position_2 == position_1);
 }
 
 TEST(Position, NotEqualTo) {
-  ASSERT_FALSE(position_1.IsNotEqual(position_1));
-  ASSERT_FALSE(position_2.IsNotEqual(position_2));
-  ASSERT_TRUE(position_1.IsNotEqual(position_2));
-  ASSERT_TRUE(position_2.IsNotEqual(position_1));
+  ASSERT_FALSE(position_1 != position_1);
+  ASSERT_FALSE(position_2 != position_2);
+  ASSERT_TRUE(position_1 != position_2);
+  ASSERT_TRUE(position_2 != position_1);
 }
 
 TEST(Position, LessThan) {
@@ -70,23 +70,23 @@ TEST(Position, GreaterThanEqualTo) {
 }
 
 TEST(Position, Addition) {
-  EXPECT_TRUE((position_1 + position_2).IsEqual(Position(30, -5)));
-  EXPECT_TRUE((position_1 + position_2).IsEqual(position_2 + position_1));
+  EXPECT_EQ(position_1 + position_2, Position(30, -5));
+  EXPECT_EQ(position_1 + position_2, position_2 + position_1);
 }
 
 TEST(Position, Subtraction) {
-  EXPECT_TRUE((position_1 - position_2).IsEqual(Position(-10, -15)));
-  EXPECT_TRUE((position_2 - position_1).IsEqual(Position(10, 15)));
+  EXPECT_EQ(position_1 - position_2, Position(-10, -15));
+  EXPECT_EQ(position_2 - position_1, Position(10, 15));
 }
 
 TEST(Position, Multiplication) {
-  EXPECT_TRUE((position_1 * position_2).IsEqual(Position(200, -50)));
-  EXPECT_TRUE((position_1 * position_2).IsEqual(position_2 * position_1));
+  EXPECT_EQ(position_1 * position_2, Position(200, -50));
+  EXPECT_EQ(position_1 * position_2, position_2 * position_1);
 }
 
 TEST(Position, Division) {
-  EXPECT_TRUE((position_1 / position_2).IsEqual(Position(0, -2)));
-  EXPECT_TRUE((position_2 / position_1).IsEqual(Position(2, 0)));
-  EXPECT_TRUE((position_1 / position_1).IsEqual(Position(1, 1)));
-  EXPECT_TRUE((position_2 / position_2).IsEqual(Position(1, 1)));
+  EXPECT_EQ(position_1 / position_2, Position(0, -2));
+  EXPECT_EQ(position_2 / position_1, Position(2, 0));
+  EXPECT_EQ(position_1 / position_1, Position(1, 1));
+  EXPECT_EQ(position_2 / position_2, Position(1, 1));
 }

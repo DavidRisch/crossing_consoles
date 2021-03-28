@@ -9,14 +9,14 @@ TEST(Player, Constructor) {
   Player player("player", Position(0, 0));
 
   ASSERT_EQ(player.name, "player");
-  ASSERT_TRUE(player.position.IsEqual(Position(0, 0)));
+  ASSERT_EQ(player.position, Position(0, 0));
 }
 
 TEST(Player, MoveTo) {
   Player player("player", Position(0, 0));
   player.MoveTo(Position(10, 5));
 
-  ASSERT_TRUE(player.position.IsEqual(Position(10, 5)));
+  ASSERT_EQ(player.position, Position(10, 5));
 }
 
 TEST(Player, IsAlive) {

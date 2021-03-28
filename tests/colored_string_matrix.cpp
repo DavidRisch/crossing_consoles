@@ -20,10 +20,43 @@ TEST(ColoredStringMatrix, EmptyMatrix) {
   }
 }
 
+TEST(ColoredStringMatrix, AppendChar) {
+  ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));
+
+  colored_string_matrix.AppendChar(L'a');
+  const std::vector<std::vector<ColoredChar>>& matrix = colored_string_matrix.GetMatrix();
+
+  for (const auto& i_lines : matrix) {
+    for (const auto& i_characters : i_lines) {
+      if (&i_characters == &matrix[0][0]) {
+        EXPECT_EQ(i_characters, ColoredChar(L'a', WHITE, BLACK));
+      } else {
+        EXPECT_EQ(i_characters, ColoredChar(L' ', WHITE, BLACK));
+      }
+    }
+  }
+}
+
+TEST(ColoredStringMatrix, AppendCharRepeated) {
+  ColoredCharMatrix colored_string_matrix(coordinate_size_t(2, 2));
+
+  colored_string_matrix.AppendChar(L'a');
+  colored_string_matrix.AppendChar(L'b');
+  colored_string_matrix.AppendChar(L'c');
+  colored_string_matrix.AppendChar(L'd');
+  colored_string_matrix.AppendChar(L'e');
+  const std::vector<std::vector<ColoredChar>>& matrix = colored_string_matrix.GetMatrix();
+
+  EXPECT_EQ(matrix[0][0], ColoredChar(L'a', WHITE, BLACK));
+  EXPECT_EQ(matrix[0][1], ColoredChar(L'b', WHITE, BLACK));
+  EXPECT_EQ(matrix[1][0], ColoredChar(L'c', WHITE, BLACK));
+  EXPECT_EQ(matrix[1][1], ColoredChar(L'd', WHITE, BLACK));
+}
+
 TEST(ColoredStringMatrix, SetChar) {
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));
 
-  colored_string_matrix.PlaceChar(L'a');
+  colored_string_matrix.SetChar(L'a', Position(0, 0));
   const std::vector<std::vector<ColoredChar>>& matrix = colored_string_matrix.GetMatrix();
 
   for (const auto& i_lines : matrix) {
@@ -38,45 +71,12 @@ TEST(ColoredStringMatrix, SetChar) {
 }
 
 TEST(ColoredStringMatrix, SetCharRepeated) {
-  ColoredCharMatrix colored_string_matrix(coordinate_size_t(2, 2));
-
-  colored_string_matrix.PlaceChar(L'a');
-  colored_string_matrix.PlaceChar(L'b');
-  colored_string_matrix.PlaceChar(L'c');
-  colored_string_matrix.PlaceChar(L'd');
-  colored_string_matrix.PlaceChar(L'e');
-  const std::vector<std::vector<ColoredChar>>& matrix = colored_string_matrix.GetMatrix();
-
-  EXPECT_EQ(matrix[0][0], ColoredChar(L'a', WHITE, BLACK));
-  EXPECT_EQ(matrix[0][1], ColoredChar(L'b', WHITE, BLACK));
-  EXPECT_EQ(matrix[1][0], ColoredChar(L'c', WHITE, BLACK));
-  EXPECT_EQ(matrix[1][1], ColoredChar(L'd', WHITE, BLACK));
-}
-
-TEST(ColoredStringMatrix, SetCharWithPosition) {
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));
 
-  colored_string_matrix.PlaceChar(L'a', Position(0, 0));
-  const std::vector<std::vector<ColoredChar>>& matrix = colored_string_matrix.GetMatrix();
-
-  for (const auto& i_lines : matrix) {
-    for (const auto& i_characters : i_lines) {
-      if (&i_characters == &matrix[0][0]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'a', WHITE, BLACK));
-      } else {
-        EXPECT_EQ(i_characters, ColoredChar(L' ', WHITE, BLACK));
-      }
-    }
-  }
-}
-
-TEST(ColoredStringMatrix, SetCharWithPositionRepeated) {
-  ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));
-
-  colored_string_matrix.PlaceChar(L'a', Position(0, 0));
-  colored_string_matrix.PlaceChar(L'b', Position(1, 0));
-  colored_string_matrix.PlaceChar(L'c', Position(2, 0));
-  colored_string_matrix.PlaceChar(L'd', Position(4, 0));
+  colored_string_matrix.SetChar(L'a', Position(0, 0));
+  colored_string_matrix.SetChar(L'b', Position(1, 0));
+  colored_string_matrix.SetChar(L'c', Position(2, 0));
+  colored_string_matrix.SetChar(L'd', Position(4, 0));
   const std::vector<std::vector<ColoredChar>>& matrix = colored_string_matrix.GetMatrix();
 
   for (const auto& i_lines : matrix) {
@@ -96,10 +96,10 @@ TEST(ColoredStringMatrix, SetCharWithPositionRepeated) {
   }
 }
 
-TEST(ColoredStringMatrix, SetUnicodeChar) {
+TEST(ColoredStringMatrix, AppendUnicodeChar) {
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));
 
-  colored_string_matrix.PlaceChar(full_block);
+  colored_string_matrix.AppendChar(full_block);
   const std::vector<std::vector<ColoredChar>>& matrix = colored_string_matrix.GetMatrix();
 
   for (const auto& i_lines : matrix) {
@@ -113,10 +113,10 @@ TEST(ColoredStringMatrix, SetUnicodeChar) {
   }
 }
 
-TEST(ColoredStringMatrix, SetString) {
+TEST(ColoredStringMatrix, AppendString) {
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));
 
-  colored_string_matrix.PlaceString(L"abcd");
+  colored_string_matrix.AppendString(L"abcd");
   const std::vector<std::vector<ColoredChar>>& matrix = colored_string_matrix.GetMatrix();
 
   for (const auto& i_lines : matrix) {
@@ -136,10 +136,10 @@ TEST(ColoredStringMatrix, SetString) {
   }
 }
 
-TEST(ColoredStringMatrix, SetStringWithPosition) {
+TEST(ColoredStringMatrix, SetString) {
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));
 
-  colored_string_matrix.PlaceString(L"abcd", Position(1, 0));
+  colored_string_matrix.SetString(L"abcd", Position(1, 0));
   const std::vector<std::vector<ColoredChar>>& matrix = colored_string_matrix.GetMatrix();
 
   for (const auto& i_lines : matrix) {
@@ -164,8 +164,8 @@ TEST(ColoredStringMatrix, InsertMatrix) {
   ColoredCharMatrix sprite_2(coordinate_size_t(2, 2));
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));
 
-  sprite_1.PlaceString(L"abcd");
-  sprite_2.PlaceString(L"efgh");
+  sprite_1.AppendString(L"abcd");
+  sprite_2.AppendString(L"efgh");
   colored_string_matrix.InsertMatrix(sprite_1);
   colored_string_matrix.InsertMatrix(sprite_2, Position(7, 7));
   const std::vector<std::vector<ColoredChar>>& matrix = colored_string_matrix.GetMatrix();

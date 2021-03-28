@@ -27,33 +27,33 @@ ColoredCharMatrix Compositor::CompositeViewport() const {
   std::wstring frame_top_line = box_drawings_double_down_and_right +
                                 std::wstring(block_count.x, box_drawings_double_horizontal) +
                                 box_drawings_double_down_and_left;
-  composited_viewport.PlaceString(frame_top_line, Position(0, 0), BRIGHT_BLACK);
+  composited_viewport.SetString(frame_top_line, Position(0, 0), BRIGHT_BLACK);
 
   // set line containing various information about the game
   std::wstring information = L" SCORE";
   std::wstring information_line = box_drawings_double_vertical + information +
                                   std::wstring(block_count.x - information.length(), L' ') +
                                   box_drawings_double_vertical;
-  composited_viewport.PlaceString(information_line, Position(0, 1), BRIGHT_BLACK);
+  composited_viewport.SetString(information_line, Position(0, 1), BRIGHT_BLACK);
 
   // set separator between header and rendered viewport
   std::wstring frame_separator_line = box_drawings_double_vertical_and_right +
                                       std::wstring(block_count.x, box_drawings_double_horizontal) +
                                       box_drawings_double_vertical_and_left;
-  composited_viewport.PlaceString(frame_separator_line, Position(0, 2), BRIGHT_BLACK);
+  composited_viewport.SetString(frame_separator_line, Position(0, 2), BRIGHT_BLACK);
 
   // set frame sides
   for (int y = rendered_viewport_offset.y; y < block_count.y + composited_viewport_overhang.y; y++) {
-    composited_viewport.PlaceChar(box_drawings_double_vertical, Position(0, y), BRIGHT_BLACK);
-    composited_viewport.PlaceChar(box_drawings_double_vertical,
-                                  Position(block_count.x + composited_viewport_overhang.x - 1, y), BRIGHT_BLACK);
+    composited_viewport.SetChar(box_drawings_double_vertical, Position(0, y), BRIGHT_BLACK);
+    composited_viewport.SetChar(box_drawings_double_vertical,
+                                Position(block_count.x + composited_viewport_overhang.x - 1, y), BRIGHT_BLACK);
   }
 
   std::wstring frame_bottom_line = box_drawings_double_up_and_right +
                                    std::wstring(block_count.x, box_drawings_double_horizontal) +
                                    box_drawings_double_up_and_left;
-  composited_viewport.PlaceString(frame_bottom_line, Position(0, block_count.y + composited_viewport_overhang.y - 1),
-                                  BRIGHT_BLACK);
+  composited_viewport.SetString(frame_bottom_line, Position(0, block_count.y + composited_viewport_overhang.y - 1),
+                                BRIGHT_BLACK);
 
   return composited_viewport;
 }

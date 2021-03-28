@@ -9,5 +9,5 @@ TEST(Wall, Constructor) {
   Position position(10, 5);
   Wall wall(position);
 
-  ASSERT_TRUE(wall.position.IsEqual(position));
+  ASSERT_EQ(wall.position, position);
 }

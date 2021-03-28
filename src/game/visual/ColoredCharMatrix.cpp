@@ -15,15 +15,15 @@ ColoredCharMatrix::ColoredCharMatrix(coordinate_size_t size)
   }
 }
 
-void ColoredCharMatrix::PlaceChar(wchar_t character, Color foreground, Color background) {
+void ColoredCharMatrix::AppendChar(wchar_t character, Color foreground, Color background) {
   if (set_current.x == size.x) {
     set_current.x = 0;
     set_current.y++;
   }
-  PlaceChar(character, set_current, foreground, background);
+  SetChar(character, set_current, foreground, background);
 }
 
-void ColoredCharMatrix::PlaceChar(wchar_t character, const Position& position, Color foreground, Color background) {
+void ColoredCharMatrix::SetChar(wchar_t character, const Position& position, Color foreground, Color background) {
   if (position.IsLess(size)) {
     characters[position.y][position.x] = ColoredChar(character, foreground, background);
     set_current = position;
@@ -31,17 +31,17 @@ void ColoredCharMatrix::PlaceChar(wchar_t character, const Position& position, C
   }
 }
 
-void ColoredCharMatrix::PlaceString(const std::wstring& string, Color foreground, Color background) {
+void ColoredCharMatrix::AppendString(const std::wstring& string, Color foreground, Color background) {
   for (wchar_t i_string : string) {
-    PlaceChar(i_string, foreground, background);
+    AppendChar(i_string, foreground, background);
   }
 }
 
-void ColoredCharMatrix::PlaceString(const std::wstring& string, const Position& position, Color foreground,
-                                    Color background) {
-  PlaceChar(string[0], position, foreground, background);
+void ColoredCharMatrix::SetString(const std::wstring& string, const Position& position, Color foreground,
+                                  Color background) {
+  SetChar(string[0], position, foreground, background);
   for (wchar_t i_string : string.substr(1)) {
-    PlaceChar(i_string, foreground, background);
+    AppendChar(i_string, foreground, background);
   }
 }
 
@@ -56,8 +56,8 @@ void ColoredCharMatrix::InsertMatrix(const ColoredCharMatrix& matrix, const Posi
     for (int x = 0; x < (int)colored_characters[y].size(); x++) {
       Position new_position = Position(x, y) + offset;
       if (new_position.IsLess(size)) {
-        PlaceChar(colored_characters[y][x].character, new_position, colored_characters[y][x].foreground,
-                  colored_characters[y][x].background);
+        SetChar(colored_characters[y][x].character, new_position, colored_characters[y][x].foreground,
+                colored_characters[y][x].background);
       }
     }
   }
