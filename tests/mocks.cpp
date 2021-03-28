@@ -1,10 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <iostream>
-#include <thread>
-
 #include "../src/communication/byte_layer/byte_stream/MockBidirectionalByteStream.h"
-#include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
+#include "../src/communication/byte_layer/byte_stream/MockInputStream.h"
 
 using namespace communication;
 using namespace communication::byte_layer;
@@ -37,4 +34,28 @@ TEST(Mocks, MockBidirectionalByteStream) {
       EXPECT_EQ(first_to_second[i], first_received[i]);
     }
   }
+}
+
+TEST(Mocks, MockInputStream) {
+  // write some data to MockInputStream
+  const std::vector<uint8_t> original_data = {'t', 'e', 's', 't', 1, 2, 3, 4};
+  MockInputStream mock_input_stream;
+  mock_input_stream.AddData(original_data);
+
+  // Stream has to be non-empty
+  ASSERT_FALSE(mock_input_stream.IsEmpty());
+  ASSERT_TRUE(mock_input_stream.HasInput());
+
+  // check if read data from Stream equals the original data
+  uint8_t received_data;
+  int i = 0;
+  while (!mock_input_stream.IsEmpty()) {
+    mock_input_stream.Read(&received_data, 1);
+    ASSERT_EQ(original_data[i], received_data);
+    i++;
+  }
+
+  // check that stream is now empty
+  ASSERT_TRUE(mock_input_stream.IsEmpty());
+  ASSERT_FALSE(mock_input_stream.HasInput());
 }

@@ -14,13 +14,13 @@ class Renderer {
   common::coordinate_size_t block_size;
   common::coordinate_size_t viewport_size;
   world::World* world;
-  world::Player* player;
+  world::Player* own_player;
 
   ColoredCharMatrix wall_sprite;
   ColoredCharMatrix player_sprite;
 
   explicit Renderer(common::coordinate_size_t viewport_size, common::coordinate_size_t block_size, world::World& world,
-                    world::Player& player);
+                    world::Player& own_player);
 
   [[nodiscard]] ColoredCharMatrix RenderWorld() const;
 };

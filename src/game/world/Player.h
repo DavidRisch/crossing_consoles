@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "../GameDefinition.h"
 #include "../common/Position.h"
 
 namespace game::world {
@@ -19,7 +20,7 @@ class Player : public networking::ISerializable {
   int health = max_health;
   bool updated = false;
 
-  Player(std::string name, common::Position position);
+  Player(std::string name, common::Position position, int player_id = 999);
 
   [[nodiscard]] bool IsAlive() const;
 
@@ -30,6 +31,8 @@ class Player : public networking::ISerializable {
   void Serialize(std::vector<uint8_t>& output_vector) const override;
 
   static Player Deserialize(std::vector<uint8_t>::iterator& input_iterator);
+
+  GameDefinition::player_id_t player_id;
 };
 
 }  // namespace game::world

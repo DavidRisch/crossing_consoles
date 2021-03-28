@@ -4,6 +4,7 @@
 #include <chrono>
 #include <utility>
 
+#include "../../debug.h"
 #include "../../message_layer/message/ConnectionResetMessage.h"
 #include "../../message_layer/message/KeepAliveMessage.h"
 #include "../event/ConnectEvent.h"
@@ -13,9 +14,17 @@
 using namespace communication;
 using namespace connection_layer;
 
-ConnectionManager::ConnectionManager(ProtocolDefinition::timeout_t timeout)
-    : timeout(timeout) {
+ConnectionManager::ConnectionManager(
+    ProtocolDefinition::timeout_t timeout,
+    const std::shared_ptr<byte_layer::IConnectionSimulatorProvider>& connection_simulator_provider)
+    : timeout(timeout)
+    , connection_simulator_provider(connection_simulator_provider) {
   connection_map = {};
+  keep_alive_interval =
+      std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::keep_alive_numerator);
+
+  assert(timeout > std::chrono::milliseconds(0));
+  assert(keep_alive_interval < timeout);
 }
 
 void ConnectionManager::Broadcast(const std::vector<uint8_t>& payload) {
@@ -44,6 +53,10 @@ void ConnectionManager::AddConnection(const std::shared_ptr<Connection>& connect
   event_queue.push_back(std::make_shared<ConnectEvent>(new_partner_id));
 }
 
+bool ConnectionManager::HasEvent() {
+  return !event_queue.empty();
+}
+
 std::shared_ptr<Event> ConnectionManager::PopAndGetOldestEvent() {
   if (event_queue.empty()) {
     return std::shared_ptr<Event>();
@@ -55,19 +68,13 @@ std::shared_ptr<Event> ConnectionManager::PopAndGetOldestEvent() {
 
 void ConnectionManager::ReceiveMessages() {
   // Handle received messages and timeouts
-  std::list<partner_id_t> connection_reset_list = {};
-  std::list<partner_id_t> connection_close_list = {};
+
+  // remove connections after timeout or acknowledged reset
+  std::list<partner_id_t> connection_remove_list = {};
 
   for (auto& connection_entry : connection_map) {
     auto connection = connection_entry.second.connection;
     auto partner_id = connection_entry.first;
-
-    /*
-     TODO: send keep alive less frequently
-     TODO: does not belong in this method
-    auto msg = std::make_shared<message_layer::KeepAliveMessage>(partner_id);
-    TODO: connection->SendMessage(msg);
-     */
 
     std::shared_ptr<message_layer::Message> received_msg;
     do {
@@ -82,7 +89,8 @@ void ConnectionManager::ReceiveMessages() {
             break;
           }
           case message_layer::MessageType::CONNECTION_RESET: {
-            connection_reset_list.push_back(partner_id);
+            // acknowledge is already sent to partner_id connection in connection->ReceiveMessage()
+            connection_remove_list.push_back(partner_id);
             break;
           }
           default: {
@@ -92,21 +100,30 @@ void ConnectionManager::ReceiveMessages() {
       }
     } while (received_msg != nullptr);
 
-    if (std::chrono::steady_clock::now() - connection_entry.second.timestamp_last_received >= timeout) {
-      connection_close_list.push_back(partner_id);
+    if (connection->ConnectionClosed()) {
+      // Connection Reset Message was sent previously and is acknowledged by the partner connection
+      connection_remove_list.push_back(partner_id);
+    }
+
+    auto current_time = std::chrono::steady_clock::now();
+    if (current_time - connection_entry.second.timestamp_last_received >= timeout) {
+      DEBUG_CONNECTION_LAYER(std::cout << "(" << connection.get() << ") Timout (ConnectionManager)\n")
+      connection_remove_list.push_back(partner_id);
+
+    } else if (current_time - connection_entry.second.timestamp_last_received >= keep_alive_interval) {
+      DEBUG_CONNECTION_LAYER(std::cout << "(" << connection.get() << ") Send KeepAlive (ConnectionManager)\n")
+      auto keep_alive_msg = std::make_shared<message_layer::KeepAliveMessage>(message_layer::KeepAliveMessage());
+      SendMessageToConnection(partner_id, keep_alive_msg);
     }
   }
-  for (auto& partner_id : connection_close_list) {
-    CloseConnection(partner_id);
-  }
 
-  for (auto& partner_id : connection_reset_list) {
-    // only called if Connection Reset Message was received, connection can be removed immediately
+  for (auto& partner_id : connection_remove_list) {
     RemoveConnection(partner_id);
   }
 }
 
-void ConnectionManager::SendMessageToConnection(partner_id_t partner_id, std::shared_ptr<message_layer::Message> msg) {
+void ConnectionManager::SendMessageToConnection(partner_id_t partner_id,
+                                                const std::shared_ptr<message_layer::Message>& msg) {
   auto connection_it = connection_map.find(partner_id);
   if (connection_it == connection_map.end()) {
     throw UnknownPartnerException();
@@ -118,9 +135,10 @@ void ConnectionManager::SendMessageToConnection(partner_id_t partner_id, std::sh
 }
 
 void ConnectionManager::CloseConnection(partner_id_t partner_id) {
-  // notify connection partner
   auto reset_msg = std::make_shared<message_layer::ConnectionResetMessage>();
   SendMessageToConnection(partner_id, reset_msg);
-  // TODO wait for acknowledge message from partner before calling Reset Connection
-  RemoveConnection(partner_id);
+}
+
+bool ConnectionManager::HasConnections() {
+  return !connection_map.empty();
 }

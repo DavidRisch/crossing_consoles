@@ -51,6 +51,12 @@ class Position : public networking::ISerializable {
    * \details Return true iff the passed position is less or equal in both dimensions
    */
   bool IsGreaterOrEqual(const Position& other_position) const;
+
+  struct HashFunction {
+    size_t operator()(const Position& pos) const {
+      return pos.x ^ (pos.y << (sizeof(size_t) / 2));
+    }
+  };
 };
 
 typedef Position coordinate_size_t;

@@ -1,10 +1,10 @@
 #include "GameServer.h"
 
 #include <cassert>
-#include <iostream>
 #include <thread>
 
 #include "../communication/connection_layer/event/PayloadEvent.h"
+#include "GameLogic.h"
 #include "networking/Change.h"
 #include "world/WorldGenerator.h"
 
@@ -13,10 +13,12 @@ using namespace game::common;
 using namespace game::world;
 using namespace game::networking;
 
-GameServer::GameServer(const coordinate_size_t &world_size) {
+GameServer::GameServer(const coordinate_size_t &world_size,
+                       communication::ProtocolDefinition::timeout_t communication_timeout) {
   world = WorldGenerator::GenerateWorld(world_size);
 
-  server_manager = communication::connection_layer::ServerSideConnectionManager::CreateServerSide();
+  server_manager =
+      communication::connection_layer::ServerSideConnectionManager::CreateServerSide(communication_timeout);
 }
 
 void GameServer::RunIteration() {
@@ -27,6 +29,8 @@ void GameServer::RunIteration() {
   }
 
   if (std::chrono::steady_clock::now() - last_world_sent >= send_world_interval) {
+    last_world_sent = std::chrono::steady_clock::now();
+
     Change action(ChangeType::SET_WORLD);
     world->Serialize(action.payload);
     server_manager->Broadcast(action.payload);
@@ -36,8 +40,15 @@ void GameServer::RunIteration() {
 void GameServer::HandleEvent(const std::shared_ptr<communication::connection_layer::Event> &event) {
   switch (event->GetType()) {
     case communication::connection_layer::EventType::CONNECT: {
-      assert(world->players.empty());  // TODO: support multiple players
-      world->AddPlayer(new Player("?", Position(0, 0)));
+      auto spawn_position = world->GetSpawner().GenerateSpawnPosition();
+      auto player = std::make_shared<Player>("?", spawn_position, event->GetPartnerId());
+
+      world->AddPlayer(player);
+
+      Change action(ChangeType::SET_OWN_ID);
+      action.payload.push_back(event->GetPartnerId());
+      server_manager->SendDataToConnection(event->GetPartnerId(), action.payload);
+
       break;
     }
     case communication::connection_layer::EventType::DISCONNECT: {
@@ -46,53 +57,18 @@ void GameServer::HandleEvent(const std::shared_ptr<communication::connection_lay
     }
     case communication::connection_layer::EventType::PAYLOAD: {
       Change change(std::dynamic_pointer_cast<communication::connection_layer::PayloadEvent>(event)->GetPayload());
-      HandleChange(change);
-      break;
-    }
-  }
-}
-
-void GameServer::HandleChange(const Change &change) {
-  switch (change.GetChangeType()) {
-    case ChangeType::MOVE_UP: {
-      MovePlayer(coordinate_distance_t(0, -1));
-      break;
-    }
-    case ChangeType::MOVE_LEFT: {
-      MovePlayer(coordinate_distance_t(-1, 0));
-      break;
-    }
-    case ChangeType::MOVE_RIGHT: {
-      MovePlayer(coordinate_distance_t(1, 0));
-      break;
-    }
-    case ChangeType::MOVE_DOWN: {
-      MovePlayer(coordinate_distance_t(0, 1));
+      // The player ids are identical to the partner ids assigned by the ConnectionManager
+      auto player_id = event->GetPartnerId();
+      auto player = world->GetPlayerById(player_id);
+      assert(player != nullptr);
+      GameLogic::HandleChange(*player, change, *world);
       break;
     }
     default:
-      throw std::runtime_error("Unexpected ChangeType");
+      throw std::runtime_error("Unexpected EventType");
   }
 }
 
-void GameServer::MovePlayer(const coordinate_distance_t &movement) {  // NOLINT(readability-make-member-function-const)
-  assert(world->players.size() == 1);  // TODO: more advanced setup require to handle multiple players
-  auto &player = *world->players.front();
-
-  Position new_position = player.position + movement;
-
-  if (new_position.x < 0) {
-    new_position.x += world->size.x;
-  } else if (new_position.x >= world->size.x) {
-    new_position.x -= world->size.x;
-  }
-  if (new_position.y < 0) {
-    new_position.y += world->size.y;
-  } else if (new_position.y >= world->size.y) {
-    new_position.y -= world->size.y;
-  }
-
-  if (new_position != player.position && !world->IsBlocked(new_position)) {
-    player.MoveTo(new_position);
-  }
+const world::World &GameServer::GetWorld() const {
+  return *world;
 }

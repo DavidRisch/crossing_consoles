@@ -9,7 +9,11 @@
 #include "../src/communication/byte_layer/byte_stream/SocketByteServer.h"
 #include "../src/communication/connection_layer/connection/ConnectionManager.h"
 #include "../src/communication/message_layer/message/AcknowledgeMessage.h"
+#include "../src/communication/message_layer/message/ConnectionRequestMessage.h"
+#include "../src/communication/message_layer/message/ConnectionResetMessage.h"
+#include "../src/communication/message_layer/message/ConnectionResponseMessage.h"
 #include "../src/communication/message_layer/message/KeepAliveMessage.h"
+#include "../src/communication/message_layer/message/NotAcknowledgeMessage.h"
 
 using namespace communication;
 using namespace communication::byte_layer;
@@ -19,6 +23,15 @@ using namespace communication::message_layer;
 class Connections : public ::testing::Test {
  public:
   Connections() = default;
+
+  std::vector<uint8_t> empty_payload;
+
+  std::list<std::shared_ptr<Message>> test_messages_all_types = {
+      std::make_shared<KeepAliveMessage>(1000),          std::make_shared<ConnectionRequestMessage>(1200),
+      std::make_shared<ConnectionResponseMessage>(1230), std::make_shared<PayloadMessage>(empty_payload, 123),
+      std::make_shared<AcknowledgeMessage>(2000),        std::make_shared<ConnectionResetMessage>(3000),
+      std::make_shared<NotAcknowledgeMessage>(3000),
+  };
 
   std::shared_ptr<Connection> server_connection;
   std::shared_ptr<Connection> client_connection;
@@ -73,6 +86,31 @@ class Connections : public ::testing::Test {
       ASSERT_NE(ack_message, nullptr);
       EXPECT_EQ(ack_message->GetMessageType(), MessageType::ACKNOWLEDGE);
     }
+  }
+
+  static void close_connection(const std::shared_ptr<Connection> &first, const std::shared_ptr<Connection> &second) {
+    // first sends Reset Message to second, connection will be closed
+    auto message = std::make_shared<ConnectionResetMessage>(1234);
+
+    first->SendMessage(message);
+    auto received_message = second->ReceiveMessage();
+    ASSERT_NE(received_message, nullptr);
+    ASSERT_EQ(received_message->GetMessageType(), message_layer::MessageType::CONNECTION_RESET);
+
+    received_message = first->ReceiveMessage();
+    ASSERT_NE(received_message, nullptr);
+    ASSERT_EQ(received_message->GetMessageType(), message_layer::MessageType::ACKNOWLEDGE);
+
+    // Connection is ready to be closed, Connection Reset has been acknowledged
+    ASSERT_TRUE(first->ConnectionClosed());
+
+    // no messages should be sent or received
+    auto new_message = std::make_shared<KeepAliveMessage>(1400);
+    first->SendMessage(message);
+    received_message = second->ReceiveMessage();
+    ASSERT_EQ(received_message, nullptr);
+    received_message = first->ReceiveMessage();
+    ASSERT_EQ(received_message, nullptr);
   }
 };
 
@@ -226,4 +264,92 @@ TEST_F(Connections, BadAcknowledgeException) {
 
   server_connection->SendMessage(message);
   EXPECT_THROW(client_connection->ReceiveMessage(), Connection::BadAcknowledgeException);
+}
+
+TEST_F(Connections, ClientClosesConnection) {
+  // Client sends ConnectionReset message
+
+  auto stream_pair = MockBidirectionalByteStream::CreatePair();
+  auto &server_side = stream_pair.first;
+  auto &client_side = stream_pair.second;
+
+  auto client_message_input_stream = std::make_shared<MessageInputStream>(client_side);
+  auto server_message_output_stream = std::make_shared<MessageOutputStream>(server_side);
+
+  auto server_message_input_stream = std::make_shared<MessageInputStream>(server_side);
+  auto client_message_output_stream = std::make_shared<MessageOutputStream>(client_side);
+
+  make_connections(client_message_input_stream, client_message_output_stream, server_message_input_stream,
+                   server_message_output_stream);
+  close_connection(client_connection, server_connection);
+}
+
+TEST_F(Connections, ServerClosesConnection) {
+  // Server sends ConnectionReset message
+
+  auto stream_pair = MockBidirectionalByteStream::CreatePair();
+  auto &server_side = stream_pair.first;
+  auto &client_side = stream_pair.second;
+
+  auto client_message_input_stream = std::make_shared<MessageInputStream>(client_side);
+  auto server_message_output_stream = std::make_shared<MessageOutputStream>(server_side);
+
+  auto server_message_input_stream = std::make_shared<MessageInputStream>(server_side);
+  auto client_message_output_stream = std::make_shared<MessageOutputStream>(client_side);
+
+  make_connections(client_message_input_stream, client_message_output_stream, server_message_input_stream,
+                   server_message_output_stream);
+  close_connection(server_connection, client_connection);
+}
+
+TEST_F(Connections, NoConnectionReset) {
+  // any other message beside ConnectionReset should not trigger ready_to_close_flag
+  auto stream_pair = MockBidirectionalByteStream::CreatePair();
+  auto &server_side = stream_pair.first;
+  auto &client_side = stream_pair.second;
+
+  auto client_message_input_stream = std::make_shared<MessageInputStream>(client_side);
+  auto server_message_output_stream = std::make_shared<MessageOutputStream>(server_side);
+
+  auto server_message_input_stream = std::make_shared<MessageInputStream>(server_side);
+  auto client_message_output_stream = std::make_shared<MessageOutputStream>(client_side);
+
+  make_connections(client_message_input_stream, client_message_output_stream, server_message_input_stream,
+                   server_message_output_stream);
+
+  for (auto &message : test_messages_all_types) {
+    if (message->GetMessageType() == MessageType::CONNECTION_RESET) {
+      continue;
+    }
+
+    client_connection->SendMessage(message);
+
+    if (message->GetMessageType() == MessageType::ACKNOWLEDGE) {
+      // server throws exception if acknowledge is received in state ready
+      EXPECT_THROW(server_connection->ReceiveMessage(), Connection::BadAcknowledgeException);
+      continue;
+    }
+
+    if (message->GetMessageType() == MessageType::NOT_ACKNOWLEDGE) {
+      // server resends last sent message
+      server_connection->ReceiveMessage();
+      auto received_message_client = client_connection->ReceiveMessage();
+      auto received_message_server = server_connection->ReceiveMessage();
+      ASSERT_EQ(received_message_server, nullptr);
+      ASSERT_EQ(received_message_client, nullptr);
+
+      ASSERT_FALSE(client_connection->ConnectionClosed());
+      continue;
+    }
+
+    auto received_message_server = server_connection->ReceiveMessage();
+    ASSERT_NE(received_message_server, nullptr);
+
+    auto received_message_client = client_connection->ReceiveMessage();
+    ASSERT_NE(received_message_client, nullptr);
+    ASSERT_EQ(received_message_client->GetMessageType(), message_layer::MessageType::ACKNOWLEDGE);
+
+    // Connection not ready to be closed, no Connection Reset was sent or acknowledged
+    ASSERT_FALSE(client_connection->ConnectionClosed());
+  }
 }

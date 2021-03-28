@@ -86,7 +86,8 @@ TEST(MessageCoder, CrcIncorrectException) {
   size_t payload_offset = sizeof(ProtocolDefinition::flag) + sizeof(MessageType) +
                           sizeof(ProtocolDefinition::payload_length_t) + sizeof(ProtocolDefinition::sequence_t);
 
-  for (size_t i = payload_offset; i < encoded_message.size() - sizeof(ProtocolDefinition::flag); ++i) {
+  for (size_t i = payload_offset;
+       i < encoded_message.size() - sizeof(ProtocolDefinition::flag) - sizeof(ProtocolDefinition::end_marker); ++i) {
     std::vector<uint8_t> bad_encoded_message(encoded_message);
     bad_encoded_message.at(i) ^= 1;  // change a single byte of the encoded message
 
@@ -163,4 +164,32 @@ TEST_F(InvalidMessageCoder, ExceptionEscape) {
   // exclude CRC Value and last flag (tested separately)
   size_t offset = sizeof(ProtocolDefinition::flag) + sizeof(crc_value_t);
   ReplaceWithSequence(ProtocolDefinition::escape, offset);
+}
+
+TEST_F(InvalidMessageCoder, MessageSequenceisFlag) {
+  // test value of flag as msg sequence - needs to be properly escaped
+  ProtocolDefinition::sequence_t sequence = ProtocolDefinition::flag;
+  KeepAliveMessage original_message(sequence);
+
+  auto encoded_message = MessageCoder::Encode(&original_message);
+
+  MockInputStream mock_input_stream;
+  mock_input_stream.AddData(encoded_message);
+
+  auto decoded_message = MessageCoder::Decode(mock_input_stream);
+  EXPECT_EQ(decoded_message->GetMessageSequence(), sequence);
+}
+
+TEST_F(InvalidMessageCoder, MessageSequenceisEscape) {
+  // test value of escape as msg sequence - needs to be properly escaped
+  ProtocolDefinition::sequence_t sequence = ProtocolDefinition::escape;
+  KeepAliveMessage original_message(sequence);
+
+  auto encoded_message = MessageCoder::Encode(&original_message);
+
+  MockInputStream mock_input_stream;
+  mock_input_stream.AddData(encoded_message);
+
+  auto decoded_message = MessageCoder::Decode(mock_input_stream);
+  EXPECT_EQ(decoded_message->GetMessageSequence(), sequence);
 }

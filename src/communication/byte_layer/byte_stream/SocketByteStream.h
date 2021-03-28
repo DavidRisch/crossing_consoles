@@ -6,6 +6,8 @@
 #include <stdexcept>
 
 #include "../connection_simulator/ConnectionSimulatorPerfect.h"
+#include "../connection_simulator/IConnectionSimulatorProvider.h"
+#include "../connection_simulator/PerfectConnectionSimulatorProvider.h"
 #include "IInputByteStream.h"
 #include "IOutputByteStream.h"
 #include "SocketHolder.h"
@@ -23,15 +25,19 @@ inline const port_t socket_default_port = 56921;
  */
 class SocketByteStream : public IOutputByteStream, public IInputByteStream {
  public:
-  explicit SocketByteStream(file_descriptor_t socket_file_descriptor,
-                            IConnectionSimulator& connection_simulator_incoming = ConnectionSimulatorPerfect::instance,
-                            IConnectionSimulator& connection_simulator_outgoing = ConnectionSimulatorPerfect::instance);
+  explicit SocketByteStream(
+      file_descriptor_t socket_file_descriptor,
+      std::shared_ptr<IConnectionSimulator> connection_simulator_incoming = ConnectionSimulatorPerfect::instance,
+      std::shared_ptr<IConnectionSimulator> connection_simulator_outgoing = ConnectionSimulatorPerfect::instance);
 
   /**
    * \brief Connect to a `SocketByteServer` and create a new `SocketByteStream`.
    * \details Blocks until a connection is established.
    */
-  static std::shared_ptr<SocketByteStream> CreateClientSide(port_t port = socket_default_port);
+  static std::shared_ptr<SocketByteStream> CreateClientSide(
+      std::shared_ptr<IConnectionSimulatorProvider> connection_simulator_provider =
+          byte_layer::PerfectConnectionSimulatorProvider::instance,
+      port_t port = socket_default_port);
 
   /**
    * \brief Configure the os socket.
@@ -47,8 +53,8 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
   /// Indicates data is available and can be read
   bool HasInput() override;
 
-  void SetConnectionSimulatorIncoming(IConnectionSimulator& ConnectionSimulator);
-  void SetConnectionSimulatorOutgoing(IConnectionSimulator& ConnectionSimulator);
+  void SetConnectionSimulatorIncoming(std::shared_ptr<IConnectionSimulator> ConnectionSimulator);
+  void SetConnectionSimulatorOutgoing(std::shared_ptr<IConnectionSimulator> ConnectionSimulator);
 
   void SetParamCatchSendFailed(bool catch_failed_param);
 
@@ -65,8 +71,8 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
   std::shared_ptr<SocketHolder> socket_holder;
   bool catch_send_failed = true;
 
-  IConnectionSimulator* connection_simulator_incoming;
-  IConnectionSimulator* connection_simulator_outgoing;
+  std::shared_ptr<IConnectionSimulator> connection_simulator_incoming;
+  std::shared_ptr<IConnectionSimulator> connection_simulator_outgoing;
 };
 
 }  // namespace byte_layer
