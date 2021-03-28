@@ -14,8 +14,10 @@ add_library(crossing_consoles_lib
 
         game/visual/Renderer.cpp
         game/visual/Compositor.cpp
-        game/visual/Sprite.cpp
-
+        game/visual/ColoredCharMatrix.cpp
+        game/visual/ColoredChar.cpp
+        game/visual/ColoredString.cpp
+        
         game/networking/Change.cpp
 
         game/terminal/RealTerminal.cpp

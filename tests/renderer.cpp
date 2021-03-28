@@ -2,12 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../src/game/visual/symbols.h"
-
 using namespace game::visual;
 using namespace game::common;
 using namespace game::world;
-using namespace game::visual::symbols;
+using namespace game::terminal::colors;
 
 TEST(Renderer, EmptyWorld) {
   coordinate_size_t world_size = coordinate_size_t(101, 101);
@@ -18,19 +16,12 @@ TEST(Renderer, EmptyWorld) {
   World world = World(world_size);
   Renderer renderer(viewport_size, block_size, world, player);
 
-  std::wstring rendered_world = renderer.RenderWorld();
+  ColoredCharMatrix rendered_world = renderer.RenderWorld();
+  const std::vector<std::vector<ColoredChar>>& matrix = rendered_world.GetMatrix();
 
-  ASSERT_TRUE((int)rendered_world.size() == (viewport_size.x * block_size.x + 1) * viewport_size.y * block_size.y);
-
-  int n;
-  for (int y = 0; y < viewport_size.y * block_size.y; y++) {
-    for (int x = 0; x < viewport_size.x * block_size.x + 1; x++) {
-      n = (viewport_size.x * block_size.x + 1) * y + x;
-      if (x == viewport_size.x * block_size.x) {
-        EXPECT_EQ(rendered_world[n], L'\n');
-      } else {
-        EXPECT_EQ(rendered_world[n], L' ');
-      }
+  for (const auto& i_lines : matrix) {
+    for (const auto& i_characters : i_lines) {
+      EXPECT_EQ(i_characters, ColoredChar(L' ', WHITE, BLACK));
     }
   }
 }

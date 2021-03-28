@@ -38,35 +38,35 @@ TEST(Position, NotEqualTo) {
 }
 
 TEST(Position, LessThan) {
-  ASSERT_TRUE(position_1 < position_2);
-  ASSERT_TRUE(position_3 < position_2);
-  ASSERT_FALSE(position_2 < position_1);
-  ASSERT_FALSE(position_1 < position_1);
-  ASSERT_FALSE(position_2 < position_2);
-  ASSERT_FALSE(position_3 < position_1);
+  ASSERT_TRUE(position_1.IsLess(position_2));
+  ASSERT_FALSE(position_3.IsLess(position_2));
+  ASSERT_FALSE(position_2.IsLess(position_1));
+  ASSERT_FALSE(position_1.IsLess(position_1));
+  ASSERT_FALSE(position_3.IsLess(position_1));
 }
 
 TEST(Position, LessThanEqualTo) {
-  ASSERT_TRUE(position_1 <= position_2);
-  ASSERT_TRUE(position_1 <= position_1);
-  ASSERT_TRUE(position_2 <= position_2);
-  ASSERT_FALSE(position_2 <= position_1);
+  ASSERT_TRUE(position_1.IsLessOrEqual(position_2));
+  ASSERT_TRUE(position_1.IsLessOrEqual(position_1));
+  ASSERT_TRUE(position_2.IsLessOrEqual(position_2));
+  ASSERT_TRUE(position_3.IsLessOrEqual(position_2));
+  ASSERT_FALSE(position_2.IsLessOrEqual(position_1));
 }
 
 TEST(Position, GreaterThan) {
-  ASSERT_TRUE(position_2 > position_1);
-  ASSERT_TRUE(position_3 > position_1);
-  ASSERT_FALSE(position_1 > position_2);
-  ASSERT_FALSE(position_1 > position_1);
-  ASSERT_FALSE(position_2 > position_2);
-  ASSERT_FALSE(position_3 > position_2);
+  ASSERT_TRUE(position_2.IsGreater(position_1));
+  ASSERT_FALSE(position_3.IsGreater(position_1));
+  ASSERT_FALSE(position_1.IsGreater(position_2));
+  ASSERT_FALSE(position_1.IsGreater(position_1));
+  ASSERT_FALSE(position_3.IsGreater(position_2));
 }
 
 TEST(Position, GreaterThanEqualTo) {
-  ASSERT_TRUE(position_2 >= position_1);
-  ASSERT_TRUE(position_1 >= position_1);
-  ASSERT_TRUE(position_2 >= position_2);
-  ASSERT_FALSE(position_1 >= position_2);
+  ASSERT_TRUE(position_2.IsGreaterOrEqual(position_1));
+  ASSERT_TRUE(position_1.IsGreaterOrEqual(position_1));
+  ASSERT_TRUE(position_2.IsGreaterOrEqual(position_2));
+  ASSERT_TRUE(position_3.IsGreaterOrEqual(position_1));
+  ASSERT_FALSE(position_1.IsGreaterOrEqual(position_2));
 }
 
 TEST(Position, Addition) {

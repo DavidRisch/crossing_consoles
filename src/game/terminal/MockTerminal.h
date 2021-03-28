@@ -20,14 +20,14 @@ class MockTerminal : public ITerminal {
   bool HasInput() override;
   int GetInput() override;
 
-  void SetScreen(const std::wstring &content) override;
+  void SetScreen(const visual::ColoredCharMatrix& content) override;
 
   void AddInput(char input);
 
-  [[nodiscard]] std::wstring GetLastOutput();
+  [[nodiscard]] std::vector<std::vector<visual::ColoredChar>> GetLastOutput();
 
  private:
-  std::wstring last_output;
+  std::vector<std::vector<visual::ColoredChar>> last_output;
   std::wstring unused_inputs;
 
   /// Needed because this object can be used by multiple threads at the same time.

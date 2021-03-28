@@ -2,6 +2,7 @@
 
 using namespace game;
 using namespace game::terminal;
+using namespace game::visual;
 
 bool MockTerminal::HasInput() {
   std::lock_guard<std::mutex> lock_guard(mutex);
@@ -17,10 +18,10 @@ int MockTerminal::GetInput() {
   return input;
 }
 
-void MockTerminal::SetScreen(const std::wstring& content) {
+void MockTerminal::SetScreen(const ColoredCharMatrix& content) {
   std::lock_guard<std::mutex> lock_guard(mutex);
 
-  last_output = content;
+  last_output = content.GetMatrix();
 }
 
 void MockTerminal::AddInput(char input) {
@@ -28,7 +29,8 @@ void MockTerminal::AddInput(char input) {
 
   unused_inputs += input;
 }
-std::wstring MockTerminal::GetLastOutput() {
+
+std::vector<std::vector<ColoredChar>> MockTerminal::GetLastOutput() {
   std::lock_guard<std::mutex> lock_guard(mutex);
 
   return last_output;

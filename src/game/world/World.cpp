@@ -20,7 +20,7 @@ void World::AddPlayer(const std::shared_ptr<Player>& player) {
 }
 
 void World::AddWall(const Position& position) {
-  if (position >= Position(0, 0) && position < size) {
+  if (position.IsGreaterOrEqual(Position(0, 0)) && position.IsLess(size)) {
     if (walls.find(position) != walls.end()) {
       walls.at(position) = Wall(position);
     } else {

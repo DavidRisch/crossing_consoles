@@ -65,7 +65,7 @@ class ConnectionSimulator : public ::testing::Test {
   }
 
   static void TestWithFlakyParameters(ConnectionSimulatorFlaky::Parameters parameters) {
-    std::vector<u_int8_t> input;
+    std::vector<uint8_t> input;
     input.reserve(100);
     for (int i = 0; i < 100; ++i) {
       input.push_back(i);
@@ -82,7 +82,7 @@ class ConnectionSimulator : public ::testing::Test {
 
     ConnectionSimulatorFlaky connection_simulator(parameters);
 
-    std::vector<u_int8_t> actual_output;
+    std::vector<uint8_t> actual_output;
     actual_output.reserve(input.size());
 
     for (const auto &value : input) {
