@@ -100,10 +100,12 @@ class GameNetworking : public ::testing::Test {
   void expect_some_output_on_all() {
     wait_for_renderer();
     bool empty = true;
-    for (const auto& i_lines : mock_terminal->GetLastOutput()) {
-      for (const auto& i_characters : i_lines) {
-        if (i_characters != ColoredChar(L' ', WHITE, BLACK)) {
-          empty = false;
+    for (const auto& mock_terminal : mock_terminals) {
+      for (const auto& i_lines : mock_terminal->GetLastOutput()) {
+        for (const auto& i_characters : i_lines) {
+          if (i_characters != ColoredChar(L' ', WHITE, BLACK)) {
+            empty = false;
+          }
         }
       }
     }
@@ -186,7 +188,7 @@ TEST_F(GameNetworking, TwoPlayers) {
 
   std::thread input_thread([this] {
     wait_for_renderer();
-    std::vector<std::wstring> outputs_before;
+    std::vector<std::vector<std::vector<game::visual::ColoredChar>>> outputs_before;
     for (auto& mock_terminal : mock_terminals) {
       outputs_before.push_back(mock_terminal->GetLastOutput());
     }

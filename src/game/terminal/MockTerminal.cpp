@@ -30,7 +30,7 @@ void MockTerminal::AddInput(char input) {
   unused_inputs += input;
 }
 
-const std::vector<std::vector<ColoredChar>>& MockTerminal::GetLastOutput() const {
+std::vector<std::vector<ColoredChar>> MockTerminal::GetLastOutput() {
   std::lock_guard<std::mutex> lock_guard(mutex);
 
   return last_output;

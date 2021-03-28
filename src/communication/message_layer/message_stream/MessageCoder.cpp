@@ -133,7 +133,7 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
     assert(found_start_sequence == ProtocolDefinition::flag);
   }
 
-  auto message_type_value = ReadFromStreamWithCRC<u_int8_t>(stream, sizeof(u_int8_t), &crc_handler);
+  auto message_type_value = ReadFromStreamWithCRC<uint8_t>(stream, sizeof(uint8_t), &crc_handler);
   if (message_type_value > static_cast<uint8_t>(MessageType::HIGHEST_ELEMENT)) {
     throw InvalidMessageException("Invalid message_type: " + std::to_string(message_type_value));
   }

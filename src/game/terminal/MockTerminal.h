@@ -24,7 +24,7 @@ class MockTerminal : public ITerminal {
 
   void AddInput(char input);
 
-  [[nodiscard]] const std::vector<std::vector<visual::ColoredChar>>& GetLastOutput() const;
+  [[nodiscard]] std::vector<std::vector<visual::ColoredChar>> GetLastOutput();
 
  private:
   std::vector<std::vector<visual::ColoredChar>> last_output;
