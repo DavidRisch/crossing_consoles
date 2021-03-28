@@ -8,22 +8,30 @@
 
 namespace communication::connection_layer {
 
+/**
+ * \brief Collect message statistics of a `Connection`.
+ * \details Messages of type ConnectionReset, ConnectionResponse and ConnectionRequest are not captured.
+ */
 class ConnectionStatistics {
-  /**
-   * \brief Collect and display message statistics of a `Connection`.
-   * \details Messages of type ConnectionReset, ConnectionResponse and ConnectionRequest are not captured.
-   */
-
  public:
   ConnectionStatistics();
+
+  /**
+   * \brief Thrown if the sequence of the received sequence does not match the sequence of the sent message
+   */
+  class ContradictoryInputException : public std::exception {
+    [[nodiscard]] const char* what() const noexcept override {
+      return "Sequence of received message does not match the sequence of the sent message.";
+    }
+  };
 
   // Variables used for the MessageType statistics and the calculation of the package loss
   typedef uint16_t message_count_t;
   typedef std::unordered_map<message_layer::MessageType, message_count_t> message_count_map_t;
 
   struct MessageStatisticData {
-    message_count_map_t map = {};
-    message_count_t count = 0;
+    message_count_map_t count_by_type = {};
+    message_count_t total_count = 0;
   };
 
   struct PackageLossData {
@@ -42,27 +50,27 @@ class ConnectionStatistics {
   void AddSentMessage(const message_layer::Message& message);
 
   /**
-   * \brief Set the timestamp at which the sent message was received after it has been acknowledged
+   * \brief Set the timestamp at which the sent message was received after it has been acknowledged.
    */
   void SetReceivedTimestampForSentMessage(ProtocolDefinition::sequence_t sequence);
 
   /**
    * \brief Calculate overall package loss.
    */
-  PackageLossData CalculatePackageLoss();
+  PackageLossData CalculatePackageLoss() const;
 
   /**
-   * \brief Calculate the average response time for all Messages in milliseconds
+   * \brief Calculate the average response time for all messages in milliseconds.
    */
-  double CalculateAverageResponseTime();
+  double CalculateAverageResponseTime() const;
   /**
-   * \brief Calculate the uptime of the Connection in milliseconds
+   * \brief Calculate the uptime of the Connection in milliseconds.
    */
-  double CalculateUptime();
+  double CalculateUptime() const;
 
-  MessageStatisticData GetReceivedMessageStatistics();
+  MessageStatisticData GetReceivedMessageStatistics() const;
 
-  MessageStatisticData GetSentMessageStatistics();
+  MessageStatisticData GetSentMessageStatistics() const;
 
  private:
   /// Hold the total of all received messages and for each message type
@@ -72,7 +80,7 @@ class ConnectionStatistics {
   MessageStatisticData sent_message_statistics;
 
   /**
-   * \brief Increment overall message counter and of specific message type in message_statistic
+   * \brief Increment overall message counter and the counter of the specific message type in message_statistics.
    */
   static void UpdateStatisticData(MessageStatisticData& message_statistics, const message_layer::Message& message);
 

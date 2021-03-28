@@ -4,20 +4,18 @@
 #include "ConnectionStatistics.h"
 
 namespace communication::connection_layer {
+
+/**
+ * \brief Print message statistics of a `Connection` collected by `ConnectionStatistic` to console.
+ */
 class StatisticPrinter {
-  /**
-   * \brief Print message statistics of a `Connection` collected by `ConnectionStatistic` to console.
-   */
-
  public:
-  StatisticPrinter();
-
   /**
    * \brief Print statistics to console.
    * \details Prints message count (sent, received) for each message type plus package loss, average response time and
    * uptime of the Connection.
    */
-  static void PrintStatistics(ConnectionStatistics statistics);
+  static void PrintStatistics(const ConnectionStatistics& statistics);
 
  private:
   /**

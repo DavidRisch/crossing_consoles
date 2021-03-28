@@ -43,7 +43,6 @@ void ConnectionManager::RemoveConnection(ProtocolDefinition::partner_id_t partne
     throw UnknownPartnerException();
   }
   event_queue.push_back(std::make_shared<DisconnectEvent>(partner_id));
-  connection_it->second.connection->PrintStatistics();
   connection_map.erase(partner_id);
 }
 
@@ -136,7 +135,8 @@ void ConnectionManager::CloseConnection(partner_id_t partner_id) {
 bool ConnectionManager::HasConnections() {
   return !connection_map.empty();
 }
-ConnectionStatistics ConnectionManager::GetStatisticsFromPartnerConnection(partner_id_t partner_id) {
+
+ConnectionStatistics ConnectionManager::GetStatisticsFromPartnerConnection(partner_id_t partner_id) const {
   auto connection_it = connection_map.find(partner_id);
   if (connection_it == connection_map.end()) {
     throw UnknownPartnerException();

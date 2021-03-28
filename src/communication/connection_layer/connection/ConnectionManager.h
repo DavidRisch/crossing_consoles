@@ -95,7 +95,7 @@ class ConnectionManager {
   /**
    * Return connection statistics of partner connection
    */
-  ConnectionStatistics GetStatisticsFromPartnerConnection(partner_id_t partner_id);
+  ConnectionStatistics GetStatisticsFromPartnerConnection(partner_id_t partner_id) const;
 
  protected:
   /**

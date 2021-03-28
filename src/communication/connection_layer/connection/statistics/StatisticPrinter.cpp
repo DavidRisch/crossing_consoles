@@ -24,8 +24,6 @@ const std::string set_red = esc_character + "[31m";  // sets output to be red
 const std::string set_bold = esc_character + "[1m";  // sets output to be bold
 const std::string reset = esc_character + "[0m";     // reset any console output changes
 
-StatisticPrinter::StatisticPrinter() = default;
-
 void StatisticPrinter::PrintMapStatistics(
     const ConnectionStatistics::MessageStatisticData& sent_message_statistics,
     const ConnectionStatistics::MessageStatisticData& received_message_statistics) {
@@ -38,12 +36,13 @@ void StatisticPrinter::PrintMapStatistics(
     int sent_entry = 0;
     int received_entry = 0;
 
-    if (sent_message_statistics.map.find(entry.first) != sent_message_statistics.map.end()) {
-      sent_entry = (sent_message_statistics.map.find(entry.first))->second;
+    if (sent_message_statistics.count_by_type.find(entry.first) != sent_message_statistics.count_by_type.end()) {
+      sent_entry = (sent_message_statistics.count_by_type.find(entry.first))->second;
     }
 
-    if (received_message_statistics.map.find(entry.first) != received_message_statistics.map.end()) {
-      received_entry = (received_message_statistics.map.find(entry.first))->second;
+    if (received_message_statistics.count_by_type.find(entry.first) !=
+        received_message_statistics.count_by_type.end()) {
+      received_entry = (received_message_statistics.count_by_type.find(entry.first))->second;
     }
 
     // calculate column width for better formatting
@@ -54,8 +53,8 @@ void StatisticPrinter::PrintMapStatistics(
   }
 
   std::cout << std::setfill('-') << std::setw(45) << "\n";
-  std::cout << std::setfill(' ') << "SUM" << std::setw(27) << sent_message_statistics.count << std::setw(8)
-            << received_message_statistics.count << "\n";
+  std::cout << std::setfill(' ') << "SUM" << std::setw(27) << sent_message_statistics.total_count << std::setw(8)
+            << received_message_statistics.total_count << "\n";
 }
 
 void StatisticPrinter::PrintPackageLoss(ConnectionStatistics::PackageLossData data) {
@@ -76,7 +75,8 @@ void StatisticPrinter::PrintAverageResponseTime(const double response_time) {
 void StatisticPrinter::PrintUptime(const double uptime) {
   std::cout << "Uptime: " << uptime << " ms\n";
 }
-void StatisticPrinter::PrintStatistics(ConnectionStatistics statistics) {
+
+void StatisticPrinter::PrintStatistics(const ConnectionStatistics& statistics) {
   std::cout << "\n" << std::setfill('=') << std::setw(line_length) << "\n";
 
   PrintMapStatistics(statistics.GetSentMessageStatistics(), statistics.GetReceivedMessageStatistics());

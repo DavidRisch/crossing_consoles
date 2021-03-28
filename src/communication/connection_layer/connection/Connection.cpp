@@ -148,8 +148,11 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
       if (acknowledge_message->GetAcknowledgedMessageSequence() != last_send_sequence) {
         throw BadAcknowledgeException();
       }
-      // set timestamp_received for the last message that was sent after receiving the correct acknowledge
+
+      // set timestamp_received for the last message that was sent after receiving the corresponding acknowledge that
+      // shows that the message has been received by the communication partner
       statistics.SetReceivedTimestampForSentMessage(last_send_sequence);
+
       if (state == ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE) {
         // acknowledge of ConnectionResetMessage has been received, close connection
         state = ConnectionState::CLOSED;
@@ -222,11 +225,7 @@ void Connection::Handle() {
   }
 }
 
-void Connection::PrintStatistics() {
-  StatisticPrinter::PrintStatistics(statistics);
-}
-
-ConnectionStatistics Connection::GetConnectionStatistics() {
+ConnectionStatistics Connection::GetConnectionStatistics() const {
   return statistics;
 }
 

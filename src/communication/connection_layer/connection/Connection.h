@@ -87,16 +87,13 @@ class Connection {
   };
 
   /**
-   * Print connection statistics
+   * \brief Return connection statistics
    */
-  void PrintStatistics();
+  ConnectionStatistics GetConnectionStatistics() const;
 
   /**
-   * Return connection statistics
+   * \brief Returns true if connection is in state `CLOSED`
    */
-  ConnectionStatistics GetConnectionStatistics();
-
-  /// Returns true if connection is in state `CLOSED`
   bool ConnectionClosed() const;
 
  private:
@@ -141,7 +138,7 @@ class Connection {
   sequence_t GenerateSequence();
   sequence_t sequence_counter;
 
-  ConnectionStatistics statistics = ConnectionStatistics();
+  ConnectionStatistics statistics{};
 };
 
 }  // namespace connection_layer
