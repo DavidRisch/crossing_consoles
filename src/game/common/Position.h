@@ -29,12 +29,12 @@ class Position : public networking::ISerializable {
   Position operator*(const Position& other_position) const;
   Position operator/(const Position& other_position) const;
 
-  bool operator==(const Position& other_position) const;
-  bool operator!=(const Position& other_position) const;
-  bool operator<(const Position& other_position) const;
-  bool operator<=(const Position& other_position) const;
-  bool operator>(const Position& other_position) const;
-  bool operator>=(const Position& other_position) const;
+  bool IsEqual(const Position& other_position) const;
+  bool IsNotEqual(const Position& other_position) const;
+  bool IsLess(const Position& other_position) const;
+  bool IsLessOrEqual(const Position& other_position) const;
+  bool IsGreater(const Position& other_position) const;
+  bool IsGreaterOrEqual(const Position& other_position) const;
 };
 
 typedef Position coordinate_size_t;

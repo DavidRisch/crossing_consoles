@@ -41,26 +41,26 @@ Position Position::operator/(const Position &other_position) const {
   return Position(x / other_position.x, y / other_position.y);
 }
 
-bool Position::operator==(const Position &other_position) const {
+bool Position::IsEqual(const Position &other_position) const {
   return (x == other_position.x && y == other_position.y);
 }
 
-bool Position::operator!=(const Position &other_position) const {
+bool Position::IsNotEqual(const Position &other_position) const {
   return (x != other_position.x || y != other_position.y);
 }
 
-bool Position::operator<(const Position &other_position) const {
+bool Position::IsLess(const Position &other_position) const {
   return (x < other_position.x && y < other_position.y);
 }
 
-bool Position::operator<=(const Position &other_position) const {
+bool Position::IsLessOrEqual(const Position &other_position) const {
   return (x <= other_position.x && y <= other_position.y);
 }
 
-bool Position::operator>(const Position &other_position) const {
+bool Position::IsGreater(const Position &other_position) const {
   return (x > other_position.x && y > other_position.y);
 }
 
-bool Position::operator>=(const Position &other_position) const {
+bool Position::IsGreaterOrEqual(const Position &other_position) const {
   return (x >= other_position.x && y >= other_position.y);
 }

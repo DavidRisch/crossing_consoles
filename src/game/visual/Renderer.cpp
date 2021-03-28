@@ -56,7 +56,7 @@ ColoredCharMatrix Renderer::RenderWorld() const {
         // get position of wall for each world repetition in world coordinates
         Position position = i_wall->position + (world->size * Position(x_factor, y_factor));
         // check if wall is within the rendered viewport
-        if (position >= viewport_start && position <= viewport_end) {
+        if (position.IsGreaterOrEqual(viewport_start) && position.IsLessOrEqual(viewport_end)) {
           // get wall position as rendered viewport coordinates
           Position relative_position = position - viewport_start;
           // insert wall sprite
@@ -69,7 +69,7 @@ ColoredCharMatrix Renderer::RenderWorld() const {
   // place players
   for (auto const& i_player : world->players) {
     // check if player is within the rendered viewport
-    if (i_player->position >= viewport_start && i_player->position <= viewport_end) {
+    if (i_player->position.IsGreaterOrEqual(viewport_start) && i_player->position.IsLessOrEqual(viewport_end)) {
       // get player position as rendered viewport coordinates
       Position relative_position = i_player->position - viewport_start;
       // insert player sprite

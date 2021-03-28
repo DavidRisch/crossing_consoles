@@ -17,10 +17,10 @@ void World::AddPlayer(Player* player) {
 }
 
 void World::AddWall(const Position& position) {
-  if (position >= Position(0, 0) && position < size) {
+  if (position.IsGreaterOrEqual(Position(0, 0)) && position.IsLess(size)) {
     bool exists = false;
     for (auto const& i_wall : walls) {
-      if (i_wall->position == position) {
+      if (i_wall->position.IsEqual(position)) {
         exists = true;
       }
     }
@@ -33,7 +33,7 @@ void World::AddWall(const Position& position) {
 
 bool World::IsBlocked(const Position& position) {
   for (auto const& i_wall : walls) {
-    if (i_wall->position == position) {
+    if (i_wall->position.IsEqual(position)) {
       return true;
     }
   }

@@ -24,7 +24,7 @@ void ColoredCharMatrix::PlaceChar(wchar_t character, Color foreground, Color bac
 }
 
 void ColoredCharMatrix::PlaceChar(wchar_t character, const Position& position, Color foreground, Color background) {
-  if (position < size) {
+  if (position.IsLess(size)) {
     characters[position.y][position.x] = ColoredChar(character, foreground, background);
     set_current = position;
     set_current.x++;
@@ -55,7 +55,7 @@ void ColoredCharMatrix::InsertMatrix(const ColoredCharMatrix& matrix, const Posi
   for (int y = 0; y < (int)colored_characters.size(); y++) {
     for (int x = 0; x < (int)colored_characters[y].size(); x++) {
       Position new_position = Position(x, y) + offset;
-      if (new_position < size) {
+      if (new_position.IsLess(size)) {
         PlaceChar(colored_characters[y][x].character, new_position, colored_characters[y][x].foreground,
                   colored_characters[y][x].background);
       }
@@ -65,6 +65,10 @@ void ColoredCharMatrix::InsertMatrix(const ColoredCharMatrix& matrix, const Posi
 
 const std::vector<std::vector<ColoredChar>>& ColoredCharMatrix::GetMatrix() const {
   return characters;
+}
+
+const common::coordinate_size_t& ColoredCharMatrix::GetSize() const {
+  return size;
 }
 
 bool ColoredCharMatrix::operator==(const ColoredCharMatrix& colored_char_matrix) {
