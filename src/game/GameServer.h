@@ -23,23 +23,13 @@ class GameServer {
    */
   void RunIteration();
 
-  const world::World &GetWorld() const;
+  [[nodiscard]] const world::World &GetWorld() const;
 
  private:
   /**
-   * \brief Handle a `Event` caused by a `GameClient`.
+   * \brief Handle an `Event` caused by a `GameClient`.
    */
   void HandleEvent(const std::shared_ptr<communication::connection_layer::Event> &event);
-
-  /**
-   * \brief Handle a `Change` sent by a `GameClient` controlling the specific player.
-   */
-  void HandleChange(const std::shared_ptr<world::Player> &player, const networking::Change &change);
-
-  /**
-   * Move the player with the given `movement`.
-   */
-  void MovePlayer(const std::shared_ptr<world::Player> &player, const common::coordinate_distance_t &movement);
 
   std::shared_ptr<world::World> world;
 

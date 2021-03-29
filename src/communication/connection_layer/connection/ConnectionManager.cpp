@@ -4,6 +4,7 @@
 #include <chrono>
 #include <utility>
 
+#include "../../debug.h"
 #include "../../message_layer/message/ConnectionResetMessage.h"
 #include "../../message_layer/message/KeepAliveMessage.h"
 #include "../event/ConnectEvent.h"
@@ -13,9 +14,17 @@
 using namespace communication;
 using namespace connection_layer;
 
-ConnectionManager::ConnectionManager(ProtocolDefinition::timeout_t timeout)
-    : timeout(timeout) {
+ConnectionManager::ConnectionManager(
+    ProtocolDefinition::timeout_t timeout,
+    const std::shared_ptr<byte_layer::IConnectionSimulatorProvider>& connection_simulator_provider)
+    : timeout(timeout)
+    , connection_simulator_provider(connection_simulator_provider) {
   connection_map = {};
+  keep_alive_interval =
+      std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::keep_alive_numerator);
+
+  assert(timeout > std::chrono::milliseconds(0));
+  assert(keep_alive_interval < timeout);
 }
 
 void ConnectionManager::Broadcast(const std::vector<uint8_t>& payload) {
@@ -44,6 +53,10 @@ void ConnectionManager::AddConnection(const std::shared_ptr<Connection>& connect
   event_queue.push_back(std::make_shared<ConnectEvent>(new_partner_id));
 }
 
+bool ConnectionManager::HasEvent() {
+  return !event_queue.empty();
+}
+
 std::shared_ptr<Event> ConnectionManager::PopAndGetOldestEvent() {
   if (event_queue.empty()) {
     return std::shared_ptr<Event>();
@@ -62,13 +75,6 @@ void ConnectionManager::ReceiveMessages() {
   for (auto& connection_entry : connection_map) {
     auto connection = connection_entry.second.connection;
     auto partner_id = connection_entry.first;
-
-    /*
-     TODO: send keep alive less frequently
-     TODO: does not belong in this method
-    auto msg = std::make_shared<message_layer::KeepAliveMessage>(partner_id);
-    TODO: connection->SendMessage(msg);
-     */
 
     std::shared_ptr<message_layer::Message> received_msg;
     do {
@@ -99,8 +105,15 @@ void ConnectionManager::ReceiveMessages() {
       connection_remove_list.push_back(partner_id);
     }
 
-    if (std::chrono::steady_clock::now() - connection_entry.second.timestamp_last_received >= timeout) {
+    auto current_time = std::chrono::steady_clock::now();
+    if (current_time - connection_entry.second.timestamp_last_received >= timeout) {
+      DEBUG_CONNECTION_LAYER(std::cout << "(" << connection.get() << ") Timout (ConnectionManager)\n")
       connection_remove_list.push_back(partner_id);
+
+    } else if (current_time - connection_entry.second.timestamp_last_received >= keep_alive_interval) {
+      DEBUG_CONNECTION_LAYER(std::cout << "(" << connection.get() << ") Send KeepAlive (ConnectionManager)\n")
+      auto keep_alive_msg = std::make_shared<message_layer::KeepAliveMessage>(message_layer::KeepAliveMessage());
+      SendMessageToConnection(partner_id, keep_alive_msg);
     }
   }
 

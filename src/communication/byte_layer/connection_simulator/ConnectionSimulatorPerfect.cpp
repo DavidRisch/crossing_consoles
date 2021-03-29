@@ -7,4 +7,5 @@ uint8_t ConnectionSimulatorPerfect::Filter(uint8_t input) {
   return input;
 }
 
-ConnectionSimulatorPerfect ConnectionSimulatorPerfect::instance = ConnectionSimulatorPerfect();
+const std::shared_ptr<ConnectionSimulatorPerfect> ConnectionSimulatorPerfect::instance =
+    std::make_shared<ConnectionSimulatorPerfect>();

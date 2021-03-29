@@ -1,20 +1,29 @@
 add_library(crossing_consoles_lib
 
         game/GameClient.cpp
-        game/world/Player.cpp
+        game/GameLogic.cpp
+        game/GameServer.cpp
+
         game/common/Position.cpp
+
+        game/world/Player.cpp
         game/world/World.cpp
         game/world/Wall.cpp
+        game/world/WorldGenerator.cpp
+        game/world/Spawner.cpp
+
         game/visual/Renderer.cpp
         game/visual/Compositor.cpp
-        game/visual/Sprite.cpp
-        game/GameServer.cpp
-        game/world/WorldGenerator.cpp
+        game/visual/ColoredCharMatrix.cpp
+        game/visual/ColoredChar.cpp
+        game/visual/ColoredString.cpp
+        
         game/networking/Change.cpp
-        game/world/Spawner.cpp
 
         game/terminal/RealTerminal.cpp
         game/terminal/MockTerminal.cpp
+
+        communication/debug.cpp
 
         communication/byte_layer/byte_stream/SocketByteStream.cpp
         communication/byte_layer/byte_stream/SocketByteServer.cpp
@@ -23,7 +32,8 @@ add_library(crossing_consoles_lib
         communication/byte_layer/byte_stream/MockBidirectionalByteStream.cpp
 
         communication/byte_layer/connection_simulator/ConnectionSimulatorPerfect.cpp
-        communication/byte_layer/connection_simulator/ConnectionSimulatorFlakey.cpp
+        communication/byte_layer/connection_simulator/ConnectionSimulatorFlaky.cpp
+        communication/byte_layer/connection_simulator/PerfectConnectionSimulatorProvider.cpp
 
         communication/message_layer/message_stream/MessageInputStream.cpp
         communication/message_layer/message_stream/MessageOutputStream.cpp
@@ -36,6 +46,7 @@ add_library(crossing_consoles_lib
         communication/message_layer/message/PayloadMessage.cpp
         communication/message_layer/message/MessageMetaData.cpp
         communication/message_layer/message/AcknowledgeMessage.cpp
+        communication/message_layer/message/NotAcknowledgeMessage.cpp
 
         communication/message_layer/crc/CRCHandler.cpp
 

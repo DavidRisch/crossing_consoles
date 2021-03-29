@@ -11,14 +11,15 @@ using namespace communication;
 using namespace communication::byte_layer;
 
 SocketByteStream::SocketByteStream(file_descriptor_t socket_file_descriptor,
-                                   IConnectionSimulator &connection_simulator_incoming,
-                                   IConnectionSimulator &connection_simulator_outgoing)
+                                   std::shared_ptr<IConnectionSimulator> connection_simulator_incoming,
+                                   std::shared_ptr<IConnectionSimulator> connection_simulator_outgoing)
     : socket_holder(std::make_shared<SocketHolder>(socket_file_descriptor))
-    , connection_simulator_incoming(&connection_simulator_incoming)
-    , connection_simulator_outgoing(&connection_simulator_outgoing) {
+    , connection_simulator_incoming(connection_simulator_incoming)
+    , connection_simulator_outgoing(connection_simulator_outgoing) {
 }
 
-std::shared_ptr<SocketByteStream> SocketByteStream::CreateClientSide(uint16_t port) {
+std::shared_ptr<SocketByteStream> SocketByteStream::CreateClientSide(
+    std::shared_ptr<IConnectionSimulatorProvider> connection_simulator_provider, uint16_t port) {
   file_descriptor_t socket_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
   if (socket_file_descriptor < 0) {
     throw std::runtime_error("socket failed");
@@ -37,7 +38,9 @@ std::shared_ptr<SocketByteStream> SocketByteStream::CreateClientSide(uint16_t po
     throw std::runtime_error("connect failed");
   }
 
-  auto socket_byte_stream = std::make_shared<SocketByteStream>(SocketByteStream(socket_file_descriptor));
+  auto socket_byte_stream = std::make_shared<SocketByteStream>(
+      socket_file_descriptor, connection_simulator_provider->make_incoming_connection_simulator(),
+      connection_simulator_provider->make_outgoing_connection_simulator());
 
   socket_byte_stream->ConfigureSocket();
 
@@ -95,12 +98,12 @@ void SocketByteStream::SendString(const std::string &message) {
   Send(reinterpret_cast<const uint8_t *>(message.c_str()), message.size());
 }
 
-void SocketByteStream::SetConnectionSimulatorIncoming(IConnectionSimulator &ConnectionSimulator) {
-  connection_simulator_incoming = &ConnectionSimulator;
+void SocketByteStream::SetConnectionSimulatorIncoming(std::shared_ptr<IConnectionSimulator> ConnectionSimulator) {
+  connection_simulator_incoming = ConnectionSimulator;
 }
 
-void SocketByteStream::SetConnectionSimulatorOutgoing(IConnectionSimulator &ConnectionSimulator) {
-  connection_simulator_outgoing = &ConnectionSimulator;
+void SocketByteStream::SetConnectionSimulatorOutgoing(std::shared_ptr<IConnectionSimulator> ConnectionSimulator) {
+  connection_simulator_outgoing = ConnectionSimulator;
 }
 
 bool SocketByteStream::HasInput() {

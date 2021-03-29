@@ -8,7 +8,9 @@
 using namespace game;
 using namespace game::common;
 using namespace game::world;
+using namespace game::visual;
 using namespace game::terminal;
+using namespace game::terminal::colors;
 
 TEST(Game, NoAction) {
   auto player = std::make_shared<Player>("player name", Position(2, 2));
@@ -21,7 +23,16 @@ TEST(Game, NoAction) {
   GameClient gc(player, mock_terminal, coordinate_size_t(10, 10));
   gc.Run();
 
-  ASSERT_FALSE(mock_terminal->GetLastOutput().empty());
+  bool empty = true;
+  for (const auto& i_lines : mock_terminal->GetLastOutput()) {
+    for (const auto& i_characters : i_lines) {
+      if (i_characters != ColoredChar(L' ', WHITE, BLACK)) {
+        empty = false;
+      }
+    }
+  }
+
+  ASSERT_FALSE(empty);
 }
 
 TEST(Game, Actions) {
@@ -39,5 +50,14 @@ TEST(Game, Actions) {
   GameClient gc(player, mock_terminal, coordinate_size_t(10, 10));
   gc.Run();
 
-  ASSERT_FALSE(mock_terminal->GetLastOutput().empty());
+  bool empty = true;
+  for (const auto& i_lines : mock_terminal->GetLastOutput()) {
+    for (const auto& i_characters : i_lines) {
+      if (i_characters != ColoredChar(L' ', WHITE, BLACK)) {
+        empty = false;
+      }
+    }
+  }
+
+  ASSERT_FALSE(empty);
 }

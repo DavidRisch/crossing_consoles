@@ -3,6 +3,8 @@
 #include <iostream>
 #include <utility>
 
+#include "../../debug.h"
+
 using namespace communication;
 using namespace connection_layer;
 
@@ -11,8 +13,9 @@ ClientSideConnectionManager::ClientSideConnectionManager(ProtocolDefinition::tim
 }
 
 std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::CreateClientSide(
-    ProtocolDefinition::timeout_t timeout) {
-  auto byte_stream = byte_layer::SocketByteStream::CreateClientSide();
+    ProtocolDefinition::timeout_t timeout,
+    std::shared_ptr<byte_layer::IConnectionSimulatorProvider> connection_simulator_provider) {
+  auto byte_stream = byte_layer::SocketByteStream::CreateClientSide(std::move(connection_simulator_provider));
   byte_stream->SetParamCatchSendFailed(false);
   auto message_input_stream = std::make_shared<message_layer::MessageInputStream>(byte_stream);
   auto message_output_stream = std::make_shared<message_layer::MessageOutputStream>(byte_stream);
@@ -20,6 +23,7 @@ std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::Create
       Connection::CreateClientSide(std::move(message_input_stream), std::move(message_output_stream), timeout);
 
   connection->BlockingEstablish();
+  DEBUG_CONNECTION_LAYER(std::cout << "(" << connection.get() << ") Establish done (ClientSideConnectionManager)\n")
 
   auto manager = std::shared_ptr<ClientSideConnectionManager>(new ClientSideConnectionManager(timeout));
   manager->AddConnection(connection);

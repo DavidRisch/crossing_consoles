@@ -5,6 +5,7 @@
 #include <thread>
 
 #include "../communication/connection_layer/event/PayloadEvent.h"
+#include "GameLogic.h"
 #include "networking/Change.h"
 #include "terminal/ITerminal.h"
 #include "world/WorldGenerator.h"
@@ -77,71 +78,25 @@ void GameClient::Run() {
 }
 
 void GameClient::ProcessInput() {
-  coordinate_distance_t movement(0, 0);
-
   if (terminal->HasInput()) {
     int keypress = terminal->GetInput();
-    switch (static_cast<KeyCode>(keypress)) {
-      case KeyCode::W: {
-        movement.Set(0, -1);
-        if (multiplayer) {
-          Change change(ChangeType::MOVE_UP);
-          client_manager->SendDataToServer(change.payload);
-        }
-        break;
-      }
-      case KeyCode::A: {
-        movement.Set(-1, 0);
-        if (multiplayer) {
-          Change change(ChangeType::MOVE_LEFT);
-          client_manager->SendDataToServer(change.payload);
-        }
-        break;
-      }
-      case KeyCode::S: {
-        movement.Set(0, 1);
-        if (multiplayer) {
-          Change change(ChangeType::MOVE_DOWN);
+    auto keycode = static_cast<KeyCode>(keypress);
+    auto change_type_it = map_key_to_change.find(keycode);
 
-          client_manager->SendDataToServer(change.payload);
-        }
-        break;
-      }
-      case KeyCode::D: {
-        movement.Set(1, 0);
-        if (multiplayer) {
-          Change change(ChangeType::MOVE_RIGHT);
-
-          client_manager->SendDataToServer(change.payload);
-        }
-        break;
-      }
-      case KeyCode::ESCAPE:
+    if (change_type_it == map_key_to_change.end()) {
+      if (keycode == KeyCode::ESCAPE) {
         keep_running = false;
-      default:
-        return;
+      }
+      return;
     }
 
-    if (!multiplayer) {
+    auto change = change_type_it->second;
+    if (multiplayer) {
+      client_manager->SendDataToServer(change.payload);
+    } else {
       auto player = weak_player.lock();
       assert(player != nullptr);
-
-      Position new_position = player->position + movement;
-
-      if (new_position.x < 0) {
-        new_position.x += world.size.x;
-      } else if (new_position.x >= world.size.x) {
-        new_position.x -= world.size.x;
-      }
-      if (new_position.y < 0) {
-        new_position.y += world.size.y;
-      } else if (new_position.y >= world.size.y) {
-        new_position.y -= world.size.y;
-      }
-
-      if (new_position != player->position && !world.IsBlocked(new_position)) {
-        player->MoveTo(new_position);
-      }
+      GameLogic::HandleChange(*player, change, world);
     }
   }
 }
