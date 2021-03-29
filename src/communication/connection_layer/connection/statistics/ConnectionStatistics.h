@@ -59,7 +59,7 @@ class ConnectionStatistics {
   /**
    * \brief Calculate the uptime of the Connection in milliseconds.
    */
-  double CalculateUptime() const;
+  std::chrono::microseconds CalculateUptime() const;
 
   MessageStatisticData GetReceivedMessageStatistics() const;
 

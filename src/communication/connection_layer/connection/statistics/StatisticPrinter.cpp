@@ -86,8 +86,8 @@ void StatisticPrinter::PrintAverageResponseTime(const std::optional<std::chrono:
   }
 }
 
-void StatisticPrinter::PrintUptime(const double uptime) {
-  std::cout << "Uptime: " << uptime << " ms\n";
+void StatisticPrinter::PrintUptime(const std::chrono::microseconds uptime) {
+  std::cout << "Uptime: " << uptime.count() / 1000.0 << " ms\n";
 }
 
 void StatisticPrinter::PrintStatistics(const ConnectionStatistics& statistics) {

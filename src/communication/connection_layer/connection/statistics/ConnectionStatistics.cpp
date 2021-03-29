@@ -62,13 +62,12 @@ std::optional<std::chrono::microseconds> ConnectionStatistics::CalculateAverageR
   }
   response_time = sum / sent_and_ack_message_list.size();
 
-  return response_time;  // convert to milliseconds
+  return response_time;
 }
 
-double ConnectionStatistics::CalculateUptime() const {
-  auto uptime =
-      std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - connection_start_time);
-  return static_cast<double>(uptime.count()) / 1000;
+std::chrono::microseconds ConnectionStatistics::CalculateUptime() const {
+  return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() -
+                                                               connection_start_time);
 }
 
 void ConnectionStatistics::UpdateStatisticData(MessageStatisticData& message_statistics,
