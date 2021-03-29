@@ -4,36 +4,24 @@
 namespace game::terminal::colors {
 
 enum Color {
-  BLACK =
-#ifdef _WIN32
-      0,
-#else
-      30,
-#endif
-  BLUE,
-  GREEN,
-  CYAN,
+  BLACK = 30,
   RED,
-  MAGENTA,
+  GREEN,
   YELLOW,
+  BLUE,
+  MAGENTA,
+  CYAN,
   WHITE,
-  BRIGHT_BLACK
-#ifdef _WIN32
-  ,
-#else
-  = 90,
-#endif
-  BRIGHT_BLUE,
-  BRIGHT_GREEN,
-  BRIGHT_CYAN,
+  BRIGHT_BLACK = 90,
   BRIGHT_RED,
-  BRIGHT_MAGENTA,
+  BRIGHT_GREEN,
   BRIGHT_YELLOW,
+  BRIGHT_BLUE,
+  BRIGHT_MAGENTA,
+  BRIGHT_CYAN,
   BRIGHT_WHITE
 };
-#ifndef _WIN32
 const char background_color_offset = 10;
-#endif
 
 }  // namespace game::terminal::colors
 

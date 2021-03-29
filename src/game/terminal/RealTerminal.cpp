@@ -60,7 +60,9 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
 
   ColoredString colored_string(std::wstring(), colored_characters[0][0].foreground,
                                colored_characters[0][0].background);
-#ifndef _WIN32
+#ifdef _WIN32
+  std::wstring output;
+#else
   std::string output;
 #endif
 
@@ -72,12 +74,15 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
         // append current character
         colored_string.string.push_back(i_characters.character);
       } else {
-#ifdef _WIN32
-        // print current string
-        SetConsoleTextAttribute(console_handle, (colored_string.background << 4) | colored_string.foreground);
-        _cwprintf(colored_string.string.c_str());
-#else
         // add current string to output, print later
+#ifdef _WIN32
+        output += L"\x1b[";
+        output += std::to_wstring(colored_string.foreground);
+        output += L";";
+        output += std::to_wstring(colored_string.background + background_color_offset);
+        output += L"m";
+        output += colored_string.string;
+#else
         output += "\033[";
         output += std::to_string(colored_string.foreground);
         output += ";";
@@ -95,8 +100,16 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
   }
   // print last string
 #ifdef _WIN32
-  SetConsoleTextAttribute(console_handle, (colored_string.background << 4) | colored_string.foreground);
-  _cwprintf(colored_string.string.c_str());
+  output += L"\x1b[";
+  output += std::to_wstring(colored_string.foreground);
+  output += L";";
+  output += std::to_wstring(colored_string.background + background_color_offset);
+  output += L"m";
+  output += colored_string.string;
+
+  output += L"\x1b[0m \n";  // reset colors to prevent flickering of background
+  // https://docs.microsoft.com/en-us/windows/console/writeconsole
+  WriteConsoleW(console_handle, output.c_str(), output.size(), nullptr, nullptr);
 #else
   output += "\033[";
   output += std::to_string(colored_string.foreground);
@@ -114,6 +127,12 @@ void RealTerminal::Initialise() {
 #ifdef _WIN32
   _setmode(_fileno(stdout), _O_U16TEXT);
   HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+
+  // https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
+  DWORD console_mode = 0;
+  GetConsoleMode(console_handle, &console_mode);
+  console_mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+  SetConsoleMode(console_handle, console_mode);
 
   SetConsoleTitle(title.c_str());
 
