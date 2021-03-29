@@ -22,7 +22,8 @@ class StatisticPrinter {
    * \brief Print message count for each Message Type to console.
    */
   static void PrintMapStatistics(const ConnectionStatistics::MessageStatisticData& sent_message_statistics,
-                                 const ConnectionStatistics::MessageStatisticData& received_message_statistics);
+                                 const ConnectionStatistics::MessageStatisticData& received_message_statistics,
+                                 const ConnectionStatistics::MessageStatisticData& sent_and_ack_message_statistics);
 
   /**
    * \brief Print overall package loss to console.
@@ -32,7 +33,7 @@ class StatisticPrinter {
   /**
    * \brief Print the average response time in milliseconds
    */
-  static void PrintAverageResponseTime(double response_time);
+  static void PrintAverageResponseTime(const std::optional<std::chrono::microseconds> response_time);
 
   /**
    * \brief Print the uptime of the Connection in milliseconds

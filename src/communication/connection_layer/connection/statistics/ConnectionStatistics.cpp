@@ -2,8 +2,6 @@
 
 #include <cassert>
 
-#include "../Connection.h"
-
 using namespace communication::connection_layer;
 using namespace communication;
 
@@ -17,20 +15,11 @@ void ConnectionStatistics::AddReceivedMessage(const message_layer::Message& mess
 
 void ConnectionStatistics::AddSentMessage(const message_layer::Message& message) {
   UpdateStatisticData(sent_message_statistics, message);
-
-  // Sent acknowledges and reset messages can not be used to measure response time
-  if (message.GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
-    sent_message_list.push_back(message);
-  }
 }
 
-void ConnectionStatistics::SetReceivedTimestampForSentMessage(ProtocolDefinition::sequence_t sequence) {
-  assert(!sent_message_list.empty());
-  if (sent_message_list.back().GetMessageSequence() != sequence) {
-    throw ConnectionStatistics::ContradictoryInputException();
-  } else {
-    sent_message_list.back().SetTimestampReceived(std::chrono::steady_clock::now());
-  }
+void ConnectionStatistics::AddSentAndAckMessage(const message_layer::Message& message) {
+  UpdateStatisticData(sent_and_ack_message_statistics, message);
+  sent_and_ack_message_list.push_back(message);
 }
 
 ConnectionStatistics::PackageLossData ConnectionStatistics::CalculatePackageLoss() const {
@@ -41,17 +30,10 @@ ConnectionStatistics::PackageLossData ConnectionStatistics::CalculatePackageLoss
     sent_acknowledge_count = sent_acknowledge_entry->second;
   }
 
-  // get number of received acknowledges
-  auto received_acknowledge_entry =
-      received_message_statistics.count_by_type.find(message_layer::MessageType::ACKNOWLEDGE);
-  message_count_t received_acknowledge_count = 0;
-  if (received_acknowledge_entry != received_message_statistics.count_by_type.end()) {
-    received_acknowledge_count = received_acknowledge_entry->second;
-  }
+  auto sent_messages_without_acknowledges = sent_message_statistics.total_count - sent_acknowledge_count;
 
   ConnectionStatistics::PackageLossData package_loss_data;
-  package_loss_data.package_loss =
-      (sent_message_statistics.total_count - sent_acknowledge_count) - received_acknowledge_count;
+  package_loss_data.package_loss = (sent_messages_without_acknowledges - sent_and_ack_message_statistics.total_count);
 
   // a negative package loss is not possible
   assert(package_loss_data.package_loss >= 0);
@@ -65,19 +47,22 @@ ConnectionStatistics::PackageLossData ConnectionStatistics::CalculatePackageLoss
   return package_loss_data;
 }
 
-double ConnectionStatistics::CalculateAverageResponseTime() const {
-  if (sent_message_list.empty()) {
-    return 0;
+std::optional<std::chrono::microseconds> ConnectionStatistics::CalculateAverageResponseTime() const {
+  std::optional<std::chrono::microseconds> response_time;
+  if (sent_and_ack_message_statistics.total_count == 0) {
+    return response_time;
   }
   std::chrono::duration<int64_t, std::micro> sum = std::chrono::microseconds(0);
-  for (auto& message : sent_message_list) {
+  for (auto& message : sent_and_ack_message_list) {
     auto meta_data = message.GetMessageMetaData();
     if (meta_data.GetTimestampReceived().has_value()) {
       sum += std::chrono::duration_cast<std::chrono::microseconds>(*meta_data.GetTimestampReceived() -
                                                                    *meta_data.GetTimestampSent());
     }
   }
-  return (static_cast<double>(sum.count()) / sent_message_list.size()) / 1000;
+  response_time = sum / sent_and_ack_message_list.size();
+
+  return response_time;  // convert to milliseconds
 }
 
 double ConnectionStatistics::CalculateUptime() const {
@@ -99,9 +84,10 @@ void ConnectionStatistics::UpdateStatisticData(MessageStatisticData& message_sta
   auto message_type_it = message_statistics.count_by_type.find(message.GetMessageType());
 
   if (message_type_it == message_statistics.count_by_type.end()) {
-    message_statistics.count_by_type.insert({message.GetMessageType(), 1});
+    message_statistics.count_by_type.insert_or_assign(message.GetMessageType(), 1);
+
   } else {
-    message_type_it->second++;
+    message_statistics.count_by_type.find(message_type_it->first)->second++;
   }
 }
 
@@ -110,4 +96,7 @@ ConnectionStatistics::MessageStatisticData ConnectionStatistics::GetReceivedMess
 }
 ConnectionStatistics::MessageStatisticData ConnectionStatistics::GetSentMessageStatistics() const {
   return sent_message_statistics;
+}
+ConnectionStatistics::MessageStatisticData ConnectionStatistics::GetSentAndAcknowledgedMessageStatistics() const {
+  return sent_and_ack_message_statistics;
 }

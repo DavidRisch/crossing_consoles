@@ -164,9 +164,6 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
     // set Metadata
     received_message->SetTimestampReceived(std::chrono::steady_clock::now());
 
-    // TODO Fix statistic functionality
-    // statistics.AddReceivedMessage(*received_message);
-
     if (received_message->GetMessageType() == message_layer::MessageType::ACKNOWLEDGE) {
       if (!(state == ConnectionState::WAITING_FOR_ACKNOWLEDGE ||
             state == ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE)) {
@@ -178,11 +175,6 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
         throw BadAcknowledgeException();
       }
 
-      // TODO Fix statistic functionality
-      // set timestamp_received for the last message that was sent after receiving the corresponding acknowledge that
-      // shows that the message has been received by the communication partner
-      // statistics.SetReceivedTimestampForSentMessage(last_send_sequence);
-
       // Update unacknowledged_sent_message to remove the Messages which have definitely been received:
 
       auto it = std::find_if(unacknowledged_sent_message.begin(), unacknowledged_sent_message.end(),
@@ -191,6 +183,8 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
                              });
 
       if (it != unacknowledged_sent_message.end()) {
+        (**it).SetTimestampReceived(std::chrono::steady_clock::now());
+        statistics.AddSentAndAckMessage(**it);
         unacknowledged_sent_message.erase(unacknowledged_sent_message.begin(), it);
       }
 
@@ -231,6 +225,11 @@ bool Connection::TryReceive() {
 
   // set Metadata
   received_message->SetTimestampReceived(std::chrono::steady_clock::now());
+
+  if (state != ConnectionState::SERVER_CONNECTION_RESPONSE_SENT) {
+    // connection establishment is not included in statistics
+    statistics.AddReceivedMessage(*received_message);
+  }
 
   if (received_message->GetMessageType() != message_layer::MessageType::NOT_ACKNOWLEDGE) {
     if (last_received_sequence_counter.has_value()) {
@@ -302,12 +301,14 @@ void Connection::SendMessageNow(const std::shared_ptr<message_layer::Message> &m
 
   message->SetTimestampSent(std::chrono::steady_clock::now());
 
-  // TODO Fix statistic functionality
-  // statistics.AddSentMessage(*message);
-
   DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") ~~~~> SendMessageNow: send type " << std::dec
                                    << (int)message->GetMessageType() << "  \t seq: " << message->GetMessageSequence()
                                    << "\n")
+
+  if (state != ConnectionState::CLIENT_CONNECTION_REQUEST_SENT) {
+    // connection establishment is not included in statistics
+    statistics.AddSentMessage(*message);
+  }
 
   message_output_stream->SendMessage(message.get());
 
@@ -374,6 +375,7 @@ void Connection::ResendLastMessages() {
       DEBUG_CONNECTION_LAYER(std::cout << "          ~~~~> Resend: send type " << std::dec
                                        << (int)item->GetMessageType() << "  \t seq: " << (int)item->GetMessageSequence()
                                        << "\n")
+      statistics.AddSentMessage(*item);
       message_output_stream->SendMessage(item.get());
     }
   } else {

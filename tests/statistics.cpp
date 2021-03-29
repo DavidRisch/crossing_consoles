@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "../src/communication/ProtocolDefinition.h"
 #include "fixtures/ConnectionManagers.h"
 
 using namespace communication;
@@ -18,7 +17,7 @@ TEST_F(Statistics, NoMessagesStatistics) {
       client_manager->GetStatisticsFromPartnerConnection(ProtocolDefinition::server_partner_id);
   ASSERT_EQ(client_statistics.GetSentMessageStatistics().total_count, 0);
   ASSERT_EQ(client_statistics.GetReceivedMessageStatistics().total_count, 0);
-  ASSERT_EQ(client_statistics.CalculateAverageResponseTime(), 0);
+  ASSERT_FALSE(client_statistics.CalculateAverageResponseTime().has_value());
   ASSERT_EQ(client_statistics.CalculatePackageLoss().package_loss, 0);
   ASSERT_EQ(client_statistics.CalculatePackageLoss().package_loss_percentage, 0);
 }
