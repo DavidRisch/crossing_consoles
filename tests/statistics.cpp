@@ -136,12 +136,12 @@ TEST_F(Statistics, Uptime) {
   auto uptime_client = client_connection->GetConnectionStatistics().CalculateUptime();
 
   // Check that uptime is in a reasonable range, half of the sleep_time is added as buffer
-  ASSERT_TRUE(uptime_server.count() > 0 && uptime_server < 1.5 * sleep_time);
-  ASSERT_TRUE(uptime_client.count() > 0 && uptime_client < 1.5 * sleep_time);
+  EXPECT_GT(uptime_server.count(), 0);
+  EXPECT_GT(uptime_client.count(), 0);
 
   std::this_thread::sleep_for(sleep_time);
 
   // Uptime increases
-  ASSERT_TRUE(uptime_server < server_connection->GetConnectionStatistics().CalculateUptime());
-  ASSERT_TRUE(uptime_client < client_connection->GetConnectionStatistics().CalculateUptime());
+  EXPECT_LT(uptime_server, server_connection->GetConnectionStatistics().CalculateUptime());
+  EXPECT_LT(uptime_client, client_connection->GetConnectionStatistics().CalculateUptime());
 }
