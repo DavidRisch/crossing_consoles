@@ -19,7 +19,7 @@ const std::unordered_map<message_layer::MessageType, const std::string>
 };
 
 // console output parameters
-const int line_length = 58;
+const int line_length = 60;
 const std::string esc_character = "\033";
 const std::string set_red = esc_character + "[31m";  // sets output to be red
 const std::string set_bold = esc_character + "[1m";  // sets output to be bold
@@ -29,12 +29,22 @@ void StatisticPrinter::PrintMapStatistics(
     const ConnectionStatistics::MessageStatisticData& sent_message_statistics,
     const ConnectionStatistics::MessageStatisticData& received_message_statistics,
     const ConnectionStatistics::MessageStatisticData& sent_and_ack_message_statistics) {
-  int max = 30;
-  std::cout << set_bold << "Connection Statistics \n" << reset;
-  std::cout << std::setfill(' ') << "Message Type " << std::setw(18) << "  Sent " << std::setw(12) << " Received"
-            << std::setw(12) << " Sent & Ack"
+  const int column_width = 16;
+  const int column_count_width = 10;
+
+  // Print headlines
+  std::cout << set_bold << "Connection Statistics \n\n" << reset;
+  std::cout << "Message Type ";
+  std::cout << std::setw(column_width) << "  Sent ";
+  std::cout << std::setw(column_width) << " Received";
+  std::cout << std::setw(column_width) << " Sent & Ack"
             << "\n";
-  std::cout << std::setfill('-') << std::setw(line_length) << "\n";
+
+  std::cout << std::setfill('-') << std::setw(line_length) << ""
+            << "\n"
+            << std::setfill(' ');
+
+  // Print message count sorted by message type
   for (auto& entry : map_message_type_to_string) {
     int sent_entry = 0;
     int received_entry = 0;
@@ -54,17 +64,20 @@ void StatisticPrinter::PrintMapStatistics(
       received_entry = (received_message_statistics.count_by_type.find(entry.first))->second;
     }
 
-    // calculate column width for better formatting
-    auto diff = static_cast<int>(max - entry.second.length());
-
-    std::cout << std::setfill(' ') << entry.second << std::setw(diff) << sent_entry << std::setw(8) << received_entry
-              << std::setw(12) << sent_and_ack_entry << "\n";
+    std::cout << std::setw(column_width) << std::left << entry.second << std::right;
+    std::cout << std::setw(column_count_width) << sent_entry;
+    std::cout << std::setw(column_width) << received_entry;
+    std::cout << std::setw(column_width) << sent_and_ack_entry << "\n";
   }
 
-  std::cout << std::setfill('-') << std::setw(line_length) << "\n";
-  std::cout << std::setfill(' ') << "SUM" << std::setw(27) << sent_message_statistics.total_count << std::setw(8)
-            << received_message_statistics.total_count << std::setw(12) << sent_and_ack_message_statistics.total_count
-            << "\n";
+  // Print SUM
+  std::cout << std::setfill('-') << std::setw(line_length) << ""
+            << "\n"
+            << std::setfill(' ');
+  std::cout << std::setw(column_width) << std::left << "SUM" << std::right;
+  std::cout << std::setw(column_count_width) << sent_message_statistics.total_count;
+  std::cout << std::setw(column_width) << received_message_statistics.total_count;
+  std::cout << std::setw(column_width) << sent_and_ack_message_statistics.total_count << "\n";
 }
 
 void StatisticPrinter::PrintPackageLoss(ConnectionStatistics::PackageLossData data) {
@@ -91,7 +104,10 @@ void StatisticPrinter::PrintUptime(const std::chrono::microseconds uptime) {
 }
 
 void StatisticPrinter::PrintStatistics(const ConnectionStatistics& statistics) {
-  std::cout << "\n" << std::setfill('=') << std::setw(line_length) << "\n";
+  std::cout << "\n"
+            << std::setfill('=') << std::setw(line_length) << ""
+            << "\n"
+            << std::setfill(' ');
 
   PrintMapStatistics(statistics.GetSentMessageStatistics(), statistics.GetReceivedMessageStatistics(),
                      statistics.GetSentAndAcknowledgedMessageStatistics());
@@ -100,5 +116,8 @@ void StatisticPrinter::PrintStatistics(const ConnectionStatistics& statistics) {
   PrintAverageResponseTime(statistics.CalculateAverageResponseTime());
   PrintUptime(statistics.CalculateUptime());
 
-  std::cout << "\n" << std::setfill('=') << std::setw(line_length) << "\n";
+  std::cout << "\n"
+            << std::setfill('=') << std::setw(line_length) << ""
+            << "\n"
+            << std::setfill(' ');
 }
