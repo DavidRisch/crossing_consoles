@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <utility>
 
-#include "Sprite.h"
 #include "symbols.h"
 
 using namespace game;
@@ -11,29 +10,28 @@ using namespace game::common;
 using namespace game::world;
 using namespace game::visual;
 using namespace game::visual::symbols;
-
-Sprite wall_sprite = Sprite(std::wstring(2, full_block) + L"\n" + std::wstring(2, full_block));
-Sprite player_sprite = Sprite(L"JL\n/\\");
+using namespace game::terminal::colors;
 
 Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size, World& world, Player& own_player)
     : block_size(std::move(block_size))
     , viewport_size(std::move(viewport_size))
     , world(&world)
-    , own_player(&own_player) {
+    , own_player(&own_player)
+    , wall_sprite(ColoredCharMatrix(block_size))
+    , player_sprite(ColoredCharMatrix(block_size)) {
+  wall_sprite.AppendString(std::wstring(4, light_shade), WHITE, RED);
+  player_sprite.AppendString(L"></\\");
 }
 
-std::wstring Renderer::RenderWorld() const {
+ColoredCharMatrix Renderer::RenderWorld() const {
   world->updated = false;
   own_player->updated = false;
 
-  std::wstring line(viewport_size.x * block_size.x, L' ');
-  line += L'\n';
-  std::wstring out;
-  for (int y = 0; y < viewport_size.y * block_size.y; y++) {
-    out.append(line);
-  }
+  ColoredCharMatrix rendered_world(viewport_size * block_size);
 
+  // calculate delta between player and rendered viewport start/end
   coordinate_size_t viewport_size_delta(viewport_size.x / 2, viewport_size.y / 2);
+  // calculate start and end of rendered viewport in world coordinates
   Position viewport_start =
       Position(own_player->position.x - viewport_size_delta.x, own_player->position.y - viewport_size_delta.y);
   Position viewport_end =
@@ -42,6 +40,7 @@ std::wstring Renderer::RenderWorld() const {
   coordinate_factor_t negative_repetition = Position(0, 0);
   coordinate_factor_t positive_repetition = Position(1, 1);
 
+  // calculate the repetition of the world in the rendered viewport
   if (viewport_start.x < 0 || viewport_start.y < 0) {
     negative_repetition = (viewport_start - world->size + Position(1, 1)) / world->size;
   }
@@ -49,31 +48,34 @@ std::wstring Renderer::RenderWorld() const {
     positive_repetition = (viewport_end + world->size - Position(1, 1)) / world->size;
   }
 
+  // place walls
   for (auto const& pair : world->walls) {
     auto wall = pair.second;
     for (int y_factor = negative_repetition.y; y_factor < positive_repetition.y; y_factor++) {
       for (int x_factor = negative_repetition.x; x_factor < positive_repetition.x; x_factor++) {
+        // get position of wall for each world repetition in world coordinates
         Position position = wall.position + (world->size * Position(x_factor, y_factor));
-        if (position >= viewport_start && position <= viewport_end) {
+        // check if wall is within the rendered viewport
+        if (position.IsGreaterOrEqual(viewport_start) && position.IsLessOrEqual(viewport_end)) {
+          // get wall position as rendered viewport coordinates
           Position relative_position = position - viewport_start;
-          for (int y = 0; y < block_size.y; y++) {
-            out.replace(((relative_position.y * block_size.y) + y) * line_length + relative_position.x * block_size.x,
-                        block_size.x, wall_sprite.GetLine(y));
-          }
+          // insert wall sprite
+          rendered_world.InsertMatrix(wall_sprite, relative_position * block_size);
         }
       }
     }
   }
 
+  // place players
   for (auto const& i_player : world->players) {
-    if (i_player->position >= viewport_start && i_player->position <= viewport_end) {
+    // check if player is within the rendered viewport
+    if (i_player->position.IsGreaterOrEqual(viewport_start) && i_player->position.IsLessOrEqual(viewport_end)) {
+      // get player position as rendered viewport coordinates
       Position relative_position = i_player->position - viewport_start;
-      for (int y = 0; y < block_size.y; y++) {
-        out.replace(((relative_position.y * block_size.y) + y) * line_length + relative_position.x * block_size.x,
-                    block_size.x, player_sprite.GetLine(y));
-      }
+      // insert player sprite
+      rendered_world.InsertMatrix(player_sprite, relative_position * block_size);
     }
   }
 
-  return out;
+  return rendered_world;
 }

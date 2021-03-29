@@ -12,11 +12,11 @@ add_executable(crossing_consoles_test
         game_serialization.cpp
         game_networking.cpp
         position.cpp
-        sprite.cpp
         renderer.cpp
         wall.cpp
         player.cpp
         world.cpp
+        colored_string_matrix.cpp
         spawner.cpp
         flaky_connection.cpp
         statistics.cpp

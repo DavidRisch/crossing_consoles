@@ -65,30 +65,37 @@ class ConnectionSimulator : public ::testing::Test {
   }
 
   static void TestWithFlakyParameters(ConnectionSimulatorFlaky::Parameters parameters) {
-    std::vector<u_int8_t> input;
+    std::vector<uint8_t> input;
     input.reserve(100);
     for (int i = 0; i < 100; ++i) {
       input.push_back(i);
     }
 
-    std::vector<u_int8_t> expected_output(input);
+    std::vector<bool> expected_output_correct;
+    expected_output_correct.reserve(input.size());
     for (size_t i = 0; i < input.size(); ++i) {
-      if (i >= static_cast<unsigned int>(parameters.first_error) &&
-          static_cast<int>((i - parameters.first_error) % (parameters.error_interval)) < parameters.error_length) {
-        expected_output.at(i) ^= 0xffu;
-      }
+      bool simulator_should_make_error =
+          (i >= static_cast<unsigned int>(parameters.first_error) &&
+           static_cast<int>((i - parameters.first_error) % (parameters.error_interval)) < parameters.error_length);
+      expected_output_correct.push_back(!simulator_should_make_error);
     }
 
     ConnectionSimulatorFlaky connection_simulator(parameters);
 
-    std::vector<u_int8_t> actual_output;
+    std::vector<uint8_t> actual_output;
     actual_output.reserve(input.size());
 
     for (const auto &value : input) {
       actual_output.push_back(connection_simulator.Filter(value));
     }
 
-    EXPECT_EQ(actual_output, expected_output);
+    for (size_t i = 0; i < input.size(); ++i) {
+      if (expected_output_correct.at(i)) {
+        EXPECT_EQ(input.at(i), actual_output.at(i));
+      } else {
+        EXPECT_NE(input.at(i), actual_output.at(i));
+      }
+    }
   }
 };
 

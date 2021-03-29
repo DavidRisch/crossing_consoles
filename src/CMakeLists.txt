@@ -14,12 +14,16 @@ add_library(crossing_consoles_lib
 
         game/visual/Renderer.cpp
         game/visual/Compositor.cpp
-        game/visual/Sprite.cpp
+        game/visual/ColoredCharMatrix.cpp
+        game/visual/ColoredChar.cpp
+        game/visual/ColoredString.cpp
 
         game/networking/Change.cpp
 
         game/terminal/RealTerminal.cpp
         game/terminal/MockTerminal.cpp
+
+        communication/debug.cpp
 
         communication/byte_layer/byte_stream/SocketByteStream.cpp
         communication/byte_layer/byte_stream/SocketByteServer.cpp
@@ -43,6 +47,7 @@ add_library(crossing_consoles_lib
         communication/message_layer/message/MessageMetaData.cpp
         communication/message_layer/message/AcknowledgeMessage.cpp
         communication/message_layer/message/ConnectionResetMessage.cpp
+        communication/message_layer/message/NotAcknowledgeMessage.cpp
 
         communication/message_layer/crc/CRCHandler.cpp
 

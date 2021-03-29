@@ -3,6 +3,8 @@
 #include <iostream>
 #include <utility>
 
+#include "../../debug.h"
+
 using namespace communication;
 using namespace connection_layer;
 
@@ -21,6 +23,7 @@ std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::Create
       Connection::CreateClientSide(std::move(message_input_stream), std::move(message_output_stream), timeout);
 
   connection->BlockingEstablish();
+  DEBUG_CONNECTION_LAYER(std::cout << "(" << connection.get() << ") Establish done (ClientSideConnectionManager)\n")
 
   auto manager = std::shared_ptr<ClientSideConnectionManager>(new ClientSideConnectionManager(timeout));
   manager->AddConnection(connection);

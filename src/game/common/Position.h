@@ -31,10 +31,26 @@ class Position : public networking::ISerializable {
 
   bool operator==(const Position& other_position) const;
   bool operator!=(const Position& other_position) const;
-  bool operator<(const Position& other_position) const;
-  bool operator<=(const Position& other_position) const;
-  bool operator>(const Position& other_position) const;
-  bool operator>=(const Position& other_position) const;
+
+  /**
+   * \details Return true iff the passed position is greater in both dimensions
+   */
+  bool IsLess(const Position& other_position) const;
+
+  /**
+   * \details Return true iff the passed position is greater or equal in both dimensions
+   */
+  bool IsLessOrEqual(const Position& other_position) const;
+
+  /**
+   * \details Return true iff the passed position is less in both dimensions
+   */
+  bool IsGreater(const Position& other_position) const;
+
+  /**
+   * \details Return true iff the passed position is less or equal in both dimensions
+   */
+  bool IsGreaterOrEqual(const Position& other_position) const;
 
   struct HashFunction {
     size_t operator()(const Position& pos) const {

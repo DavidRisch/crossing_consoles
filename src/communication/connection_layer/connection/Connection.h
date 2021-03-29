@@ -1,6 +1,7 @@
 #ifndef CROSSING_CONSOLES_CONNECTION_H
 #define CROSSING_CONSOLES_CONNECTION_H
 
+#include <list>
 #include <memory>
 #include <queue>
 
@@ -14,6 +15,7 @@ namespace communication {
 namespace connection_layer {
 
 enum class ConnectionState {
+  CLIENT_CONNECTION_START,
   CLIENT_CONNECTION_REQUEST_SENT,
   SERVER_WAITING_FOR_FIRST,
   SERVER_CONNECTION_RESPONSE_SENT,
@@ -104,25 +106,46 @@ class Connection {
   /**
    * \brief Send a message.
    */
-  void SendMessageNow(message_layer::Message* message);
+  void SendMessageNow(const std::shared_ptr<message_layer::Message>& message, bool expect_acknowledge = true);
+
+  /**
+   * Calls `ResendLastMessages()` if the last messages probably has not been received.
+   */
+  void ResendIfNecessary();
+
+  /**
+   * \brief Resends all Messages which might not have been received.
+   */
+  void ResendLastMessages();
 
   /**
    *
    * \brief Check for timeout while receiving messages
    */
-  static std::shared_ptr<message_layer::Message> ReceiveWithTimeout(
-      const std::shared_ptr<message_layer::MessageInputStream>& message_input_stream,
-      timeout_t timeout = ProtocolDefinition::timeout);
+  std::shared_ptr<message_layer::Message> ReceiveWithTimeout();
 
-  /// The sequence number of the last send message not including acknowledge messages.
+  /**
+   * \brief Receives 1 or 0 new messages and adds them to the `receive_message_queue`.
+   * \brief Returns true iff another call might receive the next message.
+   */
+  bool TryReceive();
+
+  /**
+   * \brief Call `TryReceive()` until no new messages can be received.
+   */
+  void ReceiveAll();
+
+  /// The sequence number of the last send message not including acknowledge and NACK messages.
   sequence_t last_send_sequence{};
 
   ConnectionState state;
 
   timeout_t timeout;
 
-  /// Unprocessed events ordered from oldest to newest.
+  /// Unsent Messages ordered from oldest to newest.
   std::queue<std::shared_ptr<message_layer::Message>> send_message_queue;
+  /// Received Messages ordered from oldest to newest.
+  std::queue<std::shared_ptr<message_layer::Message>> receive_message_queue;
 
   std::shared_ptr<message_layer::MessageInputStream> message_input_stream;
   std::shared_ptr<message_layer::MessageOutputStream> message_output_stream;
@@ -137,6 +160,20 @@ class Connection {
    */
   sequence_t GenerateSequence();
   sequence_t sequence_counter;
+
+  /// How frequently Messages which might not have been received by the other side should be resend.
+  ProtocolDefinition::timeout_t resend_interval{};
+  /// Reset every time a valid message (except NACK) is received, a message is send or a message is resend.
+  std::chrono::time_point<std::chrono::steady_clock> timestamp_last_change;
+
+  /**
+   * \brief Messages which might not have been received by the other side (no acknowledge received yet)
+   * ordered from oldest to newest.
+   */
+  std::list<std::shared_ptr<message_layer::Message>> unacknowledged_sent_message;
+
+  /// The newest sequence of a correct Message received from the other side.
+  std::optional<sequence_t> last_received_sequence_counter;
 
   ConnectionStatistics statistics{};
 };
