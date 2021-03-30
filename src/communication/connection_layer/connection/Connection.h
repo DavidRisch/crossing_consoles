@@ -91,7 +91,7 @@ class Connection {
   /**
    * \brief Return connection statistics
    */
-  ConnectionStatistics GetConnectionStatistics() const;
+  const ConnectionStatistics& GetConnectionStatistics() const;
 
   /**
    * \brief Returns true if connection is in state `CLOSED`

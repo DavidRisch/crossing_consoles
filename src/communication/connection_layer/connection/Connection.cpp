@@ -352,7 +352,7 @@ void Connection::Handle() {
   }
 }
 
-ConnectionStatistics Connection::GetConnectionStatistics() const {
+const ConnectionStatistics &Connection::GetConnectionStatistics() const {
   return statistics;
 }
 

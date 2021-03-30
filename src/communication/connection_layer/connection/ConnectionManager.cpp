@@ -143,7 +143,7 @@ bool ConnectionManager::HasConnections() {
   return !connection_map.empty();
 }
 
-ConnectionStatistics ConnectionManager::GetStatisticsFromPartnerConnection(partner_id_t partner_id) const {
+const ConnectionStatistics& ConnectionManager::GetStatisticsFromPartnerConnection(partner_id_t partner_id) const {
   auto connection_it = connection_map.find(partner_id);
   if (connection_it == connection_map.end()) {
     throw UnknownPartnerException();
