@@ -17,7 +17,7 @@ add_library(crossing_consoles_lib
         game/visual/ColoredCharMatrix.cpp
         game/visual/ColoredChar.cpp
         game/visual/ColoredString.cpp
-        
+
         game/networking/Change.cpp
 
         game/terminal/RealTerminal.cpp
@@ -46,6 +46,7 @@ add_library(crossing_consoles_lib
         communication/message_layer/message/PayloadMessage.cpp
         communication/message_layer/message/MessageMetaData.cpp
         communication/message_layer/message/AcknowledgeMessage.cpp
+        communication/message_layer/message/ConnectionResetMessage.cpp
         communication/message_layer/message/NotAcknowledgeMessage.cpp
 
         communication/message_layer/crc/CRCHandler.cpp
@@ -55,11 +56,14 @@ add_library(crossing_consoles_lib
         communication/connection_layer/connection/ServerSideConnectionManager.cpp
         communication/connection_layer/connection/ClientSideConnectionManager.cpp
 
+        communication/connection_layer/connection/statistics/ConnectionStatistics.cpp
+        communication/connection_layer/connection/statistics/StatisticPrinter.cpp
+
         communication/connection_layer/event/Event.cpp
         communication/connection_layer/event/ConnectEvent.cpp
         communication/connection_layer/event/DisconnectEvent.cpp
         communication/connection_layer/event/PayloadEvent.cpp
-        communication/message_layer/message/ConnectionResetMessage.cpp
+
         )
 
 add_executable(crossing_consoles_main_server

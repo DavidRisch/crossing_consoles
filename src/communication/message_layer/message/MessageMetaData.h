@@ -2,6 +2,7 @@
 #define CROSSING_CONSOLES_MESSAGEMETADATA_H
 
 #include <chrono>
+#include <optional>
 
 namespace communication {
 namespace message_layer {
@@ -9,14 +10,14 @@ namespace message_layer {
 class MessageMetaData {
  public:
   MessageMetaData();
-  [[nodiscard]] std::chrono::steady_clock::time_point GetTimestampReceived() const;
-  [[nodiscard]] std::chrono::steady_clock::time_point GetTimestampSent() const;
+  [[nodiscard]] std::optional<std::chrono::steady_clock::time_point> GetTimestampReceived() const;
+  [[nodiscard]] std::optional<std::chrono::steady_clock::time_point> GetTimestampSent() const;
   void SetTimestampReceived(std::chrono::steady_clock::time_point timestamp_received);
   void SetTimestampSent(std::chrono::steady_clock::time_point timestamp);
 
  private:
-  std::chrono::steady_clock::time_point timestamp_received{};
-  std::chrono::steady_clock::time_point timestamp_sent{};
+  std::optional<std::chrono::steady_clock::time_point> timestamp_received{};
+  std::optional<std::chrono::steady_clock::time_point> timestamp_sent{};
 };
 
 }  // namespace message_layer

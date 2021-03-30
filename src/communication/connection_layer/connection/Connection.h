@@ -8,6 +8,8 @@
 #include "../../message_layer/message/Message.h"
 #include "../../message_layer/message_stream/MessageInputStream.h"
 #include "../../message_layer/message_stream/MessageOutputStream.h"
+#include "statistics/ConnectionStatistics.h"
+#include "statistics/StatisticPrinter.h"
 
 namespace communication {
 namespace connection_layer {
@@ -86,7 +88,14 @@ class Connection {
     }
   };
 
-  /// Returns true if connection is in state `CLOSED`
+  /**
+   * \brief Return connection statistics
+   */
+  const ConnectionStatistics& GetConnectionStatistics() const;
+
+  /**
+   * \brief Returns true if connection is in state `CLOSED`
+   */
   bool ConnectionClosed() const;
 
  private:
@@ -165,6 +174,8 @@ class Connection {
 
   /// The newest sequence of a correct Message received from the other side.
   std::optional<sequence_t> last_received_sequence_counter;
+
+  ConnectionStatistics statistics{};
 };
 
 }  // namespace connection_layer

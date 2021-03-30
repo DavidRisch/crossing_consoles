@@ -13,6 +13,7 @@
 #include "../../message_layer/message/NotAcknowledgeMessage.h"
 #include "../../message_layer/message_stream/MessageCoder.h"
 #include "ConnectionManager.h"
+#include "statistics/StatisticPrinter.h"
 
 using namespace communication;
 using namespace communication::connection_layer;
@@ -183,6 +184,8 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
                              });
 
       if (it != unacknowledged_sent_message.end()) {
+        (**it).SetTimestampReceived(std::chrono::steady_clock::now());
+        statistics.AddSentAndAckMessage(**it);
         unacknowledged_sent_message.erase(unacknowledged_sent_message.begin(), it);
       }
 
@@ -223,6 +226,11 @@ bool Connection::TryReceive() {
 
   // set Metadata
   received_message->SetTimestampReceived(std::chrono::steady_clock::now());
+
+  if (state != ConnectionState::SERVER_CONNECTION_RESPONSE_SENT) {
+    // connection establishment is not included in statistics
+    statistics.AddReceivedMessage(*received_message);
+  }
 
   if (received_message->GetMessageType() != message_layer::MessageType::NOT_ACKNOWLEDGE) {
     if (last_received_sequence_counter.has_value()) {
@@ -298,6 +306,11 @@ void Connection::SendMessageNow(const std::shared_ptr<message_layer::Message> &m
                                    << (int)message->GetMessageType() << "  \t seq: " << message->GetMessageSequence()
                                    << "\n")
 
+  if (state != ConnectionState::CLIENT_CONNECTION_REQUEST_SENT) {
+    // connection establishment is not included in statistics
+    statistics.AddSentMessage(*message);
+  }
+
   message_output_stream->SendMessage(message.get());
 
   if (message->GetMessageType() != message_layer::MessageType::NOT_ACKNOWLEDGE) {
@@ -340,6 +353,10 @@ void Connection::Handle() {
   }
 }
 
+const ConnectionStatistics &Connection::GetConnectionStatistics() const {
+  return statistics;
+}
+
 bool Connection::ConnectionClosed() const {
   return state == ConnectionState::CLOSED;
 }
@@ -359,6 +376,7 @@ void Connection::ResendLastMessages() {
       DEBUG_CONNECTION_LAYER(std::cout << "          ~~~~> Resend: send type " << std::dec
                                        << (int)item->GetMessageType() << "  \t seq: " << (int)item->GetMessageSequence()
                                        << "\n")
+      statistics.AddSentMessage(*item);
       message_output_stream->SendMessage(item.get());
     }
   } else {
