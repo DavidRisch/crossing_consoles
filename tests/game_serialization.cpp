@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <chrono>
 #include <cstring>
 
 #include "../src/game/networking/SerializationUtils.h"
