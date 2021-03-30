@@ -9,54 +9,6 @@ using namespace communication::byte_layer;
 using namespace communication::connection_layer;
 using namespace communication::message_layer;
 
-void check_statistics_balanced_by_type(const ConnectionStatistics& statistic_first,
-                                       const ConnectionStatistics& statistic_second) {
-  auto statistic_map_received_first = statistic_first.GetReceivedMessageStatistics().count_by_type;
-  auto statistic_map_sent_first = statistic_first.GetSentMessageStatistics().count_by_type;
-  auto statistic_map_sent_second = statistic_second.GetSentMessageStatistics().count_by_type;
-  auto statistic_map_received_second = statistic_second.GetReceivedMessageStatistics().count_by_type;
-
-  // All messages sent by first connection are received by second connection
-  for (auto& first_it : statistic_map_sent_first) {
-    auto second_it = statistic_map_received_second.find(first_it.first);
-
-    if (second_it != statistic_map_received_second.end()) {
-      ASSERT_EQ(first_it.second, second_it->second);
-    } else {
-      ASSERT_FALSE(true);
-    }
-  }
-
-  // All messages sent by second connection are received by first connection
-  for (auto& second_it : statistic_map_sent_second) {
-    auto first_it = statistic_map_received_first.find(second_it.first);
-
-    if (first_it != statistic_map_received_first.end()) {
-      ASSERT_EQ(second_it.second, first_it->second);
-    } else {
-      ASSERT_FALSE(true);
-    }
-  }
-}
-
-void check_statistics_balanced(const ConnectionStatistics& statistic_first,
-                               const ConnectionStatistics& statistic_second) {
-  // Sent and received messages of server and client should complement each other
-
-  ASSERT_EQ(statistic_first.GetReceivedMessageStatistics().total_count,
-            statistic_second.GetSentMessageStatistics().total_count);
-  ASSERT_EQ(statistic_first.GetSentMessageStatistics().total_count,
-            statistic_second.GetReceivedMessageStatistics().total_count);
-
-  check_statistics_balanced_by_type(statistic_first, statistic_second);
-
-  ASSERT_EQ(statistic_first.CalculatePackageLoss().package_loss, 0);
-  ASSERT_EQ(statistic_first.CalculatePackageLoss().package_loss_percentage, 0);
-
-  ASSERT_EQ(statistic_second.CalculatePackageLoss().package_loss, 0);
-  ASSERT_EQ(statistic_second.CalculatePackageLoss().package_loss_percentage, 0);
-}
-
 TEST_F(Statistics, NoMessages) {
   // no messages have been sent yet, statistics should be empty / zero
 
@@ -125,7 +77,7 @@ TEST_F(Statistics, ManyMessages) {
 }
 
 TEST_F(Statistics, Uptime) {
-  // Test increase and range of uptime
+  // Test increase of uptime
 
   establish_connections();
 
