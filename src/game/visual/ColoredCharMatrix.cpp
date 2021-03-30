@@ -1,5 +1,6 @@
 #include "ColoredCharMatrix.h"
 
+#include <cassert>
 #include <utility>
 
 using namespace game;
@@ -49,6 +50,15 @@ void ColoredCharMatrix::InsertMatrix(const ColoredCharMatrix& matrix) {
   InsertMatrix(matrix, set_current);
 }
 
+void ColoredCharMatrix::AppendFullWidthMatrix(const ColoredCharMatrix& other_matrix) {
+  assert(size.x == other_matrix.size.x);
+  assert(set_current.x == 0);
+
+  InsertMatrix(other_matrix, set_current);
+  set_current.x = 0;
+  set_current.y += other_matrix.size.y;
+}
+
 void ColoredCharMatrix::InsertMatrix(const ColoredCharMatrix& matrix, const Position& position) {
   coordinate_distance_t offset = position;
   const std::vector<std::vector<ColoredChar>>& colored_characters = matrix.GetMatrix();
@@ -88,4 +98,23 @@ bool ColoredCharMatrix::operator==(const ColoredCharMatrix& colored_char_matrix)
   } else {
     return false;
   }
+}
+
+std::optional<common::Position> ColoredCharMatrix::Find(std::wstring needle) {
+  for (int y = 0; y < (int)characters.size(); y++) {
+    int match_length = 0;
+
+    const auto& line = characters[y];
+    for (int x = 0; x < (int)line.size(); x++) {
+      const auto& colored_character = line[x];
+      if (needle[match_length] == colored_character.character) {
+        match_length++;
+        if (match_length == (int)needle.size()) {
+          return Position(x - match_length + 1, y);
+        }
+      }
+    }
+  }
+
+  return {};
 }

@@ -25,12 +25,24 @@ class ColoredCharMatrix {
                  terminal::colors::Color background = terminal::colors::BLACK);
 
   void InsertMatrix(const ColoredCharMatrix& matrix);
+
+  /**
+   * \brief Insert a matrix with the same width at the current position.
+   */
+  void AppendFullWidthMatrix(const ColoredCharMatrix& other_matrix);
+
   void InsertMatrix(const ColoredCharMatrix& matrix, const common::Position& position);
 
   const std::vector<std::vector<ColoredChar>>& GetMatrix() const;
   const common::coordinate_size_t& GetSize() const;
 
   bool operator==(const ColoredCharMatrix& colored_char_matrix);
+
+  /**
+   * \brief Searches for an exact match of the given string inside of a row.
+   * The first match (from left to right, top to bottom) is returned.
+   */
+  std::optional<common::Position> Find(std::wstring needle);
 
  private:
   common::coordinate_size_t size;
