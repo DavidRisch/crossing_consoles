@@ -82,7 +82,7 @@ class GameNetworking : public ::testing::Test {
   }
 
   void wait_a_few_iterations() const {
-    auto target_iteration = server_iteration_count + 10;
+    auto target_iteration = server_iteration_count + 50;
     while (server_iteration_count < target_iteration) {
       std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
@@ -255,7 +255,7 @@ TEST_F(GameNetworking, ManyPlayers) {
 
   create_server_and_client();
 
-  for (int i = 0; i < 100; ++i) {
+  for (int i = 0; i < 30; ++i) {
     create_new_client(Position(i, 4));
   }
 
