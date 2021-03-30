@@ -1,6 +1,7 @@
 #ifndef CROSSING_CONSOLES_PLAYER_H
 #define CROSSING_CONSOLES_PLAYER_H
 
+#include <chrono>
 #include <string>
 
 #include "../GameDefinition.h"
@@ -16,9 +17,11 @@ class Player : public networking::ISerializable {
   int score = 0;
   common::Position position;
   Direction direction = NORTH;
-  int max_health = 100;
+  static constexpr int max_health = 8;
   int health = max_health;
   bool updated = false;
+  double packet_loss_percentage = 0;
+  std::optional<std::chrono::microseconds> ping{};
 
   Player(std::string name, common::Position position, int player_id = 999);
 

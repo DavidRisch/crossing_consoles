@@ -7,6 +7,7 @@
 #include "../world/Player.h"
 #include "../world/World.h"
 #include "ColoredCharMatrix.h"
+#include "PlayerList.h"
 #include "Renderer.h"
 
 namespace game::visual {
@@ -21,10 +22,14 @@ class Compositor {
   std::unique_ptr<Renderer> renderer;
   world::World* world;
   world::Player* player;
+  bool show_player_list = false;
 
   Compositor(const common::coordinate_size_t& viewport_size, world::World& world, world::Player& player);
 
   [[nodiscard]] ColoredCharMatrix CompositeViewport() const;
+
+ private:
+  std::unique_ptr<PlayerList> player_list;
 };
 
 }  // namespace game::visual

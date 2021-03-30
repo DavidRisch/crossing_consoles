@@ -3,6 +3,8 @@
 #include <cassert>
 #include <utility>
 
+#include "../networking/SerializationUtils.h"
+
 using namespace game;
 using namespace game::common;
 using namespace game::world;
@@ -34,6 +36,9 @@ void Player::Serialize(std::vector<uint8_t> &output_vector) const {
     output_vector.push_back(character);
   }
   position.Serialize(output_vector);
+
+  SerializationUtils::SerializeObject(packet_loss_percentage, output_vector);
+  SerializationUtils::SerializeObject(ping, output_vector);
 }
 
 Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
@@ -46,5 +51,11 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
   }
   auto position = Position::Deserialize(input_iterator);
 
-  return Player(name, position, player_id);
+  Player player(name, position, player_id);
+
+  player.packet_loss_percentage =
+      SerializationUtils::DeserializeObject<decltype(packet_loss_percentage)>(input_iterator);
+  player.ping = SerializationUtils::DeserializeObject<decltype(ping)>(input_iterator);
+
+  return player;
 }

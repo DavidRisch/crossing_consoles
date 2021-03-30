@@ -68,7 +68,8 @@ void GameClient::Run() {
       }
     }
 
-    if (world.updated || player->updated) {
+    if (world.updated || player->updated || updated) {
+      updated = false;
       terminal->SetScreen(compositor->CompositeViewport());
     }
 
@@ -83,10 +84,19 @@ void GameClient::ProcessInput() {
     auto change_type_it = map_key_to_change.find(keycode);
 
     if (change_type_it == map_key_to_change.end()) {
-      if (keycode == KeyCode::ESCAPE) {
-        keep_running = false;
+      switch (keycode) {
+        case KeyCode::ESCAPE: {
+          keep_running = false;
+          return;
+        }
+        case KeyCode::Y: {
+          compositor->show_player_list ^= true;
+          updated = true;
+          return;
+        }
+        default:
+          return;
       }
-      return;
     }
 
     auto change = change_type_it->second;
