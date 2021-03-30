@@ -1,5 +1,6 @@
 #include "Connection.h"
 
+#include <algorithm>
 #include <cassert>
 #include <memory>
 #include <thread>
