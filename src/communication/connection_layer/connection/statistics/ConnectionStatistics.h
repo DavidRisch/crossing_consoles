@@ -88,5 +88,5 @@ class ConnectionStatistics {
   /// Time when the Connection and the Connection statistic class were created, used for the calculation of the uptime
   std::chrono::steady_clock::time_point connection_start_time;
 };
-};      // namespace communication::connection_layer
+}  // namespace communication::connection_layer
 #endif  // CROSSING_CONSOLES_CONNECTIONSTATISTICS_H
