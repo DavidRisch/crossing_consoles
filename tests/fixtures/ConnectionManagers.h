@@ -42,7 +42,6 @@ class ConnectionManagers : public ::testing::Test {
         counter--;
       }
       ASSERT_GT(counter, 0);
-      assert(counter > 0);
     });
 
     client_manager = ClientSideConnectionManager::CreateClientSide(timeout, client_connection_simulator_provider);

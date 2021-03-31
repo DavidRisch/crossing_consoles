@@ -19,7 +19,7 @@ class SerializationUtils {
   }
 
   /**
-   * \brief Returns a const reference to the object inside of the input vector and advance `input_iterator` by the
+   * \brief Returns a const reference to the object inside of the input vector and advances `input_iterator` by the
    * correct amount.
    */
   template <class T>
