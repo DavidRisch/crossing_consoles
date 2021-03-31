@@ -11,6 +11,7 @@ add_executable(crossing_consoles_test
         connection_manager.cpp
         game_serialization.cpp
         game_networking.cpp
+        game_player_list.cpp
         position.cpp
         renderer.cpp
         wall.cpp

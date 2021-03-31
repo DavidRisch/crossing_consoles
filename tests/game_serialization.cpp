@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 
+#include <chrono>
 #include <cstring>
 
+#include "../src/game/networking/SerializationUtils.h"
 #include "../src/game/world/World.h"
 
 using namespace game;
@@ -75,4 +77,27 @@ TEST(GameSerialization, Player) {
 
   EXPECT_EQ(original.name, deserialized.name);
   EXPECT_TRUE(are_objects_identical(original.position, deserialized.position));
+}
+
+TEST(GameSerialization, Utils) {
+  int a_original = 123;
+  auto b_original = std::chrono::milliseconds(456);
+  long long c_original = 123456789;
+
+  std::vector<uint8_t> encoded;
+
+  SerializationUtils::SerializeObject(a_original, encoded);
+  SerializationUtils::SerializeObject(b_original, encoded);
+  SerializationUtils::SerializeObject(c_original, encoded);
+
+  auto it = encoded.begin();
+
+  auto a_decoded = SerializationUtils::DeserializeObject<decltype(a_original)>(it);
+  EXPECT_TRUE(are_objects_identical(a_original, a_decoded));
+  auto b_decoded = SerializationUtils::DeserializeObject<decltype(b_original)>(it);
+  EXPECT_TRUE(are_objects_identical(b_original, b_decoded));
+  auto c_decoded = SerializationUtils::DeserializeObject<decltype(c_original)>(it);
+  EXPECT_TRUE(are_objects_identical(c_original, c_decoded));
+
+  EXPECT_EQ(it, encoded.end());
 }

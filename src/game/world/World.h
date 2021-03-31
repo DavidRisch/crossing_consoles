@@ -13,10 +13,12 @@
 
 namespace game::world {
 
+typedef std::list<std::shared_ptr<Player>> player_ptr_list_t;
+
 class World : public networking::ISerializable {
  public:
   common::coordinate_size_t size;
-  std::list<std::shared_ptr<Player>> players{};
+  player_ptr_list_t players{};
   std::unordered_map<common::Position, Wall, common::Position::HashFunction> walls;
   bool updated = false;
 

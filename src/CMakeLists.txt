@@ -17,8 +17,10 @@ add_library(crossing_consoles_lib
         game/visual/ColoredCharMatrix.cpp
         game/visual/ColoredChar.cpp
         game/visual/ColoredString.cpp
+        game/visual/PlayerList.cpp
 
         game/networking/Change.cpp
+        game/networking/SerializationUtils.cpp
 
         game/terminal/RealTerminal.cpp
         game/terminal/MockTerminal.cpp

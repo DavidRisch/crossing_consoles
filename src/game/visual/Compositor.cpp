@@ -14,15 +14,24 @@ Compositor::Compositor(const coordinate_size_t &viewport_size, World &world, Pla
     , world(&world)
     , player(&player) {
   renderer = std::make_unique<Renderer>(viewport_size, block_size, world, player);
+  player_list = std::make_unique<PlayerList>(world.players);
 }
 
 ColoredCharMatrix Compositor::CompositeViewport() const {
   ColoredCharMatrix rendered_world = renderer->RenderWorld();
+  ColoredCharMatrix rendered_player_list = player_list->Render();
   ColoredCharMatrix composited_viewport(viewport_size * block_size + composited_viewport_overhang);
 
   coordinate_size_t block_count = viewport_size * block_size;
 
   composited_viewport.InsertMatrix(rendered_world, rendered_viewport_offset);
+
+  if (show_player_list) {
+    common::coordinate_size_t player_list_viewport_offset =
+        composited_viewport_overhang + common::coordinate_size_t(2, 1);
+
+    composited_viewport.InsertMatrix(rendered_player_list, player_list_viewport_offset);
+  }
 
   std::wstring frame_top_line = box_drawings_double_down_and_right +
                                 std::wstring(block_count.x, box_drawings_double_horizontal) +

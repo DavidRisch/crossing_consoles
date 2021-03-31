@@ -35,12 +35,13 @@ class ConnectionManagers : public ::testing::Test {
   void create_server_and_client(ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout) {
     server_manager = ServerSideConnectionManager::CreateServerSide(timeout, server_connection_simulator_provider);
     std::thread server_thread([this] {
-      int counter = 10;
+      int counter = 100;
       while (counter > 0 && server_manager->ConnectionCount() == 0) {
         server_manager->HandleConnections();
         std::this_thread::sleep_for(std::chrono::microseconds(10));
         counter--;
       }
+      ASSERT_GT(counter, 0);
     });
 
     client_manager = ClientSideConnectionManager::CreateClientSide(timeout, client_connection_simulator_provider);
@@ -77,12 +78,13 @@ class ConnectionManagers : public ::testing::Test {
     assert(server_manager->ConnectionCount() == 1);
 
     std::thread server_thread([this] {
-      int counter = 10;
+      int counter = 100;
       while (counter > 0 && server_manager->ConnectionCount() == 1) {
         server_manager->HandleConnections();
         std::this_thread::sleep_for(std::chrono::microseconds(10));
         counter--;
       }
+      ASSERT_GT(counter, 0);
     });
 
     second_client_manager = ClientSideConnectionManager::CreateClientSide(ProtocolDefinition::timeout,
@@ -130,11 +132,12 @@ class ConnectionManagers : public ::testing::Test {
       client_manager->SendDataToServer(payload_client_to_server);
       std::this_thread::sleep_for(std::chrono::microseconds(100));
       int counter;
-      for (counter = 0; counter < 1000 && (!server_manager->HasEvent() || !client_manager->HasEvent()); ++counter) {
+      for (counter = 0; counter < 10000 && (!server_manager->HasEvent() || !client_manager->HasEvent()); ++counter) {
         server_manager->HandleConnections();
         client_manager->HandleConnections();
-        std::this_thread::sleep_for(std::chrono::microseconds(10));
+        std::this_thread::sleep_for(std::chrono::microseconds(500));
       }
+      ASSERT_LT(counter, 10000);
 
       assert_payload_received(server_manager->PopAndGetOldestEvent(), payload_client_to_server);
       assert_payload_received(client_manager->PopAndGetOldestEvent(), payload_server_to_client);

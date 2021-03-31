@@ -194,3 +194,16 @@ TEST(ColoredStringMatrix, InsertMatrix) {
     }
   }
 }
+
+TEST(ColoredStringMatrix, SearchForString) {
+  ColoredCharMatrix colored_string_matrix(coordinate_size_t(8, 8));
+
+  colored_string_matrix.AppendString(L"abcdefgh");
+  colored_string_matrix.AppendString(L"01234567");
+
+  EXPECT_EQ(*colored_string_matrix.Find(L"abcdefgh"), Position(0, 0));
+  EXPECT_EQ(*colored_string_matrix.Find(L"def"), Position(3, 0));
+  EXPECT_EQ(*colored_string_matrix.Find(L"012"), Position(0, 1));
+  EXPECT_EQ(*colored_string_matrix.Find(L"7"), Position(7, 1));
+  EXPECT_FALSE(colored_string_matrix.Find(L"XYZ").has_value());
+}

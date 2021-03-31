@@ -11,6 +11,6 @@ int main() {
   GameServer server(coordinate_size_t(20, 15));
   while (true) {
     server.RunIteration();
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));  // TODO: shorter sleep
+    std::this_thread::sleep_for(std::chrono::microseconds(10));
   }
 }

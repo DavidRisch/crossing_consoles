@@ -13,7 +13,7 @@
 
 namespace game {
 
-enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' ' };
+enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' ', Y = 'y' };
 
 class GameClient {
  public:
@@ -45,6 +45,9 @@ class GameClient {
   std::shared_ptr<communication::connection_layer::ClientSideConnectionManager> client_manager;
   bool keep_running = true;
   bool multiplayer;
+
+  /// Indicates some kind of change which requires a new frame to be drawn.
+  bool updated = false;
 
   /// Map keycode to associated change
   std::unordered_map<const KeyCode, networking::Change> map_key_to_change = {
