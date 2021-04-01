@@ -149,7 +149,6 @@ void RealTerminal::Clear() const {
 #ifdef _WIN32
   HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
   SetConsoleCursorPosition(console_handle, {0, 0});
-#else
-  // On Linux the screen is overwritten using ANSI escape codes
 #endif
+  // On Linux the screen is overwritten using ANSI escape codes
 }
