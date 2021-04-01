@@ -279,7 +279,7 @@ TEST_F(ConnectionManagers, BrokenPipeSignal) {
 TEST_F(ConnectionManagers, ClientKeepAlive) {
   // Client sends KeepAlive to Server
   auto timeout = std::chrono::milliseconds(100);
-  auto keep_alive_interval = timeout / ProtocolDefinition::keep_alive_numerator;
+  auto keep_alive_interval = timeout / ProtocolDefinition::keep_alive_denominator;
 
   create_server_and_client(timeout);
 
@@ -300,7 +300,7 @@ TEST_F(ConnectionManagers, ClientKeepAlive) {
 TEST_F(ConnectionManagers, ServerKeepAlive) {
   // Server sends KeepAlive to Client
   auto timeout = std::chrono::milliseconds(100);
-  auto keep_alive_interval = timeout / ProtocolDefinition::keep_alive_numerator;
+  auto keep_alive_interval = timeout / ProtocolDefinition::keep_alive_denominator;
 
   create_server_and_client(timeout);
 

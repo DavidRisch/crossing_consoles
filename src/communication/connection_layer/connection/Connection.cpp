@@ -277,7 +277,7 @@ Connection::Connection(std::shared_ptr<message_layer::MessageInputStream> messag
     , message_input_stream(std::move(message_input_stream))
     , message_output_stream(std::move(message_output_stream)) {
   resend_interval =
-      std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::resend_numerator);
+      std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::resend_denominator);
   timestamp_last_change = std::chrono::steady_clock::now();
 }
 

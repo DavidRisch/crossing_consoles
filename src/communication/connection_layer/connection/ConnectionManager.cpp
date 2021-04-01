@@ -21,7 +21,7 @@ ConnectionManager::ConnectionManager(
     , connection_simulator_provider(connection_simulator_provider) {
   connection_map = {};
   keep_alive_interval =
-      std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::keep_alive_numerator);
+      std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::keep_alive_denominator);
 
   assert(timeout > std::chrono::milliseconds(0));
   assert(keep_alive_interval < timeout);

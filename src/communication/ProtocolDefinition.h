@@ -38,14 +38,14 @@ class ProtocolDefinition {
   /// Set timeout duration
   static constexpr const timeout_t timeout = std::chrono::milliseconds(20000);
 
-  /// `timeout` divided by `resend_numerator` is the interval after which a resend is triggered.
-  constexpr static const double resend_numerator = 40;
-  static_assert(resend_numerator > 1.0);
+  /// `timeout` divided by `resend_denominator` is the interval after which a resend is triggered.
+  constexpr static const double resend_denominator = 40;
+  static_assert(resend_denominator > 1.0);
 
-  /// Set keep alive numerator
-  /// `timeout` divided by `keep_alive_numerator` describes the interval after which a `KeepAliveMessage' is sent
-  constexpr static const double keep_alive_numerator = 2;
-  static_assert(keep_alive_numerator > 0);
+  /// Set keep alive denominator
+  /// `timeout` divided by `keep_alive_denominator` describes the interval after which a `KeepAliveMessage' is sent
+  constexpr static const double keep_alive_denominator = 2;
+  static_assert(keep_alive_denominator > 0);
 
   /// Used to reference connection partners.
   typedef unsigned int partner_id_t;
