@@ -8,6 +8,7 @@
 #include <sstream>
 #include <utility>
 
+#include "HealthDisplay.h"
 #include "symbols.h"
 
 using namespace game;
@@ -21,18 +22,9 @@ const std::list<PlayerList::Column> PlayerList::columns{
 
                          field.AppendString(converter.from_bytes(row.player_name));
                        }),
-    PlayerList::Column(16, "health",
+    PlayerList::Column(HealthDisplay::width, "health",
                        [](const Row &row, game::visual::ColoredCharMatrix &field) {
-                         int i;
-                         for (i = 0; i < row.player_health; ++i) {
-                           field.AppendChar(symbols::black_heart_suit);
-                           field.AppendChar(L' ');  // needed because black_heart_suit is rendered extra wide
-                         }
-                         for (; i < world::Player::max_health; ++i) {
-                           // draw emtpy space for a heart
-                           field.AppendChar(symbols::box_drawings_light_right);
-                           field.AppendChar(symbols::box_drawings_light_left);
-                         }
+                         field = HealthDisplay::Render(row.player_health);
                        }),
     PlayerList::Column(11, "packet loss",
                        [](const Row &row, game::visual::ColoredCharMatrix &field) {
