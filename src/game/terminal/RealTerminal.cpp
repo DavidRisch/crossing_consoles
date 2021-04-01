@@ -106,6 +106,9 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
   output += converter.to_bytes(colored_string.string);
 
   output += "\033[0m \n";  // reset colors to prevent flickering of background
+
+  output = "\033[1;1H" + output;  // reset cursor to the top left (dont clear to prevent flickering)
+
   printf("%s", output.c_str());
 #endif
 }
@@ -147,6 +150,6 @@ void RealTerminal::Clear() const {
   HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
   SetConsoleCursorPosition(console_handle, {0, 0});
 #else
-  system("clear");
+  // On Linux the screen is overwritten using ANSI escape codes
 #endif
 }
