@@ -6,16 +6,15 @@
 using namespace game;
 using namespace game::common;
 using namespace game::world;
-using namespace game::world::block_types;
 
 WorldGenerator::WorldGenerator() {
   std::random_device rd;
   seed = rd();
 
-  height_map.SetType(0, block_types::WALL_WATER);
-  height_map.SetType(1000, block_types::EMPTY_BLOCK);
-  height_map.SetType(3000, block_types::WALL_ROCK);
-  height_map.SetType(6000, block_types::WALL_SNOW);
+  height_map.SetType(0, BlockType::WALL_WATER);
+  height_map.SetType(1000, BlockType::EMPTY_BLOCK);
+  height_map.SetType(3000, BlockType::WALL_ROCK);
+  height_map.SetType(6000, BlockType::WALL_SNOW);
 }
 
 WorldGenerator::WorldGenerator(int seed)
@@ -32,7 +31,7 @@ std::shared_ptr<World> WorldGenerator::GenerateWorld(const coordinate_size_t& wo
       height = PerlinNoise(x, y);
 
       BlockType type = height_map.GetType((int)height);
-      if (type >= WALL_START && type <= WALL_END) {
+      if (type >= BlockType::WALL_START && type <= BlockType::WALL_END) {
         world->AddWall(Position(x, y), type);
       }
     }

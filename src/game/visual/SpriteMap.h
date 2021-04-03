@@ -13,11 +13,11 @@ class SpriteMap {
  public:
   explicit SpriteMap(common::coordinate_size_t block_size);
 
-  void SetSprite(world::block_types::BlockType type, const ColoredCharMatrix& sprite);
-  const ColoredCharMatrix& GetSprite(world::block_types::BlockType type) const;
+  void SetSprite(world::BlockType type, const ColoredCharMatrix& sprite);
+  const ColoredCharMatrix& GetSprite(world::BlockType type) const;
 
  private:
-  std::map<world::block_types::BlockType, ColoredCharMatrix> type_sprites;
+  std::map<world::BlockType, ColoredCharMatrix> type_sprites;
   common::coordinate_size_t block_size;
 };
 

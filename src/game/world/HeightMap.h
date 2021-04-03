@@ -9,11 +9,11 @@ namespace game::world {
 
 class HeightMap {
  public:
-  void SetType(int height, block_types::BlockType type);
-  block_types::BlockType GetType(int height);
+  void SetType(int height, BlockType type);
+  BlockType GetType(int height);
 
  private:
-  std::map<int, block_types::BlockType> height_types;
+  std::map<int, BlockType> height_types;
 };
 
 }  // namespace game::world

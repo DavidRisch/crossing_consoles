@@ -4,7 +4,7 @@ using namespace game;
 using namespace game::common;
 using namespace game::world;
 
-Wall::Wall(Position position, block_types::BlockType type)
+Wall::Wall(Position position, BlockType type)
     : position(position)
     , type(type) {
 }

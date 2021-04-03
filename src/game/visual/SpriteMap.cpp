@@ -2,11 +2,11 @@
 
 using namespace game;
 using namespace game::visual;
-using namespace game::world::block_types;
+using namespace game::world;
 
 SpriteMap::SpriteMap(common::coordinate_size_t block_size)
     : block_size(block_size) {
-  SetSprite(EMPTY_BLOCK, ColoredCharMatrix(block_size));
+  SetSprite(BlockType::EMPTY_BLOCK, ColoredCharMatrix(block_size));
 }
 
 void SpriteMap::SetSprite(BlockType type, const ColoredCharMatrix& sprite) {
@@ -23,6 +23,6 @@ const ColoredCharMatrix& SpriteMap::GetSprite(BlockType type) const {
   if (result != type_sprites.end()) {
     return type_sprites.at(type);
   } else {
-    return GetSprite(EMPTY_BLOCK);
+    return GetSprite(BlockType::EMPTY_BLOCK);
   }
 }

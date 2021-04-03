@@ -8,7 +8,6 @@
 using namespace game;
 using namespace game::common;
 using namespace game::world;
-using namespace game::world::block_types;
 using namespace game::visual;
 using namespace game::visual::symbols;
 using namespace game::terminal::colors;
@@ -34,11 +33,11 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
   ColoredCharMatrix player_sprite(block_size);
   player_sprite.AppendString(L" \u25CB \u2500\u253C\u2500/ \\");
 
-  sprite_map.SetSprite(WALL_WATER, wall_water_sprite);
-  sprite_map.SetSprite(WALL_BRICK, wall_brick_sprite);
-  sprite_map.SetSprite(WALL_ROCK, wall_rock_sprite);
-  sprite_map.SetSprite(WALL_SNOW, wall_snow_sprite);
-  sprite_map.SetSprite(PLAYER_BLOCK, player_sprite);
+  sprite_map.SetSprite(BlockType::WALL_WATER, wall_water_sprite);
+  sprite_map.SetSprite(BlockType::WALL_BRICK, wall_brick_sprite);
+  sprite_map.SetSprite(BlockType::WALL_ROCK, wall_rock_sprite);
+  sprite_map.SetSprite(BlockType::WALL_SNOW, wall_snow_sprite);
+  sprite_map.SetSprite(BlockType::PLAYER_BLOCK, player_sprite);
 }
 
 ColoredCharMatrix Renderer::RenderWorld() const {
@@ -91,7 +90,7 @@ ColoredCharMatrix Renderer::RenderWorld() const {
       // get player position as rendered viewport coordinates
       Position relative_position = i_player->position - viewport_start;
       // insert player sprite
-      rendered_world.InsertMatrix(sprite_map.GetSprite(PLAYER_BLOCK), relative_position * block_size);
+      rendered_world.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_BLOCK), relative_position * block_size);
     }
   }
 

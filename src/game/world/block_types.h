@@ -1,9 +1,9 @@
 #ifndef CROSSING_CONSOLES_BLOCK_TYPES_H
 #define CROSSING_CONSOLES_BLOCK_TYPES_H
 
-namespace game::world::block_types {
+namespace game::world {
 
-enum BlockType {
+enum class BlockType {
   EMPTY_BLOCK,
 
   WALL_BRICK,
@@ -21,6 +21,6 @@ enum BlockType {
   PLAYER_BLOCK
 };
 
-}  // namespace game::world::block_types
+}  // namespace game::world
 
 #endif  // CROSSING_CONSOLES_BLOCK_TYPES_H

@@ -7,7 +7,6 @@
 using namespace game;
 using namespace game::common;
 using namespace game::world;
-using namespace game::world::block_types;
 
 World::World(coordinate_size_t size)
     : size(std::move(size))
