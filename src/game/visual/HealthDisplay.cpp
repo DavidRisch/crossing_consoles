@@ -6,7 +6,7 @@ using namespace game;
 using namespace game::common;
 using namespace game::visual;
 
-game::visual::ColoredCharMatrix game::visual::HealthDisplay::Render(int health) {
+ColoredCharMatrix HealthDisplay::Render(int health) {
   ColoredCharMatrix output(coordinate_size_t(width, 1));
 
   int i;
