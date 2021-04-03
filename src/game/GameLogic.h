@@ -1,6 +1,7 @@
 #ifndef CROSSING_CONSOLES_GAMELOGIC_H
 #define CROSSING_CONSOLES_GAMELOGIC_H
 
+#include "GameDefinition.h"
 #include "networking/Change.h"
 #include "world/World.h"
 
@@ -21,6 +22,12 @@ class GameLogic {
    * \brief Move the player with the given `movement`.
    */
   static void MovePlayer(world::Player &player, const common::coordinate_distance_t &movement, world::World &world);
+
+  /**
+   * \brief Return new position in world from given movement.
+   */
+  static common::Position PositionFromMovement(const common::Position &position,
+                                               const common::coordinate_distance_t &movement, world::World &world);
 };
 
 }  // namespace game

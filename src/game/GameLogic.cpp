@@ -5,8 +5,9 @@ using namespace game::common;
 using namespace game::world;
 using namespace game::networking;
 
-void GameLogic::MovePlayer(world::Player &player, const coordinate_distance_t &movement, world::World &world) {
-  Position new_position = player.position + movement;
+Position GameLogic::PositionFromMovement(const Position &position, const coordinate_distance_t &movement,
+                                         world::World &world) {
+  Position new_position = position + movement;
 
   if (new_position.x < 0) {
     new_position.x += world.size.x;
@@ -18,6 +19,12 @@ void GameLogic::MovePlayer(world::Player &player, const coordinate_distance_t &m
   } else if (new_position.y >= world.size.y) {
     new_position.y -= world.size.y;
   }
+
+  return new_position;
+}
+
+void GameLogic::MovePlayer(world::Player &player, const coordinate_distance_t &movement, world::World &world) {
+  Position new_position = PositionFromMovement(player.position, movement, world);
 
   if (new_position != player.position && !world.IsBlocked(new_position)) {
     player.MoveTo(new_position);
