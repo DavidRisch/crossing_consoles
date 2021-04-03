@@ -23,6 +23,6 @@ const ColoredCharMatrix& SpriteMap::GetSprite(BlockType type) const {
   if (result != type_sprites.end()) {
     return type_sprites.at(type);
   } else {
-    return GetSprite(BlockType::EMPTY_BLOCK);
+    throw std::runtime_error("BlockType has no Sprite");
   }
 }

@@ -26,12 +26,7 @@ TEST(SpriteMap, NonExistentType) {
   coordinate_size_t block_size(3, 3);
   SpriteMap sprite_map(block_size);
 
-  const std::vector<std::vector<ColoredChar>>& matrix = sprite_map.GetSprite(BlockType::WALL_BRICK).GetMatrix();
-  for (const auto& i_lines : matrix) {
-    for (const auto& i_characters : i_lines) {
-      ASSERT_EQ(i_characters, ColoredChar(L' ', WHITE, BLACK));
-    }
-  }
+  EXPECT_THROW(sprite_map.GetSprite(BlockType::WALL_BRICK), std::runtime_error);
 }
 
 TEST(SpriteMap, ExistentType) {
