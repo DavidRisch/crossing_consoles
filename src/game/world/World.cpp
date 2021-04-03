@@ -7,6 +7,7 @@
 using namespace game;
 using namespace game::common;
 using namespace game::world;
+using namespace game::world::block_types;
 
 World::World(coordinate_size_t size)
     : size(std::move(size))
@@ -19,12 +20,12 @@ void World::AddPlayer(const std::shared_ptr<Player>& player) {
   updated = true;
 }
 
-void World::AddWall(const Position& position) {
+void World::AddWall(const Position& position, BlockType type) {
   if (position.IsGreaterOrEqual(Position(0, 0)) && position.IsLess(size)) {
     if (walls.find(position) != walls.end()) {
-      walls.at(position) = Wall(position);
+      walls.at(position) = Wall(position, type);
     } else {
-      walls.emplace(position, position);
+      walls.emplace(position, Wall(position, type));
     }
 
     updated = true;

@@ -23,7 +23,7 @@ class World : public networking::ISerializable {
   explicit World(common::coordinate_size_t size);
 
   void AddPlayer(const std::shared_ptr<Player>& player);
-  void AddWall(const common::Position& position);
+  void AddWall(const common::Position& position, block_types::BlockType type = block_types::WALL_BRICK);
 
   bool IsBlocked(const common::Position& position);
 

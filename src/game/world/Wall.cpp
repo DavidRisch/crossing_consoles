@@ -4,8 +4,9 @@ using namespace game;
 using namespace game::common;
 using namespace game::world;
 
-Wall::Wall(Position position)
-    : position(position) {
+Wall::Wall(Position position, block_types::BlockType type)
+    : position(position)
+    , type(type) {
 }
 
 void Wall::Serialize(std::vector<uint8_t>& output_vector) const {

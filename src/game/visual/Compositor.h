@@ -13,7 +13,7 @@ namespace game::visual {
 
 class Compositor {
  public:
-  const common::coordinate_size_t block_size = common::coordinate_size_t(2, 2);
+  const common::coordinate_size_t block_size = common::coordinate_size_t(3, 3);
   const common::coordinate_size_t composited_viewport_overhang = common::coordinate_size_t(2, 4);
   const common::coordinate_size_t rendered_viewport_offset = common::coordinate_size_t(1, 3);
 

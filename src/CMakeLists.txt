@@ -11,12 +11,14 @@ add_library(crossing_consoles_lib
         game/world/Wall.cpp
         game/world/WorldGenerator.cpp
         game/world/Spawner.cpp
+        game/world/HeightMap.cpp
 
         game/visual/Renderer.cpp
         game/visual/Compositor.cpp
         game/visual/ColoredCharMatrix.cpp
         game/visual/ColoredChar.cpp
         game/visual/ColoredString.cpp
+        game/visual/SpriteMap.cpp
         
         game/networking/Change.cpp
 

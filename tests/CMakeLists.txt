@@ -16,9 +16,11 @@ add_executable(crossing_consoles_test
         wall.cpp
         player.cpp
         world.cpp
-        colored_string_matrix.cpp
+        colored_char_matrix.cpp
         spawner.cpp
         flaky_connection.cpp
+        height_map.cpp
+        sprite_map.cpp
 
         utils/detect_debugger.h
         )

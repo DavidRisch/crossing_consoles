@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "HeightMap.h"
 #include "World.h"
 
 namespace game::world {
@@ -15,6 +16,7 @@ class WorldGenerator {
   explicit WorldGenerator(int seed);
 
  private:
+  HeightMap height_map;
   int seed;
   const double persistence = 50;
   const int octaves = 4;
