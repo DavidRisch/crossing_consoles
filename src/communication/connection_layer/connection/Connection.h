@@ -25,6 +25,8 @@ enum class ConnectionState {
   CLOSED,
 };
 
+const char* connection_state_to_string(ConnectionState value);
+
 using sequence_t = ProtocolDefinition::sequence_t;
 using timeout_t = ProtocolDefinition::timeout_t;
 

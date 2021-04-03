@@ -32,7 +32,7 @@ void ConnectionLogger::Log(connection_layer::Connection* connection, const std::
 
   std::string separator = " | ";
   if (delta_time_ms > 1.0) {
-    separator = "@@@";  // useful when searching through logs for high delta_time_ms values
+    separator = "<@>";  // useful when searching through logs for high delta_time_ms values
   } else if (delta_time_ms > 0.5) {
     separator = " @ ";
   }

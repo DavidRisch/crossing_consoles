@@ -18,6 +18,28 @@
 using namespace communication;
 using namespace communication::connection_layer;
 
+const char *communication::connection_layer::connection_state_to_string(ConnectionState value) {
+  switch (value) {
+    case ConnectionState::CLIENT_CONNECTION_START:
+      return "CLIENT_CONNECTION_START";
+    case ConnectionState::CLIENT_CONNECTION_REQUEST_SENT:
+      return "CLIENT_CONNECTION_REQUEST_SENT";
+    case ConnectionState::SERVER_WAITING_FOR_FIRST:
+      return "SERVER_WAITING_FOR_FIRST";
+    case ConnectionState::SERVER_CONNECTION_RESPONSE_SENT:
+      return "SERVER_CONNECTION_RESPONSE_SENT";
+    case ConnectionState::READY:
+      return "READY";
+    case ConnectionState::WAITING_FOR_ACKNOWLEDGE:
+      return "WAITING_FOR_ACKNOWLEDGE";
+    case ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE:
+      return "WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE";
+    case ConnectionState::CLOSED:
+      return "CLOSED";
+  }
+  throw std::runtime_error("Invalid ConnectionState");
+}
+
 std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout() {
   const auto start_time = std::chrono::steady_clock::now();
 
@@ -236,7 +258,7 @@ bool Connection::TryReceive() {
     if (last_received_sequence_counter.has_value()) {
       if (received_message->GetMessageSequence() != *last_received_sequence_counter + 1) {
         DEBUG_CONNECTION_LOG(this, "<~~ TryReceive: received type "
-                                       << std::dec << (int)received_message->GetMessageType()
+                                       << message_type_to_string(received_message->GetMessageType())
                                        << " seq: " << received_message->GetMessageSequence()
                                        << " expected: " << *last_received_sequence_counter + 1)
         return true;  // there might be more messages which can be received
@@ -246,8 +268,9 @@ bool Connection::TryReceive() {
     last_received_sequence_counter = received_message->GetMessageSequence();
   }
 
-  DEBUG_CONNECTION_LOG(this, "<~~ TryReceive: received type " << std::dec << (int)received_message->GetMessageType()
-                                                              << " seq: " << received_message->GetMessageSequence())
+  DEBUG_CONNECTION_LOG(this, "<~~ TryReceive: received type "
+                                 << message_type_to_string(received_message->GetMessageType())
+                                 << " seq: " << received_message->GetMessageSequence())
 
   if (received_message->GetMessageType() == message_layer::MessageType::NOT_ACKNOWLEDGE) {
     DEBUG_CONNECTION_LOG(this, "received NACK")
@@ -301,7 +324,7 @@ void Connection::SendMessageNow(const std::shared_ptr<message_layer::Message> &m
 
   message->SetTimestampSent(std::chrono::steady_clock::now());
 
-  DEBUG_CONNECTION_LOG(this, "~~~~> SendMessageNow: send type " << std::dec << (int)message->GetMessageType()
+  DEBUG_CONNECTION_LOG(this, "~~~~> SendMessageNow: send type " << message_type_to_string(message->GetMessageType())
                                                                 << " seq: " << message->GetMessageSequence())
 
   if (state != ConnectionState::CLIENT_CONNECTION_REQUEST_SENT) {
@@ -338,7 +361,7 @@ void Connection::Handle() {
   assert(state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE ||
          state == ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE);
 
-  DEBUG_CONNECTION_LOG(this, "Handle() current state: " << (int)state)
+  DEBUG_CONNECTION_LOG(this, "Handle() current state: " << connection_state_to_string(state))
 
   ResendIfNecessary();
 
@@ -369,12 +392,12 @@ void Connection::ResendIfNecessary() {
 void Connection::ResendLastMessages() {
   if (!unacknowledged_sent_message.empty()) {
     for (const auto &item : unacknowledged_sent_message) {
-      DEBUG_CONNECTION_LOG(this, "~~~~> Resend: send type " << std::dec << (int)item->GetMessageType()
+      DEBUG_CONNECTION_LOG(this, "~~~~> Resend: send type " << message_type_to_string(item->GetMessageType())
                                                             << " seq: " << (int)item->GetMessageSequence())
       statistics.AddSentMessage(*item);
       message_output_stream->SendMessage(item.get());
     }
   } else {
-    DEBUG_CONNECTION_LOG(this, "Nothing to resend...")
+    DEBUG_CONNECTION_LOG(this, "Nothing to resend")
   }
 }

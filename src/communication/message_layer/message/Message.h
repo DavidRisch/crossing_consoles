@@ -22,6 +22,8 @@ enum class MessageType : char {
   HIGHEST_ELEMENT = CONNECTION_RESET
 };
 
+const char* message_type_to_string(MessageType value);
+
 class Message {
  public:
   // Draft message
