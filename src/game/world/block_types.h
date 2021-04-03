@@ -1,0 +1,26 @@
+#ifndef CROSSING_CONSOLES_BLOCK_TYPES_H
+#define CROSSING_CONSOLES_BLOCK_TYPES_H
+
+namespace game::world::block_types {
+
+enum BlockType {
+  EMPTY_BLOCK,
+
+  WALL_BRICK,
+  WALL_ROCK,
+  WALL_SNOW,
+  WALL_WATER,
+  WALL_START = WALL_BRICK,
+  WALL_END = WALL_WATER,
+
+  GROUND_GRASS,
+  GROUND_SAND,
+  GROUND_START = GROUND_GRASS,
+  GROUND_END = GROUND_SAND,
+
+  PLAYER_BLOCK
+};
+
+}  // namespace game::world::block_types
+
+#endif  // CROSSING_CONSOLES_BLOCK_TYPES_H
