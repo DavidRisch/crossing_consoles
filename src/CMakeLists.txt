@@ -18,6 +18,7 @@ add_library(crossing_consoles_lib
         game/visual/ColoredChar.cpp
         game/visual/ColoredString.cpp
         game/visual/PlayerList.cpp
+        game/visual/HealthDisplay.cpp
 
         game/networking/Change.cpp
         game/networking/SerializationUtils.cpp
