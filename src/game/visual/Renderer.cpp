@@ -31,7 +31,13 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
   wall_snow_sprite.AppendString(std::wstring(9, full_block), WHITE);
 
   ColoredCharMatrix player_sprite(block_size);
-  player_sprite.AppendString(L" \u25CB \u2500\u253C\u2500/ \\");
+  player_sprite.AppendChar(L' ');
+  player_sprite.AppendChar(white_circle);
+  player_sprite.AppendChar(L' ');
+  player_sprite.AppendChar(box_drawings_light_horizontal);
+  player_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
+  player_sprite.AppendChar(box_drawings_light_horizontal);
+  player_sprite.AppendString(L"/ \\");
 
   sprite_map.SetSprite(BlockType::WALL_WATER, wall_water_sprite);
   sprite_map.SetSprite(BlockType::WALL_BRICK, wall_brick_sprite);
