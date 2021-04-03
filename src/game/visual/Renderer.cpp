@@ -18,9 +18,11 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
     , world(&world)
     , own_player(&own_player)
     , wall_sprite(ColoredCharMatrix(block_size))
-    , player_sprite(ColoredCharMatrix(block_size)) {
+    , player_sprite(ColoredCharMatrix(block_size))
+    , projectile_sprite(ColoredCharMatrix(block_size)) {
   wall_sprite.AppendString(std::wstring(4, light_shade), WHITE, RED);
   player_sprite.AppendString(L"></\\");
+  projectile_sprite.AppendString(L"o");
 }
 
 ColoredCharMatrix Renderer::RenderWorld() const {
@@ -63,6 +65,19 @@ ColoredCharMatrix Renderer::RenderWorld() const {
           rendered_world.InsertMatrix(wall_sprite, relative_position * block_size);
         }
       }
+    }
+  }
+
+  // place projectiles
+  // need to be rendered before! the player as they spawn at the same position
+  for (auto const& i_projectile : world->GetProjectiles()) {
+    // check if projectile is within the rendered viewport
+    if (i_projectile->GetPosition().IsGreaterOrEqual(viewport_start) &&
+        i_projectile->GetPosition().IsLessOrEqual(viewport_end)) {
+      // get projectile position as rendered viewport coordinates
+      Position relative_position = i_projectile->GetPosition() - viewport_start;
+      // insert projectile sprite
+      rendered_world.InsertMatrix(projectile_sprite, relative_position * block_size);
     }
   }
 

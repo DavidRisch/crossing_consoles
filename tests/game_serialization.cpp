@@ -101,3 +101,17 @@ TEST(GameSerialization, Utils) {
 
   EXPECT_EQ(it, encoded.end());
 }
+
+TEST(GameSerialization, Projectile) {
+  Player player("ABCD", Position(34, 56));
+  Projectile original(10, 72, player.player_id, player.position, player.direction);
+
+  auto deserialized = serialize_and_deserialize(original);
+
+  EXPECT_EQ(original.GetDamage(), deserialized.GetDamage());
+  EXPECT_EQ(original.GetDirection(), deserialized.GetDirection());
+  EXPECT_EQ(original.GetShooterId(), deserialized.GetShooterId());
+  EXPECT_EQ(original.GetRange(), deserialized.GetRange());
+
+  EXPECT_TRUE(are_objects_identical(original.GetPosition(), deserialized.GetPosition()));
+}

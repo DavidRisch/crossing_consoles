@@ -21,6 +21,9 @@ add_executable(crossing_consoles_test
         spawner.cpp
         flaky_connection.cpp
         statistics.cpp
+        game_logic.cpp
+        game_projectile.cpp
+        fixtures/GamePlay.cpp
         )
 
 target_link_libraries(crossing_consoles_test crossing_consoles_lib)

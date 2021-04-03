@@ -18,6 +18,7 @@ class Renderer {
 
   ColoredCharMatrix wall_sprite;
   ColoredCharMatrix player_sprite;
+  ColoredCharMatrix projectile_sprite;
 
   explicit Renderer(common::coordinate_size_t viewport_size, common::coordinate_size_t block_size, world::World& world,
                     world::Player& own_player);

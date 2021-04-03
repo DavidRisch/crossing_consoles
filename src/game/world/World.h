@@ -8,6 +8,7 @@
 
 #include "../common/Position.h"
 #include "Player.h"
+#include "Projectile.h"
 #include "Spawner.h"
 #include "Wall.h"
 
@@ -26,6 +27,19 @@ class World : public networking::ISerializable {
 
   void AddPlayer(const std::shared_ptr<Player>& player);
   void AddWall(const common::Position& position);
+  void AddProjectile(const std::shared_ptr<Projectile>& projectile);
+
+  std::list<std::shared_ptr<Projectile>> GetProjectiles();
+
+  /**
+   * \brief Remove all given `Projectile`s from world's `projectiles`.
+   */
+  void RemoveProjectiles(std::list<std::shared_ptr<Projectile>> list_to_remove);
+
+  /**
+   * \brief Returns a `Projectile` with the given position if it exists.
+   */
+  std::optional<std::shared_ptr<Projectile>> GetProjectileFromPosition(common::Position position);
 
   bool IsBlocked(const common::Position& position);
 
@@ -44,6 +58,7 @@ class World : public networking::ISerializable {
 
  private:
   Spawner spawner;
+  std::list<std::shared_ptr<Projectile>> projectiles{};
 };
 
 }  // namespace game::world

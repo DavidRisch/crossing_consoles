@@ -3,6 +3,7 @@
 
 #include <list>
 #include <unordered_map>
+#include <vector>
 
 namespace game::networking {
 

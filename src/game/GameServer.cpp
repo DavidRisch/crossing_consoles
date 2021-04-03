@@ -28,6 +28,15 @@ void GameServer::RunIteration() {
     HandleEvent(event);
   }
 
+  if (std::chrono::steady_clock::now() - last_moving_projectiles_updated >= update_projectiles_interval) {
+    // Moving projectiles should be updated in a lower frequency
+    last_moving_projectiles_updated = std::chrono::steady_clock::now();
+    GameLogic::HandleProjectiles(*world);
+
+    // TODO Set score
+    // TODO Remove dead players!
+  }
+
   if (std::chrono::steady_clock::now() - last_world_sent >= send_world_interval) {
     last_world_sent = std::chrono::steady_clock::now();
 

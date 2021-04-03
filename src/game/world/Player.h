@@ -6,6 +6,7 @@
 
 #include "../GameDefinition.h"
 #include "../common/Position.h"
+#include "items/Weapon.h"
 
 namespace game::world {
 
@@ -27,13 +28,24 @@ class Player : public networking::ISerializable {
 
   void MoveTo(const common::Position& new_position);
 
-  void Attack();
+  /**
+   * \brief Decrease player's health by given `damage`.
+   */
+  void DecreaseHealth(int damage);
 
   void Serialize(std::vector<uint8_t>& output_vector) const override;
 
   static Player Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 
   GameDefinition::player_id_t player_id;
+
+  /**
+   * \brief Returns the player's `Weapon'
+   */
+  std::optional<Weapon> GetWeapon();
+
+ private:
+  std::optional<Weapon> weapon;
 };
 
 }  // namespace game::world

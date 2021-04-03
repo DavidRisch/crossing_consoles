@@ -23,7 +23,7 @@ class GameClient {
       communication::ProtocolDefinition::timeout_t communication_timeout = communication::ProtocolDefinition::timeout);
 
   /**
-   * \brief Update world, player and process changes.
+   * \brief Update world, player, projectiles and process changes.
    * \details In multiplayer mode, events from 'ConnectionManager' are handled additionally.
    */
   void Run();
@@ -54,7 +54,9 @@ class GameClient {
       {KeyCode::W, networking::Change(networking::ChangeType::MOVE_UP)},
       {KeyCode::S, networking::Change(networking::ChangeType::MOVE_DOWN)},
       {KeyCode::A, networking::Change(networking::ChangeType::MOVE_LEFT)},
-      {KeyCode::D, networking::Change(networking::ChangeType::MOVE_RIGHT)}};
+      {KeyCode::D, networking::Change(networking::ChangeType::MOVE_RIGHT)},
+      {KeyCode::SPACE, networking::Change(networking::ChangeType::USE_ITEM)},
+  };
 };
 
 }  // namespace game

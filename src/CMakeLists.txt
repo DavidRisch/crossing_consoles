@@ -11,6 +11,9 @@ add_library(crossing_consoles_lib
         game/world/Wall.cpp
         game/world/WorldGenerator.cpp
         game/world/Spawner.cpp
+        game/world/Projectile.cpp
+
+        game/world/items/Weapon.cpp
 
         game/visual/Renderer.cpp
         game/visual/Compositor.cpp
