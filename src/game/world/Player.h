@@ -9,14 +9,12 @@
 
 namespace game::world {
 
-enum Direction : char { NORTH, EAST, SOUTH, WEST };
-
 class Player : public networking::ISerializable {
  public:
   std::string name;
   int score = 0;
   common::Position position;
-  Direction direction = NORTH;
+  GameDefinition::Direction direction = GameDefinition::NORTH;
   static constexpr int max_health = 8;
   int health = max_health;
   bool updated = false;
