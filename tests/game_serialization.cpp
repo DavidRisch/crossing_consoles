@@ -73,9 +73,14 @@ TEST(GameSerialization, World) {
 TEST(GameSerialization, Player) {
   Player original("ABCD", Position(34, 56));
 
+  original.score = 4;
+  original.health = 3;
+
   auto deserialized = serialize_and_deserialize(original);
 
   EXPECT_EQ(original.name, deserialized.name);
+  EXPECT_EQ(original.health, deserialized.health);
+  EXPECT_EQ(original.score, deserialized.score);
   EXPECT_TRUE(are_objects_identical(original.position, deserialized.position));
 }
 

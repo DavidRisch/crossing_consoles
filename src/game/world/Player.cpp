@@ -15,7 +15,7 @@ Player::Player(std::string name, Position position, int player_id)
     , position(std::move(position))
     , player_id(player_id) {
   // TODO Assign weapons dynamically by placing items in world
-  weapon = Weapon(10, 20);  // dummy weapon
+  weapon = Weapon(1, 20);  // dummy weapon
 }
 
 bool Player::IsAlive() const {
@@ -41,6 +41,9 @@ void Player::Serialize(std::vector<uint8_t> &output_vector) const {
   }
   position.Serialize(output_vector);
 
+  networking::SerializationUtils::SerializeObject(health, output_vector);
+  networking::SerializationUtils::SerializeObject(score, output_vector);
+
   networking::SerializationUtils::SerializeObject(packet_loss_percentage, output_vector);
   networking::SerializationUtils::SerializeObject(ping, output_vector);
 }
@@ -56,6 +59,9 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
   auto position = Position::Deserialize(input_iterator);
 
   Player player(name, position, player_id);
+
+  player.health = networking::SerializationUtils::DeserializeObject<decltype(health)>(input_iterator);
+  player.score = networking::SerializationUtils::DeserializeObject<decltype(score)>(input_iterator);
 
   player.packet_loss_percentage =
       networking::SerializationUtils::DeserializeObject<decltype(packet_loss_percentage)>(input_iterator);
