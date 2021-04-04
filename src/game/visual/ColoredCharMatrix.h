@@ -10,7 +10,7 @@
 namespace game::visual {
 
 /**
- * \brief Matrix of ColoredChars
+ * \brief Matrix of `ColoredChar`s
  */
 class ColoredCharMatrix {
  public:

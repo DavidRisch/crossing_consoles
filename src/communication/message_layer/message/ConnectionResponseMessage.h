@@ -6,7 +6,7 @@
 namespace communication::message_layer {
 
 /**
- * \brief Sent by the Server to the Client after receiving a ConnectionRequestMessage.
+ * \brief Sent by the Server to the Client after receiving a `ConnectionRequestMessage`.
  */
 class ConnectionResponseMessage : public Message {
  public:

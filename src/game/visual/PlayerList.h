@@ -9,7 +9,7 @@
 namespace game::visual {
 
 /**
- * \brief Draws a list/table of players with information about each player.
+ * \brief Draws a list/table of `Player`s with information about each `Player`.
  */
 class PlayerList {
  public:
