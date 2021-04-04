@@ -6,7 +6,6 @@
 namespace communication {
 namespace message_layer {
 
-
 /**
  * \brief Sent to prevent a timeout on the connection.
  */

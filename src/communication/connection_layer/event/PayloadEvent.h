@@ -8,7 +8,6 @@
 
 namespace communication::connection_layer {
 
-
 /**
  * \brief Shows that a PayloadMessage has been received on the Connection.
  */

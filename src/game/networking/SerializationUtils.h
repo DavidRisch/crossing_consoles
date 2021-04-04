@@ -36,6 +36,6 @@ class SerializationUtils {
     return object;
   }
 };
-}
+}  // namespace game::networking
 
 #endif  // CROSSING_CONSOLES_SERIALIZATION_UTILS_H

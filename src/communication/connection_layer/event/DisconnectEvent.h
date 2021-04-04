@@ -5,7 +5,6 @@
 
 namespace communication::connection_layer {
 
-
 /**
  * \brief Shows that a disconnect has occurred in the Connection.
  */
