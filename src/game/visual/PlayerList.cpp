@@ -26,6 +26,10 @@ const std::list<PlayerList::Column> PlayerList::columns{
                        [](const Row &row, game::visual::ColoredCharMatrix &field) {
                          field = HealthDisplay::Render(row.player_health);
                        }),
+    PlayerList::Column(5, "score",
+                       [](const Row &row, game::visual::ColoredCharMatrix &field) {
+                         field.SetString(std::to_wstring(row.player_score), Position(0, 0));
+                       }),
     PlayerList::Column(11, "packet loss",
                        [](const Row &row, game::visual::ColoredCharMatrix &field) {
                          std::wstringstream stream;
@@ -69,7 +73,7 @@ game::visual::ColoredCharMatrix PlayerList::Render() const {
 
   std::list<Row> rows;
   for (const auto &player : players) {
-    rows.emplace_back(player->name, player->health, player->packet_loss_percentage, player->ping);
+    rows.emplace_back(player->name, player->health, player->GetScore(), player->packet_loss_percentage, player->ping);
   }
 
   for (const auto &row : rows) {
@@ -172,10 +176,11 @@ game::visual::ColoredCharMatrix PlayerList::Column::RenderTitle() const {
 
 // Subclass Row:
 
-PlayerList::Row::Row(std::string name, int player_health, double packet_loss_percentage,
+PlayerList::Row::Row(std::string name, int player_health, uint8_t player_score, double packet_loss_percentage,
                      std::optional<std::chrono::microseconds> ping)
     : player_name(std::move(name))
     , player_health(player_health)
+    , player_score(player_score)
     , packet_loss_percentage(packet_loss_percentage)
     , ping(std::move(ping)) {
 }

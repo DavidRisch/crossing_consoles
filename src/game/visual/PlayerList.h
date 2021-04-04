@@ -33,7 +33,7 @@ class PlayerList {
 
   class Row {
    public:
-    Row(std::string name, int player_health, double packet_loss_percentage,
+    Row(std::string name, int player_health, uint8_t player_score, double packet_loss_percentage,
         std::optional<std::chrono::microseconds> ping);
 
     /**
@@ -43,6 +43,7 @@ class PlayerList {
 
     const std::string player_name;
     const int player_health;
+    const uint8_t player_score;
     const double packet_loss_percentage;
     const std::optional<std::chrono::microseconds> ping;
   };
