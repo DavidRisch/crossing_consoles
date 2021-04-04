@@ -1,6 +1,7 @@
 #ifndef CROSSING_CONSOLES_GAMELOGIC_H
 #define CROSSING_CONSOLES_GAMELOGIC_H
 
+#include "GameDefinition.h"
 #include "networking/Change.h"
 #include "world/World.h"
 
@@ -16,11 +17,40 @@ class GameLogic {
    */
   static void HandleChange(world::Player &player, const networking::Change &change, world::World &world);
 
+  static void HandleProjectiles(world::World &world);
+
  private:
   /**
    * \brief Move the player with the given `movement`.
+   * \details Handles collisions with 'Projectiles' during movement.
    */
   static void MovePlayer(world::Player &player, const common::coordinate_distance_t &movement, world::World &world);
+
+  /**
+   * \brief Move the projectile using its direction.
+   */
+  static void MoveProjectile(Projectile &projectile, world::World &world);
+
+  /**
+   * \brief Player uses weapon.
+     \details Spawns `Projectile` in world.
+   */
+  static void UseWeapon(world::Player &player, world::World &world);
+
+  static const std::unordered_map<const GameDefinition::Direction, common::coordinate_distance_t>
+      map_direction_to_movement;
+
+  static const std::unordered_map<const GameDefinition::Direction, const GameDefinition::Direction>
+      map_direction_to_opposite_direction;
+
+  /**
+   * \brief Return new position in world from given movement.
+   */
+  static common::Position PositionFromMovement(const common::Position &position,
+                                               const common::coordinate_distance_t &movement, world::World &world);
+
+  static std::list<std::shared_ptr<Projectile>> HandleProjectileCollision(
+      const std::list<std::pair<std::shared_ptr<Projectile>, std::shared_ptr<Projectile>>> &projectiles);
 };
 
 }  // namespace game

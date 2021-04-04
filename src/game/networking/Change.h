@@ -13,6 +13,7 @@ enum class ChangeType : uint8_t {
   MOVE_RIGHT,
   MOVE_DOWN,
   MOVE_LEFT,
+  USE_ITEM,
 
   // server -> client
   SET_OWN_ID,

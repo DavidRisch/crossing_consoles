@@ -6,17 +6,16 @@
 
 #include "../GameDefinition.h"
 #include "../common/Position.h"
+#include "items/Weapon.h"
 
 namespace game::world {
-
-enum Direction : char { NORTH, EAST, SOUTH, WEST };
 
 class Player : public networking::ISerializable {
  public:
   std::string name;
   int score = 0;
   common::Position position;
-  Direction direction = NORTH;
+  GameDefinition::Direction direction = GameDefinition::NORTH;
   static constexpr int max_health = 8;
   int health = max_health;
   bool updated = false;
@@ -29,13 +28,24 @@ class Player : public networking::ISerializable {
 
   void MoveTo(const common::Position& new_position);
 
-  void Attack();
+  /**
+   * \brief Decrease player's health by given `damage`.
+   */
+  void DecreaseHealth(int damage);
 
   void Serialize(std::vector<uint8_t>& output_vector) const override;
 
   static Player Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 
   GameDefinition::player_id_t player_id;
+
+  /**
+   * \brief Returns the player's `Weapon'
+   */
+  std::optional<Weapon> GetWeapon();
+
+ private:
+  std::optional<Weapon> weapon;
 };
 
 }  // namespace game::world

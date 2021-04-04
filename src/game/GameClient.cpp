@@ -70,6 +70,7 @@ void GameClient::Run() {
 
     if (world.updated || player->updated || updated) {
       updated = false;
+      GameLogic::HandleProjectiles(world);
       terminal->SetScreen(compositor->CompositeViewport());
     }
 

@@ -10,6 +10,9 @@ namespace game {
  */
 class GameDefinition {
  public:
+  /// Moving direction of `Player` and `Projectile` in `World`.
+  enum Direction : char { NORTH, EAST, SOUTH, WEST };
+
   /// Used to reference players.
   typedef uint16_t player_id_t;
 };

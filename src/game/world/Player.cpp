@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "../networking/SerializationUtils.h"
+#include "items/Weapon.h"
 
 using namespace game;
 using namespace game::common;
@@ -13,6 +14,8 @@ Player::Player(std::string name, Position position, int player_id)
     : name(std::move(name))
     , position(std::move(position))
     , player_id(player_id) {
+  // TODO Assign weapons dynamically by placing items in world
+  weapon = Weapon(10, 20);  // dummy weapon
 }
 
 bool Player::IsAlive() const {
@@ -24,7 +27,8 @@ void Player::MoveTo(const Position &new_position) {
   updated = true;
 }
 
-void Player::Attack() {
+void Player::DecreaseHealth(int damage) {
+  health -= damage;
 }
 
 void Player::Serialize(std::vector<uint8_t> &output_vector) const {
@@ -58,4 +62,8 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
   player.ping = SerializationUtils::DeserializeObject<decltype(ping)>(input_iterator);
 
   return player;
+}
+
+std::optional<Weapon> Player::GetWeapon() {
+  return weapon;
 }

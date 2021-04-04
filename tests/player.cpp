@@ -24,3 +24,16 @@ TEST(Player, IsAlive) {
 
   EXPECT_TRUE(player.IsAlive());
 }
+
+TEST(Player, HasWeapon) {
+  // TODO Adapt this test if player can have no item!
+  Player player("player", Position(0, 0));
+  ASSERT_TRUE(player.GetWeapon().has_value());
+}
+
+TEST(Player, DecreaseHealth) {
+  Player player("player", Position(0, 0));
+  int damage = 100;
+  player.DecreaseHealth(damage);
+  ASSERT_FALSE(player.IsAlive());
+}

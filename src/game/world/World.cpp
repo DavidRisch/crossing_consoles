@@ -46,7 +46,7 @@ bool World::IsBlocked(const Position& position) {
 
 void World::Update(const World& server_world) {
   size = server_world.size;
-
+  projectiles = server_world.projectiles;
   walls = server_world.walls;
 
   for (const auto& server_player : server_world.players) {
@@ -92,6 +92,8 @@ void World::Serialize(std::vector<uint8_t>& output_vector) const {
   ISerializable::SerializeMap(output_vector, walls);
 
   ISerializable::SerializeList(output_vector, players);
+
+  ISerializable::SerializeList(output_vector, projectiles);
 }
 
 World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
@@ -113,5 +115,39 @@ World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
     world.AddPlayer(player);
   }
 
+  auto projectile_count = ISerializable::DeserializeContainerLength(input_iterator);
+  for (size_t i = 0; i < projectile_count; ++i) {
+    auto projectile = std::make_shared<Projectile>(Projectile::Deserialize(input_iterator));
+    world.AddProjectile(projectile);
+  }
+
   return world;
+}
+
+std::list<std::shared_ptr<Projectile>> World::GetProjectiles() {
+  return projectiles;
+}
+
+void World::AddProjectile(const std::shared_ptr<Projectile>& projectile) {
+  projectiles.push_back(projectile);
+  updated = true;
+}
+
+void World::RemoveProjectiles(std::list<std::shared_ptr<Projectile>> list_to_remove) {
+  for (auto& remove_projectile : list_to_remove) {
+    auto iterator = std::remove_if(
+        projectiles.begin(), projectiles.end(),
+        [&remove_projectile](const std::shared_ptr<Projectile>& item) { return item == remove_projectile; });
+    projectiles.erase(iterator, projectiles.end());
+  }
+}
+
+std::optional<std::shared_ptr<Projectile>> World::GetProjectileFromPosition(common::Position position) {
+  auto projectiles_it = std::find_if(
+      projectiles.begin(), projectiles.end(),
+      [&position](const std::shared_ptr<Projectile>& projectile) { return projectile->GetPosition() == position; });
+  if (projectiles_it != projectiles.end()) {
+    return *projectiles_it;
+  }
+  return std::optional<std::shared_ptr<Projectile>>();
 }
