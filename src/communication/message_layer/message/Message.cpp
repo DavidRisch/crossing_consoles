@@ -5,6 +5,26 @@
 using namespace communication;
 using namespace communication::message_layer;
 
+const char* communication::message_layer::message_type_to_string(MessageType value) {
+  switch (value) {
+    case MessageType::CONNECTION_REQUEST:
+      return "CONNECTION_REQUEST";
+    case MessageType::CONNECTION_RESPONSE:
+      return "CONNECTION_RESPONSE";
+    case MessageType::PAYLOAD:
+      return "PAYLOAD";
+    case MessageType::ACKNOWLEDGE:
+      return "ACKNOWLEDGE";
+    case MessageType::NOT_ACKNOWLEDGE:
+      return "NOT_ACKNOWLEDGE";
+    case MessageType::KEEP_ALIVE:
+      return "KEEP_ALIVE";
+    case MessageType::CONNECTION_RESET:
+      return "CONNECTION_RESET";
+  }
+  throw std::runtime_error("Invalid MessageType");
+}
+
 Message::Message() {
   sequence = 0;
   meta_data = MessageMetaData();
