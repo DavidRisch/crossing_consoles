@@ -5,6 +5,9 @@
 
 namespace communication::message_layer {
 
+/**
+ * \brief Sent by the Client to the Server to request a connection and initiate the handshake.
+ */
 class ConnectionRequestMessage : public Message {
  public:
   static MessageType message_type;

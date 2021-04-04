@@ -8,12 +8,12 @@ namespace message_layer {
 
 typedef uint32_t crc_value_t;  // depends on CRC algorithm
 
-class CRCHandler {
-  /**
+/**
    * \brief Create and check CRC32 checksums.
    * \details The used CRC32 algorithm is described in
    * https://en.wikipedia.org/wiki/Cyclic_redundancy_check#CRC-32_algorithm
    */
+class CRCHandler {
  public:
   CRCHandler();
   /**

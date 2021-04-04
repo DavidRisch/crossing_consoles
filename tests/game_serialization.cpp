@@ -86,17 +86,17 @@ TEST(GameSerialization, Utils) {
 
   std::vector<uint8_t> encoded;
 
-  SerializationUtils::SerializeObject(a_original, encoded);
-  SerializationUtils::SerializeObject(b_original, encoded);
-  SerializationUtils::SerializeObject(c_original, encoded);
+  networking::SerializationUtils::SerializeObject(a_original, encoded);
+  networking::SerializationUtils::SerializeObject(b_original, encoded);
+  networking::SerializationUtils::SerializeObject(c_original, encoded);
 
   auto it = encoded.begin();
 
-  auto a_decoded = SerializationUtils::DeserializeObject<decltype(a_original)>(it);
+  auto a_decoded = networking::SerializationUtils::DeserializeObject<decltype(a_original)>(it);
   EXPECT_TRUE(are_objects_identical(a_original, a_decoded));
-  auto b_decoded = SerializationUtils::DeserializeObject<decltype(b_original)>(it);
+  auto b_decoded = networking::SerializationUtils::DeserializeObject<decltype(b_original)>(it);
   EXPECT_TRUE(are_objects_identical(b_original, b_decoded));
-  auto c_decoded = SerializationUtils::DeserializeObject<decltype(c_original)>(it);
+  auto c_decoded = networking::SerializationUtils::DeserializeObject<decltype(c_original)>(it);
   EXPECT_TRUE(are_objects_identical(c_original, c_decoded));
 
   EXPECT_EQ(it, encoded.end());

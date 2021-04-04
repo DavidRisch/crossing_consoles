@@ -9,6 +9,9 @@
 
 namespace game::visual {
 
+/**
+ * \brief Renders the world as a ColoredCharMatrix.
+ */
 class Renderer {
  public:
   common::coordinate_size_t block_size;

@@ -34,12 +34,18 @@ class MessageCoder {
    */
   class DecodeFailedException : public std::exception {};
 
+  /**
+   * \brief Thrown if read CRC value does not match expected CRC value.
+   */
   class CrcIncorrectException : public DecodeFailedException {
     [[nodiscard]] const char* what() const noexcept override {
       return "Message decoding failed, read CRC did not match expected CRC.";
     }
   };
 
+  /**
+   * \brief Thrown if flags or CRC value are incorrect.
+   */
   class InvalidMessageException : public DecodeFailedException {
    private:
     std::string output_message;

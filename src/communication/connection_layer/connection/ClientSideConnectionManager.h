@@ -6,6 +6,9 @@
 namespace communication {
 namespace connection_layer {
 
+/**
+ * \brief ConnectionManager on Client Side
+ */
 class ClientSideConnectionManager : public ConnectionManager {
  public:
   static std::shared_ptr<ClientSideConnectionManager> CreateClientSide(

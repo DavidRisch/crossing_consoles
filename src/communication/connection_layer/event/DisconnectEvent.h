@@ -5,6 +5,10 @@
 
 namespace communication::connection_layer {
 
+
+/**
+ * \brief Shows that a disconnect has occurred in the Connection.
+ */
 class DisconnectEvent : public Event {
  public:
   explicit DisconnectEvent(ProtocolDefinition::partner_id_t partner_id);

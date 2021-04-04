@@ -4,6 +4,11 @@
 #include <cstdint>
 #include <vector>
 
+namespace game::networking {
+
+/**
+ * \brief Provides methods for serialization and deserialization of objects.
+ */
 class SerializationUtils {
  public:
   /**
@@ -31,5 +36,6 @@ class SerializationUtils {
     return object;
   }
 };
+}
 
 #endif  // CROSSING_CONSOLES_SERIALIZATION_UTILS_H

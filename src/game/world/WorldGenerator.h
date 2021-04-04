@@ -7,6 +7,9 @@
 
 namespace game::world {
 
+/**
+ * \brief Used to generate a World with some Walls.
+ */
 class WorldGenerator {
  public:
   static std::shared_ptr<World> GenerateWorld(const common::coordinate_size_t& world_size);

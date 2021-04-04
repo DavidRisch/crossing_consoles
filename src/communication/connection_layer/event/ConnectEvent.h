@@ -5,6 +5,9 @@
 
 namespace communication::connection_layer {
 
+/**
+ * \brief Shows that a Connection has been established.
+ */
 class ConnectEvent : public Event {
  public:
   explicit ConnectEvent(ProtocolDefinition::partner_id_t partner_id);

@@ -20,11 +20,17 @@ class ConnectionStatistics {
   typedef uint16_t message_count_t;
   typedef std::unordered_map<message_layer::MessageType, message_count_t> message_count_map_t;
 
+  /**
+   * \brief Holds the Statistics about the messages by MessageType and overall
+   */
   struct MessageStatisticData {
     message_count_map_t count_by_type = {};
     message_count_t total_count = 0;
   };
 
+  /**
+   * \brief Holds the number of lost packages and their percentage of the overall packages
+   */
   struct PackageLossData {
     message_count_t package_loss = 0;
     double package_loss_percentage = 0;

@@ -7,7 +7,7 @@
 namespace game::networking {
 
 /**
- * \brief Interface for objects which can be serialize to bytes.
+ * \brief Interface for objects which can be serialized to bytes.
  * \details Any object `T` implementing this interface should a static method with the signature
  * `static T Deserialize(std::vector<uint8_t>::iterator &input_iterator)`.
  */

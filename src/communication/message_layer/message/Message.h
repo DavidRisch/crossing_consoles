@@ -22,6 +22,9 @@ enum class MessageType : char {
   HIGHEST_ELEMENT = CONNECTION_RESET
 };
 
+/**
+ * \brief Base class for messages of different types.
+ */
 class Message {
  public:
   // Draft message

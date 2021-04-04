@@ -73,6 +73,9 @@ class Connection {
    */
   std::shared_ptr<message_layer::Message> ReceiveMessage();
 
+  /**
+   * \brief Thrown if something goes wrong during the handshake so the Connection can not be established.
+   */
   class ConnectionCreationFailed : public std::exception {
     [[nodiscard]] const char* what() const noexcept override {
       return "Connection could not be created.";

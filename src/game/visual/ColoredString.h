@@ -7,6 +7,9 @@
 
 namespace game::visual {
 
+/**
+ * \brief String with foreground and background colors.
+ */
 class ColoredString {
  public:
   std::wstring string;
