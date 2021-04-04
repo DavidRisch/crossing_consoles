@@ -31,7 +31,6 @@ class MockInputStream : public IInputByteStream {
 
   /**
    * \brief Check if there is data on the Stream.
-   * @return
    */
   bool HasInput() override {
     return !data.empty();
