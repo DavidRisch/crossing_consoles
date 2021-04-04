@@ -63,7 +63,11 @@ TEST(Game, Actions) {
 }
 
 TEST(Game, ActionShoot) {
-  auto player = std::make_shared<Player>("player name", Position(2, 2));
+  // this needs to be adapted if viewport overhang changes!
+  auto composited_viewport_overhang = common::coordinate_size_t(2, 4);
+
+  auto player = std::make_shared<Player>("player name", Position(3, 2));
+  player->direction = GameDefinition::NORTH;
   World world(coordinate_size_t(5, 5));
   world.AddWall(Position(4, 4));
 
@@ -74,13 +78,23 @@ TEST(Game, ActionShoot) {
   GameClient gc(player, mock_terminal, coordinate_size_t(10, 10));
   gc.Run();
 
+  // projectile moves NORTH
+  auto projectile_position = Position(3, 1);
+
+  int row = 0;
   bool contains_bullet = false;
+
   for (const auto& i_lines : mock_terminal->GetLastOutput()) {
+    int column = 0;
     for (const auto& i_characters : i_lines) {
       if (i_characters == ColoredChar(L'o', WHITE, BLACK)) {
-        contains_bullet = true;
+        ASSERT_EQ(Position((column / 2) - composited_viewport_overhang.x, row - composited_viewport_overhang.y),
+                  projectile_position);
+        return;
       }
+      column++;
     }
+    row++;
   }
 
   ASSERT_TRUE(contains_bullet);
