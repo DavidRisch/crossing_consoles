@@ -6,6 +6,9 @@
 namespace communication {
 namespace message_layer {
 
+/**
+ * \brief Sent if one communication partner wants to close the Connection.
+ */
 class ConnectionResetMessage : public Message {
  public:
   static MessageType message_type;

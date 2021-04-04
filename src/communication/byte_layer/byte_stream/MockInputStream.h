@@ -19,10 +19,19 @@ class MockInputStream : public IInputByteStream {
  public:
   size_t Read(uint8_t* receive_buffer, size_t max_length) override;
 
+  /**
+   * \brief Add data to the Input Stream.
+   */
   void AddData(const std::vector<uint8_t>& new_data);
 
+  /**
+   * \brief Check if the Stream is empty.
+   */
   bool IsEmpty() const;
 
+  /**
+   * \brief Check if there is data on the Stream.
+   */
   bool HasInput() override {
     return !data.empty();
   }

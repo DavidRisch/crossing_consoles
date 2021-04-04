@@ -1,2 +1,4 @@
 /.idea
 /cmake-build-*
+/doc/doxygen/html
+/doc/doxygen/latex

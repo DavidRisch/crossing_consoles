@@ -7,6 +7,9 @@
 namespace communication {
 namespace message_layer {
 
+/**
+ * \brief Meta data about the Message: Timestamps for send and receive
+ */
 class MessageMetaData {
  public:
   MessageMetaData();

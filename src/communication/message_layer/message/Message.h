@@ -24,6 +24,9 @@ enum class MessageType : char {
 
 const char* message_type_to_string(MessageType value);
 
+/**
+ * \brief Base class for messages of different types.
+ */
 class Message {
  public:
   // Draft message

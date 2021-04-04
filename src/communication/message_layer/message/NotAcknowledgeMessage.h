@@ -6,7 +6,7 @@
 namespace communication::message_layer {
 
 /**
- * \brief Sent if the receiving of a message failed.
+ * \brief Sent if the receiving of a Message failed.
  */
 class NotAcknowledgeMessage : public Message {
  public:

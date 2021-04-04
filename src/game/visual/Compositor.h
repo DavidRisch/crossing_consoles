@@ -12,6 +12,9 @@
 
 namespace game::visual {
 
+/**
+ * \brief Generates a ColoredCharMatrix from the World, Walls and Players.
+ */
 class Compositor {
  public:
   const common::coordinate_size_t block_size = common::coordinate_size_t(2, 2);

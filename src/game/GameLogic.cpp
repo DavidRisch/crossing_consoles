@@ -1,5 +1,6 @@
 #include "GameLogic.h"
 
+#include <algorithm>
 #include <cassert>
 
 #include "world/Projectile.h"

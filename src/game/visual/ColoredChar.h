@@ -5,6 +5,9 @@
 
 namespace game::visual {
 
+/**
+ * \brief Character with foreground and background colors.
+ */
 class ColoredChar {
  public:
   wchar_t character;

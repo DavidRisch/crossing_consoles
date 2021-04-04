@@ -16,6 +16,9 @@ namespace game::world {
 
 typedef std::list<std::shared_ptr<Player>> player_ptr_list_t;
 
+/**
+ * \brief Handles information about the world: its size, players and walls.
+ */
 class World : public networking::ISerializable {
  public:
   common::coordinate_size_t size;

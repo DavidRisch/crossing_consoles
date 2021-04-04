@@ -10,6 +10,10 @@
 
 namespace game::world {
 
+/**
+ * \brief Represenation of a player.
+ * \details Representation of a player with name, position, direction, health and information about his connection.
+ */
 class Player : public networking::ISerializable {
  public:
   std::string name;

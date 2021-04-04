@@ -7,7 +7,7 @@
 namespace game::visual {
 
 /**
- * \brief Used to generate a visual representation of a players health.
+ * \brief Used to generate a visual representation of a player's health.
  */
 class HealthDisplay {
  public:

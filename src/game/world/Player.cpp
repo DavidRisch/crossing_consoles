@@ -41,8 +41,8 @@ void Player::Serialize(std::vector<uint8_t> &output_vector) const {
   }
   position.Serialize(output_vector);
 
-  SerializationUtils::SerializeObject(packet_loss_percentage, output_vector);
-  SerializationUtils::SerializeObject(ping, output_vector);
+  networking::SerializationUtils::SerializeObject(packet_loss_percentage, output_vector);
+  networking::SerializationUtils::SerializeObject(ping, output_vector);
 }
 
 Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
@@ -58,8 +58,8 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
   Player player(name, position, player_id);
 
   player.packet_loss_percentage =
-      SerializationUtils::DeserializeObject<decltype(packet_loss_percentage)>(input_iterator);
-  player.ping = SerializationUtils::DeserializeObject<decltype(ping)>(input_iterator);
+      networking::SerializationUtils::DeserializeObject<decltype(packet_loss_percentage)>(input_iterator);
+  player.ping = networking::SerializationUtils::DeserializeObject<decltype(ping)>(input_iterator);
 
   return player;
 }

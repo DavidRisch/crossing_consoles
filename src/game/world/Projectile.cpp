@@ -6,6 +6,7 @@
 
 using namespace game;
 using namespace game::common;
+using namespace game::networking;
 
 Projectile::Projectile(uint8_t range, int damage, GameDefinition::player_id_t shooter_id, Position position,
                        GameDefinition::Direction direction)

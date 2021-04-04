@@ -11,6 +11,9 @@ namespace game::common {
 
 typedef int coordinate_t;
 
+/**
+ * \brief Represents a (x, y) coordinate.
+ */
 class Position : public networking::ISerializable {
  public:
   coordinate_t x;
@@ -52,6 +55,9 @@ class Position : public networking::ISerializable {
    */
   bool IsGreaterOrEqual(const Position& other_position) const;
 
+  /**
+   * \brief Calculate hash of position.
+   */
   struct HashFunction {
     size_t operator()(const Position& pos) const {
       return pos.x ^ (pos.y << (sizeof(size_t) / 2));
