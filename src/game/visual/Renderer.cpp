@@ -70,14 +70,19 @@ ColoredCharMatrix Renderer::RenderWorld() const {
 
   // place projectiles
   // need to be rendered before! the player as they spawn at the same position
-  for (auto const& i_projectile : world->GetProjectiles()) {
-    // check if projectile is within the rendered viewport
-    if (i_projectile->GetPosition().IsGreaterOrEqual(viewport_start) &&
-        i_projectile->GetPosition().IsLessOrEqual(viewport_end)) {
-      // get projectile position as rendered viewport coordinates
-      Position relative_position = i_projectile->GetPosition() - viewport_start;
-      // insert projectile sprite
-      rendered_world.InsertMatrix(projectile_sprite, relative_position * block_size);
+  for (auto const& projectile : world->GetProjectiles()) {
+    for (int y_factor = negative_repetition.y; y_factor < positive_repetition.y; y_factor++) {
+      for (int x_factor = negative_repetition.x; x_factor < positive_repetition.x; x_factor++) {
+        // get position of projectile for each world repetition in world coordinates
+        Position position = projectile->GetPosition() + (world->size * Position(x_factor, y_factor));
+        // check if projectile is within the rendered viewport
+        if (position.IsGreaterOrEqual(viewport_start) && position.IsLessOrEqual(viewport_end)) {
+          // get projectile position as rendered viewport coordinates
+          Position relative_position = position - viewport_start;
+          // insert projectile sprite
+          rendered_world.InsertMatrix(projectile_sprite, relative_position * block_size);
+        }
+      }
     }
   }
 
