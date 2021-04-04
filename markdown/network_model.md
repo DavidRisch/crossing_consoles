@@ -1,4 +1,4 @@
-@page network-model Network Model
+\page network-model Network Model
 
 | Layer  | Functionality
 | :-------------: | :---------- |

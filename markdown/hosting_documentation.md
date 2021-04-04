@@ -1,4 +1,5 @@
-\page host-docs Hosting the Documentation This page contains instruction for hosting the Doxygen documentation.
+\page host-docs Hosting the Documentation
+This page contains instruction for hosting the Doxygen documentation.
 
 ## Building
 

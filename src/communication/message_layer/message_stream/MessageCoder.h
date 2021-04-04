@@ -44,7 +44,7 @@ class MessageCoder {
   };
 
   /**
-   * \brief Thrown if flags or CRC value are incorrect.
+   * \brief Thrown if the structure of the message is invalid (e.g. a flag at the wrong place)
    */
   class InvalidMessageException : public DecodeFailedException {
    private:

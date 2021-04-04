@@ -16,7 +16,7 @@ namespace game {
 enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' ', Y = 'y' };
 
 /**
- * \brief Client to handle game logic and connection to GameServer.
+ * \brief Handles keyboard input and connection to GameServer.
  */
 class GameClient {
  public:

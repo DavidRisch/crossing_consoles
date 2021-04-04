@@ -1,4 +1,5 @@
-\page game-definitions Game Definitions Collection of decisions and conventions implemented in the game.
+\page game-definitions Game Definitions
+Collection of decisions and conventions implemented in the game.
 
 ## Player
 
