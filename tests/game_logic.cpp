@@ -53,6 +53,7 @@ TEST_F(GamePlay, ProjectileHitsPlayer) {
   }
 
   ASSERT_TRUE(player_second->health < player_second->max_health);
+  ASSERT_TRUE(player_first->GetScore() > 0);
   ASSERT_TRUE(world->GetProjectiles().empty());
   reset_elements();
 }
@@ -131,5 +132,36 @@ TEST_F(GamePlay, PlayerMovesIntoProjectile) {
   ASSERT_TRUE(world->GetProjectiles().empty());
   ASSERT_TRUE(player_second->health < player_second->max_health);
 
+  reset_elements();
+}
+
+TEST_F(GamePlay, PlayerHitByOwnProjectile) {
+  // Projectile hits its shooter and decreases their health but not their score
+
+  uint8_t range = 10;  // range must be at least 1 in order to hit player
+  int damage = 2;      // any damage is possible
+
+  initialize_game();
+  add_player();
+
+  uint8_t player_score = 5;
+  player_first->IncreaseScore(5);
+
+  player_first->direction = GameDefinition::Direction::WEST;
+  spawn_projectile(range, damage, player_first->direction, player_first->player_id, player_first->position);
+
+  move_player(player_first, game::networking::ChangeType::MOVE_LEFT, 2);
+
+  // Move projectile
+  for (int i = 0; i < range; i++) {
+    GameLogic::HandleProjectiles(*world);
+    if (world->GetProjectiles().empty()) {
+      break;
+    }
+  }
+
+  ASSERT_TRUE(player_first->health < player_first->max_health);
+  ASSERT_EQ(player_first->GetScore(), player_score);
+  ASSERT_TRUE(world->GetProjectiles().empty());
   reset_elements();
 }

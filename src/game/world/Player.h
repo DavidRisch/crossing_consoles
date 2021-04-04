@@ -17,7 +17,6 @@ namespace game::world {
 class Player : public networking::ISerializable {
  public:
   std::string name;
-  int score = 0;
   common::Position position;
   GameDefinition::Direction direction = GameDefinition::NORTH;
   static constexpr int max_health = 8;
@@ -41,6 +40,13 @@ class Player : public networking::ISerializable {
 
   static Player Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 
+  uint8_t GetScore() const;
+
+  /**
+   * \brief Increase player's score by given `points`.
+   */
+  void IncreaseScore(uint8_t points);
+
   GameDefinition::player_id_t player_id;
 
   /**
@@ -50,6 +56,7 @@ class Player : public networking::ISerializable {
 
  private:
   std::optional<Weapon> weapon;
+  uint8_t score = 0;
 };
 
 }  // namespace game::world

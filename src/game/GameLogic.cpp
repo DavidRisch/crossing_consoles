@@ -180,7 +180,13 @@ void GameLogic::HandleProjectiles(World &world) {
           std::find_if(world.players.begin(), world.players.end(),
                        [&position](const std::shared_ptr<Player> &player) { return player->position == position; });
       if (shot_player_it != world.players.end()) {
-        shot_player_it->get()->DecreaseHealth(projectile->GetDamage());
+        (*shot_player_it)->DecreaseHealth(projectile->GetDamage());
+
+        // Increase score of shooter
+        auto shooter = world.GetPlayerById(projectile->GetShooterId());
+        if (shooter != nullptr && (*shot_player_it)->player_id != projectile->GetShooterId()) {
+          shooter->IncreaseScore(1);  // arbitrarily chosen number of points -> TODO associate with weapon
+        }
       }
       continue;
     }

@@ -73,3 +73,11 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
 std::optional<Weapon> Player::GetWeapon() {
   return weapon;
 }
+
+uint8_t Player::GetScore() const {
+  return score;
+}
+
+void Player::IncreaseScore(uint8_t points) {
+  score += points;
+}
