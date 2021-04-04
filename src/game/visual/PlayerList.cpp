@@ -176,7 +176,7 @@ game::visual::ColoredCharMatrix PlayerList::Column::RenderTitle() const {
 
 // Subclass Row:
 
-PlayerList::Row::Row(std::string name, int player_health, uint8_t player_score, double packet_loss_percentage,
+PlayerList::Row::Row(std::string name, int player_health, uint16_t player_score, double packet_loss_percentage,
                      std::optional<std::chrono::microseconds> ping)
     : player_name(std::move(name))
     , player_health(player_health)

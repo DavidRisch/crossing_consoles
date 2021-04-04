@@ -74,10 +74,10 @@ std::optional<Weapon> Player::GetWeapon() {
   return weapon;
 }
 
-uint8_t Player::GetScore() const {
+uint16_t Player::GetScore() const {
   return score;
 }
 
-void Player::IncreaseScore(uint8_t points) {
+void Player::IncreaseScore(uint16_t points) {
   score += points;
 }

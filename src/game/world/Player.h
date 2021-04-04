@@ -40,12 +40,12 @@ class Player : public networking::ISerializable {
 
   static Player Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 
-  uint8_t GetScore() const;
+  [[nodiscard]] uint16_t GetScore() const;
 
   /**
    * \brief Increase player's score by given `points`.
    */
-  void IncreaseScore(uint8_t points);
+  void IncreaseScore(uint16_t points);
 
   GameDefinition::player_id_t player_id;
 
@@ -56,7 +56,7 @@ class Player : public networking::ISerializable {
 
  private:
   std::optional<Weapon> weapon;
-  uint8_t score = 0;
+  uint16_t score = 0;
 };
 
 }  // namespace game::world
