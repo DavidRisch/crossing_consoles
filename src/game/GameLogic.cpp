@@ -91,6 +91,7 @@ void GameLogic::HandleChange(world::Player &player, const Change &change, world:
       throw std::runtime_error("Unexpected ChangeType");
   }
 }
+
 void GameLogic::UseWeapon(Player &player, World &world) {
   auto weapon = player.GetWeapon();
   if (!weapon.has_value()) {

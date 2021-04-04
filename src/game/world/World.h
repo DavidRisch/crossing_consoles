@@ -26,7 +26,9 @@ class World : public networking::ISerializable {
   explicit World(common::coordinate_size_t size);
 
   void AddPlayer(const std::shared_ptr<Player>& player);
+
   void AddWall(const common::Position& position);
+
   void AddProjectile(const std::shared_ptr<Projectile>& projectile);
 
   std::list<std::shared_ptr<Projectile>> GetProjectiles();

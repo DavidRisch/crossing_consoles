@@ -29,13 +29,19 @@ class Projectile : public networking::ISerializable {
    * \brief Returns Id of player that spawned the projectile.
    */
   [[nodiscard]] GameDefinition::player_id_t GetShooterId() const;
+
   [[nodiscard]] common::Position GetPosition() const;
+
   [[nodiscard]] GameDefinition::Direction GetDirection() const;
+
   [[nodiscard]] uint8_t GetRange() const;
+
   [[nodiscard]] int GetDamage() const;
+
   void SetPosition(common::Position new_position, GameDefinition::Direction new_direction);
 
   void Serialize(std::vector<uint8_t>& output_vector) const override;
+
   static Projectile Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 
  private:

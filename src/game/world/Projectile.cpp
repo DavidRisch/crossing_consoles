@@ -27,9 +27,11 @@ void Projectile::DecreaseRange() {
     range = 0;
   }
 }
+
 int Projectile::GetDamage() const {
   return damage;
 }
+
 GameDefinition::player_id_t Projectile::GetShooterId() const {
   return shooter_id;
 }
@@ -41,6 +43,7 @@ common::Position Projectile::GetPosition() const {
 GameDefinition::Direction Projectile::GetDirection() const {
   return direction;
 }
+
 void Projectile::Serialize(std::vector<uint8_t>& output_vector) const {
   SerializationUtils::SerializeObject(range, output_vector);
   SerializationUtils::SerializeObject(damage, output_vector);
@@ -59,6 +62,7 @@ Projectile Projectile::Deserialize(std::vector<uint8_t>::iterator& input_iterato
   return Projectile(deserialized_range, deserialized_damage, deserialized_id, deserialized_position,
                     deserialized_direction);
 }
+
 void Projectile::SetPosition(common::Position new_position, GameDefinition::Direction new_direction) {
   position = std::move(new_position);
   direction = new_direction;

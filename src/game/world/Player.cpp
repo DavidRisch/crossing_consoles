@@ -26,6 +26,7 @@ void Player::MoveTo(const Position &new_position) {
   position = new_position;
   updated = true;
 }
+
 void Player::DecreaseHealth(int damage) {
   health -= damage;
 }
