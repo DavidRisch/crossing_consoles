@@ -1,11 +1,11 @@
 \page game-definitions Game Definitions
 Collection of decisions and conventions implemented in the game.
 
-## Player
+# Player
 
 Each player can choose their displayed color in the console and set a name at the start of the game.
 
-### Controls
+## Controls
 
 The player's movement is controlled by the following keys:
 
@@ -15,19 +15,19 @@ The player's movement is controlled by the following keys:
 * `D` Move player 1 field to the right
 * `ESC` Closes the game
 
-### Scoring
+## Scoring
 
 Not set up yet.
 
-## World
+# World
 
-### Rules
+## Rules
 
 * Players can not walk through walls.
 * Players can not walk through other players.
 * Players are spawned randomly in the world.
 
-### Coordinate System
+## Coordinate System
 
 The world's coordinate system is orientated as follows:
 

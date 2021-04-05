@@ -107,7 +107,7 @@ void ConnectionManager::ReceiveMessages() {
 
     auto current_time = std::chrono::steady_clock::now();
     if (current_time - connection_entry.second.timestamp_last_received >= timeout) {
-      DEBUG_CONNECTION_LAYER(std::cout << "(" << connection.get() << ") Timout (ConnectionManager)\n")
+      DEBUG_CONNECTION_LAYER(std::cout << "(" << connection.get() << ") Timeout (ConnectionManager)\n")
       connection_remove_list.push_back(partner_id);
 
     } else if (current_time - connection_entry.second.timestamp_last_received >= keep_alive_interval) {

@@ -2,5 +2,6 @@
 
 * \subpage network-model
 * \subpage message-structure
-* \subpage communication-establishment
+* \subpage connection-establishment
+* \subpage connection-states
 * \subpage close-connection
