@@ -41,7 +41,7 @@ ColoredCharMatrix Compositor::CompositeViewport() const {
 
   // set line containing various information about the game
   composited_viewport.SetChar(box_drawings_double_vertical, Position(0, 1), BRIGHT_BLACK);
-  std::wstring information = L" SCORE";
+  std::wstring information = L" SCORE " + std::to_wstring(player->GetScore());
   composited_viewport.SetString(information, Position(1, 1), BRIGHT_BLACK);
   composited_viewport.InsertMatrix(HealthDisplay::Render(player->health),
                                    Position(composited_viewport.GetSize().x - HealthDisplay::width - 2, 1));

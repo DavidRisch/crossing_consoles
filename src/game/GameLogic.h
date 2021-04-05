@@ -17,6 +17,9 @@ class GameLogic {
    */
   static void HandleChange(world::Player &player, const networking::Change &change, world::World &world);
 
+  /**
+   * \brief Handle `Projectile`s movement and collision with `Player`s or `Wall`s in `World`.
+   */
   static void HandleProjectiles(world::World &world);
 
  private:
@@ -49,8 +52,19 @@ class GameLogic {
   static common::Position PositionFromMovement(const common::Position &position,
                                                const common::coordinate_distance_t &movement, world::World &world);
 
+  /**
+   * \brief Checks each `Projectile` pair in `projectile_pairs` for collisions.
+   * \details Returns list of collided projectiles that need to be removed from 'World'
+   */
   static std::list<std::shared_ptr<Projectile>> HandleProjectileCollision(
-      const std::list<std::pair<std::shared_ptr<Projectile>, std::shared_ptr<Projectile>>> &projectiles);
+      const std::list<std::pair<std::shared_ptr<Projectile>, std::shared_ptr<Projectile>>> &projectile_pairs);
+
+  /**
+   * \brief Handle collision of a `Projectile` collision with a `Player`.
+   * \details Check if a player is shot. If the shot player is alive, their health is decreased, the projectile removed
+   * and the shooter's score increased.
+   */
+  static bool HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> &projectiles, world::World &world);
 };
 
 }  // namespace game
