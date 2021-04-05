@@ -67,6 +67,12 @@ void GameLogic::MovePlayer(world::Player &player, const coordinate_distance_t &m
 }
 
 void GameLogic::HandleChange(world::Player &player, const Change &change, world::World &world) {
+
+  if (!player.IsAlive()) {
+    // if player is not alive, no changes are allowed
+    return;
+  }
+
   switch (change.GetChangeType()) {
     case ChangeType::MOVE_UP: {
       MovePlayer(player, coordinate_distance_t(0, -1), world);
@@ -172,14 +178,17 @@ void GameLogic::HandleProjectiles(World &world) {
     auto position = projectile->GetPosition();
 
     if (world.IsBlocked(position)) {
-      // projectile hit wall or player
-      destroy_projectile_list.push_back(projectile);
-
       // If a player caused collision, decrease health of player and remove projectile
       auto shot_player_it =
           std::find_if(world.players.begin(), world.players.end(),
                        [&position](const std::shared_ptr<Player> &player) { return player->position == position; });
       if (shot_player_it != world.players.end()) {
+        // check that shot player is still alive, otherwise no health or score changes are applied
+        // if player is not alive, no changes are allowed
+        if (!(*shot_player_it)->IsAlive()) {
+          continue;
+        }
+
         (*shot_player_it)->DecreaseHealth(projectile->GetDamage());
 
         // Increase score of shooter
@@ -188,6 +197,9 @@ void GameLogic::HandleProjectiles(World &world) {
           shooter->IncreaseScore(1);  // arbitrarily chosen number of points -> TODO associate with weapon
         }
       }
+
+      // projectile hit wall or a player that is still alive
+      destroy_projectile_list.push_back(projectile);
       continue;
     }
 

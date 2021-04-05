@@ -165,3 +165,64 @@ TEST_F(GamePlay, PlayerHitByOwnProjectile) {
   ASSERT_TRUE(world->GetProjectiles().empty());
   reset_elements();
 }
+
+TEST_F(GamePlay, ProjectileHitsDeadPlayer) {
+  // Projectile hits dead player, no consequences occur
+
+  uint8_t range = 10;  // range must be at least 1 in order to reach player
+  int damage = 34;     // any damage is possible
+
+  initialize_game();
+  add_player();
+
+  auto initial_score_player_first = player_first->GetScore();
+
+  player_first->direction = GameDefinition::Direction::WEST;
+  player_second->position.x = player_first->position.x;
+  player_second->position.y = player_first->position.y;
+
+  move_player(player_second, game::networking::ChangeType::MOVE_LEFT, 2);
+
+  // Kill player_second
+  player_second->DecreaseHealth(player_second->max_health);
+  EXPECT_FALSE(player_second->IsAlive());
+
+  spawn_projectile(range, damage, player_first->direction, player_first->player_id, player_first->position);
+
+  // Move projectile
+  for (int i = 0; i < range; i++) {
+    GameLogic::HandleProjectiles(*world);
+    ASSERT_FALSE(world->GetProjectiles().empty());
+  }
+
+  ASSERT_EQ(player_first->GetScore(), initial_score_player_first);
+  reset_elements();
+}
+
+TEST_F(GamePlay, DeadPlayerNoChange) {
+  // Dead player invokes changes, nothing happens
+
+  initialize_game();
+  add_player();
+
+  // Kill player_first
+  player_first->DecreaseHealth(player_first->max_health);
+  EXPECT_FALSE(player_first->IsAlive());
+
+  auto initial_position = player_first->position;
+
+  // try to move in any direction
+  move_player(player_first, game::networking::ChangeType::MOVE_LEFT, 2);
+  move_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
+  move_player(player_first, game::networking::ChangeType::MOVE_DOWN, 7);
+  move_player(player_first, game::networking::ChangeType::MOVE_UP, 10);
+
+  ASSERT_EQ(player_first->position, initial_position);
+
+  game::networking::Change item_change(game::networking::ChangeType::USE_ITEM);
+  GameLogic::HandleChange(*player_first, item_change, *world);
+
+  ASSERT_TRUE(world->GetProjectiles().empty());
+
+  reset_elements();
+}
