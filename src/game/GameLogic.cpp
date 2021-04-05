@@ -179,8 +179,8 @@ void GameLogic::HandleProjectiles(World &world) {
     if (world.IsBlocked(position)) {
       // Projectile hit wall or player
 
-      auto collided_projectile = HandleProjectileCollisionWithPlayer(projectile, world);
-      if (collided_projectile.has_value()) {
+      auto projectile_collided = HandleProjectileCollisionWithPlayer(projectile, world);
+      if (projectile_collided) {
         destroy_projectile_list.push_back(projectile);
         continue;
       }
@@ -200,8 +200,7 @@ void GameLogic::HandleProjectiles(World &world) {
   world.RemoveProjectiles(destroy_projectile_list);
 }
 
-std::optional<std::shared_ptr<Projectile>> GameLogic::HandleProjectileCollisionWithPlayer(
-    std::shared_ptr<Projectile> &projectile, World &world) {
+bool GameLogic::HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> &projectile, World &world) {
   // If a player caused collision, decrease health of player and remove projectile
 
   auto position = projectile->GetPosition();
@@ -213,7 +212,7 @@ std::optional<std::shared_ptr<Projectile>> GameLogic::HandleProjectileCollisionW
     // Check that shot player is still alive, otherwise no health or score changes are applied
 
     if (!(*shot_player_it)->IsAlive()) {
-      return std::optional<std::shared_ptr<Projectile>>();
+      return false;
     }
 
     // Increase score of shooter and decrease health of shot player
@@ -226,5 +225,5 @@ std::optional<std::shared_ptr<Projectile>> GameLogic::HandleProjectileCollisionW
     }
   }
 
-  return projectile;
+  return true;
 }

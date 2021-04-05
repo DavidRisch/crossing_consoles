@@ -63,8 +63,7 @@ class GameLogic {
    * \details Check if a player is shot. If the shot player is alive, their health is decreased, the projectile removed
    * and the shooter's score increased.
    */
-  static std::optional<std::shared_ptr<Projectile>> HandleProjectileCollisionWithPlayer(
-      std::shared_ptr<Projectile> &projectiles, world::World &world);
+  static bool HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> &projectiles, world::World &world);
 };
 
 }  // namespace game
