@@ -53,6 +53,7 @@ TEST_F(GamePlay, ProjectileHitsPlayer) {
   }
 
   ASSERT_TRUE(player_second->health < player_second->max_health);
+  ASSERT_EQ(player_second->health, player_second->max_health - damage);
   ASSERT_TRUE(player_first->GetScore() > 0);
   ASSERT_TRUE(world->GetProjectiles().empty());
   reset_elements();

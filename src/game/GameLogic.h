@@ -53,13 +53,14 @@ class GameLogic {
                                                const common::coordinate_distance_t &movement, world::World &world);
 
   /**
-   * \brief Handle collision of two 'Projectile`s.
+   * \brief Checks each `Projectile` pair in `projectile_pairs` for collisions.
+   * \details Returns list of collided projectiles that need to be removed from 'World'
    */
   static std::list<std::shared_ptr<Projectile>> HandleProjectileCollision(
-      const std::list<std::pair<std::shared_ptr<Projectile>, std::shared_ptr<Projectile>>> &projectiles);
+      const std::list<std::pair<std::shared_ptr<Projectile>, std::shared_ptr<Projectile>>> &projectile_pairs);
 
   /**
-   * \brief Handle collision of a `Projectile collision with a `Player`.
+   * \brief Handle collision of a `Projectile` collision with a `Player`.
    * \details Check if a player is shot. If the shot player is alive, their health is decreased, the projectile removed
    * and the shooter's score increased.
    */

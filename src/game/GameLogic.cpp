@@ -118,42 +118,43 @@ void GameLogic::MoveProjectile(Projectile &projectile, World &world) {
 }
 
 std::list<std::shared_ptr<Projectile>> GameLogic::HandleProjectileCollision(
-    const std::list<std::pair<std::shared_ptr<Projectile>, std::shared_ptr<Projectile>>> &projectiles) {
+    const std::list<std::pair<std::shared_ptr<Projectile>, std::shared_ptr<Projectile>>> &projectile_pairs) {
   std::list<std::shared_ptr<Projectile>> destroy_projectile_list;
   std::list<std::shared_ptr<Projectile>> merge_projectile_list;
 
-  for (auto &projectile : projectiles) {
-    if (projectile.first->GetPosition() == projectile.second->GetPosition()) {
+  for (auto &projectile_pair : projectile_pairs) {
+    if (projectile_pair.first->GetPosition() == projectile_pair.second->GetPosition()) {
       // projectiles are at the same position after both movements
 
-      if (projectile.first->GetDirection() == projectile.second->GetDirection()) {
-        // projectiles have been shot multiple times in a row -> merge to one projectile
-        assert(projectile.first->GetShooterId() == projectile.second->GetShooterId());
-        assert(projectile.first->GetRange() == projectile.second->GetRange());
+      if (projectile_pair.first->GetDirection() == projectile_pair.second->GetDirection()) {
+        // projectiles have been shot multiple times in a row -> merge to one projectile_pair
+        assert(projectile_pair.first->GetShooterId() == projectile_pair.second->GetShooterId());
+        assert(projectile_pair.first->GetRange() == projectile_pair.second->GetRange());
 
         auto merge_projectile_it =
             std::find_if(merge_projectile_list.begin(), merge_projectile_list.end(),
-                         [&projectile](const std::shared_ptr<Projectile> &merge_projectile) {
-                           return merge_projectile->GetPosition() == projectile.second->GetPosition();
+                         [&projectile_pair](const std::shared_ptr<Projectile> &merge_projectile) {
+                           return merge_projectile->GetPosition() == projectile_pair.second->GetPosition();
                          });
 
         if (merge_projectile_it == merge_projectile_list.end()) {
-          destroy_projectile_list.push_back(projectile.second);
-          merge_projectile_list.push_back(projectile.first);
+          destroy_projectile_list.push_back(projectile_pair.second);
+          merge_projectile_list.push_back(projectile_pair.first);
           continue;
         }
       }
 
       // Remove collided projectiles
-      destroy_projectile_list.push_back(projectile.first);
-      destroy_projectile_list.push_back(projectile.second);
+      destroy_projectile_list.push_back(projectile_pair.first);
+      destroy_projectile_list.push_back(projectile_pair.second);
 
     } else {
       // Handle edge case: two projectiles with opposite directions passed each other
       // o-> <-o passed to <-o->
-      auto opposite_direction = GameLogic::map_direction_to_opposite_direction.find(projectile.second->GetDirection());
-      if (projectile.first->GetDirection() == opposite_direction->second) {
-        destroy_projectile_list.push_back(projectile.first);
+      auto opposite_direction =
+          GameLogic::map_direction_to_opposite_direction.find(projectile_pair.second->GetDirection());
+      if (projectile_pair.first->GetDirection() == opposite_direction->second) {
+        destroy_projectile_list.push_back(projectile_pair.first);
       }
     }
   }
@@ -210,16 +211,16 @@ bool GameLogic::HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> 
 
   if (shot_player_it != world.players.end()) {
     // Check that shot player is still alive, otherwise no health or score changes are applied
-
-    if (!(*shot_player_it)->IsAlive()) {
+    Player &hit_player = **shot_player_it;
+    if (!hit_player.IsAlive()) {
       return false;
     }
 
     // Increase score of shooter and decrease health of shot player
-    (*shot_player_it)->DecreaseHealth(projectile->GetDamage());
+    hit_player.DecreaseHealth(projectile->GetDamage());
 
     auto shooter = world.GetPlayerById(projectile->GetShooterId());
-    if (shooter != nullptr && (*shot_player_it)->player_id != projectile->GetShooterId()) {
+    if (shooter != nullptr && hit_player.player_id != projectile->GetShooterId()) {
       // If shooter is hit by own projectile, score is not increased!
       shooter->IncreaseScore(1);  // arbitrarily chosen number of points -> TODO associate with weapon?
     }
