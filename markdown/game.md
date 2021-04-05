@@ -1,4 +1,4 @@
 \page game Game
 
-* \subpage gameplay-rules
-* \subpage game-definitions
+* \subpage game-player-controls
+* \subpage game-world-rules
