@@ -6,4 +6,3 @@
 * \subpage connection-establishment
 * \subpage connection-states
 * \subpage close-connection
-* \subpage events
