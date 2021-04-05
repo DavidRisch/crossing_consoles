@@ -67,9 +67,8 @@ void GameLogic::MovePlayer(world::Player &player, const coordinate_distance_t &m
 }
 
 void GameLogic::HandleChange(world::Player &player, const Change &change, world::World &world) {
-
   if (!player.IsAlive()) {
-    // if player is not alive, no changes are allowed
+    // If player is not alive, no changes are allowed
     return;
   }
 
@@ -150,7 +149,7 @@ std::list<std::shared_ptr<Projectile>> GameLogic::HandleProjectileCollision(
       destroy_projectile_list.push_back(projectile.second);
 
     } else {
-      // handle edge case: two projectiles with opposite directions passed each other
+      // Handle edge case: two projectiles with opposite directions passed each other
       // o-> <-o passed to <-o->
       auto opposite_direction = GameLogic::map_direction_to_opposite_direction.find(projectile.second->GetDirection());
       if (projectile.first->GetDirection() == opposite_direction->second) {
@@ -178,29 +177,13 @@ void GameLogic::HandleProjectiles(World &world) {
     auto position = projectile->GetPosition();
 
     if (world.IsBlocked(position)) {
-      // If a player caused collision, decrease health of player and remove projectile
-      auto shot_player_it =
-          std::find_if(world.players.begin(), world.players.end(),
-                       [&position](const std::shared_ptr<Player> &player) { return player->position == position; });
-      if (shot_player_it != world.players.end()) {
-        // check that shot player is still alive, otherwise no health or score changes are applied
-        // if player is not alive, no changes are allowed
-        if (!(*shot_player_it)->IsAlive()) {
-          continue;
-        }
+      // Projectile hit wall or player
 
-        (*shot_player_it)->DecreaseHealth(projectile->GetDamage());
-
-        // Increase score of shooter
-        auto shooter = world.GetPlayerById(projectile->GetShooterId());
-        if (shooter != nullptr && (*shot_player_it)->player_id != projectile->GetShooterId()) {
-          shooter->IncreaseScore(1);  // arbitrarily chosen number of points -> TODO associate with weapon
-        }
+      auto collided_projectile = HandleProjectileCollisionWithPlayer(projectile, world);
+      if (collided_projectile.has_value()) {
+        destroy_projectile_list.push_back(projectile);
+        continue;
       }
-
-      // projectile hit wall or a player that is still alive
-      destroy_projectile_list.push_back(projectile);
-      continue;
     }
 
     // Search for hit with other projectiles and add to collision list for handling
@@ -215,4 +198,33 @@ void GameLogic::HandleProjectiles(World &world) {
 
   world.RemoveProjectiles(HandleProjectileCollision(projectile_collision_list));
   world.RemoveProjectiles(destroy_projectile_list);
+}
+
+std::optional<std::shared_ptr<Projectile>> GameLogic::HandleProjectileCollisionWithPlayer(
+    std::shared_ptr<Projectile> &projectile, World &world) {
+  // If a player caused collision, decrease health of player and remove projectile
+
+  auto position = projectile->GetPosition();
+  auto shot_player_it =
+      std::find_if(world.players.begin(), world.players.end(),
+                   [&position](const std::shared_ptr<Player> &player) { return player->position == position; });
+
+  if (shot_player_it != world.players.end()) {
+    // Check that shot player is still alive, otherwise no health or score changes are applied
+
+    if (!(*shot_player_it)->IsAlive()) {
+      return std::optional<std::shared_ptr<Projectile>>();
+    }
+
+    // Increase score of shooter and decrease health of shot player
+    (*shot_player_it)->DecreaseHealth(projectile->GetDamage());
+
+    auto shooter = world.GetPlayerById(projectile->GetShooterId());
+    if (shooter != nullptr && (*shot_player_it)->player_id != projectile->GetShooterId()) {
+      // If shooter is hit by own projectile, score is not increased!
+      shooter->IncreaseScore(1);  // arbitrarily chosen number of points -> TODO associate with weapon?
+    }
+  }
+
+  return projectile;
 }
