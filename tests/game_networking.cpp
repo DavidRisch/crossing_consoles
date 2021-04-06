@@ -314,6 +314,7 @@ TEST_F(GameNetworking, PlayerDies) {
     EXPECT_EQ(second_player->score, old_second.score + 1);
 
     std::this_thread::sleep_for(GameDefinition::respawn_time);
+    wait_for_renderer();
 
     ASSERT_TRUE(first_player->IsAlive());
     ASSERT_EQ(first_player->health, Player::max_health);

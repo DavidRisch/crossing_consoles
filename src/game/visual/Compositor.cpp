@@ -54,6 +54,14 @@ ColoredCharMatrix Compositor::CompositeViewport() const {
                                       box_drawings_double_vertical_and_left;
   composited_viewport.SetString(frame_separator_line, Position(0, 2), BRIGHT_BLACK);
 
+  // Set respawn notice
+  if (!player->IsAlive()) {
+    std::wstring respawn_notice = L" YOU ARE DEAD! WAIT FOR RESPAWN... ";
+    auto position_x = composited_viewport.GetSize().x / 2 - respawn_notice.size() / 2;
+    auto position_y = composited_viewport.GetSize().y / 2;
+    composited_viewport.SetString(respawn_notice, Position(position_x, position_y), BRIGHT_MAGENTA);
+  }
+
   // set frame sides
   for (int y = rendered_viewport_offset.y; y < block_count.y + composited_viewport_overhang.y; y++) {
     composited_viewport.SetChar(box_drawings_double_vertical, Position(0, y), BRIGHT_BLACK);
