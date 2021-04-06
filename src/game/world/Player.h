@@ -18,7 +18,9 @@ class Player : public networking::ISerializable {
  public:
   std::string name;
   common::Position position;
+  GameDefinition::player_id_t player_id;
   GameDefinition::Direction direction;
+
   static constexpr int max_health = 8;
   int health = max_health;
   bool updated = false;
@@ -47,8 +49,6 @@ class Player : public networking::ISerializable {
    * \brief Increase player's score by given `points`.
    */
   void IncreaseScore(uint16_t points);
-
-  GameDefinition::player_id_t player_id;
 
   /**
    * \brief Returns the player's `Weapon'
