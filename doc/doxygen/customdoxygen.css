@@ -165,7 +165,7 @@ dl.el {
 
 /* code blocks */
 pre.fragment {
-        background-color: #F5F5F5;
+        background-color: #D9D9DB;
         padding: 4px 6px;
         margin: 4px 8px 4px 2px;
         overflow: auto;
@@ -173,7 +173,7 @@ pre.fragment {
         font-size:  9pt;
         line-height: 125%;
         font-family: monospace, fixed;
-        font-size: 105%;
+        font-size: 95%;
 }
 
 div.fragment {
@@ -1596,7 +1596,12 @@ th.markdownTableHeadCenter, td.markdownTableBodyCenter {
 /* inline code style*/
 code
 {
-	background-color: #F5F5F5;
+	background-color: #d9d9db;
+	border: 1px solid #d9d9db;
+	border-radius: 5px;
+	font-size: 90%;
+	padding-left: 2px;
+	padding-right: 2px;
 
 }
 
