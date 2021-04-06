@@ -35,10 +35,6 @@ Message::Message(ProtocolDefinition::sequence_t sequence)
   meta_data = MessageMetaData();
 }
 
-MessageType Message::GetMessageType() const {
-  throw std::logic_error("Not implemented");
-}
-
 MessageMetaData Message::GetMessageMetaData() const {
   return meta_data;
 }
