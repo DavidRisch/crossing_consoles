@@ -1,6 +1,6 @@
-\page developer-guide Developer Guide 
+\page developer-guide Developer Guide
 
-# Naming conventions 
+# Naming conventions
 
 ## Code
 

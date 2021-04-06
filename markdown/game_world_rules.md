@@ -17,16 +17,19 @@ Collection of decisions and conventions implemented in the game.
 * The direction can be changed by "moving" in one of the four directions. *(not implemented yet!)*
 
 ### Health
+
 * If a player's health is zero, the player is dead.
 * Dead players will be respawned after a certain amount of time *(not implemented yet!)*
 
 * A player's health has a fixed upper limit (e.g. 100).
 
-###  Score
+### Score
+
 * Points can be obtained by hitting **other** players.
 * Maximal score limit is 2^16 points.
 
-### Fight 
+### Fight
+
 * The player attacks into the direction they are currently facing.
 * The inflicted damage depends on the player's weapon.
 * If projectiles collide, they are removed from the world.
