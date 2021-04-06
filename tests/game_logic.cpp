@@ -230,3 +230,24 @@ TEST_F(GamePlay, DeadPlayerNoChange) {
 
   reset_elements();
 }
+
+TEST_F(GamePlay, PlayerChangesDirection) {
+  // Direction of player is changed by player's movement
+
+  initialize_game();
+  add_player();
+
+  move_player(player_first, game::networking::ChangeType::MOVE_DOWN, 4);
+  ASSERT_EQ(player_first->direction, GameDefinition::Direction::SOUTH);
+
+  move_player(player_first, game::networking::ChangeType::MOVE_LEFT, 2);
+  ASSERT_EQ(player_first->direction, GameDefinition::Direction::WEST);
+
+  move_player(player_first, game::networking::ChangeType::MOVE_UP, 7);
+  ASSERT_EQ(player_first->direction, GameDefinition::Direction::NORTH);
+
+  move_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
+  ASSERT_EQ(player_first->direction, GameDefinition::Direction::EAST);
+
+  reset_elements();
+}
