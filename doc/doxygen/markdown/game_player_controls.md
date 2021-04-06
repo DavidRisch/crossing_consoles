@@ -13,7 +13,7 @@ The player's movement is controlled by the following keys:
 * `A` Move player 1 field to the left
 * `S` Move player 1 field down
 * `D` Move player 1 field to the right
-* `SPACE` Use current item *(standard item: weapon)*
+* `SPACE` Use current item <i>(standard item: weapon)</i>
 * `ESC` Closes the game
 
 Press `Y` to show every player's score, health, package loss and ping in-game.
