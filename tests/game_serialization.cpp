@@ -40,6 +40,11 @@ TEST(GameSerialization, Wall) {
 
   auto deserialized = serialize_and_deserialize(original);
 
+  EXPECT_EQ(original.position.x, deserialized.position.x);
+  EXPECT_EQ(original.position.y, deserialized.position.y);
+  EXPECT_EQ(original.position, deserialized.position);
+  EXPECT_EQ(original.type, deserialized.type);
+
   EXPECT_TRUE(are_objects_identical(original, deserialized));
 }
 
