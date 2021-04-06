@@ -38,13 +38,11 @@ void GameServer::RunIteration() {
   if (std::chrono::steady_clock::now() - last_world_sent >= send_world_interval) {
     last_world_sent = std::chrono::steady_clock::now();
 
-    // copy communication statistics into the player objects which are sent to clients
     for (const auto &player : world->players) {
-      if (!player->IsAlive() &&
-          std::chrono::steady_clock::now() - player->time_of_death > GameDefinition::respawn_time) {
-        world->ResurrectPlayer(*player);
-      }
+      // Check if player needs to be respawned
+      GameLogic::HandlePlayerRespawn(*player, *world);
 
+      // copy communication statistics into the player objects which are sent to clients
       const auto &connection_statistics = server_manager->GetStatisticsFromPartnerConnection(player->player_id);
 
       player->packet_loss_percentage = connection_statistics.CalculatePackageLoss().package_loss_percentage;

@@ -71,6 +71,7 @@ void GameClient::Run() {
     if (world.updated || player->updated || updated) {
       if (!multiplayer) {
         GameLogic::HandleProjectiles(world);
+        GameLogic::HandlePlayerRespawn(*player, world);
       }
 
       updated = false;

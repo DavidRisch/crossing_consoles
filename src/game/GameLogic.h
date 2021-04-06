@@ -18,6 +18,11 @@ class GameLogic {
   static void HandleChange(world::Player &player, const networking::Change &change, world::World &world);
 
   /**
+   * \brief Handle respawn of dead `Player` in `World`.
+   */
+  static void HandlePlayerRespawn(world::Player &player, world::World &world);
+
+  /**
    * \brief Handle `Projectile`s movement and collision with `Player`s or `Wall`s in `World`.
    */
   static void HandleProjectiles(world::World &world);

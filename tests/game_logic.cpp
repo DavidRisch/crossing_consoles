@@ -273,9 +273,9 @@ TEST_F(GamePlay, PlayerDiesAndRespawns) {
   // Respawn player
   world->ResurrectPlayer(*player_first);
 
- ASSERT_TRUE(player_first->IsAlive());
- ASSERT_EQ(player_first->score, 0);
- ASSERT_EQ(player_first->health, Player::max_health);
+  ASSERT_TRUE(player_first->IsAlive());
+  ASSERT_EQ(player_first->score, 0);
+  ASSERT_EQ(player_first->health, Player::max_health);
 
   reset_elements();
 }

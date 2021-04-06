@@ -303,7 +303,6 @@ TEST_F(GameNetworking, PlayerDies) {
     mock_terminals.at(1)->AddInput((char)KeyCode::A);
     mock_terminals.at(1)->AddInput((char)KeyCode::SPACE);
 
-
     wait_a_few_iterations();
     wait_a_few_iterations();
     wait_a_few_iterations();
@@ -313,8 +312,6 @@ TEST_F(GameNetworking, PlayerDies) {
 
     EXPECT_FALSE(first_player->IsAlive());
     EXPECT_EQ(second_player->score, old_second.score + 1);
-
-
 
     std::this_thread::sleep_for(GameDefinition::respawn_time);
 

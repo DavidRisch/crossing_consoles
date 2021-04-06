@@ -237,3 +237,9 @@ void GameLogic::ApplyDamageToPlayer(Player &player, int damage) {
     player.Die();
   }
 }
+
+void GameLogic::HandlePlayerRespawn(Player &player, World &world) {
+  if (!player.IsAlive() && std::chrono::steady_clock::now() - player.time_of_death > GameDefinition::respawn_time) {
+    world.ResurrectPlayer(player);
+  }
+}
