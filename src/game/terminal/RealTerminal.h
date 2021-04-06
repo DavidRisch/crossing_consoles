@@ -5,6 +5,8 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#else
+#include <sys/ioctl.h>
 #endif
 
 #include "../visual/ColoredString.h"
@@ -36,7 +38,11 @@ class RealTerminal : public ITerminal {
   /**
    * \brief Clear terminal output.
    */
-  void Clear() const;
+  void Clear();
+
+#ifndef _WIN32
+  struct winsize terminal_size {};
+#endif
 };
 
 }  // namespace game::terminal
