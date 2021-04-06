@@ -129,6 +129,19 @@ std::list<std::shared_ptr<Projectile>> World::GetProjectiles() {
 }
 
 void World::AddProjectile(const std::shared_ptr<Projectile>& projectile) {
+  auto world_projectile_it = std::find_if(projectiles.begin(), projectiles.end(),
+                                          [&projectile](const std::shared_ptr<Projectile>& world_projectile) {
+                                            return world_projectile->GetPosition() == projectile->GetPosition();
+                                          });
+
+  if (world_projectile_it != projectiles.end()) {
+    if (projectile->GetDirection() == (*world_projectile_it)->GetDirection()) {
+      assert(projectile->GetShooterId() == (*world_projectile_it)->GetShooterId());
+      // Do not add multiple projectiles of same player with identical position to world
+      return;
+    }
+  }
+
   projectiles.push_back(projectile);
   updated = true;
 }

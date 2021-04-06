@@ -13,6 +13,7 @@ const std::unordered_map<const GameDefinition::Direction, common::Position> Game
 };
 
 void GamePlay::initialize_game() {
+  reset_elements();
   world = std::make_shared<world::World>(world::World(common::coordinate_size_t(21, 21)));
 }
 
@@ -43,13 +44,13 @@ void GamePlay::move_player(std::shared_ptr<world::Player>& player, game::network
 void GamePlay::projectile_collision(GameDefinition::Direction direction_first,
                                     GameDefinition::Direction direction_second) {
   spawn_projectile(10, 1, direction_first, 1, map_direction_to_position.find(direction_first)->second);
-  spawn_projectile(10, 1, direction_second, 2, map_direction_to_position.find(direction_second)->second);
+  spawn_projectile(1, 1, direction_second, 2, map_direction_to_position.find(direction_second)->second);
   GameLogic::HandleProjectiles(*world);
   EXPECT_TRUE(world->GetProjectiles().empty());
 }
 
 void GamePlay::reset_elements() {
-  world = std::shared_ptr<world::World>();
-  player_first = std::shared_ptr<world::Player>();
-  player_second = std::shared_ptr<world::Player>();
+  world.reset();
+  player_first.reset();
+  player_second.reset();
 }

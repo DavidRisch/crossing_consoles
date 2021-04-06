@@ -42,6 +42,7 @@ TEST_F(GamePlay, ProjectileHitsPlayer) {
   player_second->position.y = player_first->position.y;
 
   spawn_projectile(range, damage, player_first->direction, player_first->player_id, player_first->position);
+  ASSERT_FALSE(world->GetProjectiles().empty());
   move_player(player_second, game::networking::ChangeType::MOVE_LEFT, 2);
 
   // Move projectile
@@ -97,19 +98,21 @@ TEST_F(GamePlay, MultipleProjectileSameShooter) {
   // Projectile at the same position with common shooter_id & direction are merged to one projectile
 
   initialize_game();
+  add_player();
 
   uint8_t range = 3;  // needs to be at least 1
   int damage = 3;     // arbitrarily chosen
   int number_of_bullets = 10;
 
   for (int i = 0; i < number_of_bullets; i++) {
-    spawn_projectile(range, damage);
+    spawn_projectile(range, damage, GamePlay::standard_direction, player_first->player_id, player_first->position);
+    spawn_projectile(range, damage, GamePlay::standard_direction, player_second->player_id, player_second->position);
   }
 
   GameLogic::HandleProjectiles(*world);
 
   EXPECT_FALSE(world->GetProjectiles().empty());
-  ASSERT_EQ(world->GetProjectiles().size(), 1);
+  ASSERT_EQ(world->GetProjectiles().size(), 2);
 
   reset_elements();
 }
