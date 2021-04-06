@@ -6,7 +6,6 @@ using namespace game;
 using namespace game::visual;
 using namespace game::common;
 using namespace game::world;
-using namespace game::terminal::colors;
 
 TEST(Renderer, EmptyWorld) {
   coordinate_size_t world_size = coordinate_size_t(101, 101);
@@ -22,7 +21,7 @@ TEST(Renderer, EmptyWorld) {
 
   for (const auto& i_lines : matrix) {
     for (const auto& i_characters : i_lines) {
-      EXPECT_EQ(i_characters, ColoredChar(L' ', WHITE, BLACK));
+      EXPECT_EQ(i_characters, ColoredChar(L' ', Color::WHITE, Color::BLACK));
     }
   }
 }

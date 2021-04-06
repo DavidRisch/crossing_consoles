@@ -14,13 +14,11 @@
 #include <codecvt>
 #include <locale>
 
-#include "colors.h"
 #endif
 
 using namespace game;
 using namespace game::terminal;
 using namespace game::visual;
-using namespace game::terminal::colors;
 
 std::string RealTerminal::title = "Crossing Consoles";
 
@@ -49,18 +47,15 @@ int RealTerminal::GetInput() {
 void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
   Clear();
 
-  // initialization of relevant objects
-#ifdef _WIN32
-  HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-#else
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-#endif
 
   const std::vector<std::vector<ColoredChar>>& colored_characters = content.GetMatrix();
 
   ColoredString colored_string(std::wstring(), colored_characters[0][0].foreground,
                                colored_characters[0][0].background);
-#ifndef _WIN32
+#ifdef _WIN32
+  std::wstring output;
+#else
   std::string output;
 #endif
 
@@ -72,19 +67,17 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
         // append current character
         colored_string.string.push_back(i_characters.character);
       } else {
-#ifdef _WIN32
-        // print current string
-        SetConsoleTextAttribute(console_handle, (colored_string.background << 4) | colored_string.foreground);
-        _cwprintf(colored_string.string.c_str());
-#else
         // add current string to output, print later
-        output += "\033[";
-        output += std::to_string(colored_string.foreground);
-        output += ";";
-        output += std::to_string(colored_string.background + background_color_offset);
-        output += "m";
+#ifdef _WIN32
+        output += converter.from_bytes(ColorEscapeSequence(colored_string.foreground, false));
+        output += converter.from_bytes(ColorEscapeSequence(colored_string.background, true));
+        output += colored_string.string;
+#else
+        output += ColorEscapeSequence(colored_string.foreground, false);
+        output += ColorEscapeSequence(colored_string.background, true);
         output += converter.to_bytes(colored_string.string);
 #endif
+
         // reset string
         colored_string.string = std::wstring(1, i_characters.character);
         colored_string.foreground = i_characters.foreground;
@@ -95,20 +88,22 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
   }
   // print last string
 #ifdef _WIN32
-  SetConsoleTextAttribute(console_handle, (colored_string.background << 4) | colored_string.foreground);
-  _cwprintf(colored_string.string.c_str());
+  output += converter.from_bytes(ColorEscapeSequence(colored_string.foreground, false));
+  output += converter.from_bytes(ColorEscapeSequence(colored_string.background, true));
+  output += colored_string.string;
 #else
-  output += "\033[";
-  output += std::to_string(colored_string.foreground);
-  output += ";";
-  output += std::to_string(colored_string.background + background_color_offset);
-  output += "m";
+  output += ColorEscapeSequence(colored_string.foreground, false);
+  output += ColorEscapeSequence(colored_string.background, true);
   output += converter.to_bytes(colored_string.string);
+#endif
 
   output += "\033[0m \n";  // reset colors to prevent flickering of background
 
   output = "\033[1;1H" + output;  // reset cursor to the top left (dont clear to prevent flickering)
 
+#ifdef _WIN32
+  _cwprintf(output.c_str());
+#else
   printf("%s", output.c_str());
 #endif
 }
@@ -151,4 +146,23 @@ void RealTerminal::Clear() const {
   SetConsoleCursorPosition(console_handle, {0, 0});
 #endif
   // On Linux the screen is overwritten using ANSI escape codes
+}
+
+std::string RealTerminal::ColorEscapeSequence(const common::Color& color, bool background) {
+  // 24 bit color ANSI escape code, see https://en.wikipedia.org/wiki/ANSI_escape_code#24-bit
+  std::string output;
+  output += "\033[";
+  if (background) {
+    output += "48";
+  } else {
+    output += "38";
+  }
+  output += ";2;";
+  output += std::to_string(color.red);
+  output += ";";
+  output += std::to_string(color.green);
+  output += ";";
+  output += std::to_string(color.blue);
+  output += "m";
+  return output;
 }

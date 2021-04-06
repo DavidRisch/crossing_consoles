@@ -6,13 +6,12 @@
 using namespace game;
 using namespace game::common;
 using namespace game::visual;
-using namespace game::terminal::colors;
 
 ColoredCharMatrix::ColoredCharMatrix(coordinate_size_t size)
     : size(std::move(size))
     , characters(size.y) {
   for (int y = 0; y < size.y; y++) {
-    characters[y] = std::vector<ColoredChar>(size.x, ColoredChar(L' ', WHITE, BLACK));
+    characters[y] = std::vector<ColoredChar>(size.x, ColoredChar(L' ', Color::WHITE, Color::BLACK));
   }
 }
 
@@ -21,25 +20,25 @@ void ColoredCharMatrix::AppendChar(wchar_t character, Color foreground, Color ba
     set_current.x = 0;
     set_current.y++;
   }
-  SetChar(character, set_current, foreground, background);
+  SetChar(character, set_current, std::move(foreground), std::move(background));
 }
 
 void ColoredCharMatrix::SetChar(wchar_t character, const Position& position, Color foreground, Color background) {
   if (position.IsLess(size)) {
-    characters[position.y][position.x] = ColoredChar(character, foreground, background);
+    characters[position.y][position.x] = ColoredChar(character, foreground, std::move(background));
     set_current = position;
     set_current.x++;
   }
 }
 
-void ColoredCharMatrix::AppendString(const std::wstring& string, Color foreground, Color background) {
+void ColoredCharMatrix::AppendString(const std::wstring& string, const Color& foreground, const Color& background) {
   for (wchar_t i_string : string) {
     AppendChar(i_string, foreground, background);
   }
 }
 
-void ColoredCharMatrix::SetString(const std::wstring& string, const Position& position, Color foreground,
-                                  Color background) {
+void ColoredCharMatrix::SetString(const std::wstring& string, const Position& position, const Color& foreground,
+                                  const Color& background) {
   SetChar(string[0], position, foreground, background);
   for (wchar_t i_string : string.substr(1)) {
     AppendChar(i_string, foreground, background);

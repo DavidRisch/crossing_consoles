@@ -12,7 +12,6 @@ using namespace game::common;
 using namespace game::world;
 using namespace game::visual;
 using namespace game::terminal;
-using namespace game::terminal::colors;
 
 class GameNetworking : public ::testing::Test {
  public:
@@ -103,7 +102,7 @@ class GameNetworking : public ::testing::Test {
     for (const auto& mock_terminal : mock_terminals) {
       for (const auto& i_lines : mock_terminal->GetLastOutput()) {
         for (const auto& i_characters : i_lines) {
-          if (i_characters != ColoredChar(L' ', WHITE, BLACK)) {
+          if (i_characters != ColoredChar(L' ', Color::WHITE, Color::BLACK)) {
             empty = false;
           }
         }

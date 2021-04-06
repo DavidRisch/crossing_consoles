@@ -7,6 +7,7 @@
 #include <windows.h>
 #endif
 
+#include "../common/Color.h"
 #include "../visual/ColoredString.h"
 #include "ITerminal.h"
 
@@ -37,6 +38,11 @@ class RealTerminal : public ITerminal {
    * \brief Clear terminal output.
    */
   void Clear() const;
+
+  /**
+   * \brief Generate an escape sequence to set the specified color as the fore- or background color.
+   */
+  inline std::string ColorEscapeSequence(const common::Color& color, bool background);
 };
 
 }  // namespace game::terminal

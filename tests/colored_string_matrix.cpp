@@ -6,7 +6,6 @@
 using namespace game::common;
 using namespace game::visual;
 using namespace game::visual::symbols;
-using namespace game::terminal::colors;
 
 TEST(ColoredStringMatrix, EmptyMatrix) {
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(2, 2));
@@ -15,7 +14,7 @@ TEST(ColoredStringMatrix, EmptyMatrix) {
 
   for (const auto& i_lines : matrix) {
     for (const auto& i_characters : i_lines) {
-      EXPECT_EQ(i_characters, ColoredChar(L' ', WHITE, BLACK));
+      EXPECT_EQ(i_characters, ColoredChar(L' ', Color::WHITE, Color::BLACK));
     }
   }
 }
@@ -29,9 +28,9 @@ TEST(ColoredStringMatrix, AppendChar) {
   for (const auto& i_lines : matrix) {
     for (const auto& i_characters : i_lines) {
       if (&i_characters == &matrix[0][0]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'a', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'a', Color::WHITE, Color::BLACK));
       } else {
-        EXPECT_EQ(i_characters, ColoredChar(L' ', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L' ', Color::WHITE, Color::BLACK));
       }
     }
   }
@@ -47,10 +46,10 @@ TEST(ColoredStringMatrix, AppendCharRepeated) {
   colored_string_matrix.AppendChar(L'e');
   const std::vector<std::vector<ColoredChar>>& matrix = colored_string_matrix.GetMatrix();
 
-  EXPECT_EQ(matrix[0][0], ColoredChar(L'a', WHITE, BLACK));
-  EXPECT_EQ(matrix[0][1], ColoredChar(L'b', WHITE, BLACK));
-  EXPECT_EQ(matrix[1][0], ColoredChar(L'c', WHITE, BLACK));
-  EXPECT_EQ(matrix[1][1], ColoredChar(L'd', WHITE, BLACK));
+  EXPECT_EQ(matrix[0][0], ColoredChar(L'a', Color::WHITE, Color::BLACK));
+  EXPECT_EQ(matrix[0][1], ColoredChar(L'b', Color::WHITE, Color::BLACK));
+  EXPECT_EQ(matrix[1][0], ColoredChar(L'c', Color::WHITE, Color::BLACK));
+  EXPECT_EQ(matrix[1][1], ColoredChar(L'd', Color::WHITE, Color::BLACK));
 }
 
 TEST(ColoredStringMatrix, SetChar) {
@@ -62,9 +61,9 @@ TEST(ColoredStringMatrix, SetChar) {
   for (const auto& i_lines : matrix) {
     for (const auto& i_characters : i_lines) {
       if (&i_characters == &matrix[0][0]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'a', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'a', Color::WHITE, Color::BLACK));
       } else {
-        EXPECT_EQ(i_characters, ColoredChar(L' ', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L' ', Color::WHITE, Color::BLACK));
       }
     }
   }
@@ -82,15 +81,15 @@ TEST(ColoredStringMatrix, SetCharRepeated) {
   for (const auto& i_lines : matrix) {
     for (const auto& i_characters : i_lines) {
       if (&i_characters == &matrix[0][0]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'a', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'a', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[0][1]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'b', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'b', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[0][2]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'c', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'c', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[0][4]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'd', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'd', Color::WHITE, Color::BLACK));
       } else {
-        EXPECT_EQ(i_characters, ColoredChar(L' ', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L' ', Color::WHITE, Color::BLACK));
       }
     }
   }
@@ -105,9 +104,9 @@ TEST(ColoredStringMatrix, AppendUnicodeChar) {
   for (const auto& i_lines : matrix) {
     for (const auto& i_characters : i_lines) {
       if (&i_characters == &matrix[0][0]) {
-        EXPECT_EQ(i_characters, ColoredChar(full_block, WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(full_block, Color::WHITE, Color::BLACK));
       } else {
-        EXPECT_EQ(i_characters, ColoredChar(L' ', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L' ', Color::WHITE, Color::BLACK));
       }
     }
   }
@@ -122,15 +121,15 @@ TEST(ColoredStringMatrix, AppendString) {
   for (const auto& i_lines : matrix) {
     for (const auto& i_characters : i_lines) {
       if (&i_characters == &matrix[0][0]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'a', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'a', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[0][1]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'b', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'b', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[0][2]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'c', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'c', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[0][3]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'd', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'd', Color::WHITE, Color::BLACK));
       } else {
-        EXPECT_EQ(i_characters, ColoredChar(L' ', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L' ', Color::WHITE, Color::BLACK));
       }
     }
   }
@@ -145,15 +144,15 @@ TEST(ColoredStringMatrix, SetString) {
   for (const auto& i_lines : matrix) {
     for (const auto& i_characters : i_lines) {
       if (&i_characters == &matrix[0][1]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'a', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'a', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[0][2]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'b', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'b', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[0][3]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'c', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'c', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[0][4]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'd', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'd', Color::WHITE, Color::BLACK));
       } else {
-        EXPECT_EQ(i_characters, ColoredChar(L' ', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L' ', Color::WHITE, Color::BLACK));
       }
     }
   }
@@ -173,23 +172,23 @@ TEST(ColoredStringMatrix, InsertMatrix) {
   for (const auto& i_lines : matrix) {
     for (const auto& i_characters : i_lines) {
       if (&i_characters == &matrix[0][0]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'a', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'a', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[0][1]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'b', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'b', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[1][0]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'c', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'c', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[1][1]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'd', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'd', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[7][7]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'e', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'e', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[7][8]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'f', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'f', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[8][7]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'g', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'g', Color::WHITE, Color::BLACK));
       } else if (&i_characters == &matrix[8][8]) {
-        EXPECT_EQ(i_characters, ColoredChar(L'h', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L'h', Color::WHITE, Color::BLACK));
       } else {
-        EXPECT_EQ(i_characters, ColoredChar(L' ', WHITE, BLACK));
+        EXPECT_EQ(i_characters, ColoredChar(L' ', Color::WHITE, Color::BLACK));
       }
     }
   }

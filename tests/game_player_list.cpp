@@ -8,7 +8,6 @@ using namespace game::common;
 using namespace game::world;
 using namespace game::visual;
 using namespace game::terminal;
-using namespace game::terminal::colors;
 
 TEST_F(GamePlayerList, OnePlayer) {
   std::string player_name = "abcABC";
