@@ -18,14 +18,15 @@ class Player : public networking::ISerializable {
  public:
   std::string name;
   common::Position position;
-  GameDefinition::Direction direction = GameDefinition::NORTH;
+  GameDefinition::Direction direction;
   static constexpr int max_health = 8;
   int health = max_health;
   bool updated = false;
   double packet_loss_percentage = 0;
   std::optional<std::chrono::microseconds> ping{};
 
-  Player(std::string name, common::Position position, int player_id = 999);
+  Player(std::string name, common::Position position, int player_id = 999,
+         GameDefinition::Direction direction = GameDefinition::NORTH);
 
   [[nodiscard]] bool IsAlive() const;
 

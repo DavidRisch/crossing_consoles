@@ -75,18 +75,22 @@ void GameLogic::HandleChange(world::Player &player, const Change &change, world:
   switch (change.GetChangeType()) {
     case ChangeType::MOVE_UP: {
       MovePlayer(player, coordinate_distance_t(0, -1), world);
+      player.direction = GameDefinition::NORTH;
       break;
     }
     case ChangeType::MOVE_LEFT: {
       MovePlayer(player, coordinate_distance_t(-1, 0), world);
+      player.direction = GameDefinition::WEST;
       break;
     }
     case ChangeType::MOVE_RIGHT: {
       MovePlayer(player, coordinate_distance_t(1, 0), world);
+      player.direction = GameDefinition::EAST;
       break;
     }
     case ChangeType::MOVE_DOWN: {
       MovePlayer(player, coordinate_distance_t(0, 1), world);
+      player.direction = GameDefinition::SOUTH;
       break;
     }
     case ChangeType::USE_ITEM: {
