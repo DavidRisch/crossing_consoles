@@ -8,8 +8,8 @@
 
 #else
 
-#include <sys/ioctl.h>
 #include <termios.h>
+#include <unistd.h>
 
 #include <codecvt>
 #include <locale>
@@ -145,10 +145,20 @@ void RealTerminal::Initialise() {
 #endif
 }
 
-void RealTerminal::Clear() const {
+void RealTerminal::Clear() {
 #ifdef _WIN32
   HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
   SetConsoleCursorPosition(console_handle, {0, 0});
+#else
+  struct winsize new_terminal_size {};
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &new_terminal_size);
+
+  if (new_terminal_size.ws_col != terminal_size.ws_col || new_terminal_size.ws_row != terminal_size.ws_row) {
+    // clear terminal if its size has changed to prevents artifacts.
+    // always clearing would lead to flicker.
+    system("clear");
+  }
+
+  terminal_size = new_terminal_size;
 #endif
-  // On Linux the screen is overwritten using ANSI escape codes
 }
