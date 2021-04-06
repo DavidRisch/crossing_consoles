@@ -38,7 +38,7 @@ Collection of decisions and conventions implemented in the game.
 
 The world's coordinate system is orientated as follows:
 
-<img src="coordinate_system.png" align="left"/><br>
+<img src="coordinate_system.png" align="left"/><br/>
 
 * x-axis to the right
 * y-axis to the bottom 
