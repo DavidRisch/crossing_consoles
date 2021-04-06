@@ -24,6 +24,7 @@ class World : public networking::ISerializable {
 
   void AddPlayer(const std::shared_ptr<Player>& player);
   void AddWall(const common::Position& position, BlockType type = BlockType::WALL_BRICK);
+  void RemoveWall(const common::Position& position);
 
   bool IsBlocked(const common::Position& position);
 

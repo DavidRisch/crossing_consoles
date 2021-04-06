@@ -16,6 +16,8 @@ const wchar_t box_drawings_vertical_single_and_left_double = L'\u2561';
 const wchar_t box_drawings_double_vertical_and_left = L'\u2563';
 const wchar_t full_block = L'\u2588';
 const wchar_t light_shade = L'\u2591';
+const wchar_t medium_shade = L'\u2592';
+const wchar_t dark_shade = L'\u2593';
 const wchar_t white_circle = L'\u25CB';
 }  // namespace game::visual::symbols
 

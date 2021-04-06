@@ -31,6 +31,13 @@ void World::AddWall(const Position& position, BlockType type) {
   }
 }
 
+void World::RemoveWall(const Position& position) {
+  if (walls.find(position) != walls.end()) {
+    walls.erase(position);
+    updated = true;
+  }
+}
+
 bool World::IsBlocked(const Position& position) {
   if (walls.find(position) != walls.end()) {
     return true;

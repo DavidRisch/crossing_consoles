@@ -16,10 +16,18 @@ class WorldGenerator {
   explicit WorldGenerator(int seed);
 
  private:
-  HeightMap height_map;
   int seed;
-  const double persistence = 50;
+  common::coordinate_size_t size = common::coordinate_size_t(0, 0);
+
+  HeightMap height_map;
+  const int building_count_min = 5;
+  const int building_count_max = 15;
+  const common::coordinate_size_t building_size_min = common::coordinate_size_t(7, 5);
+  const common::coordinate_size_t building_size_max = common::coordinate_size_t(12, 10);
+
+  const double persistence = 10;
   const int octaves = 4;
+
   [[nodiscard]] double GenerateNoise(int i, int x, int y) const;
   double SmoothNoise(int i, int x, int y);
   static double Interpolate(double a, double b, double x);
