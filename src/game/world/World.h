@@ -30,6 +30,8 @@ class World : public networking::ISerializable {
 
   void AddPlayer(const std::shared_ptr<Player>& player);
 
+  void RemovePlayer(GameDefinition::player_id_t player_id);
+
   void AddWall(const common::Position& position);
 
   void AddProjectile(const std::shared_ptr<Projectile>& projectile);

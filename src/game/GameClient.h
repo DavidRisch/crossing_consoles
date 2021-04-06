@@ -32,6 +32,11 @@ class GameClient {
   void Run();
 
   /**
+   * \brief Start the process of exiting the game. `Run()` will stop some time after this method is called.
+   */
+  void StartExit();
+
+  /**
    * \brief Handle keyboard input.
    * \details In single player mode, changes are applied to the world. In multiplayer mode, changes are sent to
    * `GameServer`.
@@ -48,6 +53,9 @@ class GameClient {
   std::shared_ptr<communication::connection_layer::ClientSideConnectionManager> client_manager;
   bool keep_running = true;
   bool multiplayer;
+
+  /// True if the own `Player` is defiantly represented on the server.
+  bool server_initialised = false;
 
   /// Indicates some kind of change which requires a new frame to be drawn.
   bool updated = false;
