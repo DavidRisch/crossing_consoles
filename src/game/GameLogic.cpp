@@ -120,28 +120,15 @@ void GameLogic::MoveProjectile(Projectile &projectile, World &world) {
 std::list<std::shared_ptr<Projectile>> GameLogic::HandleProjectileCollision(
     const std::list<std::pair<std::shared_ptr<Projectile>, std::shared_ptr<Projectile>>> &projectile_pairs) {
   std::list<std::shared_ptr<Projectile>> destroy_projectile_list;
-  std::list<std::shared_ptr<Projectile>> merge_projectile_list;
 
   for (auto &projectile_pair : projectile_pairs) {
     if (projectile_pair.first->GetPosition() == projectile_pair.second->GetPosition()) {
       // projectiles are at the same position after both movements
 
-      if (projectile_pair.first->GetDirection() == projectile_pair.second->GetDirection()) {
-        // projectiles have been shot multiple times in a row -> merge to one projectile_pair
-        assert(projectile_pair.first->GetShooterId() == projectile_pair.second->GetShooterId());
-        assert(projectile_pair.first->GetRange() == projectile_pair.second->GetRange());
-
-        auto merge_projectile_it =
-            std::find_if(merge_projectile_list.begin(), merge_projectile_list.end(),
-                         [&projectile_pair](const std::shared_ptr<Projectile> &merge_projectile) {
-                           return merge_projectile->GetPosition() == projectile_pair.second->GetPosition();
-                         });
-
-        if (merge_projectile_it == merge_projectile_list.end()) {
-          destroy_projectile_list.push_back(projectile_pair.second);
-          merge_projectile_list.push_back(projectile_pair.first);
-          continue;
-        }
+      if (projectile_pair.first->GetDirection() == projectile_pair.second->GetDirection() &&
+          projectile_pair.first->GetShooterId() == projectile_pair.second->GetShooterId()) {
+        // projectiles have been shot multiple times in a row -> this is prevented by World::AddProjectile()
+        assert(false);
       }
 
       // Remove collided projectiles
@@ -164,6 +151,7 @@ std::list<std::shared_ptr<Projectile>> GameLogic::HandleProjectileCollision(
 
 void GameLogic::HandleProjectiles(World &world) {
   auto projectiles = world.GetProjectiles();
+
   std::list<std::shared_ptr<Projectile>> destroy_projectile_list;
   std::list<std::pair<std::shared_ptr<Projectile>, std::shared_ptr<Projectile>>> projectile_collision_list;
 
@@ -192,8 +180,18 @@ void GameLogic::HandleProjectiles(World &world) {
         world.GetProjectiles().begin(), world.GetProjectiles().end(),
         [&position](const std::shared_ptr<Projectile> &projectile) { return projectile->GetPosition() == position; });
 
-    if (projectiles_it != world.GetProjectiles().end() && projectiles_it->get() != projectile.get()) {
-      projectile_collision_list.emplace_back(projectile, *projectiles_it);
+    if (projectiles_it != world.GetProjectiles().end() && *projectiles_it != projectile) {
+      // check if collided projectile is marked to be destroyed
+      auto projectile_to_destroy_it =
+          std::find_if(destroy_projectile_list.begin(), destroy_projectile_list.end(),
+                       [&projectiles_it](const std::shared_ptr<Projectile> &projectile_to_destroy) {
+                         return projectile_to_destroy == *projectiles_it;
+                       });
+
+      if (projectile_to_destroy_it == destroy_projectile_list.end()) {
+        // projectile collided with another, still flying projectile
+        projectile_collision_list.emplace_back(projectile, *projectiles_it);
+      }
     }
   }
 
