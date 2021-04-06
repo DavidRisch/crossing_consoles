@@ -31,6 +31,12 @@ class ClientSideConnectionManager : public ConnectionManager {
    */
   void SendDataToServer(std::vector<uint8_t> data);
 
+  /**
+   * \brief Notify server that connection will be closed.
+   * \details Send ResetConnection message, wait for acknowledge message before actually closing the connection.
+   */
+  void CloseConnectionWithServer();
+
  private:
   ClientSideConnectionManager(ProtocolDefinition::timeout_t timeout);
 
