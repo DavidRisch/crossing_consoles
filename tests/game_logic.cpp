@@ -251,3 +251,31 @@ TEST_F(GamePlay, PlayerChangesDirection) {
 
   reset_elements();
 }
+
+TEST_F(GamePlay, PlayerDiesAndRespawns) {
+  // Player dies & gets respawned
+
+  initialize_game();
+  add_player();
+
+  // Kill player
+  spawn_projectile(2, player_first->max_health, GamePlay::standard_direction, player_first->player_id,
+                   Position(player_first->position.x, player_first->position.y - 1));
+
+  ASSERT_FALSE(world->GetProjectiles().empty());
+  move_player(player_first, networking::ChangeType::MOVE_UP, 2);
+
+  ASSERT_TRUE(world->GetProjectiles().empty());
+  ASSERT_FALSE(player_first->IsAlive());
+
+  ASSERT_FALSE(world->players.empty());
+
+  // Respawn player
+  world->ResurrectPlayer(*player_first);
+
+ ASSERT_TRUE(player_first->IsAlive());
+ ASSERT_EQ(player_first->score, 0);
+ ASSERT_EQ(player_first->health, Player::max_health);
+
+  reset_elements();
+}

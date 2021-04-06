@@ -61,6 +61,11 @@ class World : public networking::ISerializable {
 
   static World Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 
+  /**
+   * \brief Respawn player in world, reset score and restore health
+   */
+  void ResurrectPlayer(Player& player);
+
  private:
   Spawner spawner;
   std::list<std::shared_ptr<Projectile>> projectiles{};

@@ -65,6 +65,11 @@ class GameLogic {
    * and the shooter's score increased.
    */
   static bool HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> &projectiles, world::World &world);
+
+  /**
+   * \brief Apply given `damage` to `Player`and invoke Death if necessary
+   */
+  static void ApplyDamageToPlayer(world::Player &player, int damage);
 };
 
 }  // namespace game

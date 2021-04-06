@@ -280,3 +280,59 @@ TEST_F(GameNetworking, ManyPlayers) {
 
   expect_some_output_on_all();
 }
+
+TEST_F(GameNetworking, PlayerDies) {
+  communication_timeout = std::chrono::milliseconds(300000);
+
+  create_server_and_client();
+  create_new_client(Position(3, 5));
+
+  std::thread input_thread([this] {
+    wait_for_renderer();
+    wait_a_few_iterations();
+
+    auto first_player = game_server->GetWorld().GetPlayerById(1);
+    auto second_player = game_server->GetWorld().GetPlayerById(2);
+
+    first_player->health = 1;
+
+    Player old_first = *first_player;
+    Player old_second = *second_player;
+
+    // add input to a single player. This should change the world of all players.
+    mock_terminals.at(1)->AddInput((char)KeyCode::A);
+    mock_terminals.at(1)->AddInput((char)KeyCode::SPACE);
+
+
+    wait_a_few_iterations();
+    wait_a_few_iterations();
+    wait_a_few_iterations();
+
+    EXPECT_FALSE(mock_terminals.at(0)->HasInput());
+    EXPECT_FALSE(mock_terminals.at(1)->HasInput());
+
+    EXPECT_FALSE(first_player->IsAlive());
+    EXPECT_EQ(second_player->score, old_second.score + 1);
+
+
+
+    std::this_thread::sleep_for(GameDefinition::respawn_time);
+
+    ASSERT_TRUE(first_player->IsAlive());
+    ASSERT_EQ(first_player->health, Player::max_health);
+    ASSERT_EQ(first_player->score, 0);
+
+    for (const auto& mock_terminal : mock_terminals) {
+      mock_terminal->AddInput((char)KeyCode::ESCAPE);
+    }
+  });
+
+  start_server();
+
+  run_clients();
+
+  input_thread.join();
+  stop_server();
+
+  expect_some_output_on_all();
+}
