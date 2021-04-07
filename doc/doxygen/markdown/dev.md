@@ -1,4 +1,4 @@
-\page dev Development, Deployment, Hosting
+\page dev Development
 
 * \subpage developer-guide
 * \subpage deploy-game

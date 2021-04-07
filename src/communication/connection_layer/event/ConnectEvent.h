@@ -6,7 +6,7 @@
 namespace communication::connection_layer {
 
 /**
- * \brief Shows that a Connection has been established.
+ * \brief Shows that a `Connection` has been established.
  */
 class ConnectEvent : public Event {
  public:

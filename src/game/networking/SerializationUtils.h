@@ -16,7 +16,7 @@ class SerializationUtils {
    */
   template <class T>
   static void SerializeObject(const T &object, std::vector<uint8_t> &output_vector) {
-    for (int i = 0; i < sizeof(T); ++i) {
+    for (unsigned int i = 0; i < sizeof(T); ++i) {
       const uint8_t &byte = *(reinterpret_cast<const uint8_t *>(&object) + i);
 
       output_vector.push_back(byte);
@@ -30,7 +30,7 @@ class SerializationUtils {
   template <class T>
   static const T &DeserializeObject(std::vector<uint8_t>::iterator &input_iterator) {
     T &object = *(reinterpret_cast<T *>(&(*input_iterator)));
-    for (int i = 0; i < sizeof(T); ++i) {
+    for (unsigned int i = 0; i < sizeof(T); ++i) {
       input_iterator++;
     }
     return object;

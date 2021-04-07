@@ -19,6 +19,14 @@ void World::AddPlayer(const std::shared_ptr<Player>& player) {
   updated = true;
 }
 
+void World::RemovePlayer(GameDefinition::player_id_t player_id) {
+  auto it = std::find_if(players.begin(), players.end(), [&player_id](const std::shared_ptr<Player>& player) {
+    return player->player_id == player_id;
+  });
+  assert(it != players.end());
+  players.erase(it);
+}
+
 void World::AddWall(const Position& position) {
   if (position.IsGreaterOrEqual(Position(0, 0)) && position.IsLess(size)) {
     if (walls.find(position) != walls.end()) {
@@ -63,10 +71,11 @@ void World::Update(const World& server_world) {
   }
 
   // remove players no longer on the server
-  players.end() =
+  auto removed_players_begin =
       std::remove_if(players.begin(), players.end(), [&server_world](const std::shared_ptr<Player>& player) {
         return server_world.GetPlayerById(player->player_id) == nullptr;
       });
+  players.erase(removed_players_begin, players.end());
 
   updated = true;
 }
@@ -129,6 +138,19 @@ std::list<std::shared_ptr<Projectile>> World::GetProjectiles() {
 }
 
 void World::AddProjectile(const std::shared_ptr<Projectile>& projectile) {
+  auto world_projectile_it = std::find_if(projectiles.begin(), projectiles.end(),
+                                          [&projectile](const std::shared_ptr<Projectile>& world_projectile) {
+                                            return world_projectile->GetPosition() == projectile->GetPosition();
+                                          });
+
+  if (world_projectile_it != projectiles.end()) {
+    if (projectile->GetDirection() == (*world_projectile_it)->GetDirection()) {
+      assert(projectile->GetShooterId() == (*world_projectile_it)->GetShooterId());
+      // Do not add multiple projectiles of same player with identical position to world
+      return;
+    }
+  }
+
   projectiles.push_back(projectile);
   updated = true;
 }

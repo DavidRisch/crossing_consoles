@@ -11,21 +11,24 @@
 namespace game::world {
 
 /**
- * \brief Represenation of a player.
+ * \brief Representation of a player.
  * \details Representation of a player with name, position, direction, health and information about his connection.
  */
 class Player : public networking::ISerializable {
  public:
   std::string name;
   common::Position position;
-  GameDefinition::Direction direction = GameDefinition::NORTH;
+  GameDefinition::player_id_t player_id;
+  GameDefinition::Direction direction;
+
   static constexpr int max_health = 8;
   int health = max_health;
   bool updated = false;
   double packet_loss_percentage = 0;
   std::optional<std::chrono::microseconds> ping{};
 
-  Player(std::string name, common::Position position, int player_id = 999);
+  Player(std::string name, common::Position position, int player_id = 999,
+         GameDefinition::Direction direction = GameDefinition::NORTH);
 
   [[nodiscard]] bool IsAlive() const;
 
@@ -46,8 +49,6 @@ class Player : public networking::ISerializable {
    * \brief Increase player's score by given `points`.
    */
   void IncreaseScore(uint16_t points);
-
-  GameDefinition::player_id_t player_id;
 
   /**
    * \brief Returns the player's `Weapon'

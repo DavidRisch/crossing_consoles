@@ -81,6 +81,7 @@ TEST(GameSerialization, Player) {
 
   EXPECT_EQ(original.name, deserialized.name);
   EXPECT_EQ(original.health, deserialized.health);
+  EXPECT_EQ(original.direction, deserialized.direction);
   EXPECT_EQ(original.GetScore(), deserialized.GetScore());
   EXPECT_TRUE(are_objects_identical(original.position, deserialized.position));
 }

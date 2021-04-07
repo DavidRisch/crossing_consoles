@@ -6,7 +6,7 @@
 namespace communication::connection_layer {
 
 /**
- * \brief Print message statistics of a Connection collected by ConnectionStatistics to console.
+ * \brief Print message statistics of a `Connection` collected by `ConnectionStatistics` to console.
  */
 class StatisticPrinter {
  public:

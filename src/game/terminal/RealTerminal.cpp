@@ -11,8 +11,8 @@
 
 #else
 
-#include <sys/ioctl.h>
 #include <termios.h>
+#include <unistd.h>
 
 #endif
 
@@ -162,4 +162,21 @@ std::string RealTerminal::ColorEscapeSequence(const common::Color& color, bool b
   output += std::to_string(color.blue);
   output += "m";
   return output;
+}
+
+void RealTerminal::Clear() {
+#ifdef _WIN32
+  // TODO: implement clear if size has changed
+#else
+  struct winsize new_terminal_size {};
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &new_terminal_size);
+
+  if (new_terminal_size.ws_col != terminal_size.ws_col || new_terminal_size.ws_row != terminal_size.ws_row) {
+    // clear terminal if its size has changed to prevents artifacts.
+    // always clearing would lead to flicker.
+    system("clear");
+  }
+
+  terminal_size = new_terminal_size;
+#endif
 }

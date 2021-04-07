@@ -2,6 +2,7 @@
 #define CROSSING_CONSOLES_CONNECTIONSTATISTICS_H
 
 #include <list>
+#include <memory>
 #include <unordered_map>
 
 #include "../../../message_layer/message/Message.h"
@@ -39,17 +40,17 @@ class ConnectionStatistics {
   /**
    * \brief Add received message to statistics.
    */
-  void AddReceivedMessage(const message_layer::Message& message);
+  void AddReceivedMessage(const std::shared_ptr<message_layer::Message>& message);
 
   /**
    * \brief Add sent message to statistics.
    */
-  void AddSentMessage(const message_layer::Message& message);
+  void AddSentMessage(const std::shared_ptr<message_layer::Message>& message);
 
   /**
    * \brief Add sent and acknowledged message to statistics.
    */
-  void AddSentAndAckMessage(const message_layer::Message& message);
+  void AddSentAndAckMessage(const std::shared_ptr<message_layer::Message>& message);
 
   /**
    * \brief Calculate overall package loss.
@@ -86,10 +87,11 @@ class ConnectionStatistics {
   /**
    * \brief Increment overall message counter and the counter of the specific message type in message_statistics.
    */
-  static void UpdateStatisticData(MessageStatisticData& message_statistics, const message_layer::Message& message);
+  static void UpdateStatisticData(MessageStatisticData& message_statistics,
+                                  const std::shared_ptr<message_layer::Message>& message);
 
   /// List of all sent messages which have been acknowledged, used to calculate average response time
-  std::list<message_layer::Message> sent_and_ack_message_list;
+  std::list<std::shared_ptr<message_layer::Message>> sent_and_ack_message_list;
 
   /// Time when the Connection and the Connection statistic class were created, used for the calculation of the uptime
   std::chrono::steady_clock::time_point connection_start_time;

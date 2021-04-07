@@ -10,10 +10,11 @@ using namespace game;
 using namespace game::common;
 using namespace game::world;
 
-Player::Player(std::string name, Position position, int player_id)
+Player::Player(std::string name, Position position, int player_id, GameDefinition::Direction direction)
     : name(std::move(name))
     , position(std::move(position))
-    , player_id(player_id) {
+    , player_id(player_id)
+    , direction(direction) {
   // TODO Assign weapons dynamically by placing items in world
   weapon = Weapon(1, 20);  // dummy weapon
 }
@@ -41,6 +42,7 @@ void Player::Serialize(std::vector<uint8_t> &output_vector) const {
   }
   position.Serialize(output_vector);
 
+  networking::SerializationUtils::SerializeObject(direction, output_vector);
   networking::SerializationUtils::SerializeObject(health, output_vector);
   networking::SerializationUtils::SerializeObject(score, output_vector);
 
@@ -57,8 +59,9 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
     name += (char)*input_iterator++;
   }
   auto position = Position::Deserialize(input_iterator);
+  auto direction = networking::SerializationUtils::DeserializeObject<GameDefinition::Direction>(input_iterator);
 
-  Player player(name, position, player_id);
+  Player player(name, position, player_id, direction);
 
   player.health = networking::SerializationUtils::DeserializeObject<decltype(health)>(input_iterator);
   player.score = networking::SerializationUtils::DeserializeObject<decltype(score)>(input_iterator);

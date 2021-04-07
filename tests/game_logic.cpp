@@ -42,6 +42,7 @@ TEST_F(GamePlay, ProjectileHitsPlayer) {
   player_second->position.y = player_first->position.y;
 
   spawn_projectile(range, damage, player_first->direction, player_first->player_id, player_first->position);
+  ASSERT_FALSE(world->GetProjectiles().empty());
   move_player(player_second, game::networking::ChangeType::MOVE_LEFT, 2);
 
   // Move projectile
@@ -97,19 +98,21 @@ TEST_F(GamePlay, MultipleProjectileSameShooter) {
   // Projectile at the same position with common shooter_id & direction are merged to one projectile
 
   initialize_game();
+  add_player();
 
   uint8_t range = 3;  // needs to be at least 1
   int damage = 3;     // arbitrarily chosen
   int number_of_bullets = 10;
 
   for (int i = 0; i < number_of_bullets; i++) {
-    spawn_projectile(range, damage);
+    spawn_projectile(range, damage, GamePlay::standard_direction, player_first->player_id, player_first->position);
+    spawn_projectile(range, damage, GamePlay::standard_direction, player_second->player_id, player_second->position);
   }
 
   GameLogic::HandleProjectiles(*world);
 
   EXPECT_FALSE(world->GetProjectiles().empty());
-  ASSERT_EQ(world->GetProjectiles().size(), 1);
+  ASSERT_EQ(world->GetProjectiles().size(), 2);
 
   reset_elements();
 }
@@ -224,6 +227,27 @@ TEST_F(GamePlay, DeadPlayerNoChange) {
   GameLogic::HandleChange(*player_first, item_change, *world);
 
   ASSERT_TRUE(world->GetProjectiles().empty());
+
+  reset_elements();
+}
+
+TEST_F(GamePlay, PlayerChangesDirection) {
+  // Direction of player is changed by player's movement
+
+  initialize_game();
+  add_player();
+
+  move_player(player_first, game::networking::ChangeType::MOVE_DOWN, 4);
+  ASSERT_EQ(player_first->direction, GameDefinition::Direction::SOUTH);
+
+  move_player(player_first, game::networking::ChangeType::MOVE_LEFT, 2);
+  ASSERT_EQ(player_first->direction, GameDefinition::Direction::WEST);
+
+  move_player(player_first, game::networking::ChangeType::MOVE_UP, 7);
+  ASSERT_EQ(player_first->direction, GameDefinition::Direction::NORTH);
+
+  move_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
+  ASSERT_EQ(player_first->direction, GameDefinition::Direction::EAST);
 
   reset_elements();
 }

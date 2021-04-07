@@ -13,7 +13,7 @@
 namespace game::visual {
 
 /**
- * \brief Generates a ColoredCharMatrix from the World, Walls and Players.
+ * \brief Generates a `ColoredCharMatrix` from the `World`, `Wall`s and `Player`s.
  */
 class Compositor {
  public:

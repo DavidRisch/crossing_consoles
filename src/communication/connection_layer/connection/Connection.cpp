@@ -207,7 +207,7 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
 
       if (it != unacknowledged_sent_message.end()) {
         (**it).SetTimestampReceived(std::chrono::steady_clock::now());
-        statistics.AddSentAndAckMessage(**it);
+        statistics.AddSentAndAckMessage(*it);
         unacknowledged_sent_message.erase(unacknowledged_sent_message.begin(), it);
       }
 
@@ -251,7 +251,7 @@ bool Connection::TryReceive() {
 
   if (state != ConnectionState::SERVER_CONNECTION_RESPONSE_SENT) {
     // connection establishment is not included in statistics
-    statistics.AddReceivedMessage(*received_message);
+    statistics.AddReceivedMessage(received_message);
   }
 
   if (received_message->GetMessageType() != message_layer::MessageType::NOT_ACKNOWLEDGE) {
@@ -294,10 +294,10 @@ Connection::Connection(std::shared_ptr<message_layer::MessageInputStream> messag
                        std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
                        ConnectionState connection_state, sequence_t sequence_counter, timeout_t timeout)
     : state(connection_state)
-    , sequence_counter(sequence_counter)
     , timeout(timeout)
     , message_input_stream(std::move(message_input_stream))
-    , message_output_stream(std::move(message_output_stream)) {
+    , message_output_stream(std::move(message_output_stream))
+    , sequence_counter(sequence_counter) {
   resend_interval =
       std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::resend_denominator);
   timestamp_last_change = std::chrono::steady_clock::now();
@@ -329,7 +329,7 @@ void Connection::SendMessageNow(const std::shared_ptr<message_layer::Message> &m
 
   if (state != ConnectionState::CLIENT_CONNECTION_REQUEST_SENT) {
     // connection establishment is not included in statistics
-    statistics.AddSentMessage(*message);
+    statistics.AddSentMessage(message);
   }
 
   message_output_stream->SendMessage(message.get());
@@ -394,7 +394,7 @@ void Connection::ResendLastMessages() {
     for (const auto &item : unacknowledged_sent_message) {
       DEBUG_CONNECTION_LOG(this, "~~~~> Resend: send type " << message_type_to_string(item->GetMessageType())
                                                             << " seq: " << (int)item->GetMessageSequence())
-      statistics.AddSentMessage(*item);
+      statistics.AddSentMessage(item);
       message_output_stream->SendMessage(item.get());
     }
   } else {
