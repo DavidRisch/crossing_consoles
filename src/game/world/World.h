@@ -25,12 +25,15 @@ class World : public networking::ISerializable {
   player_ptr_list_t players{};
   std::unordered_map<common::Position, Wall, common::Position::HashFunction> walls;
   bool updated = false;
+  std::unordered_map<common::Position, std::shared_ptr<IItem>, common::Position::HashFunction> items;
 
   explicit World(common::coordinate_size_t size);
 
   void AddPlayer(const std::shared_ptr<Player>& player);
 
   void AddWall(const common::Position& position);
+
+  void AddItem(const common::Position& position, const std::shared_ptr<IItem>& item);
 
   void AddProjectile(const std::shared_ptr<Projectile>& projectile);
 
@@ -47,6 +50,8 @@ class World : public networking::ISerializable {
   std::optional<std::shared_ptr<Projectile>> GetProjectileFromPosition(common::Position position);
 
   bool IsBlocked(const common::Position& position);
+
+  bool IsBlockedForItem(const common::Position& position);
 
   /**
    * \brief Replace some data with newer data contained in `server_world`.

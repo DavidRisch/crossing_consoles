@@ -70,7 +70,7 @@ add_library(crossing_consoles_lib
         communication/connection_layer/event/ConnectEvent.cpp
         communication/connection_layer/event/DisconnectEvent.cpp
         communication/connection_layer/event/PayloadEvent.cpp
-        )
+        game/world/items/ItemGenerator.cpp game/world/items/ItemGenerator.h)
 
 add_executable(crossing_consoles_main_server
         main_server.cpp)

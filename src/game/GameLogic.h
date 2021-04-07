@@ -65,6 +65,12 @@ class GameLogic {
    * and the shooter's score increased.
    */
   static bool HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> &projectiles, world::World &world);
+
+
+  /**
+   * \brief Returns the position that gets attacked with a sword when the position and the direction of a player are given.
+   */
+  static common::Position AttackedPositionFromDirection(const common::Position &position, GameDefinition::Direction direction);
 };
 
 }  // namespace game

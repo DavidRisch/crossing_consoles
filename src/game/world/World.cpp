@@ -4,6 +4,9 @@
 #include <cassert>
 #include <utility>
 
+#include "../networking/SerializationUtils.h"
+#include "items/Sword.h"
+
 using namespace game;
 using namespace game::common;
 using namespace game::world;
@@ -31,6 +34,12 @@ void World::AddWall(const Position& position) {
   }
 }
 
+void World::AddItem(const Position& position, const std::shared_ptr<IItem>& item){
+  assert(item);
+  items.insert({position, item});
+}
+
+
 bool World::IsBlocked(const Position& position) {
   if (walls.find(position) != walls.end()) {
     return true;
@@ -40,7 +49,13 @@ bool World::IsBlocked(const Position& position) {
                   [&position](const std::shared_ptr<Player>& player) { return player->position == position; })) {
     return true;
   }
+  return false;
+}
 
+bool World::IsBlockedForItem(const Position& position){
+  if (IsBlocked(position) || items.find(position) != items.end()){
+    return true;
+  }
   return false;
 }
 
@@ -93,6 +108,14 @@ void World::Serialize(std::vector<uint8_t>& output_vector) const {
 
   ISerializable::SerializeList(output_vector, players);
 
+  // Serialize items
+  output_vector.push_back(items.size());
+  for (const auto& pair : items) {
+    pair.first.Serialize(output_vector);
+    networking::SerializationUtils::SerializeObject(pair.second->GetItemType(), output_vector);
+    pair.second->Serialize(output_vector);
+  }
+
   ISerializable::SerializeList(output_vector, projectiles);
 }
 
@@ -113,6 +136,27 @@ World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
   for (size_t i = 0; i < player_count; ++i) {
     auto player = std::make_shared<Player>(Player::Deserialize(input_iterator));
     world.AddPlayer(player);
+  }
+
+  // TODO: Deserialize Items
+  auto item_count = ISerializable::DeserializeContainerLength(input_iterator);
+  for (size_t i = 0; i < item_count; ++i) {
+    auto position = Position::Deserialize(input_iterator);
+    auto item_type = networking::SerializationUtils::DeserializeObject<ItemType>(input_iterator);
+    auto new_item = std::shared_ptr<IItem>();
+    switch (item_type) {
+      case ItemType::LONG_RANGE:
+        new_item = Weapon::Deserialize(input_iterator);
+        break;
+      case ItemType::SWORD:
+        new_item = Sword::Deserialize(input_iterator);
+        break;
+      case ItemType::HEALING:
+        break;
+      case ItemType::POINTS:
+        break;
+    }
+    world.AddItem(position, new_item);
   }
 
   auto projectile_count = ISerializable::DeserializeContainerLength(input_iterator);

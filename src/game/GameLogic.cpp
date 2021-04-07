@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include "world/Projectile.h"
+#include "world/items/Sword.h"
 #include "world/items/Weapon.h"
 
 using namespace game;
@@ -45,6 +46,25 @@ Position GameLogic::PositionFromMovement(const Position &position, const coordin
   }
 
   return new_position;
+}
+
+Position GameLogic::AttackedPositionFromDirection(const Position &position, const GameDefinition::Direction direction){
+  Position attacked_position = Position(0, 0);
+  switch (direction) {
+    case GameDefinition::NORTH:
+      attacked_position.Set(position.x, position.y - 1);
+      break;
+    case GameDefinition::EAST:
+      attacked_position.Set(position.x + 1, position.y);
+      break;
+    case GameDefinition::SOUTH:
+      attacked_position.Set(position.x, position.y + 1);
+      break;
+    case GameDefinition::WEST:
+      attacked_position.Set(position.x - 1, position.y);
+      break;
+  }
+  return attacked_position;
 }
 
 void GameLogic::MovePlayer(world::Player &player, const coordinate_distance_t &movement, world::World &world) {
@@ -116,25 +136,12 @@ void GameLogic::UseWeapon(Player &player, World &world) {
       break;
     }
     case ItemType::SWORD: {
-      GameDefinition::Direction player_direction = player.direction;
-      Position hit_position = Position(0, 0);
-      switch (player_direction) {
-        case GameDefinition::NORTH:
-          hit_position.Set(player.position.x, player.position.y - 1);
-          break;
-        case GameDefinition::EAST:
-          hit_position.Set(player.position.x + 1, player.position.y);
-          break;
-        case GameDefinition::SOUTH:
-          hit_position.Set(player.position.x, player.position.y + 1);
-          break;
-        case GameDefinition::WEST:
-          hit_position.Set(player.position.x - 1, player.position.y);
-          break;
-      }
+      std::shared_ptr<Sword> sword = std::dynamic_pointer_cast<Sword>(item);
+      Position attacked_position = AttackedPositionFromDirection(player.position, player.direction);
+
       auto hit_player_it = std::find_if(
           world.players.begin(), world.players.end(),
-          [&hit_position](const std::shared_ptr<Player> &other_player) { return other_player->position == hit_position; });
+          [&attacked_position](const std::shared_ptr<Player> &other_player) { return other_player->position == attacked_position; });
 
       if (hit_player_it != world.players.end()) {
         // Check that shot player is still alive, otherwise no health or score changes are applied
@@ -143,9 +150,12 @@ void GameLogic::UseWeapon(Player &player, World &world) {
           return;
         }
         // Increase score of player and decrease health of hit player
-        hit_player.DecreaseHealth(1);  // TODO
+        hit_player.DecreaseHealth(sword->GetDamage());
         player.IncreaseScore(1);       // arbitrarily chosen number of points -> TODO associate with weapon?
       }
+      // TODO: hit projectile
+
+
     }
 
     case ItemType::HEALING:
