@@ -7,6 +7,7 @@
 #include "../communication/connection_layer/event/PayloadEvent.h"
 #include "GameLogic.h"
 #include "networking/Change.h"
+#include "networking/SerializationUtils.h"
 #include "terminal/ITerminal.h"
 #include "world/WorldGenerator.h"
 
@@ -33,6 +34,17 @@ GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_
   if (multiplayer) {
     client_manager =
         communication::connection_layer::ClientSideConnectionManager::CreateClientSide(communication_timeout);
+
+    {
+      Change change(ChangeType::SET_NAME);
+      SerializationUtils::SerializeString(player->name, change.payload);
+      client_manager->SendDataToServer(change.payload);
+    }
+    {
+      Change change(ChangeType::SET_COLOR);
+      player->color.Serialize(change.payload);
+      client_manager->SendDataToServer(change.payload);
+    }
   } else {
     world = *WorldGenerator::GenerateWorld(world_size);
   }

@@ -48,6 +48,11 @@ class ColoredCharMatrix {
    */
   std::optional<common::Position> Find(std::wstring needle);
 
+  /**
+   * Changes the fore- and background color of the entire matrix.
+   */
+  void SetAllColours(const common::Color& foreground, const common::Color& background = common::Color::BLACK);
+
  private:
   common::coordinate_size_t size;
   std::vector<std::vector<ColoredChar>> characters;

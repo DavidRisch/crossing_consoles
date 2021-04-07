@@ -9,8 +9,14 @@ using namespace game;
 using namespace game::common;
 using namespace game::world;
 
-Player::Player(std::string name, Position position, int player_id, GameDefinition::Direction direction)
+Player::Player(std::string name, Position position)
+    : Player(std::move(name), Color::RED, std::move(position), GameDefinition::Direction::NORTH, 999) {
+}
+
+Player::Player(std::string name, common::Color color, Position position, GameDefinition::Direction direction,
+               int player_id)
     : name(std::move(name))
+    , color(std::move(color))
     , position(std::move(position))
     , player_id(player_id)
     , direction(direction) {
@@ -35,6 +41,7 @@ void Player::Serialize(std::vector<uint8_t> &output_vector) const {
   output_vector.push_back(player_id);  // TODO: use 2 Bytes
 
   networking::SerializationUtils::SerializeString(name, output_vector);
+  color.Serialize(output_vector);
   position.Serialize(output_vector);
 
   networking::SerializationUtils::SerializeObject(direction, output_vector);
@@ -49,10 +56,11 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
   int player_id = *input_iterator++;
 
   auto name = networking::SerializationUtils::DeserializeString(input_iterator);
+  auto color = Color::Deserialize(input_iterator);
   auto position = Position::Deserialize(input_iterator);
   auto direction = networking::SerializationUtils::DeserializeObject<GameDefinition::Direction>(input_iterator);
 
-  Player player(name, position, player_id, direction);
+  Player player(name, color, position, direction, player_id);
 
   player.health = networking::SerializationUtils::DeserializeObject<decltype(health)>(input_iterator);
   player.score = networking::SerializationUtils::DeserializeObject<decltype(score)>(input_iterator);

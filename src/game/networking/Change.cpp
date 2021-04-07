@@ -21,3 +21,9 @@ Change::Change(std::vector<uint8_t> bytes)
 ChangeType Change::GetChangeType() const {
   return change_type;
 }
+
+std::vector<uint8_t>::iterator Change::GetContentIterator() {
+  auto iterator = payload.begin();
+  ++iterator;
+  return iterator;
+}

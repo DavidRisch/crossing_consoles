@@ -5,6 +5,7 @@
 #include <string>
 
 #include "../GameDefinition.h"
+#include "../common/Color.h"
 #include "../common/Position.h"
 #include "items/Weapon.h"
 
@@ -17,6 +18,7 @@ namespace game::world {
 class Player : public networking::ISerializable {
  public:
   std::string name;
+  common::Color color;
   common::Position position;
   GameDefinition::player_id_t player_id;
   GameDefinition::Direction direction;
@@ -27,8 +29,9 @@ class Player : public networking::ISerializable {
   double packet_loss_percentage = 0;
   std::optional<std::chrono::microseconds> ping{};
 
-  Player(std::string name, common::Position position, int player_id = 999,
-         GameDefinition::Direction direction = GameDefinition::NORTH);
+  Player(std::string name, common::Position position);
+  Player(std::string name, common::Color color, common::Position position, GameDefinition::Direction direction,
+         int player_id);
 
   [[nodiscard]] bool IsAlive() const;
 
