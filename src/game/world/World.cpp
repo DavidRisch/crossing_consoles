@@ -63,6 +63,7 @@ void World::Update(const World& server_world) {
   size = server_world.size;
   projectiles = server_world.projectiles;
   walls = server_world.walls;
+  items = server_world.items;
 
   for (const auto& server_player : server_world.players) {
     auto player_id = server_player->player_id;

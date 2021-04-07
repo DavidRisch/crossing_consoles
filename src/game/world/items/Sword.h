@@ -11,7 +11,7 @@ class Sword : public IItem {
  public:
   Sword(int damage, uint8_t max_range);
 
-  void Display() override;
+  visual::ColoredCharMatrix GetSprite(common::coordinate_size_t block_size) override;
   void Serialize(std::vector<uint8_t>& output_vector) const override;
   static std::shared_ptr<Sword> Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 

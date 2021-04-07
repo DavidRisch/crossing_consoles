@@ -42,5 +42,8 @@ ItemType Weapon::GetItemType() {
   return item_type;
 }
 
-void Weapon::Display() {
+visual::ColoredCharMatrix Weapon::GetSprite(common::coordinate_size_t block_size) {
+    visual::ColoredCharMatrix colored_char_matrix = visual::ColoredCharMatrix(block_size);
+    colored_char_matrix.AppendString(L"OOOO");
+    return colored_char_matrix;
 }

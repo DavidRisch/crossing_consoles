@@ -2,6 +2,7 @@
 #define CROSSING_CONSOLES_IITEM_H
 
 #include "../../networking/ISerializable.h"
+#include "../../visual/ColoredCharMatrix.h"
 
 namespace game::world {
 
@@ -15,7 +16,7 @@ enum class ItemType : char {
 
 class IItem : public networking::ISerializable {
  public:
-  virtual void Display() = 0;
+  virtual visual::ColoredCharMatrix GetSprite(common::coordinate_size_t block_size) = 0;
   virtual ItemType GetItemType() = 0;
 };
 

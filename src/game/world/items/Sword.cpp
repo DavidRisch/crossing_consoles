@@ -5,8 +5,10 @@
 using namespace game;
 using namespace world;
 
-void Sword::Display() {
-
+visual::ColoredCharMatrix Sword::GetSprite(common::coordinate_size_t block_size) {
+    visual::ColoredCharMatrix colored_char_matrix = visual::ColoredCharMatrix(block_size);
+    colored_char_matrix.AppendString(L" // ");
+    return colored_char_matrix;
 }
 
 void Sword::Serialize(std::vector<uint8_t> &output_vector) const {

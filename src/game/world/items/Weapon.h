@@ -36,7 +36,7 @@ class Weapon : public IItem {
 
   ItemType GetItemType() override;
 
-  void Display() override;
+  visual::ColoredCharMatrix GetSprite(common::coordinate_size_t block_size) override;
 
  private:
   int damage;

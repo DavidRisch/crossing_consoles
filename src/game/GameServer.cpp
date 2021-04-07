@@ -37,7 +37,7 @@ void GameServer::RunIteration() {
     // TODO Remove dead players!
   }
 
-  if (std::chrono::steady_clock::now() - last_item_generated >= generate_item_interval) {
+  if (std::chrono::steady_clock::now() - last_item_generated >= generate_item_interval and world->items.size() < 3) {
     last_item_generated = std::chrono::steady_clock::now();
     item_generator.GenerateItem();
   }
