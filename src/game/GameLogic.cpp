@@ -103,14 +103,29 @@ void GameLogic::HandleChange(world::Player &player, const Change &change, world:
 }
 
 void GameLogic::UseWeapon(Player &player, World &world) {
-  auto weapon = player.GetWeapon();
-  if (!weapon.has_value()) {
+  auto item = player.GetItem();
+  if (item == nullptr) {
     return;
   }
 
+  switch(item->GetItemType()){
+    case ItemType::LONG_RANGE: {
+      Projectile bullet =
+          std::dynamic_pointer_cast<Weapon>(item)->SpawnProjectile(player.player_id, player.position, player.direction);
+      world.AddProjectile(std::make_shared<Projectile>(bullet));
+      break;
+    }
+    case ItemType::SWORD:
+      break;
+    case ItemType::HEALING:
+      break;
+    case ItemType::POINTS:
+      break;
+  }
+
+
   // TODO differentiate between items, right now only weapons expected
-  Projectile bullet = weapon->SpawnProjectile(player.player_id, player.position, player.direction);
-  world.AddProjectile(std::make_shared<Projectile>(bullet));
+
 }
 
 void GameLogic::MoveProjectile(Projectile &projectile, World &world) {

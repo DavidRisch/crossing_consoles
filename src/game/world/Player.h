@@ -53,10 +53,12 @@ class Player : public networking::ISerializable {
   /**
    * \brief Returns the player's `Weapon'
    */
-  std::optional<Weapon> GetWeapon();
+  std::shared_ptr<IItem> GetItem();
+
+  void SetItem(std::shared_ptr<IItem> new_item);
 
  private:
-  std::optional<Weapon> weapon;
+  std::shared_ptr<IItem> item;
   uint16_t score = 0;
 };
 
