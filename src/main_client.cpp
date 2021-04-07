@@ -22,12 +22,17 @@ void SignalHandler(int signal) {
 void SetupSignalHandler(GameClient *game_client) {
   GAME_CLIENT = game_client;
 
+#ifdef _WIN32
+  // https://stackoverflow.com/questions/32389905/sigaction-and-porting-linux-code-to-windows
+  signal(SIGINT, SignalHandler);
+#else
   struct sigaction sigIntHandler {};
   sigIntHandler.sa_handler = SignalHandler;
   sigemptyset(&sigIntHandler.sa_mask);
   sigIntHandler.sa_flags = 0;
 
   sigaction(SIGINT, &sigIntHandler, nullptr);
+#endif
 }
 
 int main() {
