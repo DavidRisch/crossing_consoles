@@ -2,6 +2,7 @@
 #define CROSSING_CONSOLES_SERIALIZATION_UTILS_H
 
 #include <cstdint>
+#include <string>
 #include <vector>
 
 namespace game::networking {
@@ -35,6 +36,17 @@ class SerializationUtils {
     }
     return object;
   }
+
+  /**
+   * \brief Push the given string and its length at the end of `output_vector`.
+   * \details Limited to a maximum length of 255 chars.
+   */
+  static void SerializeString(const std::string &string, std::vector<uint8_t> &output_vector);
+
+  /**
+   * \brief Decodes a string encoded by `SerializeString()`.
+   */
+  static std::string DeserializeString(std::vector<uint8_t>::iterator &input_iterator);
 };
 }  // namespace game::networking
 

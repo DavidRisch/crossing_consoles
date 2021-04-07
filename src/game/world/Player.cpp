@@ -1,6 +1,5 @@
 #include "Player.h"
 
-#include <cassert>
 #include <utility>
 
 #include "../networking/SerializationUtils.h"
@@ -35,11 +34,7 @@ void Player::DecreaseHealth(int damage) {
 void Player::Serialize(std::vector<uint8_t> &output_vector) const {
   output_vector.push_back(player_id);  // TODO: use 2 Bytes
 
-  assert(name.size() <= 255);
-  output_vector.push_back(name.size());
-  for (const auto &character : name) {
-    output_vector.push_back(character);
-  }
+  networking::SerializationUtils::SerializeString(name, output_vector);
   position.Serialize(output_vector);
 
   networking::SerializationUtils::SerializeObject(direction, output_vector);
@@ -53,11 +48,7 @@ void Player::Serialize(std::vector<uint8_t> &output_vector) const {
 Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
   int player_id = *input_iterator++;
 
-  std::string name;
-  auto name_length = *input_iterator++;
-  for (int i = 0; i < name_length; ++i) {
-    name += (char)*input_iterator++;
-  }
+  auto name = networking::SerializationUtils::DeserializeString(input_iterator);
   auto position = Position::Deserialize(input_iterator);
   auto direction = networking::SerializationUtils::DeserializeObject<GameDefinition::Direction>(input_iterator);
 
