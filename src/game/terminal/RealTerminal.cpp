@@ -90,8 +90,8 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
   output += converter.from_bytes(ColorEscapeSequence(colored_string.foreground, false));
   output += converter.from_bytes(ColorEscapeSequence(colored_string.background, true));
   output += colored_string.string;
-  output += L"\x1b[0m \n";         // reset colors to prevent flickering of background
-  output = L"\x1b[1;1H" + output;  // reset cursor to the top left (dont clear to prevent flickering)
+  output += L"\033[0m \n";         // reset colors to prevent flickering of background
+  output = L"\033[1;1H" + output;  // reset cursor to the top left (dont clear to prevent flickering)
 #else
   output += ColorEscapeSequence(colored_string.foreground, false);
   output += ColorEscapeSequence(colored_string.background, true);
@@ -148,11 +148,7 @@ void RealTerminal::Initialise() {
 std::string RealTerminal::ColorEscapeSequence(const common::Color& color, bool background) {
   // 24 bit color ANSI escape code, see https://en.wikipedia.org/wiki/ANSI_escape_code#24-bit
   std::string output;
-#ifdef _WIN32
-  output += "\x1b[";
-#else
   output += "\033[";
-#endif
   if (background) {
     output += "48";
   } else {
