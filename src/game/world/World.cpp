@@ -173,3 +173,9 @@ std::optional<std::shared_ptr<Projectile>> World::GetProjectileFromPosition(comm
   }
   return std::optional<std::shared_ptr<Projectile>>();
 }
+
+void World::ResurrectPlayer(Player& player) {
+  player.DecreaseHealth(-game::world::Player::max_health);
+  player.score = 0;
+  player.position = spawner.GenerateSpawnPosition();
+}

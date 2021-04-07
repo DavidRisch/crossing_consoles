@@ -84,3 +84,7 @@ uint16_t Player::GetScore() const {
 void Player::IncreaseScore(uint16_t points) {
   score += points;
 }
+
+void Player::Die() {
+  time_of_death = std::chrono::steady_clock::now();
+}
