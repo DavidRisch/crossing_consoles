@@ -115,8 +115,39 @@ void GameLogic::UseWeapon(Player &player, World &world) {
       world.AddProjectile(std::make_shared<Projectile>(bullet));
       break;
     }
-    case ItemType::SWORD:
-      break;
+    case ItemType::SWORD: {
+      GameDefinition::Direction player_direction = player.direction;
+      Position hit_position = Position(0, 0);
+      switch (player_direction) {
+        case GameDefinition::NORTH:
+          hit_position.Set(player.position.x, player.position.y - 1);
+          break;
+        case GameDefinition::EAST:
+          hit_position.Set(player.position.x + 1, player.position.y);
+          break;
+        case GameDefinition::SOUTH:
+          hit_position.Set(player.position.x, player.position.y + 1);
+          break;
+        case GameDefinition::WEST:
+          hit_position.Set(player.position.x - 1, player.position.y);
+          break;
+      }
+      auto hit_player_it = std::find_if(
+          world.players.begin(), world.players.end(),
+          [&hit_position](const std::shared_ptr<Player> &other_player) { return other_player->position == hit_position; });
+
+      if (hit_player_it != world.players.end()) {
+        // Check that shot player is still alive, otherwise no health or score changes are applied
+        Player &hit_player = **hit_player_it;
+        if (!hit_player.IsAlive()) {
+          return;
+        }
+        // Increase score of player and decrease health of hit player
+        hit_player.DecreaseHealth(1);  // TODO
+        player.IncreaseScore(1);       // arbitrarily chosen number of points -> TODO associate with weapon?
+      }
+    }
+
     case ItemType::HEALING:
       break;
     case ItemType::POINTS:

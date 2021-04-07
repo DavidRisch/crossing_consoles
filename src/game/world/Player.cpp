@@ -17,7 +17,7 @@ Player::Player(std::string name, Position position, int player_id, GameDefinitio
     , player_id(player_id)
     , direction(direction) {
   // TODO Assign weapons dynamically by placing items in world
-  item = std::make_shared<Weapon>(1, 20);  // dummy weapon
+  item = std::make_shared<Sword>(1, 20);  // dummy weapon
 }
 
 bool Player::IsAlive() const {
