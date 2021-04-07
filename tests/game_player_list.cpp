@@ -40,7 +40,8 @@ TEST_F(GamePlayerList, Compositor) {
   World world(coordinate_size_t(5, 5));
   world.AddPlayer(player);
 
-  coordinate_size_t viewport_size = Position(26, 16);
+  // viewport size_x needs to be at least 32 in order to set title in header
+  coordinate_size_t viewport_size = Position(32, 16);
   Compositor compositor(viewport_size, world, *player);
 
   {

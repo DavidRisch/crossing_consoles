@@ -62,8 +62,8 @@ TEST(Game, Actions) {
 }
 
 TEST(Game, ActionShoot) {
-  // this needs to be adapted if viewport overhang changes!
-  auto composited_viewport_overhang = common::coordinate_size_t(2, 4);
+  // this needs to be adapted if viewport header changes!
+  auto header_size = common::coordinate_size_t(2, 7);
 
   auto player = std::make_shared<Player>("player name", Position(3, 2));
   player->direction = GameDefinition::NORTH;
@@ -87,7 +87,7 @@ TEST(Game, ActionShoot) {
     int column = 0;
     for (const auto& i_characters : i_lines) {
       if (i_characters == ColoredChar(L'o', Color::WHITE, Color::BLACK)) {
-        ASSERT_EQ(Position((column / 2) - composited_viewport_overhang.x, row - composited_viewport_overhang.y),
+        ASSERT_EQ(Position((column / 2) - header_size.x, row - header_size.y),
                   projectile_position);
         return;
       }
