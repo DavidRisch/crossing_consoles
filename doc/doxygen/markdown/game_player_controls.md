@@ -26,6 +26,6 @@ The player's score is displayed on the top left of the game viewport.
 ### Health
 
 A player is dead if their health reaches zero.  
-If a player is hit by a projectile, their health is decreased by an amount specified by the weapon that spawned the projectile.
-
+If a player is hit by a projectile, their health is decreased by an amount specified by the weapon that spawned the
+projectile.  
 The health bar in the top right shows the remaining lives in form of hearts ♥ , every player starts with 8 lives.

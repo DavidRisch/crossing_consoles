@@ -36,10 +36,12 @@
 
 The following steps can be used to install GTest manually if nothing else works:
 
-1. Download a Google Test release of your choice from the official [GitHub Repository](https://github.com/google/googletest/).
-2. Download the libraries [`libgtest.a`](https://drive.google.com/file/d/1N6hmXb2Ix6fvMJa3-2O6oXuaDyDnkBu6/view?usp=sharing)
-   and [`libgtest_main.a`](https://drive.google.com/file/d/1wEpDVtbNIeSl22TKAJIqRLenjd2q6uM3/view?usp=sharing). (**use the links provided at your own
-   risk**)
+1. Download a Google Test release of your choice from the
+   official [GitHub Repository](https://github.com/google/googletest/).
+2. Download the
+   libraries [`libgtest.a`](https://drive.google.com/file/d/1N6hmXb2Ix6fvMJa3-2O6oXuaDyDnkBu6/view?usp=sharing)
+   and [`libgtest_main.a`](https://drive.google.com/file/d/1wEpDVtbNIeSl22TKAJIqRLenjd2q6uM3/view?usp=sharing). (**use
+   the links provided at your own risk**)
 3. Copy both of these files into lib of MinGW (
    ex.: `C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\lib`).
 4. Go to your extracted GTest folder, navigate to `googletest\include\gtest` and copy the whole folder
