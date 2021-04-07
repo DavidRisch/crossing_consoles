@@ -74,6 +74,12 @@ void GameLogic::MovePlayer(world::Player &player, const coordinate_distance_t &m
     player.MoveTo(new_position);
   }
 
+  // Pick up item if there is one at the new position
+  if (world.items.find(player.position) != world.items.end()) {
+    player.SetItem(world.items.at(player.position));
+    world.items.erase(world.items.find(player.position));
+  }
+
   // Check for collision with projectile
   auto projectile = world.GetProjectileFromPosition(new_position);
 
