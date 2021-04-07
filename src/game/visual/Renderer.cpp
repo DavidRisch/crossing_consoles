@@ -10,7 +10,6 @@ using namespace game::common;
 using namespace game::world;
 using namespace game::visual;
 using namespace game::visual::symbols;
-using namespace game::terminal::colors;
 
 Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size, World& world, Player& own_player)
     : block_size(std::move(block_size))
@@ -20,7 +19,7 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
     , wall_sprite(ColoredCharMatrix(block_size))
     , player_sprite(ColoredCharMatrix(block_size))
     , projectile_sprite(ColoredCharMatrix(block_size)) {
-  wall_sprite.AppendString(std::wstring(4, light_shade), WHITE, RED);
+  wall_sprite.AppendString(std::wstring(4, light_shade), Color::WHITE, Color::RED);
   player_sprite.AppendString(L"></\\");
   projectile_sprite.AppendString(L"o");
 }

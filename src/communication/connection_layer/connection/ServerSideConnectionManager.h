@@ -7,7 +7,7 @@ namespace communication {
 namespace connection_layer {
 
 /**
- * \brief ConnectionManager on the Server Side
+ * \brief `ConnectionManager` on the Server Side
  */
 
 class ServerSideConnectionManager : public ConnectionManager {

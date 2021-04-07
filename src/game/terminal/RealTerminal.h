@@ -5,8 +5,11 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#else
+#include <sys/ioctl.h>
 #endif
 
+#include "../common/Color.h"
 #include "../visual/ColoredString.h"
 #include "ITerminal.h"
 
@@ -34,9 +37,18 @@ class RealTerminal : public ITerminal {
   static void Initialise();
 
   /**
+   * \brief Generate an escape sequence to set the specified color as the fore- or background color.
+   */
+  inline std::string ColorEscapeSequence(const common::Color& color, bool background);
+
+  /**
    * \brief Clear terminal output.
    */
-  void Clear() const;
+  void Clear();
+
+#ifndef _WIN32
+  struct winsize terminal_size {};
+#endif
 };
 
 }  // namespace game::terminal

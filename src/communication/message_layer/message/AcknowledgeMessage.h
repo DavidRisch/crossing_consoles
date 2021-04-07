@@ -7,7 +7,7 @@
 namespace communication::message_layer {
 
 /**
- * \brief Sent after a Message was received to notify the partner that it has arrived.
+ * \brief Sent after a `Message` was received to notify the partner that it has arrived.
  */
 class AcknowledgeMessage : public Message {
  public:

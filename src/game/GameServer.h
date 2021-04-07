@@ -10,7 +10,7 @@
 namespace game {
 
 /**
- * \brief Server to handle game logic and connections to GameClient.
+ * \brief Server to handle game logic and connections to `GameClient`.
  */
 class GameServer {
  public:

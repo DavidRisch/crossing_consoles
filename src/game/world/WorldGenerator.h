@@ -8,7 +8,7 @@
 namespace game::world {
 
 /**
- * \brief Used to generate a World with some Walls.
+ * \brief Used to generate a World with some `Wall`s.
  */
 class WorldGenerator {
  public:

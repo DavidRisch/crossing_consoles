@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cstring>
 
+#include "../src/game/common/Color.h"
 #include "../src/game/networking/SerializationUtils.h"
 #include "../src/game/world/World.h"
 
@@ -120,4 +121,14 @@ TEST(GameSerialization, Projectile) {
   EXPECT_EQ(original.GetRange(), deserialized.GetRange());
 
   EXPECT_TRUE(are_objects_identical(original.GetPosition(), deserialized.GetPosition()));
+}
+
+TEST(GameSerialization, Color) {
+  Color original(12, 234, 56);
+
+  auto deserialized = serialize_and_deserialize(original);
+
+  EXPECT_EQ(original.red, deserialized.red);
+  EXPECT_EQ(original.green, deserialized.green);
+  EXPECT_EQ(original.blue, deserialized.blue);
 }

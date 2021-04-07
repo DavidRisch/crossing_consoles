@@ -12,7 +12,6 @@ using namespace game::common;
 using namespace game::world;
 using namespace game::visual;
 using namespace game::terminal;
-using namespace game::terminal::colors;
 
 class GameNetworking : public ::testing::Test {
  public:
@@ -103,7 +102,7 @@ class GameNetworking : public ::testing::Test {
     for (const auto& mock_terminal : mock_terminals) {
       for (const auto& i_lines : mock_terminal->GetLastOutput()) {
         for (const auto& i_characters : i_lines) {
-          if (i_characters != ColoredChar(L' ', WHITE, BLACK)) {
+          if (i_characters != ColoredChar(L' ', Color::WHITE, Color::BLACK)) {
             empty = false;
           }
         }
@@ -326,6 +325,30 @@ TEST_F(GameNetworking, PlayerDies) {
   });
 
   start_server();
+
+  run_clients();
+
+  input_thread.join();
+  stop_server();
+
+  expect_some_output_on_all();
+}
+
+TEST_F(GameNetworking, Disconnect) {
+  communication_timeout = std::chrono::milliseconds(1000);
+
+  create_server_and_client();
+  create_new_client(Position(3, 4));
+
+  start_server();
+
+  mock_terminals.at(0)->AddInput((char)KeyCode::ESCAPE);
+
+  std::thread input_thread([this] {
+    wait_a_few_iterations();  // wait for the first player to disconnect
+
+    mock_terminals.at(1)->AddInput((char)KeyCode::ESCAPE);
+  });
 
   run_clients();
 

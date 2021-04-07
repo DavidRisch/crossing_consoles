@@ -10,7 +10,6 @@ using namespace game::common;
 using namespace game::world;
 using namespace game::visual;
 using namespace game::terminal;
-using namespace game::terminal::colors;
 
 TEST(Game, NoAction) {
   auto player = std::make_shared<Player>("player name", Position(2, 2));
@@ -26,7 +25,7 @@ TEST(Game, NoAction) {
   bool empty = true;
   for (const auto& i_lines : mock_terminal->GetLastOutput()) {
     for (const auto& i_characters : i_lines) {
-      if (i_characters != ColoredChar(L' ', WHITE, BLACK)) {
+      if (i_characters != ColoredChar(L' ', Color::WHITE, Color::BLACK)) {
         empty = false;
       }
     }
@@ -53,7 +52,7 @@ TEST(Game, Actions) {
   bool empty = true;
   for (const auto& i_lines : mock_terminal->GetLastOutput()) {
     for (const auto& i_characters : i_lines) {
-      if (i_characters != ColoredChar(L' ', WHITE, BLACK)) {
+      if (i_characters != ColoredChar(L' ', Color::WHITE, Color::BLACK)) {
         empty = false;
       }
     }
@@ -87,7 +86,7 @@ TEST(Game, ActionShoot) {
   for (const auto& i_lines : mock_terminal->GetLastOutput()) {
     int column = 0;
     for (const auto& i_characters : i_lines) {
-      if (i_characters == ColoredChar(L'o', WHITE, BLACK)) {
+      if (i_characters == ColoredChar(L'o', Color::WHITE, Color::BLACK)) {
         ASSERT_EQ(Position((column / 2) - composited_viewport_overhang.x, row - composited_viewport_overhang.y),
                   projectile_position);
         return;

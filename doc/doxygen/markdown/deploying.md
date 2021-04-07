@@ -2,7 +2,7 @@
 
 This page contains instructions on how to deploy the game on a public server users can ssh into.
 
-## Creating a Locked Down User
+# Creating a Locked Down User
 
 Create a user which people will later be given access to
 (based on this [serverfault answer](https://serverfault.com/a/998437)):
@@ -46,7 +46,7 @@ Create the `.bashrc` (`sudo vim /home/cc/.bashrc`) with the following content:
     Type '${COMMAND}crossing_consoles [YOURNAME]${NORMAL}' to start the game (or the alias '${COMMAND}cc${NORMAL}').
     You can also set your color using hexadecimal codes: '${COMMAND}cc [YOURNAME] #aa2211${NORMAL}'${DEFAULT}"
 
-## Installing the Game Client
+# Installing the Game Client
 
 The crossing consoles client binary can now be placed in the `/home/cc/bin` directory. \
 Alternatively a simlink can be created:
@@ -54,7 +54,7 @@ Alternatively a simlink can be created:
     sudo ln -s /path/to/crossing_consoles_main_client /home/cc/bin/crossing_consoles
     sudo ln -s /home/cc/bin/crossing_consoles /home/cc/bin/cc
 
-## Installing the Game Server
+# Installing the Game Server
 
 Create and run a script to start the server every time it exits
 (based on this [stackoverflow answer](https://stackoverflow.com/a/697064/13623303)):

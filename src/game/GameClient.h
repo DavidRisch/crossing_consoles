@@ -16,7 +16,7 @@ namespace game {
 enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' ', Y = 'y' };
 
 /**
- * \brief Handles keyboard input and connection to GameServer.
+ * \brief Handles keyboard input and connection to `GameServer`.
  */
 class GameClient {
  public:
@@ -30,6 +30,11 @@ class GameClient {
    * \details In multiplayer mode, events from 'ConnectionManager' are handled additionally.
    */
   void Run();
+
+  /**
+   * \brief Start the process of exiting the game. `Run()` will stop some time after this method is called.
+   */
+  void StartExit();
 
   /**
    * \brief Handle keyboard input.
@@ -48,6 +53,9 @@ class GameClient {
   std::shared_ptr<communication::connection_layer::ClientSideConnectionManager> client_manager;
   bool keep_running = true;
   bool multiplayer;
+
+  /// True if the own `Player` is definitely represented on the server.
+  bool server_initialised = false;
 
   /// Indicates some kind of change which requires a new frame to be drawn.
   bool updated = false;

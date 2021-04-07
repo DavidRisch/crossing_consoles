@@ -1,5 +1,8 @@
 #include "RealTerminal.h"
 
+#include <codecvt>
+#include <locale>
+
 #include "../visual/ColoredString.h"
 
 #ifdef _WIN32
@@ -8,19 +11,14 @@
 
 #else
 
-#include <sys/ioctl.h>
 #include <termios.h>
+#include <unistd.h>
 
-#include <codecvt>
-#include <locale>
-
-#include "colors.h"
 #endif
 
 using namespace game;
 using namespace game::terminal;
 using namespace game::visual;
-using namespace game::terminal::colors;
 
 std::string RealTerminal::title = "Crossing Consoles";
 
@@ -47,20 +45,16 @@ int RealTerminal::GetInput() {
 }
 
 void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
-  Clear();
-
-  // initialization of relevant objects
-#ifdef _WIN32
-  HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-#else
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-#endif
 
   const std::vector<std::vector<ColoredChar>>& colored_characters = content.GetMatrix();
 
   ColoredString colored_string(std::wstring(), colored_characters[0][0].foreground,
                                colored_characters[0][0].background);
-#ifndef _WIN32
+#ifdef _WIN32
+  HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+  std::wstring output;
+#else
   std::string output;
 #endif
 
@@ -72,19 +66,17 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
         // append current character
         colored_string.string.push_back(i_characters.character);
       } else {
-#ifdef _WIN32
-        // print current string
-        SetConsoleTextAttribute(console_handle, (colored_string.background << 4) | colored_string.foreground);
-        _cwprintf(colored_string.string.c_str());
-#else
         // add current string to output, print later
-        output += "\033[";
-        output += std::to_string(colored_string.foreground);
-        output += ";";
-        output += std::to_string(colored_string.background + background_color_offset);
-        output += "m";
+#ifdef _WIN32
+        output += converter.from_bytes(ColorEscapeSequence(colored_string.foreground, false));
+        output += converter.from_bytes(ColorEscapeSequence(colored_string.background, true));
+        output += colored_string.string;
+#else
+        output += ColorEscapeSequence(colored_string.foreground, false);
+        output += ColorEscapeSequence(colored_string.background, true);
         output += converter.to_bytes(colored_string.string);
 #endif
+
         // reset string
         colored_string.string = std::wstring(1, i_characters.character);
         colored_string.foreground = i_characters.foreground;
@@ -95,20 +87,22 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
   }
   // print last string
 #ifdef _WIN32
-  SetConsoleTextAttribute(console_handle, (colored_string.background << 4) | colored_string.foreground);
-  _cwprintf(colored_string.string.c_str());
+  output += converter.from_bytes(ColorEscapeSequence(colored_string.foreground, false));
+  output += converter.from_bytes(ColorEscapeSequence(colored_string.background, true));
+  output += colored_string.string;
+  output += L"\033[0m \n";         // reset colors to prevent flickering of background
+  output = L"\033[1;1H" + output;  // reset cursor to the top left (dont clear to prevent flickering)
 #else
-  output += "\033[";
-  output += std::to_string(colored_string.foreground);
-  output += ";";
-  output += std::to_string(colored_string.background + background_color_offset);
-  output += "m";
+  output += ColorEscapeSequence(colored_string.foreground, false);
+  output += ColorEscapeSequence(colored_string.background, true);
   output += converter.to_bytes(colored_string.string);
-
-  output += "\033[0m \n";  // reset colors to prevent flickering of background
-
+  output += "\033[0m \n";         // reset colors to prevent flickering of background
   output = "\033[1;1H" + output;  // reset cursor to the top left (dont clear to prevent flickering)
+#endif
 
+#ifdef _WIN32
+  WriteConsoleW(console_handle, output.c_str(), output.size(), nullptr, nullptr);
+#else
   printf("%s", output.c_str());
 #endif
 }
@@ -117,6 +111,12 @@ void RealTerminal::Initialise() {
 #ifdef _WIN32
   _setmode(_fileno(stdout), _O_U16TEXT);
   HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+
+  // https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
+  DWORD console_mode = 0;
+  GetConsoleMode(console_handle, &console_mode);
+  console_mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+  SetConsoleMode(console_handle, console_mode);
 
   SetConsoleTitle(title.c_str());
 
@@ -145,10 +145,38 @@ void RealTerminal::Initialise() {
 #endif
 }
 
-void RealTerminal::Clear() const {
+std::string RealTerminal::ColorEscapeSequence(const common::Color& color, bool background) {
+  // 24 bit color ANSI escape code, see https://en.wikipedia.org/wiki/ANSI_escape_code#24-bit
+  std::string output;
+  output += "\033[";
+  if (background) {
+    output += "48";
+  } else {
+    output += "38";
+  }
+  output += ";2;";
+  output += std::to_string(color.red);
+  output += ";";
+  output += std::to_string(color.green);
+  output += ";";
+  output += std::to_string(color.blue);
+  output += "m";
+  return output;
+}
+
+void RealTerminal::Clear() {
 #ifdef _WIN32
-  HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-  SetConsoleCursorPosition(console_handle, {0, 0});
+  // TODO: implement clear if size has changed
+#else
+  struct winsize new_terminal_size {};
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &new_terminal_size);
+
+  if (new_terminal_size.ws_col != terminal_size.ws_col || new_terminal_size.ws_row != terminal_size.ws_row) {
+    // clear terminal if its size has changed to prevents artifacts.
+    // always clearing would lead to flicker.
+    system("clear");
+  }
+
+  terminal_size = new_terminal_size;
 #endif
-  // On Linux the screen is overwritten using ANSI escape codes
 }

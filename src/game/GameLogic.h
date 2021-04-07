@@ -8,7 +8,7 @@
 namespace game {
 
 /**
- * \brief Apply game logic to world and player on server and client side
+ * \brief Apply game logic to `World` and `Player` on server and client side
  */
 class GameLogic {
  public:

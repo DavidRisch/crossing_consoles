@@ -10,7 +10,7 @@
 namespace game::visual {
 
 /**
- * \brief Renders the world as a ColoredCharMatrix.
+ * \brief Renders the `World` as a `ColoredCharMatrix`.
  */
 class Renderer {
  public:
