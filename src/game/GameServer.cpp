@@ -24,8 +24,9 @@ GameServer::GameServer(const coordinate_size_t &world_size,
 void GameServer::RunIteration() {
   server_manager->HandleConnections();
   auto event = server_manager->PopAndGetOldestEvent();
-  if (event != nullptr) {
+  while (event != nullptr) {
     HandleEvent(event);
+    event = server_manager->PopAndGetOldestEvent();
   }
 
   if (std::chrono::steady_clock::now() - last_moving_projectiles_updated >= update_projectiles_interval) {
@@ -69,7 +70,8 @@ void GameServer::HandleEvent(const std::shared_ptr<communication::connection_lay
       break;
     }
     case communication::connection_layer::EventType::DISCONNECT: {
-      assert(false);  // TODO: handle client disconnect
+      auto player_id = event->GetPartnerId();
+      world->RemovePlayer(player_id);
       break;
     }
     case communication::connection_layer::EventType::PAYLOAD: {

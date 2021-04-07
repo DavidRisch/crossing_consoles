@@ -48,3 +48,7 @@ void ClientSideConnectionManager::SendMessageToServer(const std::shared_ptr<mess
 void ClientSideConnectionManager::SendDataToServer(std::vector<uint8_t> data) {
   SendDataToConnection(ProtocolDefinition::server_partner_id, std::move(data));
 }
+
+void ClientSideConnectionManager::CloseConnectionWithServer() {
+  CloseConnection(ProtocolDefinition::server_partner_id);
+}

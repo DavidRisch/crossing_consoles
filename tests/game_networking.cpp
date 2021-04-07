@@ -280,3 +280,27 @@ TEST_F(GameNetworking, ManyPlayers) {
 
   expect_some_output_on_all();
 }
+
+TEST_F(GameNetworking, Disconnect) {
+  communication_timeout = std::chrono::milliseconds(1000);
+
+  create_server_and_client();
+  create_new_client(Position(3, 4));
+
+  start_server();
+
+  mock_terminals.at(0)->AddInput((char)KeyCode::ESCAPE);
+
+  std::thread input_thread([this] {
+    wait_a_few_iterations();  // wait for the first player to disconnect
+
+    mock_terminals.at(1)->AddInput((char)KeyCode::ESCAPE);
+  });
+
+  run_clients();
+
+  input_thread.join();
+  stop_server();
+
+  expect_some_output_on_all();
+}
