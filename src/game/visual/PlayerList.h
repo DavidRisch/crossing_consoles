@@ -33,8 +33,8 @@ class PlayerList {
 
   class Row {
    public:
-    Row(std::string name, int player_health, uint16_t player_score, double packet_loss_percentage,
-        std::optional<std::chrono::microseconds> ping);
+    Row(std::string name, common::Color player_color, int player_health, uint16_t player_score,
+        double packet_loss_percentage, std::optional<std::chrono::microseconds> ping);
 
     /**
      * \brief Render a complete row of cells.
@@ -42,6 +42,7 @@ class PlayerList {
     [[nodiscard]] game::visual::ColoredCharMatrix RenderRow(const PlayerList &p) const;
 
     const std::string player_name;
+    const common::Color player_color;
     const int player_health;
     const uint16_t player_score;
     const double packet_loss_percentage;
