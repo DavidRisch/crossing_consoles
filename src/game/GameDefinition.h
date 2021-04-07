@@ -17,7 +17,7 @@ class GameDefinition {
   enum Direction : char { NORTH, EAST, SOUTH, WEST };
 
   /// Set waiting duration until player respawn
-  static constexpr std::chrono::duration<int64_t, std::milli> respawn_time = std::chrono::milliseconds(10000);
+  static constexpr std::chrono::duration<int64_t, std::milli> respawn_time = std::chrono::milliseconds(5000);
 
   /// Used to reference players.
   typedef uint16_t player_id_t;
