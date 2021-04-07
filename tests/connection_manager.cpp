@@ -21,6 +21,7 @@ using namespace communication::message_layer;
 bool CAUGHT_SIGNAL_BROKEN_PIPE = false;
 
 static void broken_pipe_handler(int signum) {
+  assert(signum == SIGPIPE);
   // Received signal of type SIGPIPE (Broken pipe)
   CAUGHT_SIGNAL_BROKEN_PIPE = true;
 }
