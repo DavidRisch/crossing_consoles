@@ -6,6 +6,7 @@
 #include "../src/game/GameClient.h"
 #include "../src/game/GameServer.h"
 #include "../src/game/terminal/MockTerminal.h"
+#include "utils/TimingHelper.h"
 
 using namespace game;
 using namespace game::common;
@@ -181,7 +182,7 @@ TEST_F(GameNetworking, Actions) {
 }
 
 TEST_F(GameNetworking, TwoPlayers) {
-  communication_timeout = std::chrono::milliseconds(1000);
+  communication_timeout = TimingHelper::HardwareDependentTime<std::milli>(25);
 
   create_server_and_client();
   create_new_client(Position(3, 4));
@@ -251,7 +252,7 @@ TEST_F(GameNetworking, TwoPlayers) {
 
 TEST_F(GameNetworking, ManyPlayers) {
   // Necessary to prevent timeouts while creating the clients
-  communication_timeout = std::chrono::milliseconds(1000);
+  communication_timeout = TimingHelper::HardwareDependentTime<std::milli>(1000);
 
   create_server_and_client();
 
@@ -282,7 +283,7 @@ TEST_F(GameNetworking, ManyPlayers) {
 }
 
 TEST_F(GameNetworking, Disconnect) {
-  communication_timeout = std::chrono::milliseconds(1000);
+  communication_timeout = TimingHelper::HardwareDependentTime<std::milli>(10);
 
   create_server_and_client();
   create_new_client(Position(3, 4));
