@@ -17,7 +17,7 @@ namespace communication {
 namespace connection_layer {
 
 /**
- * \brief Holds a pointer to the Connection and the time when the last Message was received on it.
+ * \brief Holds a pointer to the `Connection` and the time when the last `Message` was received on it.
  */
 struct ConnectionParameters {
   std::shared_ptr<connection_layer::Connection> connection;
@@ -29,7 +29,7 @@ struct ConnectionParameters {
 using partner_id_t = ProtocolDefinition::partner_id_t;
 
 /**
- * \brief Base class for handling Connections on the Server or the Client.
+ * \brief Base class for handling `Connection`s on the Server or the Client.
  */
 class ConnectionManager {
  public:

@@ -1,8 +1,8 @@
 \page developer-guide Developer Guide
 
-## Naming conventions
+# Naming conventions
 
-### Code
+## Code
 
 - Class names: `PascalCase`
 - Class attributes: `snake_case`
@@ -14,34 +14,32 @@
 - Enums: `PascalCase`
 - Defines: `ALL_CAPS`
 
-### Files
+## Files
 
 - Class files: `PascalCase.h`, `PascalCase.cpp`
 - Non-Class files: `snake_case.cpp`
 - Directories: `snake_case`
 
-### Git
+## Git
 
-#### Commits
+### Commits
 
 - Start with a capital letter
 - Present tense
 - No dot at the end of the title
 
-#### Branches
+### Branches
 
 - `snake_case`
 
-## GTest on Windows
+# GTest on Windows
 
 The following steps can be used to install GTest manually if nothing else works:
 
-1. Download a Google Test release of your choice from the
-   official [GitHub Repository](https://github.com/google/googletest/).
-2. Download the
-   libraries [`libgtest.a`](https://drive.google.com/file/d/1N6hmXb2Ix6fvMJa3-2O6oXuaDyDnkBu6/view?usp=sharing)
-   and [`libgtest_main.a`](https://drive.google.com/file/d/1wEpDVtbNIeSl22TKAJIqRLenjd2q6uM3/view?usp=sharing). (**use
-   the links provided at your own risk**)
+1. Download a Google Test release of your choice from the official [GitHub Repository](https://github.com/google/googletest/).
+2. Download the libraries [`libgtest.a`](https://drive.google.com/file/d/1N6hmXb2Ix6fvMJa3-2O6oXuaDyDnkBu6/view?usp=sharing)
+   and [`libgtest_main.a`](https://drive.google.com/file/d/1wEpDVtbNIeSl22TKAJIqRLenjd2q6uM3/view?usp=sharing). (**use the links provided at your own
+   risk**)
 3. Copy both of these files into lib of MinGW (
    ex.: `C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\lib`).
 4. Go to your extracted GTest folder, navigate to `googletest\include\gtest` and copy the whole folder
@@ -49,7 +47,7 @@ The following steps can be used to install GTest manually if nothing else works:
 
 [Source: Google Test Installation Guide](https://medium.com/swlh/google-test-installation-guide-for-c-in-windows-for-visual-studio-code-2b2e66352456)
 
-## Boost on Windows
+# Boost on Windows
 
 1. Download the MinGW distribution [here](https://nuwen.net/mingw.html).  
    It already contains multiple libraries including Boost.

@@ -8,7 +8,7 @@ namespace game::world {
 class World;
 
 /**
- * \brief Used to find suitable positions to create new players.
+ * \brief Used to find suitable positions to create new `Player`s.
  */
 class Spawner {
  public:
@@ -20,7 +20,7 @@ class Spawner {
   common::Position GenerateSpawnPosition() const;
 
   /**
-   * \brief Thrown if no free space to spawn a new player is found.
+   * \brief Thrown if no free space to spawn a new `Player` is found.
    */
   class NoSpaceException : public std::exception {
     [[nodiscard]] const char *what() const noexcept override {
