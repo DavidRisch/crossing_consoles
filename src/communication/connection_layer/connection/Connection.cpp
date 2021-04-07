@@ -294,10 +294,10 @@ Connection::Connection(std::shared_ptr<message_layer::MessageInputStream> messag
                        std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
                        ConnectionState connection_state, sequence_t sequence_counter, timeout_t timeout)
     : state(connection_state)
-    , sequence_counter(sequence_counter)
     , timeout(timeout)
     , message_input_stream(std::move(message_input_stream))
-    , message_output_stream(std::move(message_output_stream)) {
+    , message_output_stream(std::move(message_output_stream))
+    , sequence_counter(sequence_counter) {
   resend_interval =
       std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::resend_denominator);
   timestamp_last_change = std::chrono::steady_clock::now();
