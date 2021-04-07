@@ -100,6 +100,8 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
   output = "\033[1;1H" + output;  // reset cursor to the top left (dont clear to prevent flickering)
 #endif
 
+  Clear();
+
 #ifdef _WIN32
   WriteConsoleW(console_handle, output.c_str(), output.size(), nullptr, nullptr);
 #else
