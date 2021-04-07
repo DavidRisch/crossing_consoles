@@ -9,6 +9,7 @@
 #include <sys/ioctl.h>
 #endif
 
+#include "../common/Color.h"
 #include "../visual/ColoredString.h"
 #include "ITerminal.h"
 
@@ -34,6 +35,11 @@ class RealTerminal : public ITerminal {
    * Must be called again if iostream was used (e.g. write to cout).
    */
   static void Initialise();
+
+  /**
+   * \brief Generate an escape sequence to set the specified color as the fore- or background color.
+   */
+  inline std::string ColorEscapeSequence(const common::Color& color, bool background);
 
   /**
    * \brief Clear terminal output.

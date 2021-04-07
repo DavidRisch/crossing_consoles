@@ -11,7 +11,7 @@ ColoredCharMatrix HealthDisplay::Render(int health) {
 
   int i;
   for (i = 0; i < health; ++i) {
-    output.AppendChar(symbols::black_heart_suit, terminal::colors::RED);
+    output.AppendChar(symbols::black_heart_suit, common::Color::RED);
     output.AppendChar(L' ');  // needed because black_heart_suit is rendered extra wide
   }
   for (; i < world::Player::max_health; ++i) {

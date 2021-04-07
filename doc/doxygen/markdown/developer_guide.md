@@ -1,8 +1,8 @@
 \page developer-guide Developer Guide
 
-## Naming conventions
+# Naming conventions
 
-### Code
+## Code
 
 - Class names: `PascalCase`
 - Class attributes: `snake_case`
@@ -14,25 +14,25 @@
 - Enums: `PascalCase`
 - Defines: `ALL_CAPS`
 
-### Files
+## Files
 
 - Class files: `PascalCase.h`, `PascalCase.cpp`
 - Non-Class files: `snake_case.cpp`
 - Directories: `snake_case`
 
-### Git
+## Git
 
-#### Commits
+### Commits
 
 - Start with a capital letter
 - Present tense
 - No dot at the end of the title
 
-#### Branches
+### Branches
 
 - `snake_case`
 
-## GTest on Windows
+# GTest on Windows
 
 The following steps can be used to install GTest manually if nothing else works:
 
@@ -49,7 +49,7 @@ The following steps can be used to install GTest manually if nothing else works:
 
 [Source: Google Test Installation Guide](https://medium.com/swlh/google-test-installation-guide-for-c-in-windows-for-visual-studio-code-2b2e66352456)
 
-## Boost on Windows
+# Boost on Windows
 
 1. Download the MinGW distribution [here](https://nuwen.net/mingw.html).  
    It already contains multiple libraries including Boost.

@@ -8,7 +8,7 @@
 namespace game {
 
 /**
- * \brief Apply game logic to world and player on server and client side
+ * \brief Apply game logic to `World` and `Player` on server and client side
  */
 class GameLogic {
  public:
@@ -16,6 +16,11 @@ class GameLogic {
    * \brief Handle a `Change` produced by a `GameClient` controlling the specific player or by keyboard input.
    */
   static void HandleChange(world::Player &player, const networking::Change &change, world::World &world);
+
+  /**
+   * \brief Handle respawn of dead `Player` in `World`.
+   */
+  static void HandlePlayerRespawn(world::Player &player, world::World &world);
 
   /**
    * \brief Handle `Projectile`s movement and collision with `Player`s or `Wall`s in `World`.
@@ -66,11 +71,16 @@ class GameLogic {
    */
   static bool HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> &projectiles, world::World &world);
 
-
   /**
    * \brief Returns the position that gets attacked with a sword when the position and the direction of a player are given.
    */
   static common::Position AttackedPositionFromDirection(const common::Position &position, GameDefinition::Direction direction);
+
+  /**
+   * \brief Apply given `damage` to `Player`and invoke Death if necessary
+   */
+  static void ApplyDamageToPlayer(world::Player &player, int damage);
+
 };
 
 }  // namespace game

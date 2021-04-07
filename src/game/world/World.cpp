@@ -22,6 +22,14 @@ void World::AddPlayer(const std::shared_ptr<Player>& player) {
   updated = true;
 }
 
+void World::RemovePlayer(GameDefinition::player_id_t player_id) {
+  auto it = std::find_if(players.begin(), players.end(), [&player_id](const std::shared_ptr<Player>& player) {
+    return player->player_id == player_id;
+  });
+  assert(it != players.end());
+  players.erase(it);
+}
+
 void World::AddWall(const Position& position) {
   if (position.IsGreaterOrEqual(Position(0, 0)) && position.IsLess(size)) {
     if (walls.find(position) != walls.end()) {
@@ -79,10 +87,11 @@ void World::Update(const World& server_world) {
   }
 
   // remove players no longer on the server
-  players.end() =
+  auto removed_players_begin =
       std::remove_if(players.begin(), players.end(), [&server_world](const std::shared_ptr<Player>& player) {
         return server_world.GetPlayerById(player->player_id) == nullptr;
       });
+  players.erase(removed_players_begin, players.end());
 
   updated = true;
 }
@@ -208,4 +217,10 @@ std::optional<std::shared_ptr<Projectile>> World::GetProjectileFromPosition(comm
     return *projectiles_it;
   }
   return std::optional<std::shared_ptr<Projectile>>();
+}
+
+void World::ResurrectPlayer(Player& player) {
+  player.DecreaseHealth(-game::world::Player::max_health);
+  player.score = 0;
+  player.position = spawner.GenerateSpawnPosition();
 }

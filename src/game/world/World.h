@@ -31,6 +31,8 @@ class World : public networking::ISerializable {
 
   void AddPlayer(const std::shared_ptr<Player>& player);
 
+  void RemovePlayer(GameDefinition::player_id_t player_id);
+
   void AddWall(const common::Position& position);
 
   void AddItem(const common::Position& position, const std::shared_ptr<IItem>& item);
@@ -65,6 +67,11 @@ class World : public networking::ISerializable {
   void Serialize(std::vector<uint8_t>& output_vector) const override;
 
   static World Deserialize(std::vector<uint8_t>::iterator& input_iterator);
+
+  /**
+   * \brief Respawn player in world, reset score and restore health
+   */
+  void ResurrectPlayer(Player& player);
 
  private:
   Spawner spawner;

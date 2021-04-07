@@ -9,7 +9,7 @@
 namespace communication::connection_layer {
 
 /**
- * \brief Shows that a PayloadMessage has been received on the Connection.
+ * \brief Shows that a `PayloadMessage` has been received on the `Connection`.
  */
 class PayloadEvent : public Event {
  public:

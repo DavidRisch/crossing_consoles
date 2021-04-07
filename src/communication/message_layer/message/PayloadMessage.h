@@ -7,7 +7,7 @@ namespace communication {
 namespace message_layer {
 
 /**
- * \brief Message containing data/payload.
+ * \brief `Message` containing data/payload.
  */
 class PayloadMessage : public Message {
  public:

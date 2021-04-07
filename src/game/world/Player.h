@@ -11,7 +11,7 @@
 namespace game::world {
 
 /**
- * \brief Represenation of a player.
+ * \brief Representation of a player.
  * \details Representation of a player with name, position, direction, health and information about his connection.
  */
 class Player : public networking::ISerializable {
@@ -26,11 +26,19 @@ class Player : public networking::ISerializable {
   bool updated = false;
   double packet_loss_percentage = 0;
   std::optional<std::chrono::microseconds> ping{};
+  std::chrono::steady_clock::time_point time_of_death;
+  uint16_t score = 0;
 
   Player(std::string name, common::Position position, int player_id = 999,
          GameDefinition::Direction direction = GameDefinition::NORTH);
 
   [[nodiscard]] bool IsAlive() const;
+
+  /**
+   * \brief Set player's time of Death
+   * \details Time of death is used to determine respawn.
+   */
+  void Die();
 
   void MoveTo(const common::Position& new_position);
 
@@ -59,7 +67,6 @@ class Player : public networking::ISerializable {
 
  private:
   std::shared_ptr<IItem> item;
-  uint16_t score = 0;
 };
 
 }  // namespace game::world

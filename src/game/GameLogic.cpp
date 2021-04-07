@@ -85,7 +85,7 @@ void GameLogic::MovePlayer(world::Player &player, const coordinate_distance_t &m
 
   if (projectile.has_value()) {
     // decrease player's health and remove projectile from world
-    player.DecreaseHealth(projectile.value()->GetDamage());
+    ApplyDamageToPlayer(player, projectile.value()->GetDamage());
     auto list = std::list<std::shared_ptr<Projectile>>();
     list.push_back(projectile.value());
     world.RemoveProjectiles(list);
@@ -280,8 +280,8 @@ bool GameLogic::HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> 
       return false;
     }
 
-    // Increase score of shooter and decrease health of shot player
-    hit_player.DecreaseHealth(projectile->GetDamage());
+    // Increase score of shooter and apply damage to shot player
+    ApplyDamageToPlayer(hit_player, projectile->GetDamage());
 
     auto shooter = world.GetPlayerById(projectile->GetShooterId());
     if (shooter != nullptr && hit_player.player_id != projectile->GetShooterId()) {
@@ -291,4 +291,17 @@ bool GameLogic::HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> 
   }
 
   return true;
+}
+
+void GameLogic::ApplyDamageToPlayer(Player &player, int damage) {
+  player.DecreaseHealth(damage);
+  if (!player.IsAlive()) {
+    player.Die();
+  }
+}
+
+void GameLogic::HandlePlayerRespawn(Player &player, World &world) {
+  if (!player.IsAlive() && std::chrono::steady_clock::now() - player.time_of_death > GameDefinition::respawn_time) {
+    world.ResurrectPlayer(player);
+  }
 }

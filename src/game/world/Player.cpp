@@ -110,3 +110,7 @@ void Player::IncreaseScore(uint16_t points) {
 void Player::SetItem(std::shared_ptr<IItem> new_item){
   item = std::move(new_item);
 }
+
+void Player::Die() {
+  time_of_death = std::chrono::steady_clock::now();
+}

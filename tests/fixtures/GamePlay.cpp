@@ -1,5 +1,7 @@
 #include "GamePlay.h"
 
+#include "../../src/game/world/WorldGenerator.h"
+
 using namespace game;
 using namespace game::common;
 using namespace game::world;
@@ -14,7 +16,7 @@ const std::unordered_map<const GameDefinition::Direction, common::Position> Game
 
 void GamePlay::initialize_game() {
   reset_elements();
-  world = std::make_shared<world::World>(world::World(common::coordinate_size_t(21, 21)));
+  world = WorldGenerator::GenerateWorld(common::coordinate_size_t(21, 21));
 }
 
 void GamePlay::add_player() {

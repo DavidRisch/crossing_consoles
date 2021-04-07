@@ -5,6 +5,7 @@ add_library(crossing_consoles_lib
         game/GameServer.cpp
 
         game/common/Position.cpp
+        game/common/Color.cpp
 
         game/world/Player.cpp
         game/world/World.cpp

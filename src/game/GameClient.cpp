@@ -55,12 +55,16 @@ void GameClient::Run() {
         if (event->GetType() == communication::connection_layer::EventType::PAYLOAD) {
           Change change(std::dynamic_pointer_cast<communication::connection_layer::PayloadEvent>(event)->GetPayload());
           if (change.GetChangeType() == ChangeType::SET_WORLD) {
-            auto iterator = change.payload.begin();
-            ++iterator;
-            auto server_world = World::Deserialize(iterator);
-            world.Update(server_world);
+            if (server_initialised) {
+              auto iterator = change.payload.begin();
+              ++iterator;
+              auto server_world = World::Deserialize(iterator);
+              world.Update(server_world);
+              assert(world.GetPlayerById(player->player_id) != nullptr);  // the own player should never be removed
+            }
           } else if (change.GetChangeType() == ChangeType::SET_OWN_ID) {
             player->player_id = change.payload.at(1);
+            server_initialised = true;
           } else {
             throw std::runtime_error("Unexpected ChangeType");
           }
@@ -71,6 +75,7 @@ void GameClient::Run() {
     if (world.updated || player->updated || updated) {
       if (!multiplayer) {
         GameLogic::HandleProjectiles(world);
+        GameLogic::HandlePlayerRespawn(*player, world);
       }
 
       updated = false;
@@ -78,6 +83,15 @@ void GameClient::Run() {
     }
 
     std::this_thread::sleep_for(std::chrono::microseconds(100));
+  }
+
+  if (multiplayer) {
+    client_manager->CloseConnectionWithServer();
+    // wait until connection is properly closed
+    while (client_manager->HasConnections()) {
+      client_manager->HandleConnections();
+      std::this_thread::sleep_for(std::chrono::microseconds(100));
+    }
   }
 }
 
@@ -90,7 +104,7 @@ void GameClient::ProcessInput() {
     if (change_type_it == map_key_to_change.end()) {
       switch (keycode) {
         case KeyCode::ESCAPE: {
-          keep_running = false;
+          StartExit();
           return;
         }
         case KeyCode::Y: {
@@ -116,4 +130,8 @@ void GameClient::ProcessInput() {
 
 const world::World& GameClient::GetWorld() const {
   return world;
+}
+
+void GameClient::StartExit() {
+  keep_running = false;
 }

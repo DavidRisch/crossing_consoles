@@ -4,31 +4,29 @@
 #include <vector>
 
 #include "../common/Position.h"
-#include "../terminal/colors.h"
 #include "ColoredChar.h"
 
 namespace game::visual {
 
 /**
- * \brief Matrix of ColoredChars
+ * \brief Matrix of `ColoredChar`s
  */
 class ColoredCharMatrix {
  public:
   explicit ColoredCharMatrix(common::coordinate_size_t size);
 
-  void AppendChar(wchar_t character, terminal::colors::Color foreground = terminal::colors::WHITE,
-                  terminal::colors::Color background = terminal::colors::BLACK);
+  void AppendChar(wchar_t character, common::Color foreground = common::Color::WHITE,
+                  common::Color background = common::Color::BLACK);
 
-  void SetChar(wchar_t character, const common::Position& position,
-               terminal::colors::Color foreground = terminal::colors::WHITE,
-               terminal::colors::Color background = terminal::colors::BLACK);
+  void SetChar(wchar_t character, const common::Position& position, common::Color foreground = common::Color::WHITE,
+               common::Color background = common::Color::BLACK);
 
-  void AppendString(const std::wstring& string, terminal::colors::Color foreground = terminal::colors::WHITE,
-                    terminal::colors::Color background = terminal::colors::BLACK);
+  void AppendString(const std::wstring& string, const common::Color& foreground = common::Color::WHITE,
+                    const common::Color& background = common::Color::BLACK);
 
   void SetString(const std::wstring& string, const common::Position& position,
-                 terminal::colors::Color foreground = terminal::colors::WHITE,
-                 terminal::colors::Color background = terminal::colors::BLACK);
+                 const common::Color& foreground = common::Color::WHITE,
+                 const common::Color& background = common::Color::BLACK);
 
   void InsertMatrix(const ColoredCharMatrix& matrix);
 
