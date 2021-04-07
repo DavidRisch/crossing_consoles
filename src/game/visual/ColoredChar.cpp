@@ -1,13 +1,15 @@
 #include "ColoredChar.h"
 
+#include <utility>
+
 using namespace game;
 using namespace game::visual;
-using namespace game::terminal::colors;
+using namespace game::common;
 
 ColoredChar::ColoredChar(wchar_t character, Color foreground, Color background)
     : character(character)
-    , foreground(foreground)
-    , background(background) {
+    , foreground(std::move(foreground))
+    , background(std::move(background)) {
 }
 
 bool ColoredChar::operator==(const ColoredChar &colored_char) const {
