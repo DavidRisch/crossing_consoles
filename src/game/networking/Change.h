@@ -34,6 +34,8 @@ class Change {
 
   [[nodiscard]] ChangeType GetChangeType() const;
 
+  [[nodiscard]] std::vector<uint8_t>::iterator GetContentIterator();
+
   std::vector<uint8_t> payload;
 
  private:

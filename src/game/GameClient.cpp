@@ -56,8 +56,7 @@ void GameClient::Run() {
           Change change(std::dynamic_pointer_cast<communication::connection_layer::PayloadEvent>(event)->GetPayload());
           if (change.GetChangeType() == ChangeType::SET_WORLD) {
             if (server_initialised) {
-              auto iterator = change.payload.begin();
-              ++iterator;
+              auto iterator = change.GetContentIterator();
               auto server_world = World::Deserialize(iterator);
               world.Update(server_world);
               assert(world.GetPlayerById(player->player_id) != nullptr);  // the own player should never be removed
