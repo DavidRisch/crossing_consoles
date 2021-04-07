@@ -35,11 +35,6 @@ class RealTerminal : public ITerminal {
   static void Initialise();
 
   /**
-   * \brief Clear terminal output.
-   */
-  void Clear() const;
-
-  /**
    * \brief Generate an escape sequence to set the specified color as the fore- or background color.
    */
   inline std::string ColorEscapeSequence(const common::Color& color, bool background);
