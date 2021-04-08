@@ -14,23 +14,23 @@ visual::ColoredCharMatrix Heart::GetSprite(common::coordinate_size_t block_size)
 }
 
 void Heart::Serialize(std::vector<uint8_t> &output_vector) const {
-  output_vector.push_back(damage);
+  output_vector.push_back(healing);
 }
 
 std::shared_ptr<Heart> Heart::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
-  int new_damage = *input_iterator++;
+  int new_healing = *input_iterator++;
 
-  auto heart = std::make_shared<Heart>(new_damage);
+  auto heart = std::make_shared<Heart>(new_healing);
   return heart;
 }
 
-Heart::Heart(int damage)
-    : damage(damage)
+Heart::Heart(int healing)
+    : healing(healing)
     , item_type(ItemType::HEART) {
 }
 
-int Heart::GetDamage() const {
-  return damage;
+int Heart::GetHealing() const {
+  return healing;
 }
 
 ItemType Heart::GetItemType() {

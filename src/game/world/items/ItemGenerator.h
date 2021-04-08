@@ -8,6 +8,9 @@
 
 namespace game::world {
 
+/**
+ * \brief Generates a new item of a random type at a random position.
+ */
 class ItemGenerator {
  public:
   explicit ItemGenerator(std::shared_ptr<World> world);

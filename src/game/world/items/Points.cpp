@@ -18,9 +18,9 @@ void Points::Serialize(std::vector<uint8_t>& output_vector) const {
 }
 
 std::shared_ptr<Points> Points::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
-  int new_damage = *input_iterator++;
+  int new_value = *input_iterator++;
 
-  auto points = std::make_shared<Points>(new_damage);
+  auto points = std::make_shared<Points>(new_value);
   return points;
 }
 

@@ -14,7 +14,7 @@ class Gun : public IItem {
   Gun(int damage, uint8_t max_range);
 
   /**
-   * \brief Create Projectile with damage and range given by weapon
+   * \brief Create Projectile with healing and range given by weapon
    * \details Initialize with position and direction of `Player` with `shooter_id`
    */
   [[nodiscard]] Projectile SpawnProjectile(GameDefinition::player_id_t shooter_id, common::Position position,
@@ -30,12 +30,24 @@ class Gun : public IItem {
    */
   [[nodiscard]] uint8_t GetRange() const;
 
+  /**
+   * \brief Serialize the item for transmission over the network.
+   */
   void Serialize(std::vector<uint8_t> &output_vector) const override;
 
+  /**
+   * \brief Deserialize the item after receiving it over the network.
+   */
   static std::shared_ptr<Gun> Deserialize(std::vector<uint8_t>::iterator &input_iterator);
 
+  /**
+   * \brief Return the type of this item.
+   */
   ItemType GetItemType() override;
 
+  /**
+   * \brief Return the sprite of this item.
+   */
   visual::ColoredCharMatrix GetSprite(common::coordinate_size_t block_size) override;
 
  private:

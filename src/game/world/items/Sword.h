@@ -7,29 +7,40 @@
 
 namespace game::world {
 
+/**
+ * \brief Short range item which causes damage to a `Player`.
+ */
 class Sword : public IItem {
  public:
-  Sword(int damage, uint8_t max_range);
+  explicit Sword(int damage);
 
+  /**
+   * \brief Return the sprite of this item.
+   */
   visual::ColoredCharMatrix GetSprite(common::coordinate_size_t block_size) override;
+
+  /**
+   * \brief Serialize the item for transmission over the network.
+   */
   void Serialize(std::vector<uint8_t>& output_vector) const override;
+
+  /**
+   * \brief Deserialize the item after receiving it over the network.
+   */
   static std::shared_ptr<Sword> Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 
   /**
-   * \brief Return damage of this weapon
+   * \brief Return damage of this weapon.
    */
   [[nodiscard]] int GetDamage() const;
 
   /**
-   * \brief Return maximal range of projectiles spawned by this weapon
-   */
-  [[nodiscard]] uint8_t GetRange() const;
-
+  * \brief Return the type of this item.
+  */
   ItemType GetItemType() override;
 
  private:
   int damage;
-  uint8_t range;
   ItemType item_type;
 };
 }  // namespace game::world

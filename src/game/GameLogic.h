@@ -30,18 +30,18 @@ class GameLogic {
  private:
   /**
    * \brief Move the player with the given `movement`.
-   * \details Handles collisions with 'Projectiles' during movement.
+   * \details Handles collisions with 'Projectile`s and items during movement.
    */
   static void MovePlayer(world::Player &player, const common::coordinate_distance_t &movement, world::World &world);
 
   /**
-   * \brief Move the projectile using its direction.
+   * \brief Move the `Projectile` using its direction.
    */
   static void MoveProjectile(Projectile &projectile, world::World &world);
 
   /**
    * \brief Player uses weapon.
-     \details Spawns `Projectile` in world.
+     \details Spawns `Projectile` in world for `Gun`.
    */
   static void UseWeapon(world::Player &player, world::World &world);
 
@@ -79,7 +79,7 @@ class GameLogic {
                                                         GameDefinition::Direction direction);
 
   /**
-   * \brief Apply given `damage` to `Player`and invoke Death if necessary
+   * \brief Apply given `healing` to `Player`and invoke Death if necessary
    */
   static void ApplyDamageToPlayer(world::Player &player, int damage);
 };

@@ -6,8 +6,14 @@
 
 namespace game::world {
 
+/**
+ * \brief Possible item types.
+ */
 enum class ItemType : char { GUN, SWORD, HEART, POINTS, HIGHEST_ELEMENT = POINTS };
 
+/**
+ * \brief Interface for game items.
+ */
 class IItem : public networking::ISerializable {
  public:
   virtual visual::ColoredCharMatrix GetSprite(common::coordinate_size_t block_size) = 0;

@@ -43,7 +43,7 @@ class Player : public networking::ISerializable {
   void MoveTo(const common::Position& new_position);
 
   /**
-   * \brief Decrease player's health by given `damage`.
+   * \brief Decrease player's health by given `healing`.
    */
   void DecreaseHealth(int damage);
 
@@ -63,6 +63,9 @@ class Player : public networking::ISerializable {
    */
   std::shared_ptr<IItem> GetItem();
 
+  /**
+   * \brief Assign new item to the `Player`if he walked into it. `Heart`s and `Point`s are used immediately.
+   */
   void SetItem(std::shared_ptr<IItem> new_item);
 
  private:

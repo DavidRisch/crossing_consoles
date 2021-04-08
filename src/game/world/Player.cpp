@@ -18,8 +18,6 @@ Player::Player(std::string name, Position position, int player_id, GameDefinitio
     , position(std::move(position))
     , player_id(player_id)
     , direction(direction) {
-  // TODO Assign weapons dynamically by placing items in world
-  item = std::make_shared<Gun>(1, 20);  // dummy weapon
 }
 
 bool Player::IsAlive() const {
@@ -47,8 +45,13 @@ void Player::Serialize(std::vector<uint8_t> &output_vector) const {
 
   networking::SerializationUtils::SerializeObject(direction, output_vector);
 
-  networking::SerializationUtils::SerializeObject(item->GetItemType(), output_vector);
-  item->Serialize(output_vector);
+  if (item != nullptr) {
+    networking::SerializationUtils::SerializeObject(true, output_vector);
+    networking::SerializationUtils::SerializeObject(item->GetItemType(), output_vector);
+    item->Serialize(output_vector);
+  }else{
+    networking::SerializationUtils::SerializeObject(false, output_vector);
+  }
 
   networking::SerializationUtils::SerializeObject(health, output_vector);
   networking::SerializationUtils::SerializeObject(score, output_vector);
@@ -67,26 +70,26 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
   }
   auto position = Position::Deserialize(input_iterator);
   auto direction = networking::SerializationUtils::DeserializeObject<GameDefinition::Direction>(input_iterator);
-
-  auto item_type = networking::SerializationUtils::DeserializeObject<ItemType>(input_iterator);
-  auto new_item = std::shared_ptr<IItem>();
-  switch (item_type) {
-    case ItemType::SWORD:
-      new_item = Sword::Deserialize(input_iterator);
-      break;
-    case ItemType::GUN:
-      new_item = Gun::Deserialize(input_iterator);
-      break;
-    case ItemType::HEART:
-      new_item = Heart::Deserialize(input_iterator);
-      break;
-    case ItemType::POINTS:
-      new_item = Points::Deserialize(input_iterator);
-      break;
-  }
-
   Player player(name, position, player_id, direction);
-  player.SetItem(new_item);
+
+  // Deserialize item of the player, either Gun or Sword
+  bool has_item = networking::SerializationUtils::DeserializeObject<bool>(input_iterator);
+  if (has_item) {
+    auto item_type = networking::SerializationUtils::DeserializeObject<ItemType>(input_iterator);
+    auto new_item = std::shared_ptr<IItem>();
+    switch (item_type) {
+      case ItemType::SWORD:
+        new_item = Sword::Deserialize(input_iterator);
+        break;
+      case ItemType::GUN:
+        new_item = Gun::Deserialize(input_iterator);
+        break;
+      case ItemType::HEART:
+      case ItemType::POINTS:
+        break;
+    }
+    player.SetItem(new_item);
+  }
 
   player.health = networking::SerializationUtils::DeserializeObject<decltype(health)>(input_iterator);
   player.score = networking::SerializationUtils::DeserializeObject<decltype(score)>(input_iterator);
@@ -113,7 +116,7 @@ void Player::IncreaseScore(uint16_t points) {
 void Player::SetItem(std::shared_ptr<IItem> new_item) {
   switch (new_item->GetItemType()) {
     case ItemType::HEART:
-      DecreaseHealth(std::dynamic_pointer_cast<Heart>(new_item)->GetDamage());
+      DecreaseHealth(-std::dynamic_pointer_cast<Heart>(new_item)->GetHealing());
       break;
     case ItemType::POINTS:
       IncreaseScore(std::dynamic_pointer_cast<Points>(new_item)->GetValue());
