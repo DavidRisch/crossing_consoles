@@ -1,7 +1,6 @@
 #include "TimingHelper.h"
 
 #include <cassert>
-#include <iostream>
 #include <thread>
 
 #include "../../src/communication/byte_layer/byte_stream/SocketByteServer.h"

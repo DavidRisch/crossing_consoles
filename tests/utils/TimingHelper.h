@@ -17,7 +17,7 @@ class TimingHelper {
   static const TimingHelper& GetInstance();
 
   /**
-   * \breif Get a time interval which is longer if the hardware is slower.
+   * \brief Get a time interval which is longer if the hardware is slower.
    */
   template <class T>
   static std::chrono::duration<int64_t, T> HardwareDependentTime(double amount) {
