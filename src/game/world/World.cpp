@@ -16,7 +16,8 @@ using namespace game::world;
 
 World::World(coordinate_size_t size)
     : size(std::move(size))
-    , spawner(this) {
+    , spawner(this)
+, item_generator(this){
 }
 
 void World::AddPlayer(const std::shared_ptr<Player>& player) {
@@ -226,4 +227,8 @@ void World::ResurrectPlayer(Player& player) {
   player.DecreaseHealth(-game::world::Player::max_health);
   player.score = 0;
   player.position = spawner.GenerateSpawnPosition();
+}
+
+ItemGenerator World::GetItemGenerator(){
+  return item_generator;
 }

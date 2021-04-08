@@ -11,6 +11,7 @@
 #include "Projectile.h"
 #include "Spawner.h"
 #include "Wall.h"
+#include "items/ItemGenerator.h"
 
 namespace game::world {
 
@@ -73,8 +74,11 @@ class World : public networking::ISerializable {
    */
   void ResurrectPlayer(Player& player);
 
+  ItemGenerator GetItemGenerator();
+
  private:
   Spawner spawner;
+  ItemGenerator item_generator;
   std::list<std::shared_ptr<Projectile>> projectiles{};
 };
 

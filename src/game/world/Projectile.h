@@ -9,7 +9,7 @@ namespace game {
 
 class Projectile : public networking::ISerializable {
   /**
-   * \brief Projectiles are moving objects of `World` with a certain range and healing
+   * \brief Projectiles are moving objects of `World` with a certain range and damage
    */
 
  public:

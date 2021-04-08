@@ -53,7 +53,7 @@ TEST(Projectile, Spawn) {
   // spawn projectile and add to world
   World world(coordinate_size_t(21, 21));
   auto player = std::make_shared<Player>("player", Position(0, 0));
-  player->SetItem(std::make_shared<Gun>(GameDefinition::gun_damage, GameDefinition::gun_range));
+  player->SetItem(std::make_shared<Gun>(1, 20));
 
   world.AddPlayer(player);
 

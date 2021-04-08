@@ -14,11 +14,11 @@ add_library(crossing_consoles_lib
         game/world/Spawner.cpp
         game/world/Projectile.cpp
 
-        game/world/items/ItemGenerator.cpp
         game/world/items/Gun.cpp
         game/world/items/Sword.cpp
         game/world/items/Heart.cpp
         game/world/items/Points.cpp
+        game/world/items/ItemGenerator.cpp
 
         game/visual/Renderer.cpp
         game/visual/Compositor.cpp

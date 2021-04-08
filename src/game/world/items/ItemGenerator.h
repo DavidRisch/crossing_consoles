@@ -2,18 +2,18 @@
 #define CROSSING_CONSOLES_ITEMGENERATOR_H
 
 #include <memory>
-
-#include "../World.h"
 #include "IItem.h"
 
 namespace game::world {
+
+class World;
 
 /**
  * \brief Generates a new item of a random type at a random position.
  */
 class ItemGenerator {
  public:
-  explicit ItemGenerator(std::shared_ptr<World> world);
+  explicit ItemGenerator(World *world);
 
   /**
    * \brief Generate a new item at a random position with a random type.
@@ -30,7 +30,7 @@ class ItemGenerator {
   };
 
  private:
-  std::shared_ptr<World> world;
+  World *world;
 };
 
 }  // namespace game::world

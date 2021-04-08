@@ -21,12 +21,12 @@ class Gun : public IItem {
                                            GameDefinition::Direction direction) const;
 
   /**
-   * \brief Return damage of projectiles spawned by this weapon
+   * \brief Return damage of projectiles spawned by this weapon.
    */
   [[nodiscard]] int GetDamage() const;
 
   /**
-   * \brief Return maximal range of projectiles spawned by this weapon
+   * \brief Return maximal range of projectiles spawned by this weapon.
    */
   [[nodiscard]] uint8_t GetRange() const;
 

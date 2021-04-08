@@ -145,13 +145,14 @@ void GameLogic::UseWeapon(Player &player, World &world) {
       std::shared_ptr<Sword> sword = std::dynamic_pointer_cast<Sword>(item);
       Position attacked_position = AttackedPositionFromDirection(player.position, player.direction);
 
+      // check whether another player has been hit
       auto hit_player_it = std::find_if(world.players.begin(), world.players.end(),
                                         [&attacked_position](const std::shared_ptr<Player> &other_player) {
                                           return other_player->position == attacked_position;
                                         });
 
       if (hit_player_it != world.players.end()) {
-        // Check that shot player is still alive, otherwise no health or score changes are applied
+        // Check that hit player is still alive, otherwise no health or score changes are applied
         Player &hit_player = **hit_player_it;
         if (!hit_player.IsAlive()) {
           return;
@@ -160,8 +161,16 @@ void GameLogic::UseWeapon(Player &player, World &world) {
         hit_player.DecreaseHealth(sword->GetDamage());
         player.IncreaseScore(1);  // arbitrarily chosen number of points -> TODO associate with weapon?
       }
+
+      // destroy hit projectiles
+      for (auto &projectile : world.GetProjectiles()){
+        if (attacked_position == projectile->GetPosition()){
+          std::list<std::shared_ptr<Projectile>> hit_projectile = {projectile};
+          world.RemoveProjectiles(hit_projectile);
+        }
+      }
       break;
-      // TODO: hit projectile
+
     }
     case ItemType::HEART:
     case ItemType::POINTS:

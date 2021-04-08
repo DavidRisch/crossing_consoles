@@ -43,7 +43,7 @@ class Player : public networking::ISerializable {
   void MoveTo(const common::Position& new_position);
 
   /**
-   * \brief Decrease player's health by given `healing`.
+   * \brief Decrease player's health by given damage.
    */
   void DecreaseHealth(int damage);
 

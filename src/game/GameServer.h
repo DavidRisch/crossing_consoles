@@ -47,8 +47,6 @@ class GameServer {
   /// USed to generate new items in the world
   std::chrono::time_point<std::chrono::steady_clock> last_item_generated;
   static constexpr auto generate_item_interval = std::chrono::seconds(10);
-
-  world::ItemGenerator item_generator;
 };
 
 }  // namespace game

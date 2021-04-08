@@ -22,18 +22,8 @@ class GameDefinition {
   /// Used to reference players.
   typedef uint16_t player_id_t;
 
-  /// Damage and range of `Gun`
-  static constexpr int gun_damage = 1;
-  static constexpr uint8_t gun_range = 10;
-
-  /// Damage of `Sword`
-  static constexpr int sword_damage = 2;
-
-  /// Healing of `Heart`
-  static constexpr int heart_healing = 1;
-
-  /// Value of `Points`
-  static constexpr uint8_t points_value = 10;
+  /// Maximum number of items in the world at the same time
+  static constexpr int max_items_in_world = 3;
 };
 
 }  // namespace game

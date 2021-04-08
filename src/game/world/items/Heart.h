@@ -30,7 +30,7 @@ class Heart : public IItem {
   static std::shared_ptr<Heart> Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 
   /**
-   * \brief Return healing of this weapon, defined in `Game Definition`.
+   * \brief Return healing of this item.
    */
   [[nodiscard]] int GetHealing() const;
 
