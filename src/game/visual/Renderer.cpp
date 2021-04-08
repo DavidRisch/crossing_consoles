@@ -93,7 +93,7 @@ ColoredCharMatrix Renderer::RenderWorld() const {
       Position relative_position = i_player->position - viewport_start;
       // insert player sprite
       ColoredCharMatrix colored_player_sprite(player_sprite);
-      colored_player_sprite.SetAllColours(i_player->color);
+      colored_player_sprite.SetAllColors(i_player->color);
       rendered_world.InsertMatrix(colored_player_sprite, relative_position * block_size);
     }
   }

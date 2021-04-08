@@ -37,8 +37,8 @@ class ColoredCharMatrix {
 
   void InsertMatrix(const ColoredCharMatrix& matrix, const common::Position& position);
 
-  const std::vector<std::vector<ColoredChar>>& GetMatrix() const;
-  const common::coordinate_size_t& GetSize() const;
+  [[nodiscard]] const std::vector<std::vector<ColoredChar>>& GetMatrix() const;
+  [[nodiscard]] const common::coordinate_size_t& GetSize() const;
 
   bool operator==(const ColoredCharMatrix& colored_char_matrix);
 
@@ -51,7 +51,7 @@ class ColoredCharMatrix {
   /**
    * Changes the fore- and background color of the entire matrix.
    */
-  void SetAllColours(const common::Color& foreground, const common::Color& background = common::Color::BLACK);
+  void SetAllColors(const common::Color& foreground, const common::Color& background = common::Color::BLACK);
 
  private:
   common::coordinate_size_t size;
