@@ -163,14 +163,13 @@ void GameLogic::UseWeapon(Player &player, World &world) {
       }
 
       // destroy hit projectiles
-      for (auto &projectile : world.GetProjectiles()){
-        if (attacked_position == projectile->GetPosition()){
+      for (auto &projectile : world.GetProjectiles()) {
+        if (attacked_position == projectile->GetPosition()) {
           std::list<std::shared_ptr<Projectile>> hit_projectile = {projectile};
           world.RemoveProjectiles(hit_projectile);
         }
       }
       break;
-
     }
     case ItemType::HEART:
     case ItemType::POINTS:

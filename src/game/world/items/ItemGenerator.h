@@ -2,6 +2,7 @@
 #define CROSSING_CONSOLES_ITEMGENERATOR_H
 
 #include <memory>
+
 #include "IItem.h"
 
 namespace game::world {

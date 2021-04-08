@@ -17,7 +17,7 @@ using namespace game::world;
 World::World(coordinate_size_t size)
     : size(std::move(size))
     , spawner(this)
-, item_generator(this){
+    , item_generator(this) {
 }
 
 void World::AddPlayer(const std::shared_ptr<Player>& player) {
@@ -229,6 +229,6 @@ void World::ResurrectPlayer(Player& player) {
   player.position = spawner.GenerateSpawnPosition();
 }
 
-ItemGenerator World::GetItemGenerator(){
+ItemGenerator World::GetItemGenerator() {
   return item_generator;
 }

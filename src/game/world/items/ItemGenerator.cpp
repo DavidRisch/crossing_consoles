@@ -1,11 +1,12 @@
 #include "ItemGenerator.h"
+
 #include <random>
 
+#include "../World.h"
 #include "Gun.h"
 #include "Heart.h"
 #include "Points.h"
 #include "Sword.h"
-#include "../World.h"
 
 using namespace game;
 using namespace world;
@@ -15,7 +16,7 @@ ItemGenerator::ItemGenerator(World* world)
 }
 
 void ItemGenerator::GenerateItem() {
-  if (world->items.size() == GameDefinition::max_items_in_world){
+  if (world->items.size() == GameDefinition::max_items_in_world) {
     return;
   }
 

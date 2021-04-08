@@ -23,6 +23,5 @@ TEST(Item, GetItemType) {
   ASSERT_EQ(points->GetItemType(), ItemType::POINTS);
 }
 
-TEST(Item, Serialize){
-
+TEST(Item, Serialize) {
 }

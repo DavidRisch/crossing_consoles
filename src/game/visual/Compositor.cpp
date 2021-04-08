@@ -42,6 +42,16 @@ ColoredCharMatrix Compositor::CompositeViewport() const {
   composited_viewport.SetChar(box_drawings_double_vertical, Position(0, 1), Color::WHITE);
   std::wstring information = L" SCORE " + std::to_wstring(player->GetScore());
   composited_viewport.SetString(information, Position(1, 1), Color::WHITE);
+
+  // show item in top bar if the player has one
+  if (player->GetItem() != nullptr) {
+    std::wstring item = L" ITEM ";
+    composited_viewport.SetString(item, Position((composited_viewport.GetSize().x / 2) - 4, 1), Color::WHITE);
+
+    composited_viewport.InsertMatrix(player->GetItem()->GetSprite(coordinate_size_t(1, 1)),
+                                     Position((composited_viewport.GetSize().x / 2) + 2, 1));
+  }
+
   composited_viewport.InsertMatrix(HealthDisplay::Render(player->health),
                                    Position(composited_viewport.GetSize().x - HealthDisplay::width - 2, 1));
   composited_viewport.SetChar(box_drawings_double_vertical, Position(composited_viewport.GetSize().x - 1, 1),
