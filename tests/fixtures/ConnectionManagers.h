@@ -32,10 +32,10 @@ class ConnectionManagers : public ::testing::Test {
   ProtocolDefinition::partner_id_t second_client_id{};  // from server perspective
   ProtocolDefinition::partner_id_t server_id{};         // from client perspective
 
-  void create_server_and_client(ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout) {
+  void create_server_and_client(ProtocolDefinition::timeout_t timeout) {
     server_manager = ServerSideConnectionManager::CreateServerSide(timeout, server_connection_simulator_provider);
     std::thread server_thread([this] {
-      int counter = 100;
+      int counter = 1000;
       while (counter > 0 && server_manager->ConnectionCount() == 0) {
         server_manager->HandleConnections();
         std::this_thread::sleep_for(std::chrono::microseconds(10));

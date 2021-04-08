@@ -36,10 +36,10 @@ class ProtocolDefinition {
   typedef std::chrono::duration<int64_t, std::milli> timeout_t;
 
   /// Set timeout duration
-  static constexpr const timeout_t timeout = std::chrono::milliseconds(20000);
+  static constexpr const timeout_t timeout = std::chrono::milliseconds(1000);
 
   /// `timeout` divided by `resend_denominator` is the interval after which a resend is triggered.
-  constexpr static const double resend_denominator = 40;
+  constexpr static const double resend_denominator = 20;
   static_assert(resend_denominator > 1.0);
 
   /// Set keep alive denominator
