@@ -36,7 +36,7 @@ TEST(Projectile, CreateFromWeapon) {
 TEST(Projectile, HitPlayer) {
   // Decrease health of player using projectile
 
-  // choose any damage/ range > 0
+  // choose any healing/ range > 0
   int damage = 10;
   uint8_t range = 3;
 
@@ -53,6 +53,7 @@ TEST(Projectile, Spawn) {
   // spawn projectile and add to world
   World world(coordinate_size_t(21, 21));
   auto player = std::make_shared<Player>("player", Position(0, 0));
+  player->SetItem(std::make_shared<Gun>(GameDefinition::gun_damage, GameDefinition::gun_range));
 
   world.AddPlayer(player);
 

@@ -32,7 +32,7 @@ TEST_F(GamePlay, ProjectileHitsPlayer) {
   // Projectile hits player and decreases their health
 
   uint8_t range = 10;  // range must be at least 1 in order to hit player
-  int damage = 34;     // any damage is possible
+  int damage = 34;     // any healing is possible
 
   initialize_game();
   add_player();
@@ -123,7 +123,7 @@ TEST_F(GamePlay, PlayerMovesIntoProjectile) {
   initialize_game();
   add_player();
 
-  // range and damage chosen arbitrarily, range >=1
+  // range and healing chosen arbitrarily, range >=1
   spawn_projectile(4, 20, GameDefinition::NORTH);
 
   GameLogic::HandleProjectiles(*world);
@@ -143,7 +143,7 @@ TEST_F(GamePlay, PlayerHitByOwnProjectile) {
   // Projectile hits its shooter and decreases their health but not their score
 
   uint8_t range = 10;  // range must be at least 1 in order to hit player
-  int damage = 2;      // any damage is possible
+  int damage = 2;      // any healing is possible
 
   initialize_game();
   add_player();
@@ -174,7 +174,7 @@ TEST_F(GamePlay, ProjectileHitsDeadPlayer) {
   // Projectile hits dead player, no consequences occur
 
   uint8_t range = 10;  // range must be at least 1 in order to reach player
-  int damage = 34;     // any damage is possible
+  int damage = 34;     // any healing is possible
 
   initialize_game();
   add_player();

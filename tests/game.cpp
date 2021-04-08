@@ -66,6 +66,7 @@ TEST(Game, ActionShoot) {
   auto composited_viewport_overhang = common::coordinate_size_t(2, 4);
 
   auto player = std::make_shared<Player>("player name", Position(3, 2));
+  player->SetItem(std::make_shared<Gun>(GameDefinition::gun_damage, GameDefinition::gun_range));
   player->direction = GameDefinition::NORTH;
   World world(coordinate_size_t(5, 5));
   world.AddWall(Position(4, 4));
