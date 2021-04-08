@@ -31,7 +31,7 @@ const wchar_t light_shade = L'\u2591';
 
 const wchar_t black_heart_suit = L'\u2665';  // rendered as an extra wide character
 
-const std::wstring title_top /*  */ = L" ▄▀▀ █▀▄ ▄▀▄ ▄▀▀ ▄▀▀ █ █▄ █ ▄▀▀   ▄▀▀ ▄▀▄ █▄ █ ▄▀▀ ▄▀▄ █   ██▀ ▄▀▀ ";
+const std::wstring title_top /*  */ = L" ▄▀▀ █▀▄ ▄▀▄ ▄▀▀ ▄▀▀ █ █▄ █ ▄▀▀   ▄▀▀ ▄▀▄ █▄ █ ▄▀▀ ▄▀▄ █   ██▀ ▄▀▀";
 const std::wstring title_down /* */ = L" ▀▄▄ █▀▄ ▀▄▀ ▄██ ▄██ █ █ ▀█ ▀▄█   ▀▄▄ ▀▄▀ █ ▀█ ▄██ ▀▄▀ █▄▄ █▄▄ ▄██";
 
 }  // namespace game::visual::symbols

@@ -31,14 +31,14 @@ ColoredCharMatrix Compositor::CompositeViewport() const {
   coordinate_size_t game_character_count = game_viewport_size * block_size;
 
   int game_output_size_x =
-      game_character_count.x + border_size_x * 2;  // on character at the left and right is added for box lines
+      game_character_count.x + border_size_x * 2;  // one character at the left and right is added for box lines
 
   // Create header, printed above the world output
   ColoredCharMatrix header = CompositeHeader(game_output_size_x);
 
   const common::coordinate_size_t &header_size = header.GetSize();
-  // Create trailer, printed below the world output
 
+  // Create trailer, printed below the world output
   ColoredCharMatrix trailer = CompositeTrailer(game_output_size_x);
   const common::coordinate_size_t &trailer_size = trailer.GetSize();
 
@@ -130,7 +130,7 @@ ColoredCharMatrix Compositor::CompositeTrailer(int viewport_width) {
 }
 
 void Compositor::SetBorderLines(ColoredCharMatrix &character_matrix, int position_y) {
-  assert(character_matrix.GetSize().y >= position_y);
+  assert(character_matrix.GetSize().y > position_y);
 
   // Set character at the beginning of the line
   character_matrix.SetChar(box_drawings_double_vertical, Position(0, position_y), common::Color::WHITE);
@@ -155,7 +155,7 @@ ColoredCharMatrix Compositor::GenerateSeparatorLine(int viewport_width, bool is_
   }
 
   // Draw separator line
-  for (int i = 1; i < viewport_width; i++) {
+  for (int i = 1; i < viewport_width - 1; i++) {
     row.AppendChar(symbols::box_drawings_double_horizontal);
   }
 
