@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "../../visual/symbols.h"
+
 using namespace game;
 using namespace game::world;
 
@@ -44,6 +46,6 @@ ItemType Gun::GetItemType() {
 
 visual::ColoredCharMatrix Gun::GetSprite(common::coordinate_size_t block_size) {
   visual::ColoredCharMatrix colored_char_matrix = visual::ColoredCharMatrix(block_size);
-  colored_char_matrix.AppendString(L"OOOO");
+  colored_char_matrix.AppendChar(game::visual::symbols::gun);
   return colored_char_matrix;
 }

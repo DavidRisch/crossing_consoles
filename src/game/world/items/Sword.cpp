@@ -2,12 +2,14 @@
 
 #include <memory>
 
+#include "../../visual/symbols.h"
+
 using namespace game;
 using namespace world;
 
 visual::ColoredCharMatrix Sword::GetSprite(common::coordinate_size_t block_size) {
   visual::ColoredCharMatrix colored_char_matrix = visual::ColoredCharMatrix(block_size);
-  colored_char_matrix.AppendString(L" // ");
+  colored_char_matrix.AppendChar(game::visual::symbols::sword);
   return colored_char_matrix;
 }
 
