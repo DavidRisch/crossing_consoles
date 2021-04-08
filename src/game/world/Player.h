@@ -6,7 +6,7 @@
 
 #include "../GameDefinition.h"
 #include "../common/Position.h"
-#include "items/Weapon.h"
+#include "items/Gun.h"
 
 namespace game::world {
 
@@ -59,7 +59,7 @@ class Player : public networking::ISerializable {
   void IncreaseScore(uint16_t points);
 
   /**
-   * \brief Returns the player's `Weapon'
+   * \brief Returns the player's `Gun'
    */
   std::shared_ptr<IItem> GetItem();
 

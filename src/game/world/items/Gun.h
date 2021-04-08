@@ -1,5 +1,5 @@
-#ifndef CROSSING_CONSOLES_WEAPON_H
-#define CROSSING_CONSOLES_WEAPON_H
+#ifndef CROSSING_CONSOLES_GUN_H
+#define CROSSING_CONSOLES_GUN_H
 
 #include <memory>
 
@@ -9,9 +9,9 @@
 
 namespace game::world {
 
-class Weapon : public IItem {
+class Gun : public IItem {
  public:
-  Weapon(int damage, uint8_t max_range);
+  Gun(int damage, uint8_t max_range);
 
   /**
    * \brief Create Projectile with damage and range given by weapon
@@ -32,7 +32,7 @@ class Weapon : public IItem {
 
   void Serialize(std::vector<uint8_t> &output_vector) const override;
 
-  static std::shared_ptr<Weapon> Deserialize(std::vector<uint8_t>::iterator &input_iterator);
+  static std::shared_ptr<Gun> Deserialize(std::vector<uint8_t>::iterator &input_iterator);
 
   ItemType GetItemType() override;
 
@@ -45,4 +45,4 @@ class Weapon : public IItem {
 };
 }  // namespace game::world
 
-#endif  // CROSSING_CONSOLES_WEAPON_H
+#endif  // CROSSING_CONSOLES_GUN_H

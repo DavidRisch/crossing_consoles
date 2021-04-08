@@ -4,8 +4,8 @@
 #include <cassert>
 
 #include "world/Projectile.h"
+#include "world/items/Gun.h"
 #include "world/items/Sword.h"
-#include "world/items/Weapon.h"
 
 using namespace game;
 using namespace game::common;
@@ -48,7 +48,7 @@ Position GameLogic::PositionFromMovement(const Position &position, const coordin
   return new_position;
 }
 
-Position GameLogic::AttackedPositionFromDirection(const Position &position, const GameDefinition::Direction direction){
+Position GameLogic::AttackedPositionFromDirection(const Position &position, const GameDefinition::Direction direction) {
   Position attacked_position = Position(0, 0);
   switch (direction) {
     case GameDefinition::NORTH:
@@ -134,10 +134,10 @@ void GameLogic::UseWeapon(Player &player, World &world) {
     return;
   }
 
-  switch(item->GetItemType()){
-    case ItemType::LONG_RANGE: {
+  switch (item->GetItemType()) {
+    case ItemType::GUN: {
       Projectile bullet =
-          std::dynamic_pointer_cast<Weapon>(item)->SpawnProjectile(player.player_id, player.position, player.direction);
+          std::dynamic_pointer_cast<Gun>(item)->SpawnProjectile(player.player_id, player.position, player.direction);
       world.AddProjectile(std::make_shared<Projectile>(bullet));
       break;
     }
@@ -145,9 +145,10 @@ void GameLogic::UseWeapon(Player &player, World &world) {
       std::shared_ptr<Sword> sword = std::dynamic_pointer_cast<Sword>(item);
       Position attacked_position = AttackedPositionFromDirection(player.position, player.direction);
 
-      auto hit_player_it = std::find_if(
-          world.players.begin(), world.players.end(),
-          [&attacked_position](const std::shared_ptr<Player> &other_player) { return other_player->position == attacked_position; });
+      auto hit_player_it = std::find_if(world.players.begin(), world.players.end(),
+                                        [&attacked_position](const std::shared_ptr<Player> &other_player) {
+                                          return other_player->position == attacked_position;
+                                        });
 
       if (hit_player_it != world.players.end()) {
         // Check that shot player is still alive, otherwise no health or score changes are applied
@@ -157,22 +158,15 @@ void GameLogic::UseWeapon(Player &player, World &world) {
         }
         // Increase score of player and decrease health of hit player
         hit_player.DecreaseHealth(sword->GetDamage());
-        player.IncreaseScore(1);       // arbitrarily chosen number of points -> TODO associate with weapon?
+        player.IncreaseScore(1);  // arbitrarily chosen number of points -> TODO associate with weapon?
       }
-      // TODO: hit projectile
-
-
-    }
-
-    case ItemType::HEALING:
       break;
+      // TODO: hit projectile
+    }
+    case ItemType::HEART:
     case ItemType::POINTS:
       break;
   }
-
-
-  // TODO differentiate between items, right now only weapons expected
-
 }
 
 void GameLogic::MoveProjectile(Projectile &projectile, World &world) {

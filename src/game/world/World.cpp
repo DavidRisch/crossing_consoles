@@ -2,9 +2,12 @@
 
 #include <algorithm>
 #include <cassert>
+#include <memory>
 #include <utility>
 
 #include "../networking/SerializationUtils.h"
+#include "items/Heart.h"
+#include "items/Points.h"
 #include "items/Sword.h"
 
 using namespace game;
@@ -42,11 +45,10 @@ void World::AddWall(const Position& position) {
   }
 }
 
-void World::AddItem(const Position& position, const std::shared_ptr<IItem>& item){
+void World::AddItem(const Position& position, const std::shared_ptr<IItem>& item) {
   assert(item);
   items.insert({position, item});
 }
-
 
 bool World::IsBlocked(const Position& position) {
   if (walls.find(position) != walls.end()) {
@@ -60,8 +62,8 @@ bool World::IsBlocked(const Position& position) {
   return false;
 }
 
-bool World::IsBlockedForItem(const Position& position){
-  if (IsBlocked(position) || items.find(position) != items.end()){
+bool World::IsBlockedForItem(const Position& position) {
+  if (IsBlocked(position) || items.find(position) != items.end()) {
     return true;
   }
   return false;
@@ -148,22 +150,23 @@ World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
     world.AddPlayer(player);
   }
 
-  // TODO: Deserialize Items
   auto item_count = ISerializable::DeserializeContainerLength(input_iterator);
   for (size_t i = 0; i < item_count; ++i) {
     auto position = Position::Deserialize(input_iterator);
     auto item_type = networking::SerializationUtils::DeserializeObject<ItemType>(input_iterator);
     auto new_item = std::shared_ptr<IItem>();
     switch (item_type) {
-      case ItemType::LONG_RANGE:
-        new_item = Weapon::Deserialize(input_iterator);
+      case ItemType::GUN:
+        new_item = Gun::Deserialize(input_iterator);
         break;
       case ItemType::SWORD:
         new_item = Sword::Deserialize(input_iterator);
         break;
-      case ItemType::HEALING:
+      case ItemType::HEART:
+        new_item = Heart::Deserialize(input_iterator);
         break;
       case ItemType::POINTS:
+        new_item = Points::Deserialize(input_iterator);
         break;
     }
     world.AddItem(position, new_item);

@@ -49,7 +49,6 @@ class GameServer {
   static constexpr auto generate_item_interval = std::chrono::seconds(10);
 
   world::ItemGenerator item_generator;
-
 };
 
 }  // namespace game

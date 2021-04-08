@@ -15,7 +15,7 @@ class ItemGenerator {
   /**
    * \brief Generate a new item at a random position with a random type.
    */
-  void GenerateItem() ;
+  void GenerateItem();
 
   /**
    * \brief Thrown if no free space to generate a new item is found.
@@ -30,6 +30,6 @@ class ItemGenerator {
   std::shared_ptr<World> world;
 };
 
-}
+}  // namespace game::world
 
 #endif  // CROSSING_CONSOLES_ITEMGENERATOR_H

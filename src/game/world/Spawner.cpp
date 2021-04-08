@@ -12,7 +12,7 @@ Spawner::Spawner(World* world)
 
 Position Spawner::GenerateSpawnPosition() const {
   Position position(0, 0);
-  while (world->IsBlocked(position)) {
+  while (world->IsBlockedForItem(position)) {
     position.x++;
     if (position.x >= world->size.x) {
       position.x = 0;

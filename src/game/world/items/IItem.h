@@ -6,13 +6,7 @@
 
 namespace game::world {
 
-enum class ItemType : char {
-  LONG_RANGE,
-  SWORD,
-  HEALING,
-  POINTS,
-  HIGHEST_ELEMENT = POINTS
-};
+enum class ItemType : char { GUN, SWORD, HEART, POINTS, HIGHEST_ELEMENT = POINTS };
 
 class IItem : public networking::ISerializable {
  public:
@@ -20,6 +14,6 @@ class IItem : public networking::ISerializable {
   virtual ItemType GetItemType() = 0;
 };
 
-}
+}  // namespace game::world
 
 #endif  // CROSSING_CONSOLES_IITEM_H

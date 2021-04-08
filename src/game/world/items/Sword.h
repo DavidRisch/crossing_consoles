@@ -32,5 +32,5 @@ class Sword : public IItem {
   uint8_t range;
   ItemType item_type;
 };
-}
+}  // namespace game::world
 #endif  // CROSSING_CONSOLES_SWORD_H
