@@ -31,7 +31,11 @@ const wchar_t light_shade = L'\u2591';
 
 const wchar_t black_heart_suit = L'\u2665';  // rendered as an extra wide character
 
-const wchar_t black_vertical_ellipse = L'\u2B2E';  // rendered as an extra wide character
+const wchar_t black_vertical_ellipse = L'\u2B2E';
+
+const std::wstring title_top /*  */ = L" ▄▀▀ █▀▄ ▄▀▄ ▄▀▀ ▄▀▀ █ █▄ █ ▄▀▀   ▄▀▀ ▄▀▄ █▄ █ ▄▀▀ ▄▀▄ █   ██▀ ▄▀▀";
+const std::wstring title_down /* */ = L" ▀▄▄ █▀▄ ▀▄▀ ▄██ ▄██ █ █ ▀█ ▀▄█   ▀▄▄ ▀▄▀ █ ▀█ ▄██ ▀▄▀ █▄▄ █▄▄ ▄██";
+
 }  // namespace game::visual::symbols
 
 #endif  // CROSSING_CONSOLES_SYMBOLS_H
