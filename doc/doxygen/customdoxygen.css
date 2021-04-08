@@ -1174,7 +1174,8 @@ dl.section dd {
 }
 
 .image {
-    text-align: center;
+    text-align: left;
+    min-width: 1500px;
 }
 
 .dotgraph {
