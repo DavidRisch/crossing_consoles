@@ -30,6 +30,8 @@ const wchar_t full_block = L'\u2588';
 const wchar_t light_shade = L'\u2591';
 
 const wchar_t black_heart_suit = L'\u2665';  // rendered as an extra wide character
+
+const wchar_t black_vertical_ellipse = L'\u2B2E';  // rendered as an extra wide character
 }  // namespace game::visual::symbols
 
 #endif  // CROSSING_CONSOLES_SYMBOLS_H

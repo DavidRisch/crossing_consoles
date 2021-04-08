@@ -6,6 +6,7 @@
 #include "../communication/connection_layer/event/PayloadEvent.h"
 #include "GameLogic.h"
 #include "networking/Change.h"
+#include "networking/SerializationUtils.h"
 #include "world/WorldGenerator.h"
 
 using namespace game;
@@ -60,7 +61,8 @@ void GameServer::HandleEvent(const std::shared_ptr<communication::connection_lay
   switch (event->GetType()) {
     case communication::connection_layer::EventType::CONNECT: {
       auto spawn_position = world->GetSpawner().GenerateSpawnPosition();
-      auto player = std::make_shared<Player>("?", spawn_position, event->GetPartnerId());
+      auto player = std::make_shared<Player>("?", Color::RED, spawn_position, GameDefinition::Direction::NORTH,
+                                             event->GetPartnerId());
 
       world->AddPlayer(player);
 
@@ -81,7 +83,22 @@ void GameServer::HandleEvent(const std::shared_ptr<communication::connection_lay
       auto player_id = event->GetPartnerId();
       auto player = world->GetPlayerById(player_id);
       assert(player != nullptr);
-      GameLogic::HandleChange(*player, change, *world);
+      switch (change.GetChangeType()) {
+        case ChangeType::SET_NAME: {
+          auto iterator = change.GetContentIterator();
+          player->name = SerializationUtils::DeserializeString(iterator);
+          break;
+        }
+        case ChangeType::SET_COLOR: {
+          auto iterator = change.GetContentIterator();
+          player->color = Color::Deserialize(iterator);
+          break;
+        }
+        default:
+          GameLogic::HandleChange(*player, change, *world);
+          break;
+      }
+
       break;
     }
     default:

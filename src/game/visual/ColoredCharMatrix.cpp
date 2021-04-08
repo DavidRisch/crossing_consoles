@@ -117,3 +117,12 @@ std::optional<common::Position> ColoredCharMatrix::Find(std::wstring needle) {
 
   return {};
 }
+
+void ColoredCharMatrix::SetAllColors(const Color& foreground, const Color& background) {
+  for (auto& line : characters) {
+    for (auto& character : line) {
+      character.foreground = foreground;
+      character.background = background;
+    }
+  }
+}
