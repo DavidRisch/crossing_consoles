@@ -49,7 +49,7 @@ void Player::Serialize(std::vector<uint8_t> &output_vector) const {
     networking::SerializationUtils::SerializeObject(true, output_vector);
     networking::SerializationUtils::SerializeObject(item->GetItemType(), output_vector);
     item->Serialize(output_vector);
-  }else{
+  } else {
     networking::SerializationUtils::SerializeObject(false, output_vector);
   }
 

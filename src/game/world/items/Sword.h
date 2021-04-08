@@ -35,8 +35,8 @@ class Sword : public IItem {
   [[nodiscard]] int GetDamage() const;
 
   /**
-  * \brief Return the type of this item.
-  */
+   * \brief Return the type of this item.
+   */
   ItemType GetItemType() override;
 
  private:
