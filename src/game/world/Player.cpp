@@ -131,3 +131,7 @@ void Player::SetItem(std::shared_ptr<IItem> new_item) {
 void Player::Die() {
   time_of_death = std::chrono::steady_clock::now();
 }
+
+void Player::RemoveItem() {
+  item.reset();
+}

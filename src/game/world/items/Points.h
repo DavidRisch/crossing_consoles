@@ -8,7 +8,7 @@
 namespace game::world {
 
 /**
- * \brief Item which increases a `Player`s score.
+ * \brief Items which increases a `Player`s score.
  */
 class Points : public IItem {
  public:

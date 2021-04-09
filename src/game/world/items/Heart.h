@@ -8,7 +8,7 @@
 namespace game::world {
 
 /**
- * \brief Item which increases a `Player`s health.
+ * \brief Items which increases a `Player`s health.
  */
 class Heart : public IItem {
  public:

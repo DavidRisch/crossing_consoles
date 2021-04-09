@@ -68,6 +68,11 @@ class Player : public networking::ISerializable {
    */
   void SetItem(std::shared_ptr<IItem> new_item);
 
+  /**
+   * \brief Remove the current item.
+   */
+  void RemoveItem();
+
  private:
   std::shared_ptr<IItem> item;
 };
