@@ -13,6 +13,7 @@ cd "$BUILD_DIR"
 
 cmake ..
 
+make doc_uml
 make doc_doxygen
 
 echo "Doxygen build done"
