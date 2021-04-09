@@ -2,6 +2,7 @@
 
 #include "../src/game/GameClient.h"
 #include "../src/game/GameLogic.h"
+#include "../src/game/world/items/Sword.h"
 #include "fixtures/GamePlay.h"
 
 using namespace game;
@@ -257,6 +258,9 @@ TEST_F(GamePlay, PlayerDiesAndRespawns) {
 
   initialize_game();
   add_player();
+  auto sword = std::make_shared<Sword>(2);
+  player_first->SetItem(sword);
+  ASSERT_NE(player_first->GetItem(), nullptr);
 
   // Kill player
   spawn_projectile(2, player_first->max_health, GamePlay::standard_direction, player_first->player_id,
@@ -276,6 +280,7 @@ TEST_F(GamePlay, PlayerDiesAndRespawns) {
   ASSERT_TRUE(player_first->IsAlive());
   ASSERT_EQ(player_first->score, 0);
   ASSERT_EQ(player_first->health, Player::max_health);
+  ASSERT_EQ(player_first->GetItem(), nullptr);
 
   reset_elements();
 }
