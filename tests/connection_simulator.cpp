@@ -40,7 +40,7 @@ class ConnectionSimulator : public ::testing::Test {
       byte_stream.SetConnectionSimulatorOutgoing(client_outgoing);
 
       byte_stream.SendString(client_to_server);
-      client_received = byte_stream.ReadString();
+      client_received = byte_stream.ReadStringBlocking();
     });
 
     std::shared_ptr<SocketByteStream> byte_stream;
@@ -59,7 +59,7 @@ class ConnectionSimulator : public ::testing::Test {
     byte_stream->SetConnectionSimulatorOutgoing(std::move(server_outgoing));
 
     byte_stream->SendString(server_to_client);
-    server_received = byte_stream->ReadString();
+    server_received = byte_stream->ReadStringBlocking();
 
     client_thread.join();
   }

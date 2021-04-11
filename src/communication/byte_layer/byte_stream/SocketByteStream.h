@@ -2,6 +2,7 @@
 #define CROSSING_CONSOLES_BYTE_STREAM_H
 
 #include <cstdint>
+#include <deque>
 #include <memory>
 #include <stdexcept>
 
@@ -35,7 +36,7 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
    * \details Blocks until a connection is established.
    */
   static std::shared_ptr<SocketByteStream> CreateClientSide(
-      std::shared_ptr<IConnectionSimulatorProvider> connection_simulator_provider =
+      const std::shared_ptr<IConnectionSimulatorProvider>& connection_simulator_provider =
           byte_layer::PerfectConnectionSimulatorProvider::instance,
       port_t port = socket_default_port);
 
@@ -48,7 +49,7 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
   void SendString(const std::string& message);
 
   size_t Read(uint8_t* receive_buffer, size_t max_length) override;
-  std::string ReadString(size_t max_length = 1024);
+  std::string ReadStringBlocking(size_t max_length = 1024);
 
   /// Indicates data is available and can be read
   bool HasInput() override;
@@ -68,6 +69,14 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
   };
 
  private:
+  /**
+   * \brief Read some bytes from the socket and push them at the back of `receive_deque`.
+   */
+  size_t ReadToDeque();
+
+  /// Holds bytes read from the socket but not yet read by the application.
+  std::deque<uint8_t> receive_deque;
+
   std::shared_ptr<SocketHolder> socket_holder;
   bool catch_send_failed = true;
 

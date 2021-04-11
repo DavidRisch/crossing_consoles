@@ -31,6 +31,7 @@ void TimingHelper::CalculateReferenceTime() {
   DummyActions();
 
   reference_duration = std::chrono::steady_clock::now() - start;
+  reference_duration += constant_part_of_reference_duration;
 }
 
 void TimingHelper::DummyActions() {

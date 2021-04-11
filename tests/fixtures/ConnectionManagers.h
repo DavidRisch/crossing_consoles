@@ -43,15 +43,20 @@ class ConnectionManagers : public ::testing::Test {
       }
       ASSERT_GT(counter, 0);
     });
+    try {
+      client_manager = ClientSideConnectionManager::CreateClientSide(timeout, client_connection_simulator_provider);
 
-    client_manager = ClientSideConnectionManager::CreateClientSide(timeout, client_connection_simulator_provider);
+      while (!server_manager->HasConnections()) {
+        client_manager->HandleConnections();
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+      }
 
-    while (!server_manager->HasConnections()) {
-      client_manager->HandleConnections();
-      std::this_thread::sleep_for(std::chrono::microseconds(10));
+      server_thread.join();
+    } catch (const std::exception &e) {
+      // make sure the server_thread is joined. Otherwise it can hide the real exception.
+      server_thread.join();
+      throw e;
     }
-
-    server_thread.join();
 
     ASSERT_TRUE(server_manager->ConnectionCount() != 0);
 
