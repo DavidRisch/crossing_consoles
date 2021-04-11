@@ -44,67 +44,69 @@ std::shared_ptr<World> WorldGenerator::GenerateWorld(const coordinate_size_t& wo
     }
   }
 
-  std::mt19937 random(seed);
-  std::uniform_int_distribution<int> count(building_count_min, building_count_max);
-  std::uniform_int_distribution<int> position_x(0, size.x - building_size_max.x - 1);
-  std::uniform_int_distribution<int> position_y(0, size.y - building_size_max.y - 1);
-  std::uniform_int_distribution<int> size_x(building_size_min.x, building_size_max.x);
-  std::uniform_int_distribution<int> size_y(building_size_min.y, building_size_max.y);
+  if (world_size.IsGreater(building_size_max)) {
+    std::mt19937 random(seed);
+    std::uniform_int_distribution<int> count(building_count_min, building_count_max);
+    std::uniform_int_distribution<int> position_x(0, size.x - building_size_max.x - 1);
+    std::uniform_int_distribution<int> position_y(0, size.y - building_size_max.y - 1);
+    std::uniform_int_distribution<int> size_x(building_size_min.x, building_size_max.x);
+    std::uniform_int_distribution<int> size_y(building_size_min.y, building_size_max.y);
 
-  // generate buildings
-  for (int n = count(random); n > 0; n--) {
-    // calculate start and end position of building
-    Position start(position_x(random), position_y(random));
-    Position end = start + Position(size_x(random), size_y(random));
+    // generate buildings
+    for (int n = count(random); n > 0; n--) {
+      // calculate start and end position of building
+      Position start(position_x(random), position_y(random));
+      Position end = start + Position(size_x(random), size_y(random));
 
-    // check if area is spare
-    if (world->IsBlocked(start) || world->IsBlocked(end) || world->IsBlocked(Position(start.x, end.y - 1)) ||
-        world->IsBlocked(Position(end.x - 1, start.y))) {
-      n++;
-      continue;
-    }
-
-    for (int y = start.y; y < end.y; y++) {
-      for (int x = start.x; x < end.x; x++) {
-        if (x == start.x || x == end.x - 1 || y == start.y || y == end.y - 1) {
-          Position current_position(x, y);
-          // place corners of building
-          world->AddWall(Position(x, y), BlockType::WALL_BRICK);
-        } else {
-          // hollow inside of building out
-          world->RemoveWall(Position(x, y));
-        }
+      // check if area is spare
+      if (world->IsBlocked(start) || world->IsBlocked(end) || world->IsBlocked(Position(start.x, end.y - 1)) ||
+          world->IsBlocked(Position(end.x - 1, start.y))) {
+        n++;
+        continue;
       }
-    }
 
-    std::uniform_int_distribution<int> building_x(start.x + 1, end.x - 2);
-    std::uniform_int_distribution<int> building_y(start.y + 1, end.y - 2);
-    std::uniform_int_distribution<int> door_chance(0, 1);
-
-    // place doors randomly
-    int door_count = 0;
-    for (int i = 0; i < 4; i++) {
-      if (door_chance(random) == 0) {
-        door_count++;
-        switch (i) {
-          case 0:
-            world->RemoveWall(Position(building_x(random), start.y));
-            break;
-          case 1:
-            world->RemoveWall(Position(building_x(random), end.y - 1));
-            break;
-          case 2:
-            world->RemoveWall(Position(start.x, building_y(random)));
-            break;
-          case 3:
-            world->RemoveWall(Position(end.x - 1, building_y(random)));
-            break;
+      for (int y = start.y; y < end.y; y++) {
+        for (int x = start.x; x < end.x; x++) {
+          if (x == start.x || x == end.x - 1 || y == start.y || y == end.y - 1) {
+            Position current_position(x, y);
+            // place corners of building
+            world->AddWall(Position(x, y), BlockType::WALL_BRICK);
+          } else {
+            // hollow inside of building out
+            world->RemoveWall(Position(x, y));
+          }
         }
       }
 
-      // repeat if no door has been placed
-      if (i == 3 && door_count == 0) {
-        i--;
+      std::uniform_int_distribution<int> building_x(start.x + 1, end.x - 2);
+      std::uniform_int_distribution<int> building_y(start.y + 1, end.y - 2);
+      std::uniform_int_distribution<int> door_chance(0, 1);
+
+      // place doors randomly
+      int door_count = 0;
+      for (int i = 0; i < 4; i++) {
+        if (door_chance(random) == 0) {
+          door_count++;
+          switch (i) {
+            case 0:
+              world->RemoveWall(Position(building_x(random), start.y));
+              break;
+            case 1:
+              world->RemoveWall(Position(building_x(random), end.y - 1));
+              break;
+            case 2:
+              world->RemoveWall(Position(start.x, building_y(random)));
+              break;
+            case 3:
+              world->RemoveWall(Position(end.x - 1, building_y(random)));
+              break;
+          }
+        }
+
+        // repeat if no door has been placed
+        if (i == 3 && door_count == 0) {
+          i--;
+        }
       }
     }
   }

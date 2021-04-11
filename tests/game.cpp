@@ -37,8 +37,6 @@ TEST(Game, NoAction) {
 
 TEST(Game, Actions) {
   auto player = std::make_shared<Player>("player name", Position(2, 2));
-  World world(coordinate_size_t(5, 5));
-  world.AddWall(Position(4, 4));
 
   auto mock_terminal = std::make_shared<MockTerminal>();
   mock_terminal->AddInput((char)KeyCode::W);
