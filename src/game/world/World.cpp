@@ -70,10 +70,10 @@ void World::Update(const World& server_world) {
   }
 
   // remove players no longer on the server
-//  players.end() =
-//      std::remove_if(players.begin(), players.end(), [&server_world](const std::shared_ptr<Player>& player) {
-//        return server_world.GetPlayerById(player->player_id) == nullptr;
-//      });
+  //  players.end() =
+  //      std::remove_if(players.begin(), players.end(), [&server_world](const std::shared_ptr<Player>& player) {
+  //        return server_world.GetPlayerById(player->player_id) == nullptr;
+  //      });
 
   updated = true;
 }
