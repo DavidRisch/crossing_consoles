@@ -74,7 +74,7 @@ class SocketByteStream : public IOutputByteStream, public IInputByteStream {
    */
   size_t ReadToDeque();
 
-  /// Holds bytes read form the socket but not yet read by the application.
+  /// Holds bytes read from the socket but not yet read by the application.
   std::deque<uint8_t> receive_deque;
 
   std::shared_ptr<SocketHolder> socket_holder;
