@@ -102,6 +102,7 @@ bool Connection::TryEstablish() {
       if (step_2->GetMessageType() != message_layer::MessageType::CONNECTION_RESPONSE) {
         throw ConnectionCreationFailed();
       }
+      unacknowledged_sent_message.clear();
 
       // step 3:
       SendMessageNow(std::make_shared<message_layer::AcknowledgeMessage>(step_2->GetMessageSequence()), false);
@@ -135,6 +136,7 @@ bool Connection::TryEstablish() {
           throw ConnectionCreationFailed();
         }
       }
+      unacknowledged_sent_message.clear();
       state = ConnectionState::READY;
       break;
     }
