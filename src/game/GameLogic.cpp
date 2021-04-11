@@ -158,7 +158,7 @@ void GameLogic::UseWeapon(Player &player, World &world) {
           return;
         }
         // Increase score of player and decrease health of hit player
-        hit_player.DecreaseHealth(sword->GetDamage());
+        ApplyDamageToPlayer(hit_player, sword->GetDamage());
         player.IncreaseScore(1);  // arbitrarily chosen number of points -> TODO associate with weapon?
       }
 
