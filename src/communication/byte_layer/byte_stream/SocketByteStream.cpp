@@ -1,9 +1,10 @@
 #include "SocketByteStream.h"
 
 #include <cassert>
-#include <climits>
-#include <csignal>
 #include <cstring>
+#include <iostream>
+#include <thread>
+#include <utility>
 
 #include "socket_libs.h"
 
@@ -14,12 +15,13 @@ SocketByteStream::SocketByteStream(file_descriptor_t socket_file_descriptor,
                                    std::shared_ptr<IConnectionSimulator> connection_simulator_incoming,
                                    std::shared_ptr<IConnectionSimulator> connection_simulator_outgoing)
     : socket_holder(std::make_shared<SocketHolder>(socket_file_descriptor))
-    , connection_simulator_incoming(connection_simulator_incoming)
-    , connection_simulator_outgoing(connection_simulator_outgoing) {
+    , connection_simulator_incoming(std::move(connection_simulator_incoming))
+    , connection_simulator_outgoing(std::move(connection_simulator_outgoing)) {
+  SocketSetNoneBlocking(socket_holder->file_descriptor);
 }
 
 std::shared_ptr<SocketByteStream> SocketByteStream::CreateClientSide(
-    std::shared_ptr<IConnectionSimulatorProvider> connection_simulator_provider, uint16_t port) {
+    const std::shared_ptr<IConnectionSimulatorProvider> &connection_simulator_provider, uint16_t port) {
   file_descriptor_t socket_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
   if (socket_file_descriptor < 0) {
     throw std::runtime_error("socket failed");
@@ -47,25 +49,50 @@ std::shared_ptr<SocketByteStream> SocketByteStream::CreateClientSide(
   return socket_byte_stream;
 }
 
-size_t SocketByteStream::Read(  // NOLINT(readability-make-member-function-const)
-    uint8_t *receive_buffer, size_t max_length) {
-  assert(max_length < SSIZE_MAX);
+size_t SocketByteStream::ReadToDeque() {
+  const int max_length = 1;
+  uint8_t receive_buffer[max_length];
+
   ssize_t read_count = recv(socket_holder->file_descriptor, reinterpret_cast<char *>(receive_buffer), max_length, 0);
   if (read_count < 0) {
+    if (errno == EAGAIN) {
+      return 0;
+    }
     throw std::runtime_error("recv failed");
   }
-  assert(static_cast<size_t>(read_count) <= max_length);
 
   for (ssize_t i = 0; i < read_count; ++i) {
-    receive_buffer[i] = connection_simulator_incoming->Filter(receive_buffer[i]);
+    receive_deque.push_back(connection_simulator_incoming->Filter(receive_buffer[i]));
   }
 
-  return static_cast<size_t>(read_count);
+  return read_count;
 }
 
-std::string SocketByteStream::ReadString(size_t max_length) {
+size_t SocketByteStream::Read(uint8_t *receive_buffer, size_t max_length) {
+  size_t length = 0;
+  while (length < max_length) {
+    if (receive_deque.empty()) {
+      auto read_count = ReadToDeque();
+      if (read_count == 0) {
+        return length;
+      }
+    }
+    receive_buffer[length] = receive_deque.front();
+    receive_deque.pop_front();
+    length++;
+  }
+  return length;
+}
+
+std::string SocketByteStream::ReadStringBlocking(size_t max_length) {
   char *receive_buffer = new char[max_length + 1];
-  auto read_count = Read(reinterpret_cast<uint8_t *>(receive_buffer), max_length);
+
+  size_t read_count = 0;
+
+  while (read_count == 0) {
+    read_count = Read(reinterpret_cast<uint8_t *>(receive_buffer), max_length);
+  }
+
   receive_buffer[read_count] = '\0';
   std::string received(receive_buffer);
   delete[] receive_buffer;
@@ -99,11 +126,11 @@ void SocketByteStream::SendString(const std::string &message) {
 }
 
 void SocketByteStream::SetConnectionSimulatorIncoming(std::shared_ptr<IConnectionSimulator> ConnectionSimulator) {
-  connection_simulator_incoming = ConnectionSimulator;
+  connection_simulator_incoming = std::move(ConnectionSimulator);
 }
 
 void SocketByteStream::SetConnectionSimulatorOutgoing(std::shared_ptr<IConnectionSimulator> ConnectionSimulator) {
-  connection_simulator_outgoing = ConnectionSimulator;
+  connection_simulator_outgoing = std::move(ConnectionSimulator);
 }
 
 bool SocketByteStream::HasInput() {

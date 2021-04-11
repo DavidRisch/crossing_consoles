@@ -17,7 +17,7 @@ TEST(ByteServer, NoBlocking) {
     uint8_t first_byte = 123;
     receive_buffer.at(0) = first_byte;
 
-    int read_count = byte_stream->ReadWithoutBlocking(receive_buffer.data(), receive_buffer.capacity());
+    int read_count = byte_stream->Read(receive_buffer.data(), receive_buffer.capacity());
     EXPECT_EQ(read_count, 0);
     EXPECT_EQ(receive_buffer.at(0), first_byte);
   });
@@ -34,7 +34,7 @@ TEST(ByteServer, NoBlocking) {
   std::vector<uint8_t> receive_buffer(100);
   uint8_t first_byte = 123;
   receive_buffer.at(0) = first_byte;
-  int read_count = byte_stream->ReadWithoutBlocking(receive_buffer.data(), receive_buffer.capacity());
+  int read_count = byte_stream->Read(receive_buffer.data(), receive_buffer.capacity());
   EXPECT_EQ(read_count, 0);
   EXPECT_EQ(receive_buffer.at(0), first_byte);
 
@@ -90,7 +90,7 @@ TEST(ByteServer, SingleClient) {
     SocketByteStream b = *SocketByteStream::CreateClientSide();
     b.SendString(client_to_server);
     std::this_thread::sleep_for(std::chrono::microseconds(1000));
-    client_received = b.ReadString();
+    client_received = b.ReadStringBlocking();
   });
 
   std::shared_ptr<SocketByteStream> byte_stream;
@@ -107,7 +107,7 @@ TEST(ByteServer, SingleClient) {
 
   byte_stream->SendString(server_to_client);
   std::this_thread::sleep_for(std::chrono::microseconds(1000));
-  std::string server_received = byte_stream->ReadString();
+  std::string server_received = byte_stream->ReadStringBlocking();
 
   client_thread.join();
 
@@ -141,7 +141,7 @@ TEST(ByteServer, TwoClients) {
       if (byte_stream) {
         byte_stream->SendString(next_message);
         next_message = server_to_client2;
-        server_received += byte_stream->ReadString();
+        server_received += byte_stream->ReadStringBlocking();
         success_count++;
       }
     }
@@ -152,7 +152,7 @@ TEST(ByteServer, TwoClients) {
   std::thread client1_thread([client1_to_server, &client1_received] {
     SocketByteStream b = *SocketByteStream::CreateClientSide();
     b.SendString(client1_to_server);
-    client1_received = b.ReadString();
+    client1_received = b.ReadStringBlocking();
   });
 
   client1_thread.join();
@@ -162,7 +162,7 @@ TEST(ByteServer, TwoClients) {
   std::thread client2_thread([client2_to_server, &client2_received] {
     SocketByteStream b = *SocketByteStream::CreateClientSide();
     b.SendString(client2_to_server);
-    client2_received = b.ReadString();
+    client2_received = b.ReadStringBlocking();
   });
 
   client2_thread.join();
