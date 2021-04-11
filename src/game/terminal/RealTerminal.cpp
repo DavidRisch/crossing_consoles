@@ -145,8 +145,8 @@ void RealTerminal::Initialise() {
   CONSOLE_FONT_INFOEX font_info;
   font_info.cbSize = sizeof font_info;
   font_info.nFont = 0;
-  font_info.dwFontSize.X = 8;
-  font_info.dwFontSize.Y = 14;
+  font_info.dwFontSize.X = 7;
+  font_info.dwFontSize.Y = 12;
   font_info.FontFamily = FF_DONTCARE;
   font_info.FontWeight = FW_NORMAL;
   wcscpy(font_info.FaceName, L"Lucida Console");
