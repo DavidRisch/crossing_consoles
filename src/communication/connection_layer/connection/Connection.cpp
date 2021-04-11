@@ -208,7 +208,9 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
       if (it != unacknowledged_sent_message.end()) {
         (**it).SetTimestampReceived(std::chrono::steady_clock::now());
         statistics.AddSentAndAckMessage(*it);
-        unacknowledged_sent_message.erase(unacknowledged_sent_message.begin(), it);
+
+        // remove all messages up to and including it
+        unacknowledged_sent_message.erase(unacknowledged_sent_message.begin(), ++it);
       }
 
       if (state == ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE) {
