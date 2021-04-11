@@ -37,7 +37,7 @@ class GameServer {
 
   /// Used to send world updates at a constant frequency.
   std::chrono::time_point<std::chrono::steady_clock> last_world_sent;
-  static constexpr auto send_world_interval = std::chrono::milliseconds(10);
+  static constexpr auto send_world_interval = std::chrono::milliseconds(25);
 
   /// Handle moving projectiles at a constant frequency.
   std::chrono::time_point<std::chrono::steady_clock> last_moving_projectiles_updated;
