@@ -15,6 +15,8 @@ void SpriteMap::SetSprite(BlockType type, const ColoredCharMatrix& sprite) {
     if (!result.second) {
       result.first->second = sprite;
     }
+  } else {
+    throw SpriteWrongSizeException();
   }
 }
 
@@ -23,6 +25,6 @@ const ColoredCharMatrix& SpriteMap::GetSprite(BlockType type) const {
   if (result != type_sprites.end()) {
     return type_sprites.at(type);
   } else {
-    throw std::runtime_error("BlockType has no Sprite");
+    throw BlockTypeNotFoundException();
   }
 }

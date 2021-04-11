@@ -9,9 +9,10 @@ add_library(crossing_consoles_lib
         game/world/Player.cpp
         game/world/World.cpp
         game/world/Wall.cpp
-        game/world/WorldGenerator.cpp
+        game/world/RandomWorldGenerator.cpp
         game/world/Spawner.cpp
         game/world/HeightMap.cpp
+        game/world/EmptyWorldGenerator.cpp
 
         game/visual/Renderer.cpp
         game/visual/Compositor.cpp

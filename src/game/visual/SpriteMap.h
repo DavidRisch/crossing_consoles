@@ -16,6 +16,18 @@ class SpriteMap {
   void SetSprite(world::BlockType type, const ColoredCharMatrix& sprite);
   const ColoredCharMatrix& GetSprite(world::BlockType type) const;
 
+  class SpriteWrongSizeException : public std::exception {
+    [[nodiscard]] const char* what() const noexcept override {
+      return "Sprite has a wrong size.";
+    }
+  };
+
+  class BlockTypeNotFoundException : public std::exception {
+    [[nodiscard]] const char* what() const noexcept override {
+      return "No Sprite was found for the specified BlockType.";
+    }
+  };
+
  private:
   std::map<world::BlockType, ColoredCharMatrix> type_sprites;
   common::coordinate_size_t block_size;

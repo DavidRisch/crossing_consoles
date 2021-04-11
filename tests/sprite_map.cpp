@@ -26,7 +26,7 @@ TEST(SpriteMap, NonExistentType) {
   coordinate_size_t block_size(3, 3);
   SpriteMap sprite_map(block_size);
 
-  EXPECT_THROW(sprite_map.GetSprite(BlockType::WALL_BRICK), std::runtime_error);
+  EXPECT_THROW(sprite_map.GetSprite(BlockType::WALL_BRICK), SpriteMap::BlockTypeNotFoundException);
 }
 
 TEST(SpriteMap, ExistentType) {

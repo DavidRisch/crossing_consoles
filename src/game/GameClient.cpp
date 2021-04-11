@@ -8,7 +8,8 @@
 #include "GameLogic.h"
 #include "networking/Change.h"
 #include "terminal/ITerminal.h"
-#include "world/WorldGenerator.h"
+#include "world/EmptyWorldGenerator.h"
+#include "world/RandomWorldGenerator.h"
 
 using namespace game;
 using namespace game::common;
@@ -34,10 +35,11 @@ GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_
     client_manager =
         communication::connection_layer::ClientSideConnectionManager::CreateClientSide(communication_timeout);
   } else {
-    WorldGenerator world_generator;
     if (empty_world) {
-      world = *world_generator.GenerateEmptyWorld(world_size);
+      EmptyWorldGenerator world_generator;
+      world = *world_generator.GenerateWorld(world_size);
     } else {
+      RandomWorldGenerator world_generator;
       world = *world_generator.GenerateWorld(world_size);
     }
   }
