@@ -13,10 +13,14 @@ using namespace game::common;
 using namespace game::world;
 using namespace game::networking;
 
-GameServer::GameServer(const coordinate_size_t &world_size,
+GameServer::GameServer(const coordinate_size_t &world_size, bool empty_world,
                        communication::ProtocolDefinition::timeout_t communication_timeout) {
   WorldGenerator world_generator;
-  world = world_generator.GenerateWorld(world_size);
+  if (empty_world) {
+    world = world_generator.GenerateEmptyWorld(world_size);
+  } else {
+    world = world_generator.GenerateWorld(world_size);
+  }
 
   server_manager =
       communication::connection_layer::ServerSideConnectionManager::CreateServerSide(communication_timeout);

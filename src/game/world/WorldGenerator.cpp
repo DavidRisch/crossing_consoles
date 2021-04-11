@@ -114,6 +114,13 @@ std::shared_ptr<World> WorldGenerator::GenerateWorld(const coordinate_size_t& wo
   return world;
 }
 
+std::shared_ptr<World> WorldGenerator::GenerateEmptyWorld(const coordinate_size_t& world_size) {
+  size = world_size;
+  auto world = std::make_shared<World>(world_size);
+
+  return world;
+}
+
 double WorldGenerator::GenerateNoise(int i, int x, int y) const {
   std::mt19937 random(seed + (i + 1) * (x + (y * size.x)));
   std::uniform_real_distribution<double> distribution(-1.0, 1.0);

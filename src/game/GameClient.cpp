@@ -18,7 +18,7 @@ using namespace game::networking;
 using namespace game::visual;
 
 GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_ptr<ITerminal>& terminal,
-                       const coordinate_size_t& world_size, bool multiplayer,
+                       const coordinate_size_t& world_size, bool multiplayer, bool empty_world,
                        communication::ProtocolDefinition::timeout_t communication_timeout)
     : weak_player(player)
     , world(world_size)
@@ -35,7 +35,11 @@ GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_
         communication::connection_layer::ClientSideConnectionManager::CreateClientSide(communication_timeout);
   } else {
     WorldGenerator world_generator;
-    world = *world_generator.GenerateWorld(world_size);
+    if (empty_world) {
+      world = *world_generator.GenerateEmptyWorld(world_size);
+    } else {
+      world = *world_generator.GenerateWorld(world_size);
+    }
   }
 
   world.AddPlayer(player);

@@ -11,6 +11,7 @@ namespace game::world {
 class WorldGenerator {
  public:
   std::shared_ptr<World> GenerateWorld(const common::coordinate_size_t& world_size);
+  std::shared_ptr<World> GenerateEmptyWorld(const common::coordinate_size_t& world_size);
 
   WorldGenerator();
   explicit WorldGenerator(int seed);
