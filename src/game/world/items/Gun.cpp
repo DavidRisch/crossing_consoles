@@ -17,8 +17,7 @@ uint8_t Gun::GetRange() const {
 
 Gun::Gun(int damage, uint8_t max_range)
     : damage(damage)
-    , range(max_range)
-    , item_type(ItemType::GUN) {
+    , range(max_range){
 }
 
 Projectile Gun::SpawnProjectile(GameDefinition::player_id_t shooter_id, common::Position position,
@@ -41,11 +40,11 @@ std::shared_ptr<Gun> Gun::Deserialize(std::vector<uint8_t>::iterator &input_iter
 }
 
 ItemType Gun::GetItemType() {
-  return item_type;
+  return ItemType::GUN;
 }
 
 visual::ColoredCharMatrix Gun::GetSprite(common::coordinate_size_t block_size) {
   visual::ColoredCharMatrix colored_char_matrix = visual::ColoredCharMatrix(block_size);
-  colored_char_matrix.AppendChar(game::visual::symbols::gun);
+  colored_char_matrix.AppendChar(game::visual::symbols::not_sign);
   return colored_char_matrix;
 }

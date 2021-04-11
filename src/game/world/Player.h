@@ -59,7 +59,7 @@ class Player : public networking::ISerializable {
   void IncreaseScore(uint16_t points);
 
   /**
-   * \brief Returns the player's `Gun'
+   * \brief Returns the player's item.
    */
   std::shared_ptr<IItem> GetItem();
 

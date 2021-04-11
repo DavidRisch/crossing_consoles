@@ -42,7 +42,7 @@ class Items : public ::testing::Test {
     world->AddPlayer(player_second);
   }
 
-  void move_player(std::shared_ptr<world::Player>& player, game::networking::ChangeType change, int steps) {
+  void action_with_player(std::shared_ptr<world::Player>& player, game::networking::ChangeType change, int steps) {
     for (int i = 0; i < steps; i++) {
       game::networking::Change movement_change(change);
       GameLogic::HandleChange(*player, movement_change, *world);

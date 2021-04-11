@@ -72,14 +72,14 @@ class GameLogic {
   static bool HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> &projectiles, world::World &world);
 
   /**
-   * \brief Returns the position that gets attacked with a sword when the position and the direction of a player are
+   * \brief Returns the position that gets attacked with a coptic_capital_letter_dei when the position and the direction of a player are
    * given.
    */
   static common::Position AttackedPositionFromDirection(const common::Position &position,
                                                         GameDefinition::Direction direction);
 
   /**
-   * \brief Apply given `healing` to `Player`and invoke Death if necessary
+   * \brief Apply given `damage` to `Player`and invoke Death if necessary
    */
   static void ApplyDamageToPlayer(world::Player &player, int damage);
 };

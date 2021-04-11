@@ -44,7 +44,7 @@ ColoredCharMatrix Compositor::CompositeViewport() const {
   composited_viewport.SetString(information, Position(1, 1), Color::WHITE);
 
   // show item in top bar
-  std::wstring item = L" ITEM ";
+  std::wstring item = L"ITEM";
   composited_viewport.SetString(item, Position((composited_viewport.GetSize().x / 2) - 4, 1), Color::WHITE);
   if (player->GetItem() != nullptr) {
     composited_viewport.InsertMatrix(player->GetItem()->GetSprite(coordinate_size_t(1, 1)),

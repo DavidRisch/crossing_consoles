@@ -25,8 +25,7 @@ std::shared_ptr<Heart> Heart::Deserialize(std::vector<uint8_t>::iterator &input_
 }
 
 Heart::Heart(int healing)
-    : healing(healing)
-    , item_type(ItemType::HEART) {
+    : healing(healing){
 }
 
 int Heart::GetHealing() const {
@@ -34,5 +33,5 @@ int Heart::GetHealing() const {
 }
 
 ItemType Heart::GetItemType() {
-  return item_type;
+  return ItemType::HEART;
 }

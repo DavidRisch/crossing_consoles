@@ -21,15 +21,6 @@ class ItemGenerator {
    */
   void GenerateItem();
 
-  /**
-   * \brief Thrown if no free space to generate a new item is found.
-   */
-  class NoItemSpaceException : public std::exception {
-    [[nodiscard]] const char *what() const noexcept override {
-      return "ItemGenerator found no free space to add a new item.";
-    }
-  };
-
  private:
   World *world;
 };

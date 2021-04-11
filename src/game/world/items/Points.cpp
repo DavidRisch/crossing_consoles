@@ -3,8 +3,7 @@ using namespace game;
 using namespace world;
 
 Points::Points(uint8_t value)
-    : value(value)
-    , item_type(ItemType::POINTS) {
+    : value(value){
 }
 
 visual::ColoredCharMatrix game::world::Points::GetSprite(game::common::coordinate_size_t block_size) {
@@ -29,5 +28,5 @@ uint8_t Points::GetValue() const {
 }
 
 ItemType Points::GetItemType() {
-  return item_type;
+  return ItemType::POINTS;
 }

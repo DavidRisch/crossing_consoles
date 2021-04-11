@@ -14,7 +14,7 @@ class Gun : public IItem {
   Gun(int damage, uint8_t max_range);
 
   /**
-   * \brief Create Projectile with healing and range given by weapon
+   * \brief Create Projectile with damage and range given by weapon
    * \details Initialize with position and direction of `Player` with `shooter_id`
    */
   [[nodiscard]] Projectile SpawnProjectile(GameDefinition::player_id_t shooter_id, common::Position position,
@@ -53,7 +53,6 @@ class Gun : public IItem {
  private:
   int damage;
   uint8_t range;
-  ItemType item_type;
 };
 }  // namespace game::world
 

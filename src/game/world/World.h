@@ -36,6 +36,9 @@ class World : public networking::ISerializable {
 
   void AddWall(const common::Position& position);
 
+  /**
+   * \brief Add an item to the `World` at a `Position`
+   */
   void AddItem(const common::Position& position, const std::shared_ptr<IItem>& item);
 
   void AddProjectile(const std::shared_ptr<Projectile>& projectile);
@@ -54,6 +57,9 @@ class World : public networking::ISerializable {
 
   bool IsBlocked(const common::Position& position);
 
+  /**
+   * \brief Return whhether a `Position`is blocked for an item by either a `Player`, `Wall`or another item.
+   */
   bool IsBlockedForItem(const common::Position& position);
 
   /**

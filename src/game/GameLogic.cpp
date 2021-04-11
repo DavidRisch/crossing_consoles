@@ -171,8 +171,7 @@ void GameLogic::UseWeapon(Player &player, World &world) {
       }
       break;
     }
-    case ItemType::HEART:
-    case ItemType::POINTS:
+    default:
       break;
   }
 }
@@ -282,7 +281,7 @@ bool GameLogic::HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> 
       return false;
     }
 
-    // Increase score of shooter and apply healing to shot player
+    // Increase score of shooter and apply damage to shot player
     ApplyDamageToPlayer(hit_player, projectile->GetDamage());
 
     auto shooter = world.GetPlayerById(projectile->GetShooterId());

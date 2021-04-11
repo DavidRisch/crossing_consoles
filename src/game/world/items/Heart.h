@@ -41,7 +41,6 @@ class Heart : public IItem {
 
  private:
   int healing;
-  ItemType item_type;
 };
 }  // namespace game::world
 

@@ -41,7 +41,6 @@ class Sword : public IItem {
 
  private:
   int damage;
-  ItemType item_type;
 };
 }  // namespace game::world
 #endif  // CROSSING_CONSOLES_SWORD_H

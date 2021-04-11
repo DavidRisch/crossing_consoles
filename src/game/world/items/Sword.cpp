@@ -9,7 +9,7 @@ using namespace world;
 
 visual::ColoredCharMatrix Sword::GetSprite(common::coordinate_size_t block_size) {
   visual::ColoredCharMatrix colored_char_matrix = visual::ColoredCharMatrix(block_size);
-  colored_char_matrix.AppendChar(game::visual::symbols::sword);
+  colored_char_matrix.AppendChar(game::visual::symbols::coptic_capital_letter_dei);
   return colored_char_matrix;
 }
 
@@ -25,8 +25,7 @@ std::shared_ptr<Sword> Sword::Deserialize(std::vector<uint8_t>::iterator &input_
 }
 
 Sword::Sword(int damage)
-    : damage(damage)
-    , item_type(ItemType::SWORD) {
+    : damage(damage){
 }
 
 int Sword::GetDamage() const {
@@ -34,5 +33,5 @@ int Sword::GetDamage() const {
 }
 
 ItemType Sword::GetItemType() {
-  return item_type;
+  return ItemType::SWORD;
 }

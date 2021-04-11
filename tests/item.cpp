@@ -67,8 +67,8 @@ TEST_F(Items, SwordCausesDamage) {
 
   int health_before_hit = player_second->health;
 
-  move_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
-  move_player(player_first, game::networking::ChangeType::USE_ITEM, 1);
+  action_with_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
+  action_with_player(player_first, game::networking::ChangeType::USE_ITEM, 1);
 
   ASSERT_EQ(player_second->health, health_before_hit - sword->GetDamage());
 }
@@ -90,7 +90,7 @@ TEST_F(Items, SwordDestroysProjectile) {
 
   ASSERT_FALSE(world->GetProjectiles().empty());
 
-  move_player(player_first, game::networking::ChangeType::USE_ITEM, 1);
+  action_with_player(player_first, game::networking::ChangeType::USE_ITEM, 1);
 
   ASSERT_TRUE(world->GetProjectiles().empty());
 }
@@ -106,7 +106,7 @@ TEST_F(Items, Heart) {
   world->AddItem(Position(1, 0), heart);
   EXPECT_FALSE(world->items.empty());
 
-  move_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
+  action_with_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
 
   ASSERT_EQ(player_first->health, health_with_damage + heart->GetHealing());
   ASSERT_TRUE(world->items.empty());
@@ -122,7 +122,7 @@ TEST_F(Items, Points) {
   world->AddItem(Position(1, 0), points);
   EXPECT_FALSE(world->items.empty());
 
-  move_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
+  action_with_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
 
   ASSERT_EQ(player_first->score, old_score + points->GetValue());
   ASSERT_TRUE(world->items.empty());
@@ -140,9 +140,9 @@ TEST_F(Items, PickUpWeapons) {
   world->AddItem(Position(2, 0), gun);
   EXPECT_FALSE(world->items.empty());
 
-  move_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
+  action_with_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
   ASSERT_EQ(player_first->GetItem(), sword);
-  move_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
+  action_with_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
   ASSERT_EQ(player_first->GetItem(), gun);
 
   ASSERT_TRUE(world->items.empty());

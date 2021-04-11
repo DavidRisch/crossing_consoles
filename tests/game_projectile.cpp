@@ -36,7 +36,7 @@ TEST(Projectile, CreateFromWeapon) {
 TEST(Projectile, HitPlayer) {
   // Decrease health of player using projectile
 
-  // choose any healing/ range > 0
+  // choose any damage/ range > 0
   int damage = 10;
   uint8_t range = 3;
 

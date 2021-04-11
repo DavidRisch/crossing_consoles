@@ -84,8 +84,7 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
       case ItemType::GUN:
         new_item = Gun::Deserialize(input_iterator);
         break;
-      case ItemType::HEART:
-      case ItemType::POINTS:
+      default:
         break;
     }
     player.SetItem(new_item);
