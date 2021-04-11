@@ -23,7 +23,7 @@
 
 #endif
 
-inline void SocketSetNoneBlocking(int file_descriptor){
+inline void SocketSetNoneBlocking(int file_descriptor) {
 #ifdef _WIN32
   // Windows
   u_long blocking_io_mode = 1;  // != 0 -> none blocking mode
@@ -32,8 +32,7 @@ inline void SocketSetNoneBlocking(int file_descriptor){
   }
 #else
   // Linux
-  if (fcntl(file_descriptor, F_SETFL, fcntl(file_descriptor, F_GETFL, 0) | O_NONBLOCK) !=
-      0) {
+  if (fcntl(file_descriptor, F_SETFL, fcntl(file_descriptor, F_GETFL, 0) | O_NONBLOCK) != 0) {
     throw std::runtime_error("fcntl failed");
   }
 #endif
