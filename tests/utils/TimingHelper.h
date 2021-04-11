@@ -31,6 +31,7 @@ class TimingHelper {
   static void DummyActions();
 
   std::chrono::duration<int64_t, std::nano> reference_duration{};
+  constexpr static const auto constant_part_of_reference_duration = std::chrono::microseconds(1000);
 
   static std::shared_ptr<TimingHelper> instance;
 };
