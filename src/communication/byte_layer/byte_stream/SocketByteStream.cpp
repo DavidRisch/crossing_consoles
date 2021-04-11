@@ -50,7 +50,7 @@ std::shared_ptr<SocketByteStream> SocketByteStream::CreateClientSide(
 }
 
 size_t SocketByteStream::ReadToDeque() {
-  const int max_length = 1;
+  const int max_length = 1024;
   uint8_t receive_buffer[max_length];
 
   ssize_t read_count = recv(socket_holder->file_descriptor, reinterpret_cast<char *>(receive_buffer), max_length, 0);
