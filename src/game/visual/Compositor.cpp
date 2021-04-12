@@ -109,10 +109,10 @@ ColoredCharMatrix Compositor::CompositeHeader(int viewport_width) const {
 
   // show item in top bar
   std::wstring item = L"ITEM";
-  header.SetString(item, Position((header.GetSize().x / 2) - 4, 1), Color::WHITE);
+  header.SetString(item, Position((header.GetSize().x / 2) - 4, current_position_y), Color::WHITE);
   if (player->GetItem() != nullptr) {
     header.InsertMatrix(player->GetItem()->GetSprite(coordinate_size_t(1, 1)),
-                                     Position((header.GetSize().x / 2) + 2, 1));
+                        Position((header.GetSize().x / 2) + 2, current_position_y));
   }
 
   header.InsertMatrix(HealthDisplay::Render(player->health),
