@@ -43,10 +43,10 @@ ColoredCharMatrix Renderer::RenderWorld() const {
 
   // calculate the repetition of the world in the rendered viewport
   if (viewport_start.x < 0 || viewport_start.y < 0) {
-    negative_repetition = (viewport_start - world->size + Position(1, 1)) / world->size;
+    negative_repetition = (viewport_start - world->size) / world->size;
   }
   if (viewport_end.x >= world->size.x || viewport_end.y >= world->size.y) {
-    positive_repetition = (viewport_end + world->size - Position(1, 1)) / world->size;
+    positive_repetition = (viewport_end + world->size) / world->size;
   }
 
   // place walls
@@ -86,15 +86,21 @@ ColoredCharMatrix Renderer::RenderWorld() const {
   }
 
   // place players
-  for (auto const& i_player : world->players) {
-    // check if player is within the rendered viewport
-    if (i_player->position.IsGreaterOrEqual(viewport_start) && i_player->position.IsLessOrEqual(viewport_end)) {
-      // get player position as rendered viewport coordinates
-      Position relative_position = i_player->position - viewport_start;
-      // insert player sprite
-      ColoredCharMatrix colored_player_sprite(player_sprite);
-      colored_player_sprite.SetAllColors(i_player->color);
-      rendered_world.InsertMatrix(colored_player_sprite, relative_position * block_size);
+  for (auto const& player : world->players) {
+    for (int y_factor = negative_repetition.y; y_factor < positive_repetition.y; y_factor++) {
+      for (int x_factor = negative_repetition.x; x_factor < positive_repetition.x; x_factor++) {
+        // get position of player for each world repetition in world coordinates
+        Position position = player->position + (world->size * Position(x_factor, y_factor));
+        // check if player is within the rendered viewport
+        if (position.IsGreaterOrEqual(viewport_start) && position.IsLessOrEqual(viewport_end)) {
+          // get player position as rendered viewport coordinates
+          Position relative_position = position - viewport_start;
+          // insert player sprite
+          ColoredCharMatrix colored_player_sprite(player_sprite);
+          colored_player_sprite.SetAllColors(player->color);
+          rendered_world.InsertMatrix(colored_player_sprite, relative_position * block_size);
+        }
+      }
     }
   }
 
