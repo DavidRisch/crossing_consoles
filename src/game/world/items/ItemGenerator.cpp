@@ -43,7 +43,7 @@ void ItemGenerator::GenerateItem() {
   }
 
   // Generate a position for the item which is not blocked by a wall, player or other item
-  common::Position generated_position(0,0);
+  common::Position generated_position(0, 0);
   do {
     // TODO: avoid possible endless loop -> throw exception or return at some point
     std::uniform_int_distribution<int> x_coordinate(0, world->size.x);

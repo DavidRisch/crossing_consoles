@@ -18,8 +18,7 @@ class IItem : public networking::ISerializable {
  public:
   virtual visual::ColoredCharMatrix GetSprite(common::coordinate_size_t block_size) = 0;
   virtual ItemType GetItemType() = 0;
-};
 
+};  // namespace game::world
 }  // namespace game::world
-
 #endif  // CROSSING_CONSOLES_IITEM_H

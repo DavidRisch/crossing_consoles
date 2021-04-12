@@ -3,12 +3,12 @@ using namespace game;
 using namespace world;
 
 Points::Points(uint8_t value)
-    : value(value){
+    : value(value) {
 }
 
-visual::ColoredCharMatrix game::world::Points::GetSprite(game::common::coordinate_size_t block_size) {
+visual::ColoredCharMatrix game::world::Points::GetSprite(common::coordinate_size_t block_size) {
   visual::ColoredCharMatrix point_sprite = visual::ColoredCharMatrix(block_size);
-  point_sprite.AppendString(L"10");
+  point_sprite.AppendString(std::to_wstring(value));
   return point_sprite;
 }
 

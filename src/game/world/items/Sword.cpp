@@ -25,7 +25,7 @@ std::shared_ptr<Sword> Sword::Deserialize(std::vector<uint8_t>::iterator &input_
 }
 
 Sword::Sword(int damage)
-    : damage(damage){
+    : damage(damage) {
 }
 
 int Sword::GetDamage() const {

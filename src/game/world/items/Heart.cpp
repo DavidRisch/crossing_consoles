@@ -1,5 +1,6 @@
 #include "Heart.h"
 
+#include <cassert>
 #include <memory>
 
 #include "../../visual/symbols.h"
@@ -14,6 +15,7 @@ visual::ColoredCharMatrix Heart::GetSprite(common::coordinate_size_t block_size)
 }
 
 void Heart::Serialize(std::vector<uint8_t> &output_vector) const {
+  assert(0 <= healing && healing <= 255);
   output_vector.push_back(healing);
 }
 
@@ -25,7 +27,7 @@ std::shared_ptr<Heart> Heart::Deserialize(std::vector<uint8_t>::iterator &input_
 }
 
 Heart::Heart(int healing)
-    : healing(healing){
+    : healing(healing) {
 }
 
 int Heart::GetHealing() const {

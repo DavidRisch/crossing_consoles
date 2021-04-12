@@ -80,7 +80,7 @@ class World : public networking::ISerializable {
    */
   void ResurrectPlayer(Player& player);
 
-  ItemGenerator GetItemGenerator();
+  ItemGenerator& GetItemGenerator();
 
  private:
   Spawner spawner;

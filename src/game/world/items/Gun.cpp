@@ -17,7 +17,7 @@ uint8_t Gun::GetRange() const {
 
 Gun::Gun(int damage, uint8_t max_range)
     : damage(damage)
-    , range(max_range){
+    , range(max_range) {
 }
 
 Projectile Gun::SpawnProjectile(GameDefinition::player_id_t shooter_id, common::Position position,
