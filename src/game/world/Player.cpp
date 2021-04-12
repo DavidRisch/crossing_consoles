@@ -3,7 +3,11 @@
 #include <utility>
 
 #include "../networking/SerializationUtils.h"
-#include "items/Weapon.h"
+#include "items/DeserializeItemUtils.h"
+#include "items/Gun.h"
+#include "items/Heart.h"
+#include "items/Points.h"
+#include "items/Sword.h"
 
 using namespace game;
 using namespace game::common;
@@ -20,8 +24,6 @@ Player::Player(std::string name, common::Color color, Position position, GameDef
     , position(std::move(position))
     , player_id(player_id)
     , direction(direction) {
-  // TODO Assign weapons dynamically by placing items in world
-  weapon = Weapon(1, 20);  // dummy weapon
 }
 
 bool Player::IsAlive() const {
@@ -45,6 +47,15 @@ void Player::Serialize(std::vector<uint8_t> &output_vector) const {
   position.Serialize(output_vector);
 
   networking::SerializationUtils::SerializeObject(direction, output_vector);
+
+  if (item != nullptr) {
+    networking::SerializationUtils::SerializeObject(true, output_vector);
+    networking::SerializationUtils::SerializeObject(item->GetItemType(), output_vector);
+    item->Serialize(output_vector);
+  } else {
+    networking::SerializationUtils::SerializeObject(false, output_vector);
+  }
+
   networking::SerializationUtils::SerializeObject(health, output_vector);
   networking::SerializationUtils::SerializeObject(score, output_vector);
 
@@ -62,6 +73,14 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
 
   Player player(name, color, position, direction, player_id);
 
+  // Deserialize item of the player, either Gun or Sword
+  bool has_item = networking::SerializationUtils::DeserializeObject<bool>(input_iterator);
+  if (has_item) {
+    auto item_type = networking::SerializationUtils::DeserializeObject<ItemType>(input_iterator);
+    auto new_item = game::world::DeserializeItemUtils::DeserializeItem(item_type, input_iterator);
+    player.SetItem(new_item);
+  }
+
   player.health = networking::SerializationUtils::DeserializeObject<decltype(health)>(input_iterator);
   player.score = networking::SerializationUtils::DeserializeObject<decltype(score)>(input_iterator);
 
@@ -72,8 +91,8 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
   return player;
 }
 
-std::optional<Weapon> Player::GetWeapon() {
-  return weapon;
+std::shared_ptr<IItem> Player::GetItem() {
+  return item;
 }
 
 uint16_t Player::GetScore() const {
@@ -84,6 +103,25 @@ void Player::IncreaseScore(uint16_t points) {
   score += points;
 }
 
+void Player::SetItem(std::shared_ptr<IItem> new_item) {
+  switch (new_item->GetItemType()) {
+    case ItemType::HEART:
+      DecreaseHealth(-std::dynamic_pointer_cast<Heart>(new_item)->GetHealing());
+      break;
+    case ItemType::POINTS:
+      IncreaseScore(std::dynamic_pointer_cast<Points>(new_item)->GetValue());
+      break;
+    case ItemType::GUN:
+    case ItemType::SWORD:
+      item = std::move(new_item);
+      break;
+  }
+}
+
 void Player::Die() {
   time_of_death = std::chrono::steady_clock::now();
+}
+
+void Player::RemoveItem() {
+  item.reset();
 }

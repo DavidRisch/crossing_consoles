@@ -30,18 +30,18 @@ class GameLogic {
  private:
   /**
    * \brief Move the player with the given `movement`.
-   * \details Handles collisions with 'Projectiles' during movement.
+   * \details Handles collisions with 'Projectile`s and items during movement.
    */
   static void MovePlayer(world::Player &player, const common::coordinate_distance_t &movement, world::World &world);
 
   /**
-   * \brief Move the projectile using its direction.
+   * \brief Move the `Projectile` using its direction.
    */
   static void MoveProjectile(Projectile &projectile, world::World &world);
 
   /**
    * \brief Player uses weapon.
-     \details Spawns `Projectile` in world.
+     \details Spawns `Projectile` in world for `Gun`.
    */
   static void UseWeapon(world::Player &player, world::World &world);
 
@@ -70,6 +70,13 @@ class GameLogic {
    * and the shooter's score increased.
    */
   static bool HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> &projectiles, world::World &world);
+
+  /**
+   * \brief Returns the position that gets attacked with a coptic_capital_letter_dei when the position and the direction
+   * of a player are given.
+   */
+  static common::Position AttackedPositionFromDirection(const common::Position &position,
+                                                        GameDefinition::Direction direction);
 
   /**
    * \brief Apply given `damage` to `Player`and invoke Death if necessary

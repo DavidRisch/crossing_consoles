@@ -25,8 +25,9 @@ add_executable(crossing_consoles_test
         statistics.cpp
         game_logic.cpp
         game_projectile.cpp
+        item_generator.cpp
+        item.cpp
         fixtures/GamePlay.cpp
-
         utils/detect_debugger.cpp
         utils/TimingHelper.cpp
         )

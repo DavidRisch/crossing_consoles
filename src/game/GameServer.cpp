@@ -44,6 +44,11 @@ void GameServer::RunIteration() {
     GameLogic::HandleProjectiles(*world);
   }
 
+  if (std::chrono::steady_clock::now() - last_item_generated >= generate_item_interval) {
+    last_item_generated = std::chrono::steady_clock::now();
+    world->GetItemGenerator().GenerateItem();
+  }
+
   if (std::chrono::steady_clock::now() - last_world_sent >= send_world_interval) {
     last_world_sent = std::chrono::steady_clock::now();
 

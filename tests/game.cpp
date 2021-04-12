@@ -61,6 +61,7 @@ TEST(Game, Actions) {
 
 TEST(Game, ActionShoot) {
   auto player = std::make_shared<Player>("player name", Position(3, 2));
+  player->SetItem(std::make_shared<Gun>(1, 20));
   player->direction = GameDefinition::NORTH;
 
   auto mock_terminal = std::make_shared<MockTerminal>();

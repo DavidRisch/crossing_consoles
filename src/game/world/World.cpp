@@ -2,7 +2,11 @@
 
 #include <algorithm>
 #include <cassert>
+#include <memory>
 #include <utility>
+
+#include "../networking/SerializationUtils.h"
+#include "items/DeserializeItemUtils.h"
 
 using namespace game;
 using namespace game::common;
@@ -10,7 +14,8 @@ using namespace game::world;
 
 World::World(coordinate_size_t size)
     : size(std::move(size))
-    , spawner(this) {
+    , spawner(this)
+    , item_generator(this) {
 }
 
 void World::AddPlayer(const std::shared_ptr<Player>& player) {
@@ -46,6 +51,11 @@ void World::RemoveWall(const Position& position) {
   }
 }
 
+void World::AddItem(const Position& position, const std::shared_ptr<IItem>& item) {
+  assert(item);
+  items.insert({position, item});
+}
+
 bool World::IsBlocked(const Position& position) {
   if (walls.find(position) != walls.end()) {
     return true;
@@ -55,7 +65,13 @@ bool World::IsBlocked(const Position& position) {
                   [&position](const std::shared_ptr<Player>& player) { return player->position == position; })) {
     return true;
   }
+  return false;
+}
 
+bool World::IsBlockedForItem(const Position& position) {
+  if (IsBlocked(position) || items.find(position) != items.end()) {
+    return true;
+  }
   return false;
 }
 
@@ -63,6 +79,7 @@ void World::Update(const World& server_world) {
   size = server_world.size;
   projectiles = server_world.projectiles;
   walls = server_world.walls;
+  items = server_world.items;
 
   for (const auto& server_player : server_world.players) {
     auto player_id = server_player->player_id;
@@ -109,6 +126,14 @@ void World::Serialize(std::vector<uint8_t>& output_vector) const {
 
   ISerializable::SerializeList(output_vector, players);
 
+  // Serialize items
+  output_vector.push_back(items.size());
+  for (const auto& pair : items) {
+    pair.first.Serialize(output_vector);
+    networking::SerializationUtils::SerializeObject(pair.second->GetItemType(), output_vector);
+    pair.second->Serialize(output_vector);
+  }
+
   ISerializable::SerializeList(output_vector, projectiles);
 }
 
@@ -129,6 +154,14 @@ World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
   for (size_t i = 0; i < player_count; ++i) {
     auto player = std::make_shared<Player>(Player::Deserialize(input_iterator));
     world.AddPlayer(player);
+  }
+
+  auto item_count = game::world::DeserializeItemUtils::DeserializeItemNumber(input_iterator);
+  for (size_t i = 0; i < item_count; ++i) {
+    auto position = Position::Deserialize(input_iterator);
+    auto item_type = networking::SerializationUtils::DeserializeObject<ItemType>(input_iterator);
+    auto new_item = game::world::DeserializeItemUtils::DeserializeItem(item_type, input_iterator);
+    world.AddItem(position, new_item);
   }
 
   auto projectile_count = ISerializable::DeserializeContainerLength(input_iterator);
@@ -183,6 +216,11 @@ std::optional<std::shared_ptr<Projectile>> World::GetProjectileFromPosition(comm
 
 void World::ResurrectPlayer(Player& player) {
   player.DecreaseHealth(-game::world::Player::max_health);
+  player.RemoveItem();
   player.score = 0;
   player.position = spawner.GenerateSpawnPosition();
+}
+
+ItemGenerator& World::GetItemGenerator() {
+  return item_generator;
 }

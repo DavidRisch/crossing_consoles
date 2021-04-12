@@ -14,7 +14,7 @@ TEST(Projectile, CreateFromWeapon) {
   uint8_t range = 3;
 
   auto player = std::make_shared<Player>("player", Position(0, 0));
-  auto weapon = Weapon(damage, range);
+  auto weapon = Gun(damage, range);
   Projectile projectile = weapon.SpawnProjectile(player->player_id, player->position, player->direction);
 
   ASSERT_EQ(projectile.GetDamage(), damage);
@@ -42,7 +42,7 @@ TEST(Projectile, HitPlayer) {
 
   auto player = std::make_shared<Player>("player", Position(0, 0));
 
-  auto weapon = Weapon(damage, range);
+  auto weapon = Gun(damage, range);
   Projectile projectile = weapon.SpawnProjectile(player->player_id, player->position, player->direction);
 
   player->DecreaseHealth(projectile.GetDamage());
@@ -53,6 +53,7 @@ TEST(Projectile, Spawn) {
   // spawn projectile and add to world
   World world(coordinate_size_t(21, 21));
   auto player = std::make_shared<Player>("player", Position(0, 0));
+  player->SetItem(std::make_shared<Gun>(1, 20));
 
   world.AddPlayer(player);
 

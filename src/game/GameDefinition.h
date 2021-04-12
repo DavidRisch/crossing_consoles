@@ -22,6 +22,9 @@ class GameDefinition {
   /// Used to reference players.
   typedef uint16_t player_id_t;
 
+  /// Maximum number of items in the world at the same time
+  static constexpr int max_items_in_world = 3;
+
   /// Minimum length of a `Player`'s name
   static const int name_length_min = 2;
   /// Maximum length of a `Player`'s name
