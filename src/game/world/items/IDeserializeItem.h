@@ -16,8 +16,6 @@ namespace game::world {
 class IDeserializeItem {
  public:
   static std::shared_ptr<IItem> DeserializeItem(ItemType item_type, std::vector<uint8_t>::iterator& input_iterator) {
-    assert(item_type == ItemType::GUN || item_type == ItemType::SWORD || item_type == ItemType::HEART ||
-           item_type == ItemType::POINTS);
     switch (item_type) {
       case ItemType::GUN:
         return Gun::Deserialize(input_iterator);
@@ -27,8 +25,9 @@ class IDeserializeItem {
         return Heart::Deserialize(input_iterator);
       case ItemType::POINTS:
         return Points::Deserialize(input_iterator);
+      default:
+        throw std::runtime_error("Unknown ItemType.");
     }
-    return std::shared_ptr<IItem>();  // to prevent compiler warning / error
   };
 
   static size_t DeserializeItemNumber(std::vector<uint8_t>::iterator& from) {

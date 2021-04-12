@@ -11,6 +11,8 @@
 using namespace game;
 using namespace world;
 
+std::random_device ItemGenerator::random_device;
+
 ItemGenerator::ItemGenerator(World* world)
     : world(world) {
 }
@@ -21,9 +23,8 @@ void ItemGenerator::GenerateItem() {
   }
 
   // Generate random number between 0 and 3
-  std::random_device generator;
   std::uniform_int_distribution<int> distribution(0, 3);
-  int random = distribution(generator);
+  int random = distribution(random_device);
 
   // Generate a new item whose type is determined by the random number
   auto item = std::shared_ptr<IItem>();
@@ -47,9 +48,9 @@ void ItemGenerator::GenerateItem() {
   do {
     // TODO: avoid possible endless loop -> throw exception or return at some point
     std::uniform_int_distribution<int> x_coordinate(0, world->size.x);
-    int random_x = distribution(generator);
+    int random_x = distribution(random_device);
     std::uniform_int_distribution<int> y_coordinate(0, world->size.y);
-    int random_y = distribution(generator);
+    int random_y = distribution(random_device);
     generated_position = common::Position(random_x, random_y);
   } while (world->IsBlockedForItem(generated_position));
 

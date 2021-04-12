@@ -2,6 +2,7 @@
 #define CROSSING_CONSOLES_ITEMGENERATOR_H
 
 #include <memory>
+#include <random>
 
 #include "IItem.h"
 
@@ -23,6 +24,7 @@ class ItemGenerator {
 
  private:
   World *world;
+  static std::random_device random_device;
 };
 
 }  // namespace game::world
