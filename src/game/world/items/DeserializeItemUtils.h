@@ -26,7 +26,7 @@ class DeserializeItemUtils {
       case ItemType::POINTS:
         return Points::Deserialize(input_iterator);
       default:
-        throw std::runtime_error("Unknown ItemType.");
+        throw std::runtime_error("Unknown ItemType: "+std::to_string(static_cast<int>(item_type)));
     }
   };
 
