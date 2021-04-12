@@ -10,7 +10,6 @@ using namespace game::common;
 using namespace game::world;
 using namespace game::visual;
 using namespace game::visual::symbols;
-using namespace game::terminal::colors;
 
 Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size, World& world, Player& own_player)
     : block_size(std::move(block_size))
@@ -57,6 +56,9 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
   player_sprite.AppendChar(box_drawings_light_horizontal);
   player_sprite.AppendString(L"/ \\");
 
+  ColoredCharMatrix projectile_sprite(block_size);
+  projectile_sprite.AppendString(L"    o    ");
+
   sprite_map.SetSprite(BlockType::WALL_WATER, wall_water_sprite);
   sprite_map.SetSprite(BlockType::WALL_BRICK, wall_brick_sprite);
   sprite_map.SetSprite(BlockType::WALL_ROCK_LIGHT, wall_rock_light_sprite);
@@ -68,6 +70,7 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
   sprite_map.SetSprite(BlockType::WALL_SNOW_HEAVY, wall_snow_heavy_sprite);
   sprite_map.SetSprite(BlockType::WALL_SNOW_FULL, wall_snow_full_sprite);
   sprite_map.SetSprite(BlockType::PLAYER_BLOCK, player_sprite);
+  sprite_map.SetSprite(BlockType::PROJECTILE_BLOCK, projectile_sprite);
 }
 
 ColoredCharMatrix Renderer::RenderWorld() const {
@@ -113,6 +116,25 @@ ColoredCharMatrix Renderer::RenderWorld() const {
     }
   }
 
+  // place projectiles
+  // need to be rendered before! the player as they spawn at the same position
+  for (auto const& projectile : world->GetProjectiles()) {
+    for (int y_factor = negative_repetition.y; y_factor < positive_repetition.y; y_factor++) {
+      for (int x_factor = negative_repetition.x; x_factor < positive_repetition.x; x_factor++) {
+        // get position of projectile for each world repetition in world coordinates
+        Position position = projectile->GetPosition() + (world->size * Position(x_factor, y_factor));
+        // check if projectile is within the rendered viewport
+        if (position.IsGreaterOrEqual(viewport_start) && position.IsLessOrEqual(viewport_end)) {
+          // get projectile position as rendered viewport coordinates
+          Position relative_position = position - viewport_start;
+          // insert projectile sprite
+          rendered_world.InsertMatrix(sprite_map.GetSprite(BlockType::PROJECTILE_BLOCK),
+                                      relative_position * block_size);
+        }
+      }
+    }
+  }
+
   // place players
   for (auto const& i_player : world->players) {
     // check if player is within the rendered viewport
@@ -120,7 +142,9 @@ ColoredCharMatrix Renderer::RenderWorld() const {
       // get player position as rendered viewport coordinates
       Position relative_position = i_player->position - viewport_start;
       // insert player sprite
-      rendered_world.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_BLOCK), relative_position * block_size);
+      ColoredCharMatrix colored_player_sprite(sprite_map.GetSprite(BlockType::PLAYER_BLOCK));
+      colored_player_sprite.SetAllColors(i_player->color);
+      rendered_world.InsertMatrix(colored_player_sprite, relative_position * block_size);
     }
   }
 

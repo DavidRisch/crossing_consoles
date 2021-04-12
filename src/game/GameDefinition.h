@@ -1,6 +1,9 @@
 #ifndef CROSSING_CONSOLES_GAME_DEFINITION_H
 #define CROSSING_CONSOLES_GAME_DEFINITION_H
 
+#include <time.h>
+
+#include <chrono>
 #include <cstdint>
 
 namespace game {
@@ -10,8 +13,19 @@ namespace game {
  */
 class GameDefinition {
  public:
+  /// Moving direction of `Player` and `Projectile` in `World`.
+  enum Direction : char { NORTH, EAST, SOUTH, WEST };
+
+  /// Set waiting duration until player respawn
+  static constexpr std::chrono::duration<int64_t, std::milli> respawn_time = std::chrono::milliseconds(5000);
+
   /// Used to reference players.
   typedef uint16_t player_id_t;
+
+  /// Minimum length of a `Player`'s name
+  static const int name_length_min = 2;
+  /// Maximum length of a `Player`'s name
+  static const int name_length_max = 16;
 };
 
 }  // namespace game

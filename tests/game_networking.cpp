@@ -6,13 +6,13 @@
 #include "../src/game/GameClient.h"
 #include "../src/game/GameServer.h"
 #include "../src/game/terminal/MockTerminal.h"
+#include "utils/TimingHelper.h"
 
 using namespace game;
 using namespace game::common;
 using namespace game::world;
 using namespace game::visual;
 using namespace game::terminal;
-using namespace game::terminal::colors;
 
 class GameNetworking : public ::testing::Test {
  public:
@@ -82,7 +82,7 @@ class GameNetworking : public ::testing::Test {
   }
 
   void wait_a_few_iterations() const {
-    auto target_iteration = server_iteration_count + 10;
+    auto target_iteration = server_iteration_count + 50;
     while (server_iteration_count < target_iteration) {
       std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
@@ -103,7 +103,7 @@ class GameNetworking : public ::testing::Test {
     for (const auto& mock_terminal : mock_terminals) {
       for (const auto& i_lines : mock_terminal->GetLastOutput()) {
         for (const auto& i_characters : i_lines) {
-          if (i_characters != ColoredChar(L' ', WHITE, BLACK)) {
+          if (i_characters != ColoredChar(L' ', Color::WHITE, Color::BLACK)) {
             empty = false;
           }
         }
@@ -181,7 +181,7 @@ TEST_F(GameNetworking, Actions) {
 }
 
 TEST_F(GameNetworking, TwoPlayers) {
-  communication_timeout = std::chrono::milliseconds(1000);
+  communication_timeout = TimingHelper::HardwareDependentTime<std::milli>(25);
 
   create_server_and_client();
   create_new_client(Position(3, 4));
@@ -251,11 +251,11 @@ TEST_F(GameNetworking, TwoPlayers) {
 
 TEST_F(GameNetworking, ManyPlayers) {
   // Necessary to prevent timeouts while creating the clients
-  communication_timeout = std::chrono::milliseconds(1000);
+  communication_timeout = TimingHelper::HardwareDependentTime<std::milli>(1000);
 
   create_server_and_client();
 
-  for (int i = 0; i < 100; ++i) {
+  for (int i = 0; i < 30; ++i) {
     create_new_client(Position(i, 4));
   }
 
@@ -272,6 +272,84 @@ TEST_F(GameNetworking, ManyPlayers) {
   });
 
   start_server();
+
+  run_clients();
+
+  input_thread.join();
+  stop_server();
+
+  expect_some_output_on_all();
+}
+
+TEST_F(GameNetworking, PlayerDies) {
+  communication_timeout = std::chrono::milliseconds(300000);
+
+  create_server_and_client();
+  create_new_client(Position(3, 5));
+
+  std::thread input_thread([this] {
+    wait_for_renderer();
+    wait_a_few_iterations();
+
+    auto first_player = game_server->GetWorld().GetPlayerById(1);
+    auto second_player = game_server->GetWorld().GetPlayerById(2);
+
+    first_player->health = 1;
+
+    Player old_first = *first_player;
+    Player old_second = *second_player;
+
+    // add input to a single player. This should change the world of all players.
+    mock_terminals.at(1)->AddInput((char)KeyCode::A);
+    mock_terminals.at(1)->AddInput((char)KeyCode::SPACE);
+
+    wait_a_few_iterations();
+    wait_a_few_iterations();
+    wait_a_few_iterations();
+
+    EXPECT_FALSE(mock_terminals.at(0)->HasInput());
+    EXPECT_FALSE(mock_terminals.at(1)->HasInput());
+
+    EXPECT_FALSE(first_player->IsAlive());
+    EXPECT_EQ(second_player->score, old_second.score + 1);
+
+    std::this_thread::sleep_for(GameDefinition::respawn_time);
+    wait_for_renderer();
+
+    ASSERT_TRUE(first_player->IsAlive());
+    ASSERT_EQ(first_player->health, Player::max_health);
+    ASSERT_EQ(first_player->score, 0);
+
+    for (const auto& mock_terminal : mock_terminals) {
+      mock_terminal->AddInput((char)KeyCode::ESCAPE);
+    }
+  });
+
+  start_server();
+
+  run_clients();
+
+  input_thread.join();
+  stop_server();
+
+  expect_some_output_on_all();
+}
+
+TEST_F(GameNetworking, Disconnect) {
+  communication_timeout = TimingHelper::HardwareDependentTime<std::milli>(10);
+
+  create_server_and_client();
+  create_new_client(Position(3, 4));
+
+  start_server();
+
+  mock_terminals.at(0)->AddInput((char)KeyCode::ESCAPE);
+
+  std::thread input_thread([this] {
+    wait_a_few_iterations();  // wait for the first player to disconnect
+
+    mock_terminals.at(1)->AddInput((char)KeyCode::ESCAPE);
+  });
 
   run_clients();
 

@@ -8,23 +8,47 @@
 
 #include "../common/Position.h"
 #include "Player.h"
+#include "Projectile.h"
 #include "Spawner.h"
 #include "Wall.h"
 
 namespace game::world {
 
+typedef std::list<std::shared_ptr<Player>> player_ptr_list_t;
+
+/**
+ * \brief Handles information about the world: its size, players and walls.
+ */
 class World : public networking::ISerializable {
  public:
   common::coordinate_size_t size;
-  std::list<std::shared_ptr<Player>> players{};
+  player_ptr_list_t players{};
   std::unordered_map<common::Position, Wall, common::Position::HashFunction> walls;
   bool updated = false;
 
   explicit World(common::coordinate_size_t size);
 
   void AddPlayer(const std::shared_ptr<Player>& player);
+
+  void RemovePlayer(GameDefinition::player_id_t player_id);
+
   void AddWall(const common::Position& position, BlockType type = BlockType::WALL_BRICK);
+
   void RemoveWall(const common::Position& position);
+
+  void AddProjectile(const std::shared_ptr<Projectile>& projectile);
+
+  std::list<std::shared_ptr<Projectile>> GetProjectiles();
+
+  /**
+   * \brief Remove all given `Projectile`s from world's `projectiles`.
+   */
+  void RemoveProjectiles(std::list<std::shared_ptr<Projectile>> list_to_remove);
+
+  /**
+   * \brief Returns a `Projectile` with the given position if it exists.
+   */
+  std::optional<std::shared_ptr<Projectile>> GetProjectileFromPosition(common::Position position);
 
   bool IsBlocked(const common::Position& position);
 
@@ -41,8 +65,14 @@ class World : public networking::ISerializable {
 
   static World Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 
+  /**
+   * \brief Respawn player in world, reset score and restore health
+   */
+  void ResurrectPlayer(Player& player);
+
  private:
   Spawner spawner;
+  std::list<std::shared_ptr<Projectile>> projectiles{};
 };
 
 }  // namespace game::world

@@ -11,7 +11,6 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-#define ECONNREFUSED WSAECONNREFUSED
 #define MSG_NOSIGNAL 0
 
 #else
@@ -23,5 +22,20 @@
 #include <sys/socket.h>
 
 #endif
+
+inline void SocketSetNoneBlocking(int file_descriptor) {
+#ifdef _WIN32
+  // Windows
+  u_long blocking_io_mode = 1;  // != 0 -> none blocking mode
+  if (ioctlsocket(file_descriptor, FIONBIO, &blocking_io_mode) != 0) {
+    throw std::runtime_error("ioctlsocket failed");
+  }
+#else
+  // Linux
+  if (fcntl(file_descriptor, F_SETFL, fcntl(file_descriptor, F_GETFL, 0) | O_NONBLOCK) != 0) {
+    throw std::runtime_error("fcntl failed");
+  }
+#endif
+}
 
 #endif  // CROSSING_CONSOLES_SOCKET_LIBS_H

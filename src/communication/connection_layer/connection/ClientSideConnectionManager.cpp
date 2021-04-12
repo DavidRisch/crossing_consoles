@@ -23,7 +23,7 @@ std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::Create
       Connection::CreateClientSide(std::move(message_input_stream), std::move(message_output_stream), timeout);
 
   connection->BlockingEstablish();
-  DEBUG_CONNECTION_LAYER(std::cout << "(" << connection.get() << ") Establish done (ClientSideConnectionManager)\n")
+  DEBUG_CONNECTION_LOG(connection.get(), "Establish done (ClientSideConnectionManager)")
 
   auto manager = std::shared_ptr<ClientSideConnectionManager>(new ClientSideConnectionManager(timeout));
   manager->AddConnection(connection);
@@ -47,4 +47,8 @@ void ClientSideConnectionManager::SendMessageToServer(const std::shared_ptr<mess
 
 void ClientSideConnectionManager::SendDataToServer(std::vector<uint8_t> data) {
   SendDataToConnection(ProtocolDefinition::server_partner_id, std::move(data));
+}
+
+void ClientSideConnectionManager::CloseConnectionWithServer() {
+  CloseConnection(ProtocolDefinition::server_partner_id);
 }

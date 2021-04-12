@@ -3,17 +3,20 @@
 
 #include <string>
 
-#include "../terminal/colors.h"
+#include "../common/Color.h"
 
 namespace game::visual {
 
+/**
+ * \brief String with foreground and background colors.
+ */
 class ColoredString {
  public:
   std::wstring string;
-  terminal::colors::Color foreground;
-  terminal::colors::Color background;
+  common::Color foreground;
+  common::Color background;
 
-  ColoredString(std::wstring string, terminal::colors::Color foreground, terminal::colors::Color background);
+  ColoredString(std::wstring string, common::Color foreground, common::Color background);
 };
 
 }  // namespace game::visual

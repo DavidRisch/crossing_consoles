@@ -6,6 +6,9 @@
 
 namespace game::world {
 
+/**
+ * \brief Handles the information of a wall.
+ */
 class Wall : public networking::ISerializable {
  public:
   common::Position position;

@@ -5,6 +5,9 @@
 
 namespace communication::message_layer {
 
+/**
+ * \brief Sent by the Server to the Client after receiving a `ConnectionRequestMessage`.
+ */
 class ConnectionResponseMessage : public Message {
  public:
   static MessageType message_type;

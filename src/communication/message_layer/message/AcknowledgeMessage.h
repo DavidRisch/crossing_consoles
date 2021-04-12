@@ -6,6 +6,9 @@
 
 namespace communication::message_layer {
 
+/**
+ * \brief Sent after a `Message` was received to notify the partner that it has arrived.
+ */
 class AcknowledgeMessage : public Message {
  public:
   static MessageType message_type;
@@ -21,6 +24,7 @@ class AcknowledgeMessage : public Message {
   [[nodiscard]] ProtocolDefinition::sequence_t GetAcknowledgedMessageSequence() const;
 
  private:
+  /// Sequence of the acknowledged message
   ProtocolDefinition::sequence_t acknowledged_msg_sequence;
 };
 

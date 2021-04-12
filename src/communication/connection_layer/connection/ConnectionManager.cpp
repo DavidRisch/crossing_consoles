@@ -21,7 +21,7 @@ ConnectionManager::ConnectionManager(
     , connection_simulator_provider(connection_simulator_provider) {
   connection_map = {};
   keep_alive_interval =
-      std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::keep_alive_numerator);
+      std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::keep_alive_denominator);
 
   assert(timeout > std::chrono::milliseconds(0));
   assert(keep_alive_interval < timeout);
@@ -107,11 +107,11 @@ void ConnectionManager::ReceiveMessages() {
 
     auto current_time = std::chrono::steady_clock::now();
     if (current_time - connection_entry.second.timestamp_last_received >= timeout) {
-      DEBUG_CONNECTION_LAYER(std::cout << "(" << connection.get() << ") Timout (ConnectionManager)\n")
+      DEBUG_CONNECTION_LOG(connection.get(), "Timeout (ConnectionManager)")
       connection_remove_list.push_back(partner_id);
 
     } else if (current_time - connection_entry.second.timestamp_last_received >= keep_alive_interval) {
-      DEBUG_CONNECTION_LAYER(std::cout << "(" << connection.get() << ") Send KeepAlive (ConnectionManager)\n")
+      DEBUG_CONNECTION_LOG(connection.get(), "Send KeepAlive (ConnectionManager)")
       auto keep_alive_msg = std::make_shared<message_layer::KeepAliveMessage>(message_layer::KeepAliveMessage());
       SendMessageToConnection(partner_id, keep_alive_msg);
     }
@@ -141,4 +141,15 @@ void ConnectionManager::CloseConnection(partner_id_t partner_id) {
 
 bool ConnectionManager::HasConnections() {
   return !connection_map.empty();
+}
+
+const ConnectionStatistics& ConnectionManager::GetStatisticsFromPartnerConnection(partner_id_t partner_id) const {
+  auto connection_it = connection_map.find(partner_id);
+  if (connection_it == connection_map.end()) {
+    throw UnknownPartnerException();
+  }
+  assert(connection_it->first == partner_id);
+  auto connection = connection_it->second.connection;
+
+  return connection->GetConnectionStatistics();
 }

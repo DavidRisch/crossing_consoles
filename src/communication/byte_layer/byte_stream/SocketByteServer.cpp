@@ -64,20 +64,8 @@ SocketByteServer::SocketByteServer(
     throw std::runtime_error("listen failed");
   }
 
-  // None blocking mode (needed for GetNewClient())
-#ifdef _WIN32
-  // Windows
-  u_long blocking_io_mode = 1;  // != 0 -> none blocking mode
-  if (ioctlsocket(socket_holder->file_descriptor, FIONBIO, &blocking_io_mode) != 0) {
-    throw std::runtime_error("ioctlsocket failed");
-  }
-#else
-  // Linux
-  if (fcntl(socket_holder->file_descriptor, F_SETFL, fcntl(socket_holder->file_descriptor, F_GETFL, 0) | O_NONBLOCK) !=
-      0) {
-    throw std::runtime_error("fcntl failed");
-  }
-#endif
+  // needed for GetNewClient()
+  SocketSetNoneBlocking(socket_holder->file_descriptor);
 }
 
 std::shared_ptr<SocketByteStream> SocketByteServer::GetNewClient() {  // NOLINT(readability-make-member-function-const)

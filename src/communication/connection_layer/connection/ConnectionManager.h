@@ -16,6 +16,9 @@
 namespace communication {
 namespace connection_layer {
 
+/**
+ * \brief Holds a pointer to the `Connection` and the time when the last `Message` was received on it.
+ */
 struct ConnectionParameters {
   std::shared_ptr<connection_layer::Connection> connection;
   // timestamp_last_received holds the timestamp of the last received message from its associated connection
@@ -25,6 +28,9 @@ struct ConnectionParameters {
 
 using partner_id_t = ProtocolDefinition::partner_id_t;
 
+/**
+ * \brief Base class for handling `Connection`s on the Server or the Client.
+ */
 class ConnectionManager {
  public:
   explicit ConnectionManager(
@@ -96,6 +102,11 @@ class ConnectionManager {
       return "No partner with that id found.";
     }
   };
+
+  /**
+   * Return connection statistics of partner connection
+   */
+  const ConnectionStatistics& GetStatisticsFromPartnerConnection(partner_id_t partner_id) const;
 
  protected:
   /**

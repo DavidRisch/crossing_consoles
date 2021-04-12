@@ -22,6 +22,11 @@ enum class MessageType : char {
   HIGHEST_ELEMENT = CONNECTION_RESET
 };
 
+const char* message_type_to_string(MessageType value);
+
+/**
+ * \brief Base class for messages of different types.
+ */
 class Message {
  public:
   // Draft message
@@ -33,7 +38,7 @@ class Message {
   ProtocolDefinition::sequence_t GetMessageSequence() const;
   void SetMessageSequence(ProtocolDefinition::sequence_t new_sequence);
 
-  [[nodiscard]] virtual MessageType GetMessageType() const;
+  [[nodiscard]] virtual MessageType GetMessageType() const = 0;
   [[nodiscard]] MessageMetaData GetMessageMetaData() const;
 
   void SetTimestampReceived(std::chrono::steady_clock::time_point timestamp);

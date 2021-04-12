@@ -2,10 +2,6 @@ import os
 import subprocess
 
 
-class Hpp2plantumlBug(Exception):
-    pass
-
-
 class UmlDirectory:
     def __init__(self, absolute_path: str, relative_path: str):
         self.absolute_path = absolute_path
@@ -75,13 +71,7 @@ def run_hpp2plantuml(uml_directory: UmlDirectory):
             arguments += ['-i', child_path]
 
     process = subprocess.run(['hpp2plantuml'] + arguments)
-
-    try:
-        process.check_returncode()
-    except subprocess.CalledProcessError as e:
-        # TODO: Temporary workaround for issue in hpp2plantuml:
-        # https://github.com/thibaultmarin/hpp2plantuml/issues/13)
-        raise Hpp2plantumlBug from e
+    process.check_returncode()
 
 
 def run_plant_uml(uml_directory: UmlDirectory):
@@ -111,14 +101,9 @@ def main():
 
         uml_directory = UmlDirectory(absolute_path, relative_path)
 
-        try:
-            run_hpp2plantuml(uml_directory)
-            uml_directory.apply_hacks()
-            run_plant_uml(uml_directory)
-        except Hpp2plantumlBug as e:
-            # TODO: Temporary workaround for issue in hpp2plantuml:
-            # https://github.com/thibaultmarin/hpp2plantuml/issues/13)
-            print('caught', e)
+        run_hpp2plantuml(uml_directory)
+        uml_directory.apply_hacks()
+        run_plant_uml(uml_directory)
 
 
 if __name__ == '__main__':

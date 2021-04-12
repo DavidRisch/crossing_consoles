@@ -5,6 +5,7 @@ add_library(crossing_consoles_lib
         game/GameServer.cpp
 
         game/common/Position.cpp
+        game/common/Color.cpp
 
         game/world/Player.cpp
         game/world/World.cpp
@@ -13,6 +14,9 @@ add_library(crossing_consoles_lib
         game/world/Spawner.cpp
         game/world/HeightMap.cpp
         game/world/EmptyWorldGenerator.cpp
+        game/world/Projectile.cpp
+
+        game/world/items/Weapon.cpp
 
         game/visual/Renderer.cpp
         game/visual/Compositor.cpp
@@ -20,8 +24,11 @@ add_library(crossing_consoles_lib
         game/visual/ColoredChar.cpp
         game/visual/ColoredString.cpp
         game/visual/SpriteMap.cpp
-        
+        game/visual/PlayerList.cpp
+        game/visual/HealthDisplay.cpp
+
         game/networking/Change.cpp
+        game/networking/SerializationUtils.cpp
 
         game/terminal/RealTerminal.cpp
         game/terminal/MockTerminal.cpp
@@ -49,6 +56,7 @@ add_library(crossing_consoles_lib
         communication/message_layer/message/PayloadMessage.cpp
         communication/message_layer/message/MessageMetaData.cpp
         communication/message_layer/message/AcknowledgeMessage.cpp
+        communication/message_layer/message/ConnectionResetMessage.cpp
         communication/message_layer/message/NotAcknowledgeMessage.cpp
 
         communication/message_layer/crc/CRCHandler.cpp
@@ -58,11 +66,13 @@ add_library(crossing_consoles_lib
         communication/connection_layer/connection/ServerSideConnectionManager.cpp
         communication/connection_layer/connection/ClientSideConnectionManager.cpp
 
+        communication/connection_layer/connection/statistics/ConnectionStatistics.cpp
+        communication/connection_layer/connection/statistics/StatisticPrinter.cpp
+
         communication/connection_layer/event/Event.cpp
         communication/connection_layer/event/ConnectEvent.cpp
         communication/connection_layer/event/DisconnectEvent.cpp
         communication/connection_layer/event/PayloadEvent.cpp
-        communication/message_layer/message/ConnectionResetMessage.cpp
         )
 
 add_executable(crossing_consoles_main_server

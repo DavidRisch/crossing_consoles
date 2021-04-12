@@ -19,6 +19,14 @@ void World::AddPlayer(const std::shared_ptr<Player>& player) {
   updated = true;
 }
 
+void World::RemovePlayer(GameDefinition::player_id_t player_id) {
+  auto it = std::find_if(players.begin(), players.end(), [&player_id](const std::shared_ptr<Player>& player) {
+    return player->player_id == player_id;
+  });
+  assert(it != players.end());
+  players.erase(it);
+}
+
 void World::AddWall(const Position& position, BlockType type) {
   if (position.IsGreaterOrEqual(Position(0, 0)) && position.IsLess(size)) {
     if (walls.find(position) != walls.end()) {
@@ -53,7 +61,7 @@ bool World::IsBlocked(const Position& position) {
 
 void World::Update(const World& server_world) {
   size = server_world.size;
-
+  projectiles = server_world.projectiles;
   walls = server_world.walls;
 
   for (const auto& server_player : server_world.players) {
@@ -70,10 +78,11 @@ void World::Update(const World& server_world) {
   }
 
   // remove players no longer on the server
-  //  players.end() =
-  //      std::remove_if(players.begin(), players.end(), [&server_world](const std::shared_ptr<Player>& player) {
-  //        return server_world.GetPlayerById(player->player_id) == nullptr;
-  //      });
+  auto removed_players_begin =
+      std::remove_if(players.begin(), players.end(), [&server_world](const std::shared_ptr<Player>& player) {
+        return server_world.GetPlayerById(player->player_id) == nullptr;
+      });
+  players.erase(removed_players_begin, players.end());
 
   updated = true;
 }
@@ -99,6 +108,8 @@ void World::Serialize(std::vector<uint8_t>& output_vector) const {
   ISerializable::SerializeMap(output_vector, walls);
 
   ISerializable::SerializeList(output_vector, players);
+
+  ISerializable::SerializeList(output_vector, projectiles);
 }
 
 World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
@@ -120,5 +131,58 @@ World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
     world.AddPlayer(player);
   }
 
+  auto projectile_count = ISerializable::DeserializeContainerLength(input_iterator);
+  for (size_t i = 0; i < projectile_count; ++i) {
+    auto projectile = std::make_shared<Projectile>(Projectile::Deserialize(input_iterator));
+    world.AddProjectile(projectile);
+  }
+
   return world;
+}
+
+std::list<std::shared_ptr<Projectile>> World::GetProjectiles() {
+  return projectiles;
+}
+
+void World::AddProjectile(const std::shared_ptr<Projectile>& projectile) {
+  auto world_projectile_it = std::find_if(projectiles.begin(), projectiles.end(),
+                                          [&projectile](const std::shared_ptr<Projectile>& world_projectile) {
+                                            return world_projectile->GetPosition() == projectile->GetPosition();
+                                          });
+
+  if (world_projectile_it != projectiles.end()) {
+    if (projectile->GetDirection() == (*world_projectile_it)->GetDirection()) {
+      assert(projectile->GetShooterId() == (*world_projectile_it)->GetShooterId());
+      // Do not add multiple projectiles of same player with identical position to world
+      return;
+    }
+  }
+
+  projectiles.push_back(projectile);
+  updated = true;
+}
+
+void World::RemoveProjectiles(std::list<std::shared_ptr<Projectile>> list_to_remove) {
+  for (auto& remove_projectile : list_to_remove) {
+    auto iterator = std::remove_if(
+        projectiles.begin(), projectiles.end(),
+        [&remove_projectile](const std::shared_ptr<Projectile>& item) { return item == remove_projectile; });
+    projectiles.erase(iterator, projectiles.end());
+  }
+}
+
+std::optional<std::shared_ptr<Projectile>> World::GetProjectileFromPosition(common::Position position) {
+  auto projectiles_it = std::find_if(
+      projectiles.begin(), projectiles.end(),
+      [&position](const std::shared_ptr<Projectile>& projectile) { return projectile->GetPosition() == position; });
+  if (projectiles_it != projectiles.end()) {
+    return *projectiles_it;
+  }
+  return std::optional<std::shared_ptr<Projectile>>();
+}
+
+void World::ResurrectPlayer(Player& player) {
+  player.DecreaseHealth(-game::world::Player::max_health);
+  player.score = 0;
+  player.position = spawner.GenerateSpawnPosition();
 }

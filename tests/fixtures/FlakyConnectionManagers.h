@@ -13,6 +13,7 @@
 #include "../../src/communication/connection_layer/connection/ServerSideConnectionManager.h"
 #include "../../src/communication/connection_layer/event/PayloadEvent.h"
 #include "../../src/communication/debug.h"
+#include "../utils/TimingHelper.h"
 #include "../utils/detect_debugger.h"
 #include "ConnectionManagers.h"
 
@@ -81,7 +82,7 @@ class FlakyConnectionManagers : public ConnectionManagers {
       client_connection_simulator_provider.reset(
           new FlakyConnectionSimulatorProvider(*client_incoming_parameters, *client_outgoing_parameters));
 
-      create_server_and_client();
+      create_server_and_client(TimingHelper::HardwareDependentTime<std::milli>(10));
       send_and_check_messages(10);
 
       destroy();

@@ -8,6 +8,8 @@
 #include "../../message_layer/message/Message.h"
 #include "../../message_layer/message_stream/MessageInputStream.h"
 #include "../../message_layer/message_stream/MessageOutputStream.h"
+#include "statistics/ConnectionStatistics.h"
+#include "statistics/StatisticPrinter.h"
 
 namespace communication {
 namespace connection_layer {
@@ -22,6 +24,8 @@ enum class ConnectionState {
   WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE,
   CLOSED,
 };
+
+const char* connection_state_to_string(ConnectionState value);
 
 using sequence_t = ProtocolDefinition::sequence_t;
 using timeout_t = ProtocolDefinition::timeout_t;
@@ -71,6 +75,9 @@ class Connection {
    */
   std::shared_ptr<message_layer::Message> ReceiveMessage();
 
+  /**
+   * \brief Thrown if something goes wrong during the handshake so the Connection can not be established.
+   */
   class ConnectionCreationFailed : public std::exception {
     [[nodiscard]] const char* what() const noexcept override {
       return "Connection could not be created.";
@@ -86,7 +93,14 @@ class Connection {
     }
   };
 
-  /// Returns true if connection is in state `CLOSED`
+  /**
+   * \brief Return connection statistics
+   */
+  const ConnectionStatistics& GetConnectionStatistics() const;
+
+  /**
+   * \brief Returns true if connection is in state `CLOSED`
+   */
   bool ConnectionClosed() const;
 
  private:
@@ -165,6 +179,8 @@ class Connection {
 
   /// The newest sequence of a correct Message received from the other side.
   std::optional<sequence_t> last_received_sequence_counter;
+
+  ConnectionStatistics statistics{};
 };
 
 }  // namespace connection_layer

@@ -9,10 +9,12 @@ namespace game::networking {
 enum class ChangeType : uint8_t {
   // client -> server
   SET_NAME = 0,
+  SET_COLOR,
   MOVE_UP,
   MOVE_RIGHT,
   MOVE_DOWN,
   MOVE_LEFT,
+  USE_ITEM,
 
   // server -> client
   SET_OWN_ID,
@@ -32,6 +34,8 @@ class Change {
   explicit Change(std::vector<uint8_t> bytes);
 
   [[nodiscard]] ChangeType GetChangeType() const;
+
+  [[nodiscard]] std::vector<uint8_t>::iterator GetContentIterator();
 
   std::vector<uint8_t> payload;
 

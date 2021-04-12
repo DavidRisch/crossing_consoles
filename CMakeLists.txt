@@ -9,6 +9,9 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 add_compile_options(-Wall -Wextra -pedantic)
 
+# treat all warnings as errors
+add_compile_options(-Werror)
+
 # uncomment to enable verbose debug output
 # add_compile_definitions(CROSSING_CONSOLES_DO_DEBUG)
 

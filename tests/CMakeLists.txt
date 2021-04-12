@@ -11,6 +11,7 @@ add_executable(crossing_consoles_test
         connection_manager.cpp
         game_serialization.cpp
         game_networking.cpp
+        game_player_list.cpp
         position.cpp
         renderer.cpp
         wall.cpp
@@ -21,8 +22,13 @@ add_executable(crossing_consoles_test
         flaky_connection.cpp
         height_map.cpp
         sprite_map.cpp
+        statistics.cpp
+        game_logic.cpp
+        game_projectile.cpp
+        fixtures/GamePlay.cpp
 
-        utils/detect_debugger.h
+        utils/detect_debugger.cpp
+        utils/TimingHelper.cpp
         )
 
 target_link_libraries(crossing_consoles_test crossing_consoles_lib)

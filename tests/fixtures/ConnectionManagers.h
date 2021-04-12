@@ -32,25 +32,31 @@ class ConnectionManagers : public ::testing::Test {
   ProtocolDefinition::partner_id_t second_client_id{};  // from server perspective
   ProtocolDefinition::partner_id_t server_id{};         // from client perspective
 
-  void create_server_and_client(ProtocolDefinition::timeout_t timeout = ProtocolDefinition::timeout) {
+  void create_server_and_client(ProtocolDefinition::timeout_t timeout) {
     server_manager = ServerSideConnectionManager::CreateServerSide(timeout, server_connection_simulator_provider);
     std::thread server_thread([this] {
-      int counter = 10;
+      int counter = 1000;
       while (counter > 0 && server_manager->ConnectionCount() == 0) {
         server_manager->HandleConnections();
         std::this_thread::sleep_for(std::chrono::microseconds(10));
         counter--;
       }
+      ASSERT_GT(counter, 0);
     });
+    try {
+      client_manager = ClientSideConnectionManager::CreateClientSide(timeout, client_connection_simulator_provider);
 
-    client_manager = ClientSideConnectionManager::CreateClientSide(timeout, client_connection_simulator_provider);
+      while (!server_manager->HasConnections()) {
+        client_manager->HandleConnections();
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+      }
 
-    while (!server_manager->HasConnections()) {
-      client_manager->HandleConnections();
-      std::this_thread::sleep_for(std::chrono::microseconds(10));
+      server_thread.join();
+    } catch (const std::exception &e) {
+      // make sure the server_thread is joined. Otherwise it can hide the real exception.
+      server_thread.join();
+      throw e;
     }
-
-    server_thread.join();
 
     ASSERT_TRUE(server_manager->ConnectionCount() != 0);
 
@@ -77,12 +83,13 @@ class ConnectionManagers : public ::testing::Test {
     assert(server_manager->ConnectionCount() == 1);
 
     std::thread server_thread([this] {
-      int counter = 10;
+      int counter = 100;
       while (counter > 0 && server_manager->ConnectionCount() == 1) {
         server_manager->HandleConnections();
         std::this_thread::sleep_for(std::chrono::microseconds(10));
         counter--;
       }
+      ASSERT_GT(counter, 0);
     });
 
     second_client_manager = ClientSideConnectionManager::CreateClientSide(ProtocolDefinition::timeout,
@@ -130,11 +137,12 @@ class ConnectionManagers : public ::testing::Test {
       client_manager->SendDataToServer(payload_client_to_server);
       std::this_thread::sleep_for(std::chrono::microseconds(100));
       int counter;
-      for (counter = 0; counter < 1000 && (!server_manager->HasEvent() || !client_manager->HasEvent()); ++counter) {
+      for (counter = 0; counter < 10000 && (!server_manager->HasEvent() || !client_manager->HasEvent()); ++counter) {
         server_manager->HandleConnections();
         client_manager->HandleConnections();
-        std::this_thread::sleep_for(std::chrono::microseconds(10));
+        std::this_thread::sleep_for(std::chrono::microseconds(500));
       }
+      ASSERT_LT(counter, 10000);
 
       assert_payload_received(server_manager->PopAndGetOldestEvent(), payload_client_to_server);
       assert_payload_received(client_manager->PopAndGetOldestEvent(), payload_server_to_client);

@@ -6,6 +6,9 @@
 namespace communication {
 namespace connection_layer {
 
+/**
+ * \brief `ConnectionManager` on Client Side
+ */
 class ClientSideConnectionManager : public ConnectionManager {
  public:
   static std::shared_ptr<ClientSideConnectionManager> CreateClientSide(
@@ -27,6 +30,12 @@ class ClientSideConnectionManager : public ConnectionManager {
    * \brief Send data from a Client to the Server
    */
   void SendDataToServer(std::vector<uint8_t> data);
+
+  /**
+   * \brief Notify server that connection will be closed.
+   * \details Send ResetConnection message, wait for acknowledge message before actually closing the connection.
+   */
+  void CloseConnectionWithServer();
 
  private:
   ClientSideConnectionManager(ProtocolDefinition::timeout_t timeout);

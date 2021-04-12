@@ -6,6 +6,9 @@
 namespace communication {
 namespace message_layer {
 
+/**
+ * \brief Sent to prevent a timeout on the connection.
+ */
 class KeepAliveMessage : public Message {
  public:
   static MessageType message_type;

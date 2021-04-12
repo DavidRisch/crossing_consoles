@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 
+#include <chrono>
 #include <cstring>
 
+#include "../src/game/common/Color.h"
+#include "../src/game/networking/SerializationUtils.h"
 #include "../src/game/world/World.h"
 
 using namespace game;
@@ -72,8 +75,62 @@ TEST(GameSerialization, World) {
 TEST(GameSerialization, Player) {
   Player original("ABCD", Position(34, 56));
 
+  original.IncreaseScore(4);
+  original.health = 3;
+
   auto deserialized = serialize_and_deserialize(original);
 
   EXPECT_EQ(original.name, deserialized.name);
+  EXPECT_EQ(original.color, deserialized.color);
+  EXPECT_EQ(original.health, deserialized.health);
+  EXPECT_EQ(original.direction, deserialized.direction);
+  EXPECT_EQ(original.GetScore(), deserialized.GetScore());
   EXPECT_TRUE(are_objects_identical(original.position, deserialized.position));
+}
+
+TEST(GameSerialization, Utils) {
+  int a_original = 123;
+  auto b_original = std::chrono::milliseconds(456);
+  long long c_original = 123456789;
+
+  std::vector<uint8_t> encoded;
+
+  networking::SerializationUtils::SerializeObject(a_original, encoded);
+  networking::SerializationUtils::SerializeObject(b_original, encoded);
+  networking::SerializationUtils::SerializeObject(c_original, encoded);
+
+  auto it = encoded.begin();
+
+  auto a_decoded = networking::SerializationUtils::DeserializeObject<decltype(a_original)>(it);
+  EXPECT_TRUE(are_objects_identical(a_original, a_decoded));
+  auto b_decoded = networking::SerializationUtils::DeserializeObject<decltype(b_original)>(it);
+  EXPECT_TRUE(are_objects_identical(b_original, b_decoded));
+  auto c_decoded = networking::SerializationUtils::DeserializeObject<decltype(c_original)>(it);
+  EXPECT_TRUE(are_objects_identical(c_original, c_decoded));
+
+  EXPECT_EQ(it, encoded.end());
+}
+
+TEST(GameSerialization, Projectile) {
+  Player player("ABCD", Position(34, 56));
+  Projectile original(10, 72, player.player_id, player.position, player.direction);
+
+  auto deserialized = serialize_and_deserialize(original);
+
+  EXPECT_EQ(original.GetDamage(), deserialized.GetDamage());
+  EXPECT_EQ(original.GetDirection(), deserialized.GetDirection());
+  EXPECT_EQ(original.GetShooterId(), deserialized.GetShooterId());
+  EXPECT_EQ(original.GetRange(), deserialized.GetRange());
+
+  EXPECT_TRUE(are_objects_identical(original.GetPosition(), deserialized.GetPosition()));
+}
+
+TEST(GameSerialization, Color) {
+  Color original(12, 234, 56);
+
+  auto deserialized = serialize_and_deserialize(original);
+
+  EXPECT_EQ(original.red, deserialized.red);
+  EXPECT_EQ(original.green, deserialized.green);
+  EXPECT_EQ(original.blue, deserialized.blue);
 }

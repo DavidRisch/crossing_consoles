@@ -13,9 +13,32 @@
 #include "../../message_layer/message/NotAcknowledgeMessage.h"
 #include "../../message_layer/message_stream/MessageCoder.h"
 #include "ConnectionManager.h"
+#include "statistics/StatisticPrinter.h"
 
 using namespace communication;
 using namespace communication::connection_layer;
+
+const char *communication::connection_layer::connection_state_to_string(ConnectionState value) {
+  switch (value) {
+    case ConnectionState::CLIENT_CONNECTION_START:
+      return "CLIENT_CONNECTION_START";
+    case ConnectionState::CLIENT_CONNECTION_REQUEST_SENT:
+      return "CLIENT_CONNECTION_REQUEST_SENT";
+    case ConnectionState::SERVER_WAITING_FOR_FIRST:
+      return "SERVER_WAITING_FOR_FIRST";
+    case ConnectionState::SERVER_CONNECTION_RESPONSE_SENT:
+      return "SERVER_CONNECTION_RESPONSE_SENT";
+    case ConnectionState::READY:
+      return "READY";
+    case ConnectionState::WAITING_FOR_ACKNOWLEDGE:
+      return "WAITING_FOR_ACKNOWLEDGE";
+    case ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE:
+      return "WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE";
+    case ConnectionState::CLOSED:
+      return "CLOSED";
+  }
+  throw std::runtime_error("Invalid ConnectionState");
+}
 
 std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout() {
   const auto start_time = std::chrono::steady_clock::now();
@@ -72,13 +95,14 @@ bool Connection::TryEstablish() {
     }
 
     case (ConnectionState::CLIENT_CONNECTION_REQUEST_SENT): {
-      DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") Wait for step_2 start\n")
+      DEBUG_CONNECTION_LOG(this, "Wait for step_2 start")
       auto step_2 = ReceiveWithTimeout();
-      DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") Wait for step_2 end\n")
+      DEBUG_CONNECTION_LOG(this, "Wait for step_2 end")
       assert(step_2 != nullptr);
       if (step_2->GetMessageType() != message_layer::MessageType::CONNECTION_RESPONSE) {
         throw ConnectionCreationFailed();
       }
+      unacknowledged_sent_message.clear();
 
       // step 3:
       SendMessageNow(std::make_shared<message_layer::AcknowledgeMessage>(step_2->GetMessageSequence()), false);
@@ -87,9 +111,9 @@ bool Connection::TryEstablish() {
       break;
     }
     case (ConnectionState::SERVER_WAITING_FOR_FIRST): {
-      DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") Wait for step_1 start\n")
+      DEBUG_CONNECTION_LOG(this, "Wait for step_1 start")
       auto step_1 = ReceiveWithTimeout();
-      DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") Wait for step_1 end\n")
+      DEBUG_CONNECTION_LOG(this, "Wait for step_1 end")
       if (step_1->GetMessageType() != message_layer::MessageType::CONNECTION_REQUEST) {
         throw ConnectionCreationFailed();
       }
@@ -101,9 +125,9 @@ bool Connection::TryEstablish() {
       break;
     }
     case (ConnectionState::SERVER_CONNECTION_RESPONSE_SENT): {
-      DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") Wait for step_3 start\n")
+      DEBUG_CONNECTION_LOG(this, "Wait for step_3 start")
       auto step_3 = ReceiveWithTimeout();
-      DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") Wait for step_3 end\n")
+      DEBUG_CONNECTION_LOG(this, "Wait for step_3 end")
       if (step_3->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
         throw ConnectionCreationFailed();
       } else {
@@ -112,6 +136,7 @@ bool Connection::TryEstablish() {
           throw ConnectionCreationFailed();
         }
       }
+      unacknowledged_sent_message.clear();
       state = ConnectionState::READY;
       break;
     }
@@ -183,7 +208,11 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
                              });
 
       if (it != unacknowledged_sent_message.end()) {
-        unacknowledged_sent_message.erase(unacknowledged_sent_message.begin(), it);
+        (**it).SetTimestampReceived(std::chrono::steady_clock::now());
+        statistics.AddSentAndAckMessage(*it);
+
+        // remove all messages up to and including it
+        unacknowledged_sent_message.erase(unacknowledged_sent_message.begin(), ++it);
       }
 
       if (state == ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE) {
@@ -209,7 +238,7 @@ bool Connection::TryReceive() {
   try {
     received_message = message_input_stream->ReceiveMessage(false);
   } catch (const message_layer::MessageCoder::DecodeFailedException &exception) {
-    DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") InvalidMessageException " << exception.what() << "\n")
+    DEBUG_CONNECTION_LOG(this, "InvalidMessageException " << exception.what())
 
     auto message = std::make_shared<message_layer::NotAcknowledgeMessage>();
     SendMessageNow(message);
@@ -224,13 +253,18 @@ bool Connection::TryReceive() {
   // set Metadata
   received_message->SetTimestampReceived(std::chrono::steady_clock::now());
 
+  if (state != ConnectionState::SERVER_CONNECTION_RESPONSE_SENT) {
+    // connection establishment is not included in statistics
+    statistics.AddReceivedMessage(received_message);
+  }
+
   if (received_message->GetMessageType() != message_layer::MessageType::NOT_ACKNOWLEDGE) {
     if (last_received_sequence_counter.has_value()) {
       if (received_message->GetMessageSequence() != *last_received_sequence_counter + 1) {
-        DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") <~~ TryReceive: received type " << std::dec
-                                         << (int)received_message->GetMessageType()
-                                         << "   \t seq: " << received_message->GetMessageSequence()
-                                         << " expected: " << *last_received_sequence_counter + 1 << "\n")
+        DEBUG_CONNECTION_LOG(this, "<~~ TryReceive: received type "
+                                       << message_type_to_string(received_message->GetMessageType())
+                                       << " seq: " << received_message->GetMessageSequence()
+                                       << " expected: " << *last_received_sequence_counter + 1)
         return true;  // there might be more messages which can be received
       }
     }
@@ -238,12 +272,12 @@ bool Connection::TryReceive() {
     last_received_sequence_counter = received_message->GetMessageSequence();
   }
 
-  DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") <~~ TryReceive: received type " << std::dec
-                                   << (int)received_message->GetMessageType()
-                                   << "   \t seq: " << received_message->GetMessageSequence() << "\n")
+  DEBUG_CONNECTION_LOG(this, "<~~ TryReceive: received type "
+                                 << message_type_to_string(received_message->GetMessageType())
+                                 << " seq: " << received_message->GetMessageSequence())
 
   if (received_message->GetMessageType() == message_layer::MessageType::NOT_ACKNOWLEDGE) {
-    DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") received NACK\n")
+    DEBUG_CONNECTION_LOG(this, "received NACK")
 
     ResendLastMessages();
     return false;  // no further messages can be received
@@ -264,12 +298,12 @@ Connection::Connection(std::shared_ptr<message_layer::MessageInputStream> messag
                        std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
                        ConnectionState connection_state, sequence_t sequence_counter, timeout_t timeout)
     : state(connection_state)
-    , sequence_counter(sequence_counter)
     , timeout(timeout)
     , message_input_stream(std::move(message_input_stream))
-    , message_output_stream(std::move(message_output_stream)) {
+    , message_output_stream(std::move(message_output_stream))
+    , sequence_counter(sequence_counter) {
   resend_interval =
-      std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::resend_numerator);
+      std::chrono::duration_cast<std::chrono::milliseconds>(timeout / ProtocolDefinition::resend_denominator);
   timestamp_last_change = std::chrono::steady_clock::now();
 }
 
@@ -294,17 +328,21 @@ void Connection::SendMessageNow(const std::shared_ptr<message_layer::Message> &m
 
   message->SetTimestampSent(std::chrono::steady_clock::now());
 
-  DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") ~~~~> SendMessageNow: send type " << std::dec
-                                   << (int)message->GetMessageType() << "  \t seq: " << message->GetMessageSequence()
-                                   << "\n")
+  DEBUG_CONNECTION_LOG(this, "~~~~> SendMessageNow: send type " << message_type_to_string(message->GetMessageType())
+                                                                << " seq: " << message->GetMessageSequence())
+
+  if (state != ConnectionState::CLIENT_CONNECTION_REQUEST_SENT) {
+    // connection establishment is not included in statistics
+    statistics.AddSentMessage(message);
+  }
 
   message_output_stream->SendMessage(message.get());
 
   if (message->GetMessageType() != message_layer::MessageType::NOT_ACKNOWLEDGE) {
     unacknowledged_sent_message.push_back(message);
     timestamp_last_change = std::chrono::steady_clock::now();
-    DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") Add to unacknowledged_sent_message now size "
-                                     << (int)unacknowledged_sent_message.size() << "\n")
+    DEBUG_CONNECTION_LOG(this,
+                         "Add to unacknowledged_sent_message now size " << (int)unacknowledged_sent_message.size())
   }
 
   if (expect_acknowledge && message->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE &&
@@ -312,8 +350,7 @@ void Connection::SendMessageNow(const std::shared_ptr<message_layer::Message> &m
     if (message->GetMessageType() == message_layer::MessageType::CONNECTION_RESET) {
       state = ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE;
     } else {
-      DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") SendMessageNow State -> WAITING_FOR_ACKNOWLEDGE "
-                                       << "\n")
+      DEBUG_CONNECTION_LOG(this, "SendMessageNow State -> WAITING_FOR_ACKNOWLEDGE")
       state = ConnectionState::WAITING_FOR_ACKNOWLEDGE;
     }
   }
@@ -328,7 +365,7 @@ void Connection::Handle() {
   assert(state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE ||
          state == ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE);
 
-  DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") Handle. current state " << (int)state << "\n")
+  DEBUG_CONNECTION_LOG(this, "Handle() current state: " << connection_state_to_string(state))
 
   ResendIfNecessary();
 
@@ -338,6 +375,10 @@ void Connection::Handle() {
       send_message_queue.pop();
     }
   }
+}
+
+const ConnectionStatistics &Connection::GetConnectionStatistics() const {
+  return statistics;
 }
 
 bool Connection::ConnectionClosed() const {
@@ -354,14 +395,13 @@ void Connection::ResendIfNecessary() {
 
 void Connection::ResendLastMessages() {
   if (!unacknowledged_sent_message.empty()) {
-    DEBUG_CONNECTION_LAYER(std::cout << "(" << this << ") \n")
     for (const auto &item : unacknowledged_sent_message) {
-      DEBUG_CONNECTION_LAYER(std::cout << "          ~~~~> Resend: send type " << std::dec
-                                       << (int)item->GetMessageType() << "  \t seq: " << (int)item->GetMessageSequence()
-                                       << "\n")
+      DEBUG_CONNECTION_LOG(this, "~~~~> Resend: send type " << message_type_to_string(item->GetMessageType())
+                                                            << " seq: " << (int)item->GetMessageSequence())
+      statistics.AddSentMessage(item);
       message_output_stream->SendMessage(item.get());
     }
   } else {
-    DEBUG_CONNECTION_LAYER(std::cout << "          Nothing to resend...\n")
+    DEBUG_CONNECTION_LOG(this, "Nothing to resend")
   }
 }

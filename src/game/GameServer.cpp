@@ -6,6 +6,7 @@
 #include "../communication/connection_layer/event/PayloadEvent.h"
 #include "GameLogic.h"
 #include "networking/Change.h"
+#include "networking/SerializationUtils.h"
 #include "world/EmptyWorldGenerator.h"
 #include "world/RandomWorldGenerator.h"
 
@@ -31,12 +32,31 @@ GameServer::GameServer(const coordinate_size_t &world_size, bool empty_world,
 void GameServer::RunIteration() {
   server_manager->HandleConnections();
   auto event = server_manager->PopAndGetOldestEvent();
-  if (event != nullptr) {
+  while (event != nullptr) {
     HandleEvent(event);
+    event = server_manager->PopAndGetOldestEvent();
+  }
+
+  if (std::chrono::steady_clock::now() - last_moving_projectiles_updated >= update_projectiles_interval) {
+    // Moving projectiles should be updated in a lower frequency
+
+    last_moving_projectiles_updated = std::chrono::steady_clock::now();
+    GameLogic::HandleProjectiles(*world);
   }
 
   if (std::chrono::steady_clock::now() - last_world_sent >= send_world_interval) {
     last_world_sent = std::chrono::steady_clock::now();
+
+    for (const auto &player : world->players) {
+      // Check if player needs to be respawned
+      GameLogic::HandlePlayerRespawn(*player, *world);
+
+      // copy communication statistics into the player objects which are sent to clients
+      const auto &connection_statistics = server_manager->GetStatisticsFromPartnerConnection(player->player_id);
+
+      player->packet_loss_percentage = connection_statistics.CalculatePackageLoss().package_loss_percentage;
+      player->ping = connection_statistics.CalculateAverageResponseTime();
+    }
 
     Change action(ChangeType::SET_WORLD);
     world->Serialize(action.payload);
@@ -48,7 +68,8 @@ void GameServer::HandleEvent(const std::shared_ptr<communication::connection_lay
   switch (event->GetType()) {
     case communication::connection_layer::EventType::CONNECT: {
       auto spawn_position = world->GetSpawner().GenerateSpawnPosition();
-      auto player = std::make_shared<Player>("?", spawn_position, event->GetPartnerId());
+      auto player = std::make_shared<Player>("?", Color::RED, spawn_position, GameDefinition::Direction::NORTH,
+                                             event->GetPartnerId());
 
       world->AddPlayer(player);
 
@@ -59,7 +80,8 @@ void GameServer::HandleEvent(const std::shared_ptr<communication::connection_lay
       break;
     }
     case communication::connection_layer::EventType::DISCONNECT: {
-      assert(false);  // TODO: handle client disconnect
+      auto player_id = event->GetPartnerId();
+      world->RemovePlayer(player_id);
       break;
     }
     case communication::connection_layer::EventType::PAYLOAD: {
@@ -68,7 +90,22 @@ void GameServer::HandleEvent(const std::shared_ptr<communication::connection_lay
       auto player_id = event->GetPartnerId();
       auto player = world->GetPlayerById(player_id);
       assert(player != nullptr);
-      GameLogic::HandleChange(*player, change, *world);
+      switch (change.GetChangeType()) {
+        case ChangeType::SET_NAME: {
+          auto iterator = change.GetContentIterator();
+          player->name = SerializationUtils::DeserializeString(iterator);
+          break;
+        }
+        case ChangeType::SET_COLOR: {
+          auto iterator = change.GetContentIterator();
+          player->color = Color::Deserialize(iterator);
+          break;
+        }
+        default:
+          GameLogic::HandleChange(*player, change, *world);
+          break;
+      }
+
       break;
     }
     default:
