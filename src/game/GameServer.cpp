@@ -15,9 +15,8 @@ using namespace game::world;
 using namespace game::networking;
 
 GameServer::GameServer(const coordinate_size_t &world_size,
-                       communication::ProtocolDefinition::timeout_t communication_timeout) {
-  world = WorldGenerator::GenerateWorld(world_size);
-
+                       communication::ProtocolDefinition::timeout_t communication_timeout)
+    : world(WorldGenerator::GenerateWorld(world_size)) {
   server_manager =
       communication::connection_layer::ServerSideConnectionManager::CreateServerSide(communication_timeout);
 }
@@ -35,6 +34,11 @@ void GameServer::RunIteration() {
 
     last_moving_projectiles_updated = std::chrono::steady_clock::now();
     GameLogic::HandleProjectiles(*world);
+  }
+
+  if (std::chrono::steady_clock::now() - last_item_generated >= generate_item_interval) {
+    last_item_generated = std::chrono::steady_clock::now();
+    world->GetItemGenerator().GenerateItem();
   }
 
   if (std::chrono::steady_clock::now() - last_world_sent >= send_world_interval) {

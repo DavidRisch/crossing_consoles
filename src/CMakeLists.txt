@@ -14,7 +14,11 @@ add_library(crossing_consoles_lib
         game/world/Spawner.cpp
         game/world/Projectile.cpp
 
-        game/world/items/Weapon.cpp
+        game/world/items/Gun.cpp
+        game/world/items/Sword.cpp
+        game/world/items/Heart.cpp
+        game/world/items/Points.cpp
+        game/world/items/ItemGenerator.cpp
 
         game/visual/Renderer.cpp
         game/visual/Compositor.cpp
@@ -70,8 +74,7 @@ add_library(crossing_consoles_lib
         communication/connection_layer/event/ConnectEvent.cpp
         communication/connection_layer/event/DisconnectEvent.cpp
         communication/connection_layer/event/PayloadEvent.cpp
-
-        )
+        game/world/items/DeserializeItemUtils.h)
 
 add_executable(crossing_consoles_main_server
         main_server.cpp)

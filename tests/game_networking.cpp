@@ -292,7 +292,10 @@ TEST_F(GameNetworking, PlayerDies) {
     wait_a_few_iterations();
 
     auto first_player = game_server->GetWorld().GetPlayerById(1);
+    first_player->SetItem(std::make_shared<Gun>(1, 20));
+
     auto second_player = game_server->GetWorld().GetPlayerById(2);
+    second_player->SetItem(std::make_shared<Gun>(1, 20));
 
     first_player->health = 1;
 

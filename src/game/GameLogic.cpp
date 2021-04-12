@@ -4,7 +4,8 @@
 #include <cassert>
 
 #include "world/Projectile.h"
-#include "world/items/Weapon.h"
+#include "world/items/Gun.h"
+#include "world/items/Sword.h"
 
 using namespace game;
 using namespace game::common;
@@ -47,11 +48,36 @@ Position GameLogic::PositionFromMovement(const Position &position, const coordin
   return new_position;
 }
 
+Position GameLogic::AttackedPositionFromDirection(const Position &position, const GameDefinition::Direction direction) {
+  Position attacked_position = Position(0, 0);
+  switch (direction) {
+    case GameDefinition::NORTH:
+      attacked_position.Set(position.x, position.y - 1);
+      break;
+    case GameDefinition::EAST:
+      attacked_position.Set(position.x + 1, position.y);
+      break;
+    case GameDefinition::SOUTH:
+      attacked_position.Set(position.x, position.y + 1);
+      break;
+    case GameDefinition::WEST:
+      attacked_position.Set(position.x - 1, position.y);
+      break;
+  }
+  return attacked_position;
+}
+
 void GameLogic::MovePlayer(world::Player &player, const coordinate_distance_t &movement, world::World &world) {
   Position new_position = PositionFromMovement(player.position, movement, world);
 
   if (new_position != player.position && !world.IsBlocked(new_position)) {
     player.MoveTo(new_position);
+  }
+
+  // Pick up item if there is one at the new position
+  if (world.items.find(player.position) != world.items.end()) {
+    player.SetItem(world.items.at(player.position));
+    world.items.erase(world.items.find(player.position));
   }
 
   // Check for collision with projectile
@@ -103,14 +129,51 @@ void GameLogic::HandleChange(world::Player &player, const Change &change, world:
 }
 
 void GameLogic::UseWeapon(Player &player, World &world) {
-  auto weapon = player.GetWeapon();
-  if (!weapon.has_value()) {
+  auto item = player.GetItem();
+  if (item == nullptr) {
     return;
   }
 
-  // TODO differentiate between items, right now only weapons expected
-  Projectile bullet = weapon->SpawnProjectile(player.player_id, player.position, player.direction);
-  world.AddProjectile(std::make_shared<Projectile>(bullet));
+  switch (item->GetItemType()) {
+    case ItemType::GUN: {
+      Projectile bullet =
+          std::dynamic_pointer_cast<Gun>(item)->SpawnProjectile(player.player_id, player.position, player.direction);
+      world.AddProjectile(std::make_shared<Projectile>(bullet));
+      break;
+    }
+    case ItemType::SWORD: {
+      std::shared_ptr<Sword> sword = std::dynamic_pointer_cast<Sword>(item);
+      Position attacked_position = AttackedPositionFromDirection(player.position, player.direction);
+
+      // check whether another player has been hit
+      auto hit_player_it = std::find_if(world.players.begin(), world.players.end(),
+                                        [&attacked_position](const std::shared_ptr<Player> &other_player) {
+                                          return other_player->position == attacked_position;
+                                        });
+
+      if (hit_player_it != world.players.end()) {
+        // Check that hit player is still alive, otherwise no health or score changes are applied
+        Player &hit_player = **hit_player_it;
+        if (!hit_player.IsAlive()) {
+          return;
+        }
+        // Increase score of player and decrease health of hit player
+        ApplyDamageToPlayer(hit_player, sword->GetDamage());
+        player.IncreaseScore(1);  // arbitrarily chosen number of points -> TODO associate with weapon?
+      }
+
+      // destroy hit projectiles
+      for (auto &projectile : world.GetProjectiles()) {
+        if (attacked_position == projectile->GetPosition()) {
+          std::list<std::shared_ptr<Projectile>> hit_projectile = {projectile};
+          world.RemoveProjectiles(hit_projectile);
+        }
+      }
+      break;
+    }
+    default:
+      break;
+  }
 }
 
 void GameLogic::MoveProjectile(Projectile &projectile, World &world) {

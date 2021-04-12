@@ -106,6 +106,15 @@ ColoredCharMatrix Compositor::CompositeHeader(int viewport_width) const {
   // set lines containing various information about the game (Score and Health)
   std::wstring score = L" SCORE " + std::to_wstring(player->GetScore());
   header.SetString(score, Position(1, current_position_y), common::Color::WHITE);
+
+  // show item in top bar
+  std::wstring item = L"ITEM";
+  header.SetString(item, Position((header.GetSize().x / 2) - 4, current_position_y), Color::WHITE);
+  if (player->GetItem() != nullptr) {
+    header.InsertMatrix(player->GetItem()->GetSprite(coordinate_size_t(1, 1)),
+                        Position((header.GetSize().x / 2) + 2, current_position_y));
+  }
+
   header.InsertMatrix(HealthDisplay::Render(player->health),
                       Position(header.GetSize().x - HealthDisplay::width - 2, current_position_y));
 

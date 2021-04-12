@@ -7,7 +7,7 @@
 #include "../GameDefinition.h"
 #include "../common/Color.h"
 #include "../common/Position.h"
-#include "items/Weapon.h"
+#include "items/Gun.h"
 
 namespace game::world {
 
@@ -46,7 +46,7 @@ class Player : public networking::ISerializable {
   void MoveTo(const common::Position& new_position);
 
   /**
-   * \brief Decrease player's health by given `damage`.
+   * \brief Decrease player's health by given damage.
    */
   void DecreaseHealth(int damage);
 
@@ -62,12 +62,22 @@ class Player : public networking::ISerializable {
   void IncreaseScore(uint16_t points);
 
   /**
-   * \brief Returns the player's `Weapon'
+   * \brief Returns the player's item.
    */
-  std::optional<Weapon> GetWeapon();
+  std::shared_ptr<IItem> GetItem();
+
+  /**
+   * \brief Assign new item to the `Player`if he walked into it. `Heart`s and `Point`s are used immediately.
+   */
+  void SetItem(std::shared_ptr<IItem> new_item);
+
+  /**
+   * \brief Remove the current item.
+   */
+  void RemoveItem();
 
  private:
-  std::optional<Weapon> weapon;
+  std::shared_ptr<IItem> item;
 };
 
 }  // namespace game::world

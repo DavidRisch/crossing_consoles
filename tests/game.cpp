@@ -66,6 +66,7 @@ TEST(Game, ActionShoot) {
   auto header_size = common::coordinate_size_t(2, 7);
 
   auto player = std::make_shared<Player>("player name", Position(3, 2));
+  player->SetItem(std::make_shared<Gun>(1, 20));
   player->direction = GameDefinition::NORTH;
   World world(coordinate_size_t(5, 5));
   world.AddWall(Position(4, 4));

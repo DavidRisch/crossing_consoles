@@ -11,6 +11,7 @@
 #include "Projectile.h"
 #include "Spawner.h"
 #include "Wall.h"
+#include "items/ItemGenerator.h"
 
 namespace game::world {
 
@@ -25,6 +26,7 @@ class World : public networking::ISerializable {
   player_ptr_list_t players{};
   std::unordered_map<common::Position, Wall, common::Position::HashFunction> walls;
   bool updated = false;
+  std::unordered_map<common::Position, std::shared_ptr<IItem>, common::Position::HashFunction> items;
 
   explicit World(common::coordinate_size_t size);
 
@@ -33,6 +35,11 @@ class World : public networking::ISerializable {
   void RemovePlayer(GameDefinition::player_id_t player_id);
 
   void AddWall(const common::Position& position);
+
+  /**
+   * \brief Add an item to the `World` at a `Position`
+   */
+  void AddItem(const common::Position& position, const std::shared_ptr<IItem>& item);
 
   void AddProjectile(const std::shared_ptr<Projectile>& projectile);
 
@@ -49,6 +56,11 @@ class World : public networking::ISerializable {
   std::optional<std::shared_ptr<Projectile>> GetProjectileFromPosition(common::Position position);
 
   bool IsBlocked(const common::Position& position);
+
+  /**
+   * \brief Return whhether a `Position`is blocked for an item by either a `Player`, `Wall`or another item.
+   */
+  bool IsBlockedForItem(const common::Position& position);
 
   /**
    * \brief Replace some data with newer data contained in `server_world`.
@@ -68,8 +80,11 @@ class World : public networking::ISerializable {
    */
   void ResurrectPlayer(Player& player);
 
+  ItemGenerator& GetItemGenerator();
+
  private:
   Spawner spawner;
+  ItemGenerator item_generator;
   std::list<std::shared_ptr<Projectile>> projectiles{};
 };
 

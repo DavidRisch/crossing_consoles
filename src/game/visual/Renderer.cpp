@@ -1,6 +1,7 @@
 #include "Renderer.h"
 
 #include <algorithm>
+#include <iostream>
 #include <utility>
 
 #include "symbols.h"
@@ -95,6 +96,27 @@ ColoredCharMatrix Renderer::RenderWorld() const {
       ColoredCharMatrix colored_player_sprite(player_sprite);
       colored_player_sprite.SetAllColors(i_player->color);
       rendered_world.InsertMatrix(colored_player_sprite, relative_position * block_size);
+    }
+  }
+
+  // place items
+  for (auto const& pair : world->items) {
+    auto item_position = pair.first;
+    auto item = pair.second;
+
+    for (int y_factor = negative_repetition.y; y_factor < positive_repetition.y; y_factor++) {
+      for (int x_factor = negative_repetition.x; x_factor < positive_repetition.x; x_factor++) {
+        // get position of item for each world repetition in world coordinates
+        Position position = item_position + (world->size * Position(x_factor, y_factor));
+        // check if item is within the rendered viewport
+        if (position.IsGreaterOrEqual(viewport_start) && position.IsLessOrEqual(viewport_end)) {
+          // get item position as rendered viewport coordinates
+          Position relative_position = position - viewport_start;
+          // insert item sprite
+          ColoredCharMatrix item_sprite = item->GetSprite(block_size);
+          rendered_world.InsertMatrix(item_sprite, relative_position * block_size);
+        }
+      }
     }
   }
 
