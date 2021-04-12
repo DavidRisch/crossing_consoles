@@ -93,7 +93,9 @@ ColoredCharMatrix Renderer::RenderWorld() const {
       // get player position as rendered viewport coordinates
       Position relative_position = i_player->position - viewport_start;
       // insert player sprite
-      rendered_world.InsertMatrix(player_sprite, relative_position * block_size);
+      ColoredCharMatrix colored_player_sprite(player_sprite);
+      colored_player_sprite.SetAllColors(i_player->color);
+      rendered_world.InsertMatrix(colored_player_sprite, relative_position * block_size);
     }
   }
 

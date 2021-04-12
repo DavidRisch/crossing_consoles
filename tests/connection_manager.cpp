@@ -9,6 +9,7 @@
 #include "../src/communication/connection_layer/connection/ServerSideConnectionManager.h"
 #include "../src/communication/connection_layer/event/PayloadEvent.h"
 #include "fixtures/ConnectionManagers.h"
+#include "utils/TimingHelper.h"
 #include "utils/detect_debugger.h"
 
 using namespace communication;
@@ -52,12 +53,12 @@ static void reset_signal_handler() {
 #endif
 
 TEST_F(ConnectionManagers, ConnectClient) {
-  create_server_and_client();
+  create_server_and_client(TimingHelper::HardwareDependentTime<std::milli>(2));
 }
 
 TEST_F(ConnectionManagers, ServerTimeout) {
   // Server becomes unreachable
-  auto timeout = std::chrono::milliseconds(100);
+  auto timeout = TimingHelper::HardwareDependentTime<std::milli>(2);
   create_server_and_client(timeout);
 
   client_manager->HandleConnections();
@@ -75,7 +76,7 @@ TEST_F(ConnectionManagers, ServerTimeout) {
 
 TEST_F(ConnectionManagers, ClientTimeout) {
   // Client becomes unreachable
-  auto timeout = std::chrono::milliseconds(100);
+  auto timeout = TimingHelper::HardwareDependentTime<std::milli>(2);
   create_server_and_client(timeout);
 
   server_manager->HandleConnections();
@@ -93,7 +94,7 @@ TEST_F(ConnectionManagers, ClientTimeout) {
 }
 
 TEST_F(ConnectionManagers, UnknownPartnerException) {
-  create_server_and_client();
+  create_server_and_client(TimingHelper::HardwareDependentTime<std::milli>(2));
   std::vector<uint8_t> payload;
   EXPECT_THROW(server_manager->SendDataToConnection(client_id + 1, payload),
                ConnectionManager::UnknownPartnerException);
@@ -102,17 +103,17 @@ TEST_F(ConnectionManagers, UnknownPartnerException) {
 }
 
 TEST_F(ConnectionManagers, SendMessages) {
-  create_server_and_client();
+  create_server_and_client(TimingHelper::HardwareDependentTime<std::milli>(2));
   send_and_check_messages(10);
 }
 
 TEST_F(ConnectionManagers, SendManyMessages) {
-  create_server_and_client();
+  create_server_and_client(TimingHelper::HardwareDependentTime<std::milli>(2));
   send_and_check_messages(1000);
 }
 
 TEST_F(ConnectionManagers, TwoClients) {
-  create_server_and_client();
+  create_server_and_client(TimingHelper::HardwareDependentTime<std::milli>(2));
   create_second_client();
 
   for (int i = 0; i < 10; ++i) {
@@ -148,7 +149,7 @@ TEST_F(ConnectionManagers, TwoClients) {
 }
 
 TEST_F(ConnectionManagers, LongQueue) {
-  create_server_and_client();
+  create_server_and_client(TimingHelper::HardwareDependentTime<std::milli>(2));
   std::vector<std::vector<uint8_t>> payloads_server_to_client;
   std::vector<std::vector<uint8_t>> payloads_client_to_server;
 
@@ -169,7 +170,7 @@ TEST_F(ConnectionManagers, LongQueue) {
   for (int i = 0; i < count; ++i) {
     server_manager->SendDataToConnection(client_id, payloads_server_to_client.at(i));
     client_manager->SendDataToServer(payloads_client_to_server.at(i));
-    std::this_thread::sleep_for(std::chrono::microseconds(100));
+    std::this_thread::sleep_for(TimingHelper::HardwareDependentTime<std::milli>(0.1));
     server_manager->HandleConnections();
     client_manager->HandleConnections();
   }
@@ -186,7 +187,7 @@ TEST_F(ConnectionManagers, LongQueue) {
 
 TEST_F(ConnectionManagers, ClientConnectionReset) {
   // Client sends message of type ConnectionResetMessage
-  create_server_and_client();
+  create_server_and_client(TimingHelper::HardwareDependentTime<std::milli>(2));
 
 #ifndef _WIN32
   // setup signal handler to catch signal SIGPIPE and fail test
@@ -223,7 +224,7 @@ TEST_F(ConnectionManagers, ClientConnectionReset) {
 
 TEST_F(ConnectionManagers, ServerConnectionReset) {
   // Server sends message of type ConnectionResetMessage
-  create_server_and_client();
+  create_server_and_client(TimingHelper::HardwareDependentTime<std::milli>(2));
 
 #ifndef _WIN32
   // setup signal handler to catch signal SIGPIPE and fail test
@@ -279,7 +280,7 @@ TEST_F(ConnectionManagers, BrokenPipeSignal) {
 
 TEST_F(ConnectionManagers, ClientKeepAlive) {
   // Client sends KeepAlive to Server
-  auto timeout = std::chrono::milliseconds(100);
+  auto timeout = TimingHelper::HardwareDependentTime<std::milli>(10);
   auto keep_alive_interval = timeout / ProtocolDefinition::keep_alive_denominator;
 
   create_server_and_client(timeout);
@@ -300,7 +301,7 @@ TEST_F(ConnectionManagers, ClientKeepAlive) {
 
 TEST_F(ConnectionManagers, ServerKeepAlive) {
   // Server sends KeepAlive to Client
-  auto timeout = std::chrono::milliseconds(100);
+  auto timeout = TimingHelper::HardwareDependentTime<std::milli>(10);
   auto keep_alive_interval = timeout / ProtocolDefinition::keep_alive_denominator;
 
   create_server_and_client(timeout);

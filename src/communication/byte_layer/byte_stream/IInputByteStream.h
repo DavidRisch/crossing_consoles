@@ -16,27 +16,16 @@ class IInputByteStream {
 
   /**
    * \brief Read data.
-   * \details May block if `HasInput()` = false.
+   * \details Never blocks.
    */
   virtual size_t Read(uint8_t* receive_buffer, size_t max_length) = 0;
-
-  /**
-   * \brief Read data without blocking.
-   */
-  size_t ReadWithoutBlocking(uint8_t* receive_buffer, size_t max_length) {
-    if (!HasInput()) {
-      return 0;
-    }
-    // never blocks, HasInput()=True
-    return Read(receive_buffer, max_length);
-  }
 
   /**
    * \brief Read a string without blocking.
    */
   std::string ReadStringWithoutBlocking(size_t max_length = 1024) {
     char* receive_buffer = new char[max_length + 1];
-    auto read_count = ReadWithoutBlocking(reinterpret_cast<uint8_t*>(receive_buffer), max_length);
+    auto read_count = Read(reinterpret_cast<uint8_t*>(receive_buffer), max_length);
     receive_buffer[read_count] = '\0';
     std::string received(receive_buffer);
     delete[] receive_buffer;

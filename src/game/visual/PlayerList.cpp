@@ -16,10 +16,12 @@ using namespace game::common;
 using namespace game::visual;
 
 const std::list<PlayerList::Column> PlayerList::columns{
-    PlayerList::Column(15, "name",
+    PlayerList::Column(2 + GameDefinition::name_length_max, "name",
                        [](const Row &row, game::visual::ColoredCharMatrix &field) {
-                         std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+                         field.AppendChar(symbols::black_vertical_ellipse, row.player_color);
+                         field.AppendChar(L' ');
 
+                         std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
                          field.AppendString(converter.from_bytes(row.player_name));
                        }),
     PlayerList::Column(HealthDisplay::width, "health",
@@ -73,7 +75,8 @@ game::visual::ColoredCharMatrix PlayerList::Render() const {
 
   std::list<Row> rows;
   for (const auto &player : players) {
-    rows.emplace_back(player->name, player->health, player->GetScore(), player->packet_loss_percentage, player->ping);
+    rows.emplace_back(player->name, player->color, player->health, player->GetScore(), player->packet_loss_percentage,
+                      player->ping);
   }
 
   for (const auto &row : rows) {
@@ -176,9 +179,10 @@ game::visual::ColoredCharMatrix PlayerList::Column::RenderTitle() const {
 
 // Subclass Row:
 
-PlayerList::Row::Row(std::string name, int player_health, uint16_t player_score, double packet_loss_percentage,
-                     std::optional<std::chrono::microseconds> ping)
+PlayerList::Row::Row(std::string name, common::Color player_color, int player_health, uint16_t player_score,
+                     double packet_loss_percentage, std::optional<std::chrono::microseconds> ping)
     : player_name(std::move(name))
+    , player_color(std::move(player_color))
     , player_health(player_health)
     , player_score(player_score)
     , packet_loss_percentage(packet_loss_percentage)

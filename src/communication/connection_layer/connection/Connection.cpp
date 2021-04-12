@@ -102,6 +102,7 @@ bool Connection::TryEstablish() {
       if (step_2->GetMessageType() != message_layer::MessageType::CONNECTION_RESPONSE) {
         throw ConnectionCreationFailed();
       }
+      unacknowledged_sent_message.clear();
 
       // step 3:
       SendMessageNow(std::make_shared<message_layer::AcknowledgeMessage>(step_2->GetMessageSequence()), false);
@@ -135,6 +136,7 @@ bool Connection::TryEstablish() {
           throw ConnectionCreationFailed();
         }
       }
+      unacknowledged_sent_message.clear();
       state = ConnectionState::READY;
       break;
     }
@@ -208,7 +210,9 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
       if (it != unacknowledged_sent_message.end()) {
         (**it).SetTimestampReceived(std::chrono::steady_clock::now());
         statistics.AddSentAndAckMessage(*it);
-        unacknowledged_sent_message.erase(unacknowledged_sent_message.begin(), it);
+
+        // remove all messages up to and including it
+        unacknowledged_sent_message.erase(unacknowledged_sent_message.begin(), ++it);
       }
 
       if (state == ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE) {
