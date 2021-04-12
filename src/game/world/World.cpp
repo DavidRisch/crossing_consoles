@@ -146,8 +146,7 @@ World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
     auto position = Position::Deserialize(input_iterator);
     auto wall = Wall::Deserialize(input_iterator);
     assert(position == wall.position);
-    // TODO: this needs to be extended when Wall has any attributes in addition to position
-    world.AddWall(position);
+    world.AddWall(position, wall.type);
   }
 
   auto player_count = ISerializable::DeserializeContainerLength(input_iterator);

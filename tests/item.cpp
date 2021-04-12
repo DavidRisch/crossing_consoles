@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../src/game/world/WorldGenerator.h"
+#include "../src/game/world/EmptyWorldGenerator.h"
 #include "../src/game/world/items/Heart.h"
 #include "../src/game/world/items/Points.h"
 #include "../src/game/world/items/Sword.h"
