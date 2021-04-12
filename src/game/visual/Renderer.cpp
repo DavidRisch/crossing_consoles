@@ -17,35 +17,32 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
     , world(&world)
     , own_player(&own_player)
     , sprite_map(SpriteMap(block_size)) {
-  ColoredCharMatrix wall_water_sprite(block_size);
-  wall_water_sprite.AppendString(std::wstring(9, full_block), BRIGHT_BLUE);
-
   ColoredCharMatrix wall_brick_sprite(block_size);
-  wall_brick_sprite.AppendString(std::wstring(9, light_shade), WHITE, RED);
+  wall_brick_sprite.AppendString(std::wstring(9, light_shade), Color::WHITE, Color::RED);
 
   ColoredCharMatrix wall_rock_light_sprite(block_size);
-  wall_rock_light_sprite.AppendString(std::wstring(9, light_shade), BRIGHT_BLACK);
+  wall_rock_light_sprite.AppendString(std::wstring(9, light_shade), Color::GREY);
 
   ColoredCharMatrix wall_rock_medium_sprite(block_size);
-  wall_rock_medium_sprite.AppendString(std::wstring(9, medium_shade), BRIGHT_BLACK);
+  wall_rock_medium_sprite.AppendString(std::wstring(9, medium_shade), Color::GREY);
 
   ColoredCharMatrix wall_rock_heavy_sprite(block_size);
-  wall_rock_heavy_sprite.AppendString(std::wstring(9, dark_shade), BRIGHT_BLACK);
+  wall_rock_heavy_sprite.AppendString(std::wstring(9, dark_shade), Color::GREY);
 
   ColoredCharMatrix wall_rock_full_sprite(block_size);
-  wall_rock_full_sprite.AppendString(std::wstring(9, full_block), BRIGHT_BLACK);
+  wall_rock_full_sprite.AppendString(std::wstring(9, full_block), Color::GREY);
 
   ColoredCharMatrix wall_snow_light_sprite(block_size);
-  wall_snow_light_sprite.AppendString(std::wstring(9, light_shade), WHITE, BRIGHT_BLACK);
+  wall_snow_light_sprite.AppendString(std::wstring(9, light_shade), Color::WHITE, Color::GREY);
 
   ColoredCharMatrix wall_snow_medium_sprite(block_size);
-  wall_snow_medium_sprite.AppendString(std::wstring(9, medium_shade), WHITE, BRIGHT_BLACK);
+  wall_snow_medium_sprite.AppendString(std::wstring(9, medium_shade), Color::WHITE, Color::GREY);
 
   ColoredCharMatrix wall_snow_heavy_sprite(block_size);
-  wall_snow_heavy_sprite.AppendString(std::wstring(9, dark_shade), WHITE, BRIGHT_BLACK);
+  wall_snow_heavy_sprite.AppendString(std::wstring(9, dark_shade), Color::WHITE, Color::GREY);
 
   ColoredCharMatrix wall_snow_full_sprite(block_size);
-  wall_snow_full_sprite.AppendString(std::wstring(9, full_block), WHITE);
+  wall_snow_full_sprite.AppendString(std::wstring(9, full_block), Color::WHITE);
 
   ColoredCharMatrix player_sprite(block_size);
   player_sprite.AppendChar(L' ');
@@ -59,7 +56,6 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
   ColoredCharMatrix projectile_sprite(block_size);
   projectile_sprite.AppendString(L"    o    ");
 
-  sprite_map.SetSprite(BlockType::WALL_WATER, wall_water_sprite);
   sprite_map.SetSprite(BlockType::WALL_BRICK, wall_brick_sprite);
   sprite_map.SetSprite(BlockType::WALL_ROCK_LIGHT, wall_rock_light_sprite);
   sprite_map.SetSprite(BlockType::WALL_ROCK_MEDIUM, wall_rock_medium_sprite);

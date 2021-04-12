@@ -20,7 +20,6 @@ RandomWorldGenerator::RandomWorldGenerator(int seed) {
 void RandomWorldGenerator::Construct(int new_seed) {
   seed = new_seed;
 
-  height_map.SetType(10, BlockType::WALL_WATER);
   height_map.SetType(10, BlockType::EMPTY_BLOCK);
   height_map.SetType(28, BlockType::WALL_ROCK_LIGHT);
   height_map.SetType(29, BlockType::WALL_ROCK_MEDIUM);

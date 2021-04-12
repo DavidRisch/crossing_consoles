@@ -8,7 +8,6 @@ using namespace game::visual;
 using namespace game::visual::symbols;
 using namespace game::common;
 using namespace game::world;
-using namespace game::terminal::colors;
 
 TEST(SpriteMap, Empty) {
   coordinate_size_t block_size(3, 3);
@@ -17,7 +16,7 @@ TEST(SpriteMap, Empty) {
   const std::vector<std::vector<ColoredChar>>& matrix = sprite_map.GetSprite(BlockType::EMPTY_BLOCK).GetMatrix();
   for (const auto& i_lines : matrix) {
     for (const auto& i_characters : i_lines) {
-      ASSERT_EQ(i_characters, ColoredChar(L' ', WHITE, BLACK));
+      ASSERT_EQ(i_characters, ColoredChar(L' ', Color::WHITE, Color::BLACK));
     }
   }
 }
@@ -34,13 +33,13 @@ TEST(SpriteMap, ExistentType) {
   SpriteMap sprite_map(block_size);
 
   ColoredCharMatrix wall_sprite(block_size);
-  wall_sprite.AppendString(std::wstring(9, light_shade), WHITE, RED);
+  wall_sprite.AppendString(std::wstring(9, light_shade), Color::WHITE, Color::RED);
   sprite_map.SetSprite(BlockType::WALL_BRICK, wall_sprite);
 
   const std::vector<std::vector<ColoredChar>>& matrix = sprite_map.GetSprite(BlockType::WALL_BRICK).GetMatrix();
   for (const auto& i_lines : matrix) {
     for (const auto& i_characters : i_lines) {
-      ASSERT_EQ(i_characters, ColoredChar(light_shade, WHITE, RED));
+      ASSERT_EQ(i_characters, ColoredChar(light_shade, Color::WHITE, Color::RED));
     }
   }
 }

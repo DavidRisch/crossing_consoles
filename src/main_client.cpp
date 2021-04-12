@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 
   auto player = std::make_shared<Player>(name, color, Position(0, 0), GameDefinition::Direction::NORTH, 999);
   auto terminal = std::make_shared<RealTerminal>();
-  GameClient game_client(player, terminal, coordinate_size_t(1, 1), true);
+  GameClient game_client(player, terminal, coordinate_size_t(30, 30), true);
 
   SetupSignalHandler(&game_client);
 
