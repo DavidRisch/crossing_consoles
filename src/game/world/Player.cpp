@@ -3,9 +3,9 @@
 #include <utility>
 
 #include "../networking/SerializationUtils.h"
+#include "items/DeserializeItemUtils.h"
 #include "items/Gun.h"
 #include "items/Heart.h"
-#include "items/IDeserializeItem.h"
 #include "items/Points.h"
 #include "items/Sword.h"
 
@@ -77,7 +77,7 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
   bool has_item = networking::SerializationUtils::DeserializeObject<bool>(input_iterator);
   if (has_item) {
     auto item_type = networking::SerializationUtils::DeserializeObject<ItemType>(input_iterator);
-    auto new_item = game::world::IDeserializeItem::DeserializeItem(item_type, input_iterator);
+    auto new_item = game::world::DeserializeItemUtils::DeserializeItem(item_type, input_iterator);
     player.SetItem(new_item);
   }
 

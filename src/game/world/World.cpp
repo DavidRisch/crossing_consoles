@@ -6,7 +6,7 @@
 #include <utility>
 
 #include "../networking/SerializationUtils.h"
-#include "items/IDeserializeItem.h"
+#include "items/DeserializeItemUtils.h"
 
 using namespace game;
 using namespace game::common;
@@ -149,11 +149,11 @@ World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
     world.AddPlayer(player);
   }
 
-  auto item_count = game::world::IDeserializeItem::DeserializeItemNumber(input_iterator);
+  auto item_count = game::world::DeserializeItemUtils::DeserializeItemNumber(input_iterator);
   for (size_t i = 0; i < item_count; ++i) {
     auto position = Position::Deserialize(input_iterator);
     auto item_type = networking::SerializationUtils::DeserializeObject<ItemType>(input_iterator);
-    auto new_item = game::world::IDeserializeItem::DeserializeItem(item_type, input_iterator);
+    auto new_item = game::world::DeserializeItemUtils::DeserializeItem(item_type, input_iterator);
     world.AddItem(position, new_item);
   }
 

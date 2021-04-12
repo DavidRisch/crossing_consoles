@@ -1,5 +1,5 @@
-#ifndef CROSSING_CONSOLES_IDESERIALIZEITEM_H
-#define CROSSING_CONSOLES_IDESERIALIZEITEM_H
+#ifndef CROSSING_CONSOLES_DESERIALIZE_ITEM_UTILS_H
+#define CROSSING_CONSOLES_DESERIALIZE_ITEM_UTILS_H
 
 #include <cassert>
 #include <memory>
@@ -13,7 +13,7 @@
 
 namespace game::world {
 
-class IDeserializeItem {
+class DeserializeItemUtils {
  public:
   static std::shared_ptr<IItem> DeserializeItem(ItemType item_type, std::vector<uint8_t>::iterator& input_iterator) {
     switch (item_type) {
@@ -35,4 +35,4 @@ class IDeserializeItem {
   };
 };
 }  // namespace game::world
-#endif  // CROSSING_CONSOLES_IDESERIALIZEITEM_H
+#endif  // CROSSING_CONSOLES_DESERIALIZE_ITEM_UTILS_H
