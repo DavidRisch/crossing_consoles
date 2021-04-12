@@ -9,7 +9,8 @@
 #include "networking/Change.h"
 #include "networking/SerializationUtils.h"
 #include "terminal/ITerminal.h"
-#include "world/WorldGenerator.h"
+#include "world/EmptyWorldGenerator.h"
+#include "world/RandomWorldGenerator.h"
 
 using namespace game;
 using namespace game::common;
@@ -19,7 +20,7 @@ using namespace game::networking;
 using namespace game::visual;
 
 GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_ptr<ITerminal>& terminal,
-                       const coordinate_size_t& world_size, bool multiplayer,
+                       const coordinate_size_t& world_size, bool multiplayer, bool empty_world,
                        communication::ProtocolDefinition::timeout_t communication_timeout)
     : weak_player(player)
     , world(world_size)
@@ -46,7 +47,13 @@ GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_
       client_manager->SendDataToServer(change.payload);
     }
   } else {
-    world = *WorldGenerator::GenerateWorld(world_size);
+    if (empty_world) {
+      EmptyWorldGenerator world_generator;
+      world = *world_generator.GenerateWorld(world_size);
+    } else {
+      RandomWorldGenerator world_generator;
+      world = *world_generator.GenerateWorld(world_size);
+    }
   }
 
   world.AddPlayer(player);

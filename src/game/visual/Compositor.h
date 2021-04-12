@@ -17,7 +17,7 @@ namespace game::visual {
  */
 class Compositor {
  public:
-  const common::coordinate_size_t block_size = common::coordinate_size_t(2, 2);
+  const common::coordinate_size_t block_size = common::coordinate_size_t(3, 3);
   common::coordinate_size_t game_viewport_size;
   std::unique_ptr<Renderer> renderer;
   world::World* world;

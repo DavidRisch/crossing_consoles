@@ -22,7 +22,7 @@ class GameClient {
  public:
   GameClient(
       const std::shared_ptr<world::Player>& player, const std::shared_ptr<terminal::ITerminal>& terminal,
-      const common::coordinate_size_t& world_size, bool multiplayer = false,
+      const common::coordinate_size_t& world_size, bool multiplayer = false, bool empty_world = false,
       communication::ProtocolDefinition::timeout_t communication_timeout = communication::ProtocolDefinition::timeout);
 
   /**

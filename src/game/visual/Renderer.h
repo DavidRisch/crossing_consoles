@@ -5,7 +5,7 @@
 
 #include "../world/Player.h"
 #include "../world/World.h"
-#include "ColoredCharMatrix.h"
+#include "SpriteMap.h"
 
 namespace game::visual {
 
@@ -19,9 +19,7 @@ class Renderer {
   world::World* world;
   world::Player* own_player;
 
-  ColoredCharMatrix wall_sprite;
-  ColoredCharMatrix player_sprite;
-  ColoredCharMatrix projectile_sprite;
+  SpriteMap sprite_map;
 
   explicit Renderer(common::coordinate_size_t viewport_size, common::coordinate_size_t block_size, world::World& world,
                     world::Player& own_player);

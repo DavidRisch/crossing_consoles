@@ -7,7 +7,7 @@ using namespace game::common;
 using namespace game::visual;
 using namespace game::visual::symbols;
 
-TEST(ColoredStringMatrix, EmptyMatrix) {
+TEST(ColoredCharMatrix, EmptyMatrix) {
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(2, 2));
 
   const std::vector<std::vector<ColoredChar>>& matrix = colored_string_matrix.GetMatrix();
@@ -19,7 +19,7 @@ TEST(ColoredStringMatrix, EmptyMatrix) {
   }
 }
 
-TEST(ColoredStringMatrix, AppendChar) {
+TEST(ColoredCharMatrix, AppendChar) {
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));
 
   colored_string_matrix.AppendChar(L'a');
@@ -36,7 +36,7 @@ TEST(ColoredStringMatrix, AppendChar) {
   }
 }
 
-TEST(ColoredStringMatrix, AppendCharRepeated) {
+TEST(ColoredCharMatrix, AppendCharRepeated) {
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(2, 2));
 
   colored_string_matrix.AppendChar(L'a');
@@ -52,7 +52,7 @@ TEST(ColoredStringMatrix, AppendCharRepeated) {
   EXPECT_EQ(matrix[1][1], ColoredChar(L'd', Color::WHITE, Color::BLACK));
 }
 
-TEST(ColoredStringMatrix, SetChar) {
+TEST(ColoredCharMatrix, SetChar) {
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));
 
   colored_string_matrix.SetChar(L'a', Position(0, 0));
@@ -69,7 +69,7 @@ TEST(ColoredStringMatrix, SetChar) {
   }
 }
 
-TEST(ColoredStringMatrix, SetCharRepeated) {
+TEST(ColoredCharMatrix, SetCharRepeated) {
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));
 
   colored_string_matrix.SetChar(L'a', Position(0, 0));
@@ -95,7 +95,7 @@ TEST(ColoredStringMatrix, SetCharRepeated) {
   }
 }
 
-TEST(ColoredStringMatrix, AppendUnicodeChar) {
+TEST(ColoredCharMatrix, AppendUnicodeChar) {
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));
 
   colored_string_matrix.AppendChar(full_block);
@@ -112,7 +112,7 @@ TEST(ColoredStringMatrix, AppendUnicodeChar) {
   }
 }
 
-TEST(ColoredStringMatrix, AppendString) {
+TEST(ColoredCharMatrix, AppendString) {
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));
 
   colored_string_matrix.AppendString(L"abcd");
@@ -135,7 +135,7 @@ TEST(ColoredStringMatrix, AppendString) {
   }
 }
 
-TEST(ColoredStringMatrix, SetString) {
+TEST(ColoredCharMatrix, SetString) {
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));
 
   colored_string_matrix.SetString(L"abcd", Position(1, 0));
@@ -158,7 +158,7 @@ TEST(ColoredStringMatrix, SetString) {
   }
 }
 
-TEST(ColoredStringMatrix, InsertMatrix) {
+TEST(ColoredCharMatrix, InsertMatrix) {
   ColoredCharMatrix sprite_1(coordinate_size_t(2, 2));
   ColoredCharMatrix sprite_2(coordinate_size_t(2, 2));
   ColoredCharMatrix colored_string_matrix(coordinate_size_t(10, 10));

@@ -16,7 +16,7 @@ namespace game {
 class GameServer {
  public:
   explicit GameServer(
-      const common::coordinate_size_t &world_size,
+      const common::coordinate_size_t &world_size, bool empty_world = false,
       communication::ProtocolDefinition::timeout_t communication_timeout = communication::ProtocolDefinition::timeout);
 
   /**

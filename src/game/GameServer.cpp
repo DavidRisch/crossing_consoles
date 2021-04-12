@@ -7,16 +7,24 @@
 #include "GameLogic.h"
 #include "networking/Change.h"
 #include "networking/SerializationUtils.h"
-#include "world/WorldGenerator.h"
+#include "world/EmptyWorldGenerator.h"
+#include "world/RandomWorldGenerator.h"
 
 using namespace game;
 using namespace game::common;
 using namespace game::world;
 using namespace game::networking;
 
-GameServer::GameServer(const coordinate_size_t &world_size,
-                       communication::ProtocolDefinition::timeout_t communication_timeout)
-    : world(WorldGenerator::GenerateWorld(world_size)) {
+GameServer::GameServer(const coordinate_size_t &world_size, bool empty_world,
+                       communication::ProtocolDefinition::timeout_t communication_timeout) {
+  if (empty_world) {
+    EmptyWorldGenerator world_generator;
+    world = world_generator.GenerateWorld(world_size);
+  } else {
+    RandomWorldGenerator world_generator;
+    world = world_generator.GenerateWorld(world_size);
+  }
+
   server_manager =
       communication::connection_layer::ServerSideConnectionManager::CreateServerSide(communication_timeout);
 }

@@ -10,8 +10,10 @@ add_library(crossing_consoles_lib
         game/world/Player.cpp
         game/world/World.cpp
         game/world/Wall.cpp
-        game/world/WorldGenerator.cpp
+        game/world/RandomWorldGenerator.cpp
         game/world/Spawner.cpp
+        game/world/HeightMap.cpp
+        game/world/EmptyWorldGenerator.cpp
         game/world/Projectile.cpp
 
         game/world/items/Gun.cpp
@@ -25,6 +27,7 @@ add_library(crossing_consoles_lib
         game/visual/ColoredCharMatrix.cpp
         game/visual/ColoredChar.cpp
         game/visual/ColoredString.cpp
+        game/visual/SpriteMap.cpp
         game/visual/PlayerList.cpp
         game/visual/HealthDisplay.cpp
 
@@ -74,7 +77,8 @@ add_library(crossing_consoles_lib
         communication/connection_layer/event/ConnectEvent.cpp
         communication/connection_layer/event/DisconnectEvent.cpp
         communication/connection_layer/event/PayloadEvent.cpp
-        game/world/items/DeserializeItemUtils.h)
+        game/world/items/DeserializeItemUtils.h
+        )
 
 add_executable(crossing_consoles_main_server
         main_server.cpp)

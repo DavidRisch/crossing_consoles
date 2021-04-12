@@ -5,7 +5,7 @@
 
 #include "../../src/game/GameClient.h"
 #include "../../src/game/GameLogic.h"
-#include "../../src/game/world/WorldGenerator.h"
+#include "../../src/game/world/EmptyWorldGenerator.h"
 
 namespace game {
 
@@ -19,7 +19,7 @@ class Items : public ::testing::Test {
 
   void generate_world() {
     reset_elements();
-    world = world::WorldGenerator::GenerateWorld(common::coordinate_size_t(20, 15));
+    world = world::EmptyWorldGenerator().GenerateWorld(common::coordinate_size_t(20, 15));
   }
 
   void add_one_player() {

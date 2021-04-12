@@ -34,7 +34,9 @@ class World : public networking::ISerializable {
 
   void RemovePlayer(GameDefinition::player_id_t player_id);
 
-  void AddWall(const common::Position& position);
+  void AddWall(const common::Position& position, BlockType type = BlockType::WALL_BRICK);
+
+  void RemoveWall(const common::Position& position);
 
   /**
    * \brief Add an item to the `World` at a `Position`

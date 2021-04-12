@@ -36,8 +36,6 @@ TEST(Game, NoAction) {
 
 TEST(Game, Actions) {
   auto player = std::make_shared<Player>("player name", Position(2, 2));
-  World world(coordinate_size_t(5, 5));
-  world.AddWall(Position(4, 4));
 
   auto mock_terminal = std::make_shared<MockTerminal>();
   mock_terminal->AddInput((char)KeyCode::W);
@@ -62,24 +60,24 @@ TEST(Game, Actions) {
 }
 
 TEST(Game, ActionShoot) {
-  // this needs to be adapted if viewport header changes!
-  auto header_size = common::coordinate_size_t(2, 7);
-
   auto player = std::make_shared<Player>("player name", Position(3, 2));
   player->SetItem(std::make_shared<Gun>(1, 20));
   player->direction = GameDefinition::NORTH;
-  World world(coordinate_size_t(5, 5));
-  world.AddWall(Position(4, 4));
 
   auto mock_terminal = std::make_shared<MockTerminal>();
   mock_terminal->AddInput((char)KeyCode::SPACE);
   mock_terminal->AddInput((char)KeyCode::ESCAPE);
 
-  GameClient gc(player, mock_terminal, coordinate_size_t(10, 10));
+  GameClient gc(player, mock_terminal, coordinate_size_t(10, 10), false, true);
   gc.Run();
 
   // projectile moves NORTH
   auto projectile_position = Position(3, 1);
+
+  auto world = gc.GetWorld();
+  auto projectile = world.GetProjectiles().front();
+
+  ASSERT_EQ(projectile->GetPosition(), projectile_position);
 
   int row = 0;
   bool contains_bullet = false;
@@ -88,8 +86,7 @@ TEST(Game, ActionShoot) {
     int column = 0;
     for (const auto& i_characters : i_lines) {
       if (i_characters == ColoredChar(L'o', Color::WHITE, Color::BLACK)) {
-        ASSERT_EQ(Position((column / 2) - header_size.x, row - header_size.y), projectile_position);
-        return;
+        contains_bullet = true;
       }
       column++;
     }

@@ -32,14 +32,21 @@ void World::RemovePlayer(GameDefinition::player_id_t player_id) {
   players.erase(it);
 }
 
-void World::AddWall(const Position& position) {
+void World::AddWall(const Position& position, BlockType type) {
   if (position.IsGreaterOrEqual(Position(0, 0)) && position.IsLess(size)) {
     if (walls.find(position) != walls.end()) {
-      walls.at(position) = Wall(position);
+      walls.at(position) = Wall(position, type);
     } else {
-      walls.emplace(position, position);
+      walls.emplace(position, Wall(position, type));
     }
 
+    updated = true;
+  }
+}
+
+void World::RemoveWall(const Position& position) {
+  if (walls.find(position) != walls.end()) {
+    walls.erase(position);
     updated = true;
   }
 }
@@ -139,8 +146,7 @@ World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
     auto position = Position::Deserialize(input_iterator);
     auto wall = Wall::Deserialize(input_iterator);
     assert(position == wall.position);
-    // TODO: this needs to be extended when Wall has any attributes in addition to position
-    world.AddWall(position);
+    world.AddWall(position, wall.type);
   }
 
   auto player_count = ISerializable::DeserializeContainerLength(input_iterator);

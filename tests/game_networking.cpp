@@ -66,7 +66,7 @@ class GameNetworking : public ::testing::Test {
   }
 
   void create_server_and_client() {
-    game_server = std::make_shared<GameServer>(coordinate_size_t(35, 45), communication_timeout);
+    game_server = std::make_shared<GameServer>(coordinate_size_t(35, 45), true, communication_timeout);
 
     create_new_client(Position(1, 5));
   }
@@ -77,7 +77,7 @@ class GameNetworking : public ::testing::Test {
 
     start_server();
     game_clients.push_back(std::make_shared<GameClient>(player, mock_terminals.back(), coordinate_size_t(1, 1), true,
-                                                        communication_timeout));
+                                                        false, communication_timeout));
     stop_server();
   }
 

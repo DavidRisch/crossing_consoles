@@ -17,12 +17,57 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
     , viewport_size(std::move(viewport_size))
     , world(&world)
     , own_player(&own_player)
-    , wall_sprite(ColoredCharMatrix(block_size))
-    , player_sprite(ColoredCharMatrix(block_size))
-    , projectile_sprite(ColoredCharMatrix(block_size)) {
-  wall_sprite.AppendString(std::wstring(4, light_shade), Color::WHITE, Color::RED);
-  player_sprite.AppendString(L"></\\");
-  projectile_sprite.AppendString(L"o");
+    , sprite_map(SpriteMap(block_size)) {
+  ColoredCharMatrix wall_brick_sprite(block_size);
+  wall_brick_sprite.AppendString(std::wstring(9, light_shade), Color::WHITE, Color::RED);
+
+  ColoredCharMatrix wall_rock_light_sprite(block_size);
+  wall_rock_light_sprite.AppendString(std::wstring(9, light_shade), Color::GREY);
+
+  ColoredCharMatrix wall_rock_medium_sprite(block_size);
+  wall_rock_medium_sprite.AppendString(std::wstring(9, medium_shade), Color::GREY);
+
+  ColoredCharMatrix wall_rock_heavy_sprite(block_size);
+  wall_rock_heavy_sprite.AppendString(std::wstring(9, dark_shade), Color::GREY);
+
+  ColoredCharMatrix wall_rock_full_sprite(block_size);
+  wall_rock_full_sprite.AppendString(std::wstring(9, full_block), Color::GREY);
+
+  ColoredCharMatrix wall_snow_light_sprite(block_size);
+  wall_snow_light_sprite.AppendString(std::wstring(9, light_shade), Color::WHITE, Color::GREY);
+
+  ColoredCharMatrix wall_snow_medium_sprite(block_size);
+  wall_snow_medium_sprite.AppendString(std::wstring(9, medium_shade), Color::WHITE, Color::GREY);
+
+  ColoredCharMatrix wall_snow_heavy_sprite(block_size);
+  wall_snow_heavy_sprite.AppendString(std::wstring(9, dark_shade), Color::WHITE, Color::GREY);
+
+  ColoredCharMatrix wall_snow_full_sprite(block_size);
+  wall_snow_full_sprite.AppendString(std::wstring(9, full_block), Color::WHITE);
+
+  ColoredCharMatrix player_sprite(block_size);
+  player_sprite.AppendChar(L' ');
+  player_sprite.AppendChar(white_circle);
+  player_sprite.AppendChar(L' ');
+  player_sprite.AppendChar(box_drawings_light_horizontal);
+  player_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
+  player_sprite.AppendChar(box_drawings_light_horizontal);
+  player_sprite.AppendString(L"/ \\");
+
+  ColoredCharMatrix projectile_sprite(block_size);
+  projectile_sprite.AppendString(L"    o    ");
+
+  sprite_map.SetSprite(BlockType::WALL_BRICK, wall_brick_sprite);
+  sprite_map.SetSprite(BlockType::WALL_ROCK_LIGHT, wall_rock_light_sprite);
+  sprite_map.SetSprite(BlockType::WALL_ROCK_MEDIUM, wall_rock_medium_sprite);
+  sprite_map.SetSprite(BlockType::WALL_ROCK_HEAVY, wall_rock_heavy_sprite);
+  sprite_map.SetSprite(BlockType::WALL_ROCK_FULL, wall_rock_full_sprite);
+  sprite_map.SetSprite(BlockType::WALL_SNOW_LIGHT, wall_snow_light_sprite);
+  sprite_map.SetSprite(BlockType::WALL_SNOW_MEDIUM, wall_snow_medium_sprite);
+  sprite_map.SetSprite(BlockType::WALL_SNOW_HEAVY, wall_snow_heavy_sprite);
+  sprite_map.SetSprite(BlockType::WALL_SNOW_FULL, wall_snow_full_sprite);
+  sprite_map.SetSprite(BlockType::PLAYER_BLOCK, player_sprite);
+  sprite_map.SetSprite(BlockType::PROJECTILE_BLOCK, projectile_sprite);
 }
 
 ColoredCharMatrix Renderer::RenderWorld() const {
@@ -62,7 +107,7 @@ ColoredCharMatrix Renderer::RenderWorld() const {
           // get wall position as rendered viewport coordinates
           Position relative_position = position - viewport_start;
           // insert wall sprite
-          rendered_world.InsertMatrix(wall_sprite, relative_position * block_size);
+          rendered_world.InsertMatrix(sprite_map.GetSprite(wall.type), relative_position * block_size);
         }
       }
     }
@@ -80,7 +125,8 @@ ColoredCharMatrix Renderer::RenderWorld() const {
           // get projectile position as rendered viewport coordinates
           Position relative_position = position - viewport_start;
           // insert projectile sprite
-          rendered_world.InsertMatrix(projectile_sprite, relative_position * block_size);
+          rendered_world.InsertMatrix(sprite_map.GetSprite(BlockType::PROJECTILE_BLOCK),
+                                      relative_position * block_size);
         }
       }
     }
@@ -97,7 +143,7 @@ ColoredCharMatrix Renderer::RenderWorld() const {
           // get player position as rendered viewport coordinates
           Position relative_position = position - viewport_start;
           // insert player sprite
-          ColoredCharMatrix colored_player_sprite(player_sprite);
+          ColoredCharMatrix colored_player_sprite(sprite_map.GetSprite(BlockType::PLAYER_BLOCK));
           colored_player_sprite.SetAllColors(player->color);
           rendered_world.InsertMatrix(colored_player_sprite, relative_position * block_size);
         }
