@@ -1,6 +1,6 @@
 #include "GamePlay.h"
 
-#include "../../src/game/world/RandomWorldGenerator.h"
+#include "../../src/game/world/EmptyWorldGenerator.h"
 
 using namespace game;
 using namespace game::common;
@@ -16,7 +16,7 @@ const std::unordered_map<const GameDefinition::Direction, common::Position> Game
 
 void GamePlay::initialize_game() {
   reset_elements();
-  RandomWorldGenerator world_generator;
+  EmptyWorldGenerator world_generator;
   world = world_generator.GenerateWorld(common::coordinate_size_t(21, 21));
 }
 

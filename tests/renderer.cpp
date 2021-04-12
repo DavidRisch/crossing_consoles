@@ -29,7 +29,7 @@ TEST(Renderer, EmptyWorld) {
 TEST(Renderer, ProjectileInWorld) {
   coordinate_size_t world_size = coordinate_size_t(101, 101);
   coordinate_size_t viewport_size = coordinate_size_t(41, 21);
-  coordinate_size_t block_size = coordinate_size_t(2, 2);
+  coordinate_size_t block_size = coordinate_size_t(3, 3);
   Position player_position = Position(0, 0);
   Player player = Player("player", player_position);
   World world = World(world_size);
