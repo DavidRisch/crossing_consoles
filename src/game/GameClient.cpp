@@ -36,6 +36,9 @@ GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_
     client_manager =
         communication::connection_layer::ClientSideConnectionManager::CreateClientSide(communication_timeout);
 
+    compositor->SetConnectionStatistics(
+        client_manager->GetStatisticsFromPartnerConnection(communication::ProtocolDefinition::server_partner_id));
+
     {
       Change change(ChangeType::SET_NAME);
       SerializationUtils::SerializeString(player->name, change.payload);
@@ -127,6 +130,11 @@ void GameClient::ProcessInput() {
         }
         case KeyCode::Y: {
           compositor->show_player_list ^= true;
+          updated = true;
+          return;
+        }
+        case KeyCode::X: {
+          compositor->show_statistics_table ^= true;
           updated = true;
           return;
         }
