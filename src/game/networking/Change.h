@@ -19,8 +19,9 @@ enum class ChangeType : uint8_t {
   // server -> client
   SET_OWN_ID,
   SET_WORLD,
+  UPDATE_WORLD,
 
-  HIGHEST_ELEMENT = SET_WORLD
+  HIGHEST_ELEMENT = UPDATE_WORLD
 };
 
 /**

@@ -63,8 +63,8 @@ void GameServer::RunIteration() {
       player->ping = connection_statistics.GetAverageResponseTime();
     }
 
-    Change action(ChangeType::SET_WORLD);
-    world->Serialize(action.payload);
+    Change action(ChangeType::UPDATE_WORLD);
+    world->SerializeUpdate(action.payload);
     server_manager->Broadcast(action.payload);
   }
 }
@@ -83,9 +83,16 @@ void GameServer::HandleEvent(const std::shared_ptr<communication::connection_lay
 
       world->AddPlayer(player);
 
-      Change action(ChangeType::SET_OWN_ID);
-      action.payload.push_back(event->GetPartnerId());
-      server_manager->SendDataToConnection(event->GetPartnerId(), action.payload);
+      {
+        Change action(ChangeType::SET_OWN_ID);
+        action.payload.push_back(event->GetPartnerId());
+        server_manager->SendDataToConnection(event->GetPartnerId(), action.payload);
+      }
+      {
+        Change action(ChangeType::SET_WORLD);
+        world->Serialize(action.payload);
+        server_manager->SendDataToConnection(event->GetPartnerId(), action.payload);
+      }
 
       break;
     }
