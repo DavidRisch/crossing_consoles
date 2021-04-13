@@ -40,8 +40,8 @@ TEST_F(Statistics, Simple) {
   auto statistic_server = server_connection->GetConnectionStatistics();
   auto statistic_client = client_connection->GetConnectionStatistics();
 
-  ASSERT_TRUE(statistic_server.CalculateAverageResponseTime().has_value());
-  ASSERT_TRUE(statistic_client.CalculateAverageResponseTime().has_value());
+  ASSERT_TRUE(statistic_server.GetAverageResponseTime().has_value());
+  ASSERT_TRUE(statistic_client.GetAverageResponseTime().has_value());
 
   ASSERT_EQ(statistic_client.GetSentAndAcknowledgedMessageStatistics().total_count, 2);
   ASSERT_EQ(statistic_server.GetSentAndAcknowledgedMessageStatistics().total_count, 3);
@@ -66,8 +66,8 @@ TEST_F(Statistics, ManyMessages) {
   auto statistic_server = server_connection->GetConnectionStatistics();
   auto statistic_client = client_connection->GetConnectionStatistics();
 
-  ASSERT_TRUE(statistic_server.CalculateAverageResponseTime().has_value());
-  ASSERT_TRUE(statistic_client.CalculateAverageResponseTime().has_value());
+  ASSERT_TRUE(statistic_server.GetAverageResponseTime().has_value());
+  ASSERT_TRUE(statistic_client.GetAverageResponseTime().has_value());
 
   // client has one sent & acknowledged message more than server because of connection reset
   ASSERT_EQ(statistic_client.GetSentAndAcknowledgedMessageStatistics().total_count, count + 1);
