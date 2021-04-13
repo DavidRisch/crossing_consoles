@@ -29,7 +29,9 @@ ConnectionManager::ConnectionManager(
 
 void ConnectionManager::Broadcast(const std::vector<uint8_t>& payload) {
   for (auto& connection_entry : connection_map) {
-    SendDataToConnection(connection_entry.first, payload);
+    if (connection_entry.second.connection->IsUsable()) {
+      SendDataToConnection(connection_entry.first, payload);
+    }
   }
 }
 

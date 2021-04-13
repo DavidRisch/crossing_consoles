@@ -103,6 +103,11 @@ class Connection {
    */
   bool ConnectionClosed() const;
 
+  /**
+   * \brief Returns true iff connection is in state `READY` or `WAITING_FOR_ACKNOWLEDGE`.
+   */
+  bool IsUsable() const;
+
  private:
   Connection(std::shared_ptr<message_layer::MessageInputStream> message_input_stream,
              std::shared_ptr<message_layer::MessageOutputStream> message_output_stream,
