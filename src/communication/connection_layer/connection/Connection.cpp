@@ -385,6 +385,10 @@ bool Connection::ConnectionClosed() const {
   return state == ConnectionState::CLOSED;
 }
 
+bool Connection::IsUsable() const {
+  return state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE;
+}
+
 void Connection::ResendIfNecessary() {
   auto current_time = std::chrono::steady_clock::now();
   if (current_time - timestamp_last_change >= resend_interval) {
