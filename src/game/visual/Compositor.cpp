@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <memory>
 
 #include "HealthDisplay.h"
 #include "symbols.h"
@@ -22,7 +23,6 @@ Compositor::Compositor(const coordinate_size_t &viewport_size, World &world, Pla
 
 ColoredCharMatrix Compositor::CompositeViewport() const {
   ColoredCharMatrix rendered_world = renderer->RenderWorld();
-  ColoredCharMatrix rendered_player_list = player_list->Render();
 
   // border size = number of characters used to draw the frame
   int border_size_x = 1;
@@ -55,10 +55,17 @@ ColoredCharMatrix Compositor::CompositeViewport() const {
   for (int y = header_size.y; y < game_character_count.y + header_size.y; y++) {
     SetBorderLines(game_output, y);
   }
+  auto table_output_offset = coordinate_size_t(border_size_x + 2, header_size.y + 1);
+
   // Set player list
   if (show_player_list) {
-    auto player_list_game_output_offset = coordinate_size_t(border_size_x + 2, header_size.y + 1);
-    game_output.InsertMatrix(rendered_player_list, player_list_game_output_offset);
+    ColoredCharMatrix rendered_player_list = player_list->Render();
+    game_output.InsertMatrix(rendered_player_list, table_output_offset);
+  }
+
+  if (statistics_table != nullptr && show_statistics_table) {
+    ColoredCharMatrix rendered_statistics_table = statistics_table->Render();
+    game_output.InsertMatrix(rendered_statistics_table, table_output_offset);
   }
 
   // Set respawn notice
@@ -73,6 +80,11 @@ ColoredCharMatrix Compositor::CompositeViewport() const {
   game_output.InsertMatrix(trailer, coordinate_size_t(0, game_output_size_y - trailer_size.y));
 
   return game_output;
+}
+
+void Compositor::SetConnectionStatistics(
+    const communication::connection_layer::ConnectionStatistics &connection_statistics) {
+  statistics_table = std::make_unique<StatisticsTable>(connection_statistics);
 }
 
 ColoredCharMatrix Compositor::CompositeHeader(int viewport_width) const {

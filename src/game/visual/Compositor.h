@@ -9,6 +9,7 @@
 #include "ColoredCharMatrix.h"
 #include "PlayerList.h"
 #include "Renderer.h"
+#include "StatisticsTable.h"
 
 namespace game::visual {
 
@@ -23,6 +24,7 @@ class Compositor {
   world::World* world;
   world::Player* player;
   bool show_player_list = false;
+  bool show_statistics_table = false;
 
   Compositor(const common::coordinate_size_t& viewport_size, world::World& world, world::Player& player);
 
@@ -31,8 +33,11 @@ class Compositor {
    */
   [[nodiscard]] ColoredCharMatrix CompositeViewport() const;
 
+  void SetConnectionStatistics(const communication::connection_layer::ConnectionStatistics& connection_statistics);
+
  private:
   std::unique_ptr<PlayerList> player_list;
+  std::unique_ptr<StatisticsTable> statistics_table;
 
   /**
    * \brief Composite header containing game title, and game information.

@@ -40,6 +40,7 @@ class StatisticPrinter {
    */
   static void PrintUptime(std::chrono::microseconds uptime);
 
+ public:
   /// Mapping from MessageTypes to Strings, used for printing of the statistics
   static const std::unordered_map<message_layer::MessageType, const std::string> map_message_type_to_string;
 };
