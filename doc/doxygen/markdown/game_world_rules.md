@@ -14,12 +14,12 @@ Collection of decisions and conventions implemented in the game.
 * Dead players can not invoke any changes to the world.
 * Projectiles pass through dead players.
 * Players can not walk through dead players.
-* The direction can be changed by "moving" in one of the four directions. *(not implemented yet!)*
+* The direction can be changed by "moving" in one of the four directions.
 
 ### Health
 
 * If a player's health is zero, the player is dead.
-* Dead players will be respawned after a certain amount of time *(not implemented yet!)*
+* Dead players will be respawned after a certain amount of time.
 
 * A player's health has a fixed upper limit (e.g. 100).
 
