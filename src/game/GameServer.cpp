@@ -72,6 +72,11 @@ void GameServer::RunIteration() {
 void GameServer::HandleEvent(const std::shared_ptr<communication::connection_layer::Event> &event) {
   switch (event->GetType()) {
     case communication::connection_layer::EventType::CONNECT: {
+      if (world->players.size() >= max_player_count) {
+        server_manager->CloseConnection(event->GetPartnerId());
+        break;
+      }
+
       auto spawn_position = world->GetSpawner().GenerateSpawnPosition();
       auto player = std::make_shared<Player>("?", Color::RED, spawn_position, GameDefinition::Direction::NORTH,
                                              event->GetPartnerId());
@@ -86,6 +91,12 @@ void GameServer::HandleEvent(const std::shared_ptr<communication::connection_lay
     }
     case communication::connection_layer::EventType::DISCONNECT: {
       auto player_id = event->GetPartnerId();
+
+      auto player = world->GetPlayerById(player_id);
+      if (player == nullptr) {
+        break;  // client was never fully connected
+      }
+
       world->RemovePlayer(player_id);
       break;
     }
@@ -94,7 +105,9 @@ void GameServer::HandleEvent(const std::shared_ptr<communication::connection_lay
       // The player ids are identical to the partner ids assigned by the ConnectionManager
       auto player_id = event->GetPartnerId();
       auto player = world->GetPlayerById(player_id);
-      assert(player != nullptr);
+      if (player == nullptr) {
+        break;
+      }
       switch (change.GetChangeType()) {
         case ChangeType::SET_NAME: {
           auto iterator = change.GetContentIterator();

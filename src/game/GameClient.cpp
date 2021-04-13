@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <chrono>
+#include <iostream>
 #include <thread>
 
 #include "../communication/connection_layer/event/PayloadEvent.h"
@@ -86,6 +87,9 @@ void GameClient::Run() {
           } else {
             throw std::runtime_error("Unexpected ChangeType");
           }
+        } else if (event->GetType() == communication::connection_layer::EventType::DISCONNECT) {
+          std::cout << "Server disconnected. Maximum player count reached." << std::endl;
+          exit(1);
         }
       }
     }
