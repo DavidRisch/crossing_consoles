@@ -19,7 +19,7 @@ void ConnectionStatistics::AddSentMessage(const std::shared_ptr<message_layer::M
 
 void ConnectionStatistics::AddSentAndAckMessage(const std::shared_ptr<message_layer::Message>& message) {
   UpdateStatisticData(sent_and_ack_message_statistics, message);
-  sent_and_ack_message_list.push_back(message);
+  UpdateAverageResponseTimeSum(message);
 }
 
 ConnectionStatistics::PackageLossData ConnectionStatistics::CalculatePackageLoss() const {
@@ -47,22 +47,12 @@ ConnectionStatistics::PackageLossData ConnectionStatistics::CalculatePackageLoss
   return package_loss_data;
 }
 
-std::optional<std::chrono::microseconds> ConnectionStatistics::CalculateAverageResponseTime() const {
-  std::optional<std::chrono::microseconds> response_time;
+std::optional<std::chrono::microseconds> ConnectionStatistics::GetAverageResponseTime() const {
   if (sent_and_ack_message_statistics.total_count == 0) {
-    return response_time;
+    return std::optional<std::chrono::microseconds>();
   }
-  std::chrono::duration<int64_t, std::micro> sum = std::chrono::microseconds(0);
-  for (const auto& message : sent_and_ack_message_list) {
-    auto meta_data = message->GetMessageMetaData();
-    if (meta_data.GetTimestampReceived().has_value()) {
-      sum += std::chrono::duration_cast<std::chrono::microseconds>(*meta_data.GetTimestampReceived() -
-                                                                   *meta_data.GetTimestampSent());
-    }
-  }
-  response_time = sum / sent_and_ack_message_list.size();
 
-  return response_time;
+  return response_time_sum / sent_and_ack_message_statistics.total_count;
 }
 
 std::chrono::microseconds ConnectionStatistics::CalculateUptime() const {
@@ -93,9 +83,21 @@ void ConnectionStatistics::UpdateStatisticData(MessageStatisticData& message_sta
 ConnectionStatistics::MessageStatisticData ConnectionStatistics::GetReceivedMessageStatistics() const {
   return received_message_statistics;
 }
+
 ConnectionStatistics::MessageStatisticData ConnectionStatistics::GetSentMessageStatistics() const {
   return sent_message_statistics;
 }
+
 ConnectionStatistics::MessageStatisticData ConnectionStatistics::GetSentAndAcknowledgedMessageStatistics() const {
   return sent_and_ack_message_statistics;
+}
+
+void ConnectionStatistics::UpdateAverageResponseTimeSum(const std::shared_ptr<message_layer::Message>& message) {
+  auto meta_data = message->GetMessageMetaData();
+
+  if (meta_data.GetTimestampReceived().has_value()) {
+    auto interval = std::chrono::duration_cast<std::chrono::microseconds>(*meta_data.GetTimestampReceived() -
+                                                                          *meta_data.GetTimestampSent());
+    response_time_sum += interval;
+  }
 }

@@ -113,7 +113,7 @@ void StatisticPrinter::PrintStatistics(const ConnectionStatistics& statistics) {
                      statistics.GetSentAndAcknowledgedMessageStatistics());
   std::cout << "\n";
   PrintPackageLoss(statistics.CalculatePackageLoss());
-  PrintAverageResponseTime(statistics.CalculateAverageResponseTime());
+  PrintAverageResponseTime(statistics.GetAverageResponseTime());
   PrintUptime(statistics.CalculateUptime());
 
   std::cout << "\n"

@@ -58,11 +58,11 @@ class ConnectionStatistics {
   PackageLossData CalculatePackageLoss() const;
 
   /**
-   * \brief Calculate the average response time for all messages in milliseconds.
+   * \brief Calculate the average response time for all messages in microseconds.
    * \details Only available if at least one message has been sent.
    */
+  std::optional<std::chrono::microseconds> GetAverageResponseTime() const;
 
-  std::optional<std::chrono::microseconds> CalculateAverageResponseTime() const;
   /**
    * \brief Calculate the uptime of the Connection in milliseconds.
    */
@@ -75,13 +75,19 @@ class ConnectionStatistics {
   MessageStatisticData GetSentAndAcknowledgedMessageStatistics() const;
 
  private:
-  /// Hold the total of all received messages and for each message type
+  /**
+   * \brief Holds the sum of all response intervals between time point of sent message and received acknowledge, used to
+   *  calculate response time
+   */
+  std::chrono::microseconds response_time_sum = std::chrono::microseconds(0);
+
+  /// Holds the total of all received messages and for each message type
   MessageStatisticData received_message_statistics;
 
-  /// Hold the total of all sent messages and for each message type
+  /// Holds the total of all sent messages and for each message type
   MessageStatisticData sent_message_statistics;
 
-  /// Hold the total of all sent messages which have been acknowledged for each message type
+  /// Holds the total of all sent messages which have been acknowledged for each message type
   MessageStatisticData sent_and_ack_message_statistics;
 
   /**
@@ -90,8 +96,11 @@ class ConnectionStatistics {
   static void UpdateStatisticData(MessageStatisticData& message_statistics,
                                   const std::shared_ptr<message_layer::Message>& message);
 
-  /// List of all sent messages which have been acknowledged, used to calculate average response time
-  std::list<std::shared_ptr<message_layer::Message>> sent_and_ack_message_list;
+  /**
+   * Updates the summed response time of all sent messages in milliseconds
+   * \details Adds the response interval of `message` to  `response_time_sum`.
+   */
+  void UpdateAverageResponseTimeSum(const std::shared_ptr<message_layer::Message>& message);
 
   /// Time when the Connection and the Connection statistic class were created, used for the calculation of the uptime
   std::chrono::steady_clock::time_point connection_start_time;

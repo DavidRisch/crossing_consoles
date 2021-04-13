@@ -60,7 +60,7 @@ void GameServer::RunIteration() {
       const auto &connection_statistics = server_manager->GetStatisticsFromPartnerConnection(player->player_id);
 
       player->packet_loss_percentage = connection_statistics.CalculatePackageLoss().package_loss_percentage;
-      player->ping = connection_statistics.CalculateAverageResponseTime();
+      player->ping = connection_statistics.GetAverageResponseTime();
     }
 
     Change action(ChangeType::SET_WORLD);
