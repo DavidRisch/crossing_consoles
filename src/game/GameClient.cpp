@@ -77,7 +77,20 @@ void GameClient::Run() {
             if (server_initialised) {
               auto iterator = change.GetContentIterator();
               auto server_world = World::Deserialize(iterator);
-              world.Update(server_world);
+
+              world.UpdateWalls(server_world);
+              world.UpdateWithoutWalls(server_world);
+
+              assert(world.GetPlayerById(player->player_id) != nullptr);  // the own player should never be removed
+            }
+          } else if (change.GetChangeType() == ChangeType::UPDATE_WORLD) {
+            if (server_initialised) {
+              auto iterator = change.GetContentIterator();
+              World server_world(world.size);
+              World::DeserializeUpdate(iterator, server_world);
+
+              world.UpdateWithoutWalls(server_world);
+
               assert(world.GetPlayerById(player->player_id) != nullptr);  // the own player should never be removed
             }
           } else if (change.GetChangeType() == ChangeType::SET_OWN_ID) {

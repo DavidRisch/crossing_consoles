@@ -65,9 +65,15 @@ class World : public networking::ISerializable {
   bool IsBlockedForItem(const common::Position& position);
 
   /**
-   * \brief Replace some data with newer data contained in `server_world`.
+   * \brief Replace size and walls with newer data contained in `server_world`.
    */
-  void Update(const World& server_world);
+  void UpdateWalls(const World& server_world);
+
+  /**
+   * \brief Replace some data with newer data contained in `server_world`.
+   * \details `UpdateWalls()` should be called at least once before this method.
+   */
+  void UpdateWithoutWalls(const World& server_world);
 
   std::shared_ptr<Player> GetPlayerById(int player_id) const;
 
@@ -75,7 +81,11 @@ class World : public networking::ISerializable {
 
   void Serialize(std::vector<uint8_t>& output_vector) const override;
 
+  void SerializeUpdate(std::vector<uint8_t>& output_vector) const;
+
   static World Deserialize(std::vector<uint8_t>::iterator& input_iterator);
+
+  static World DeserializeUpdate(std::vector<uint8_t>::iterator& input_iterator, World& world);
 
   /**
    * \brief Respawn player in world, reset score and restore health
