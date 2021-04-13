@@ -30,6 +30,7 @@ add_library(crossing_consoles_lib
         game/visual/SpriteMap.cpp
         game/visual/PlayerList.cpp
         game/visual/HealthDisplay.cpp
+        game/visual/Table.cpp
 
         game/networking/Change.cpp
         game/networking/SerializationUtils.cpp
