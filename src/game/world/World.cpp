@@ -2,10 +2,10 @@
 
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 #include <memory>
 #include <utility>
 
-#include "../networking/SerializationUtils.h"
 #include "items/DeserializeItemUtils.h"
 
 using namespace game;
@@ -87,6 +87,7 @@ void World::UpdateWithoutWalls(const World& server_world) {
 
   projectiles = server_world.projectiles;
   items = server_world.items;
+  colored_fields = server_world.colored_fields;
 
   for (const auto& server_player : server_world.players) {
     auto player_id = server_player->player_id;
@@ -146,6 +147,7 @@ void World::SerializeUpdate(std::vector<uint8_t>& output_vector) const {
   }
 
   ISerializable::SerializeList(output_vector, projectiles);
+  ISerializable::SerializeMap(output_vector, colored_fields);
 }
 
 World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
@@ -184,6 +186,14 @@ World World::DeserializeUpdate(std::vector<uint8_t>::iterator& input_iterator, W
   for (size_t i = 0; i < projectile_count; ++i) {
     auto projectile = std::make_shared<Projectile>(Projectile::Deserialize(input_iterator));
     world.AddProjectile(projectile);
+  }
+
+  auto colored_field_count = ISerializable::DeserializeContainerLength(input_iterator);
+  for (size_t i = 0; i < colored_field_count; ++i) {
+    auto position = Position::Deserialize(input_iterator);
+    auto colored_field = ColoredField::Deserialize(input_iterator);
+    assert(position == colored_field.GetPosition());
+    world.AddColoredField(colored_field);
   }
 
   return world;
@@ -239,4 +249,27 @@ void World::ResurrectPlayer(Player& player) {
 
 ItemGenerator& World::GetItemGenerator() {
   return item_generator;
+}
+
+void World::ReduceColoredFieldLifetimes() {
+  std::list<Position> delete_list;
+
+  for (auto& field_it : colored_fields) {
+    field_it.second.ReduceLifetime();
+    if (field_it.second.GetLifetime() == 0) {
+      delete_list.push_back(field_it.first);
+    }
+  }
+
+  for (const auto& delete_position : delete_list) {
+    colored_fields.erase(delete_position);
+  }
+}
+
+void World::AddColoredField(const ColoredField& colored_field) {
+  if (colored_fields.find(colored_field.GetPosition()) == colored_fields.end()) {
+    colored_fields.insert({colored_field.GetPosition(), colored_field});
+  } else {
+    colored_fields.at(colored_field.GetPosition()) = colored_field;
+  }
 }
