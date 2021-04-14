@@ -16,5 +16,5 @@ defintiions are listed below.
 | MOVE_UP <br> MOVE_DOWN <br> MOVE_RIGHT <br> MOVE_LEFT | Client | Move the player one field towards the indicated direction|
 | USE_ITEM | Client | Use the item currently held by the player|
 | SET_OWN_ID | Server | Assign an ID to the player|
-| SET_WORLD | Server | An updated version of the world can be set in the client's viewport
-
+| SET_WORLD | Server | An updated version of the world can be set in the client's viewport|
+| UPDATE_WORLD | Server | An updated version of the world (static elements excluded) can be set in the client's viewport|
