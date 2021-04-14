@@ -39,11 +39,13 @@ class ISerializable {
    */
   template <typename K, typename V>
   static void SerializeMap(std::vector<uint8_t>& output_vector,
-                           std::unordered_map<K, V, typename K::HashFunction> objects) {
+                           std::unordered_map<K, V, typename K::HashFunction> objects, bool with_keys = true) {
     assert(objects.size() < INT16_MAX);
     SerializeContainerLength(output_vector, objects.size());
     for (const auto& pair : objects) {
-      pair.first.Serialize(output_vector);
+      if (with_keys) {
+        pair.first.Serialize(output_vector);
+      }
       pair.second.Serialize(output_vector);
     }
   }

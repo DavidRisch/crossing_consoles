@@ -129,7 +129,7 @@ const Spawner& World::GetSpawner() const {
 void World::Serialize(std::vector<uint8_t>& output_vector) const {
   size.Serialize(output_vector);
 
-  ISerializable::SerializeMap(output_vector, walls);
+  ISerializable::SerializeMap(output_vector, walls, false);
 
   SerializeUpdate(output_vector);
 }
@@ -154,10 +154,8 @@ World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
 
   auto wall_count = ISerializable::DeserializeContainerLength(input_iterator);
   for (size_t i = 0; i < wall_count; ++i) {
-    auto position = Position::Deserialize(input_iterator);
     auto wall = Wall::Deserialize(input_iterator);
-    assert(position == wall.position);
-    world.AddWall(position, wall.type);
+    world.AddWall(wall.position, wall.type);
   }
 
   DeserializeUpdate(input_iterator, world);
