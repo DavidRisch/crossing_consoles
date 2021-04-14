@@ -68,6 +68,12 @@ class GameClient {
       {KeyCode::D, networking::Change(networking::ChangeType::MOVE_RIGHT)},
       {KeyCode::SPACE, networking::Change(networking::ChangeType::USE_ITEM)},
   };
+
+  /**
+   * \brief Handle an `Event` caused by the `GameServer`.
+   */
+  void HandleEvent(const std::shared_ptr<world::Player>& player,
+                   const std::shared_ptr<communication::connection_layer::Event>& event);
 };
 
 }  // namespace game
