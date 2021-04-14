@@ -18,6 +18,8 @@ The player's movement is controlled by the following keys:
 
 Press `Y` to show every player's score, health, package loss and ping in-game.
 
+Press `X` to show detailed statistics of your connection.
+
 ### Items
 
 Currently, there are four types of items:
