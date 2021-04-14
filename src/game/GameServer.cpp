@@ -1,6 +1,7 @@
 #include "GameServer.h"
 
 #include <cassert>
+#include <iostream>
 #include <thread>
 
 #include "../communication/connection_layer/event/PayloadEvent.h"
@@ -50,6 +51,8 @@ void GameServer::RunIteration() {
   }
 
   if (std::chrono::steady_clock::now() - last_world_sent >= send_world_interval) {
+    GameLogic::HandleColoredFields(*world);
+
     last_world_sent = std::chrono::steady_clock::now();
 
     for (const auto &player : world->players) {
