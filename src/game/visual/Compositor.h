@@ -52,6 +52,11 @@ class Compositor {
   static ColoredCharMatrix GenerateSeparatorLine(int viewport_size, bool is_first, bool is_last);
 
   static void SetBorderLines(ColoredCharMatrix& character_matrix, int position_y);
+
+  /**
+   * \brief Add a frame around the given `ColoredCharMatrix`.
+   */
+  static ColoredCharMatrix DrawFrame(const ColoredCharMatrix& content);
 };
 
 }  // namespace game::visual

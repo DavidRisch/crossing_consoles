@@ -70,10 +70,17 @@ ColoredCharMatrix Compositor::CompositeViewport() const {
 
   // Set respawn notice
   if (!player->IsAlive()) {
-    std::wstring respawn_notice = L" YOU ARE DEAD! WAIT FOR RESPAWN... ";
-    auto position_x = static_cast<int>(game_output.GetSize().x / 2 - respawn_notice.size() / 2);
+    // calculate position in viewport
+    std::wstring respawn_message = L" YOU ARE DEAD! WAIT FOR RESPAWN... ";
+    auto position_x = static_cast<int>(game_output.GetSize().x / 2 - respawn_message.size() / 2);
     auto position_y = static_cast<int>(game_character_count.y / 2 + header.GetSize().y);
-    game_output.SetString(respawn_notice, Position(position_x, position_y), Color::RED);
+
+    // generate and frame respawn message
+    auto respawn_matrix = DrawFrame(ColoredCharMatrix(coordinate_size_t(static_cast<int>(respawn_message.size()), 1)));
+    respawn_matrix.SetString(respawn_message, coordinate_size_t(1, 1));
+    respawn_matrix.SetAllColors(common::Color::RED);
+
+    game_output.InsertMatrix(respawn_matrix, Position(position_x, position_y));
   }
 
   // Set trailer
@@ -191,4 +198,29 @@ ColoredCharMatrix Compositor::GenerateSeparatorLine(int viewport_width, bool is_
   }
 
   return row;
+}
+
+ColoredCharMatrix Compositor::DrawFrame(const ColoredCharMatrix &content) {
+  // calculate new matrix dimensions including the new box lines
+  auto result_height = content.GetSize().y + 2;
+  auto result_width = content.GetSize().x + 2;
+
+  ColoredCharMatrix result(coordinate_size_t(result_width, result_height));
+
+  // generate top and bottom line and add side lines
+  ColoredCharMatrix top_line(coordinate_size_t(0, 0));
+
+  top_line = GenerateSeparatorLine(result_width, true, false);
+
+  result.InsertMatrix(top_line, coordinate_size_t(0, 0));
+  result.InsertMatrix(content, coordinate_size_t(1, 1));
+
+  auto bottom_line = GenerateSeparatorLine(result_width, false, true);
+  result.InsertMatrix(bottom_line, coordinate_size_t(0, result_height - 1));
+
+  for (int i = 1; i < result.GetSize().y - 1; i++) {
+    SetBorderLines(result, i);
+  }
+
+  return result;
 }
