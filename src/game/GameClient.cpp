@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <chrono>
+#include <iostream>
 #include <thread>
 
 #include "../communication/connection_layer/event/PayloadEvent.h"
@@ -145,7 +146,14 @@ void GameClient::StartExit() {
 
 void GameClient::HandleEvent(const std::shared_ptr<Player>& player,
                              const std::shared_ptr<communication::connection_layer::Event>& event) {
-  if (event == nullptr || event->GetType() != communication::connection_layer::EventType::PAYLOAD) {
+  if (event == nullptr) {
+    return;
+  }
+  if (event->GetType() != communication::connection_layer::EventType::PAYLOAD) {
+    if (event->GetType() == communication::connection_layer::EventType::DISCONNECT) {
+      std::cout << "Server disconnected. Maximum player count reached." << std::endl;
+      exit(1);
+    }
     return;
   }
 
