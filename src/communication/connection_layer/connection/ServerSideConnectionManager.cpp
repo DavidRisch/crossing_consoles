@@ -31,6 +31,10 @@ void ServerSideConnectionManager::HandleConnections() {
     AddConnection(connection);
   }
 
+  FastHandleConnections();
+}
+
+void ServerSideConnectionManager::FastHandleConnections() {
   ReceiveMessages();
 
   for (auto& entry : connection_map) {

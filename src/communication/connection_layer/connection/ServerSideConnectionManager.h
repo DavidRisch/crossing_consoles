@@ -16,6 +16,12 @@ class ServerSideConnectionManager : public ConnectionManager {
    * \brief Check for and process new connections, messages and timeouts.
    */
   void HandleConnections() override;
+
+  /**
+   * \brief Much faster that `HandleConnections()` if nothing needs to be done. Does not establish new connections.
+   */
+  void FastHandleConnections();
+
   /**
    * \brief Create Connection Manager for usage on server side.
    */

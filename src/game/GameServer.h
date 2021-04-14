@@ -48,6 +48,10 @@ class GameServer {
   std::chrono::time_point<std::chrono::steady_clock> last_item_generated;
   static constexpr auto generate_item_interval = std::chrono::seconds(10);
 
+  /// Used to improve performance by accepting new clients less often
+  std::chrono::time_point<std::chrono::steady_clock> last_full_connection_handle;
+  static constexpr auto full_connection_handle_interval = std::chrono::milliseconds(250);
+
   static constexpr int max_player_count = 32;
 };
 

@@ -32,7 +32,14 @@ GameServer::GameServer(const coordinate_size_t &world_size, bool empty_world,
 void GameServer::RunIteration() {
   auto now = std::chrono::steady_clock::now();
 
-  server_manager->HandleConnections();
+  if (now - last_full_connection_handle >= full_connection_handle_interval) {
+    last_full_connection_handle = now;
+
+    server_manager->HandleConnections();
+  } else {
+    server_manager->FastHandleConnections();
+  }
+
   auto event = server_manager->PopAndGetOldestEvent();
   while (event != nullptr) {
     HandleEvent(event);
