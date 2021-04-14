@@ -39,7 +39,7 @@ ColoredCharMatrix Compositor::CompositeViewport() const {
   const common::coordinate_size_t &header_size = header.GetSize();
 
   // Create trailer, printed below the world output
-  ColoredCharMatrix trailer = CompositeTrailer(game_output_size_x);
+  ColoredCharMatrix trailer = CompositeTrailer(game_output_size_x, player->GetItem() != nullptr);
   const common::coordinate_size_t &trailer_size = trailer.GetSize();
 
   // Create game output, which contains header, world output and trailer
@@ -141,11 +141,38 @@ ColoredCharMatrix Compositor::CompositeHeader(int viewport_width) const {
   return header;
 }
 
-ColoredCharMatrix Compositor::CompositeTrailer(int viewport_width) {
-  ColoredCharMatrix trailer(coordinate_size_t(viewport_width, 1));
+ColoredCharMatrix Compositor::CompositeTrailer(int viewport_width, bool has_item) {
+  ColoredCharMatrix trailer(coordinate_size_t(viewport_width, 3));
+  int position_y = 0;
+
+  auto middle_line = GenerateSeparatorLine(viewport_width, false, false);
+  trailer.InsertMatrix(middle_line, coordinate_size_t(0, position_y));
+  position_y++;
+
+  std::wstring instructions_movement = L"Movement: [WASD]  ";
+  std::wstring instructions_item = L"Use Item: [SPACE]  ";
+  std::wstring instruction_player = L"Player Info: [Y]  Statistics: [X]";
+
+  int position_x =
+      int(viewport_width / 2 - (instructions_movement + instructions_item + instruction_player).size() / 2);
+  trailer.SetString(instructions_movement, coordinate_size_t(position_x, position_y));
+  position_x += int(instructions_movement.size());
+
+  if (has_item) {
+    trailer.SetString(instructions_item, coordinate_size_t(position_x, position_y));
+  } else {
+    trailer.SetString(instructions_item, coordinate_size_t(position_x, position_y), common::Color::GREY);
+  }
+
+  position_x += int(instructions_item.size());
+  trailer.SetString(instruction_player, coordinate_size_t(position_x, position_y));
+  SetBorderLines(trailer, position_y);
+  position_y++;
 
   auto bottom_line = GenerateSeparatorLine(viewport_width, false, true);
-  trailer.AppendFullWidthMatrix(bottom_line);
+  trailer.InsertMatrix(bottom_line, coordinate_size_t(0, position_y));
+
+  assert(position_y == trailer.GetSize().y - 1);
 
   return trailer;
 }
