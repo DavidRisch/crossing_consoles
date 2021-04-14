@@ -30,6 +30,8 @@ GameServer::GameServer(const coordinate_size_t &world_size, bool empty_world,
 }
 
 void GameServer::RunIteration() {
+  auto now = std::chrono::steady_clock::now();
+
   server_manager->HandleConnections();
   auto event = server_manager->PopAndGetOldestEvent();
   while (event != nullptr) {
@@ -37,20 +39,20 @@ void GameServer::RunIteration() {
     event = server_manager->PopAndGetOldestEvent();
   }
 
-  if (std::chrono::steady_clock::now() - last_moving_projectiles_updated >= update_projectiles_interval) {
+  if (now - last_moving_projectiles_updated >= update_projectiles_interval) {
     // Moving projectiles should be updated in a lower frequency
 
-    last_moving_projectiles_updated = std::chrono::steady_clock::now();
+    last_moving_projectiles_updated = now;
     GameLogic::HandleProjectiles(*world);
   }
 
-  if (std::chrono::steady_clock::now() - last_item_generated >= generate_item_interval) {
-    last_item_generated = std::chrono::steady_clock::now();
+  if (now - last_item_generated >= generate_item_interval) {
+    last_item_generated = now;
     world->GetItemGenerator().GenerateItem();
   }
 
-  if (std::chrono::steady_clock::now() - last_world_sent >= send_world_interval) {
-    last_world_sent = std::chrono::steady_clock::now();
+  if (now - last_world_sent >= send_world_interval) {
+    last_world_sent = now;
 
     for (const auto &player : world->players) {
       // Check if player needs to be respawned
