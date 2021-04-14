@@ -172,5 +172,25 @@ ColoredCharMatrix Renderer::RenderWorld() const {
     }
   }
 
+  // show colored fields
+  for (auto const& pair : world->colored_fields) {
+    auto colored_field_position = pair.first;
+
+    for (int y_factor = negative_repetition.y; y_factor < positive_repetition.y; y_factor++) {
+      for (int x_factor = negative_repetition.x; x_factor < positive_repetition.x; x_factor++) {
+        // get position of colored fields for each world repetition in world coordinates
+        Position position = colored_field_position + (world->size * Position(x_factor, y_factor));
+        // check if colored field is within the rendered viewport
+        if (position.IsGreaterOrEqual(viewport_start) && position.IsLessOrEqual(viewport_end)) {
+          // get position as rendered viewport coordinates
+          Position relative_position = position - viewport_start;
+          relative_position = relative_position * block_size;
+          // color the background while keeping the foreground
+          rendered_world.SetBackgroundColorInRegion(relative_position, block_size, Color::RED);
+        }
+      }
+    }
+  }
+
   return rendered_world;
 }
