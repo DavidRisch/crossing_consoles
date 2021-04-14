@@ -49,6 +49,18 @@ TEST(World, AddWalls) {
   }
 }
 
+TEST(World, AddColoredField) {
+  World world(coordinate_size_t(21, 21));
+
+  Position position(0, 0);
+  ColoredField colored_field(position);
+  world.AddColoredField(colored_field);
+
+  ASSERT_TRUE(world.colored_fields.size() == 1);
+  EXPECT_EQ(colored_field.GetPosition(), Position(0, 0));
+  EXPECT_EQ(colored_field.GetPosition(), world.colored_fields.at(position).GetPosition());
+}
+
 TEST(World, IsBlocked) {
   World world(coordinate_size_t(21, 21));
 
