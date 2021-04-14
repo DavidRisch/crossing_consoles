@@ -15,7 +15,7 @@ add_library(crossing_consoles_lib
         game/world/HeightMap.cpp
         game/world/EmptyWorldGenerator.cpp
         game/world/Projectile.cpp
-        game/world/ColoredField.h
+        game/world/ColoredField.cpp
 
         game/world/items/Gun.cpp
         game/world/items/Sword.cpp
