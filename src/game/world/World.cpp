@@ -75,10 +75,17 @@ bool World::IsBlockedForItem(const Position& position) {
   return false;
 }
 
-void World::Update(const World& server_world) {
+void World::UpdateWalls(const World& server_world) {
   size = server_world.size;
-  projectiles = server_world.projectiles;
   walls = server_world.walls;
+
+  updated = true;
+}
+
+void World::UpdateWithoutWalls(const World& server_world) {
+  assert(size == server_world.size);
+
+  projectiles = server_world.projectiles;
   items = server_world.items;
 
   for (const auto& server_player : server_world.players) {
@@ -124,6 +131,10 @@ void World::Serialize(std::vector<uint8_t>& output_vector) const {
 
   ISerializable::SerializeMap(output_vector, walls);
 
+  SerializeUpdate(output_vector);
+}
+
+void World::SerializeUpdate(std::vector<uint8_t>& output_vector) const {
   ISerializable::SerializeList(output_vector, players);
 
   // Serialize items
@@ -149,6 +160,12 @@ World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
     world.AddWall(position, wall.type);
   }
 
+  DeserializeUpdate(input_iterator, world);
+
+  return world;
+}
+
+World World::DeserializeUpdate(std::vector<uint8_t>::iterator& input_iterator, World& world) {
   auto player_count = ISerializable::DeserializeContainerLength(input_iterator);
   for (size_t i = 0; i < player_count; ++i) {
     auto player = std::make_shared<Player>(Player::Deserialize(input_iterator));

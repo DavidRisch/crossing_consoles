@@ -37,6 +37,9 @@ GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_
     client_manager =
         communication::connection_layer::ClientSideConnectionManager::CreateClientSide(communication_timeout);
 
+    compositor->SetConnectionStatistics(
+        client_manager->GetStatisticsFromPartnerConnection(communication::ProtocolDefinition::server_partner_id));
+
     {
       Change change(ChangeType::SET_NAME);
       SerializationUtils::SerializeString(player->name, change.payload);
@@ -69,29 +72,7 @@ void GameClient::Run() {
 
     if (multiplayer) {
       client_manager->HandleConnections();
-
-      auto event = client_manager->PopAndGetOldestEvent();
-      if (event != nullptr) {
-        if (event->GetType() == communication::connection_layer::EventType::PAYLOAD) {
-          Change change(std::dynamic_pointer_cast<communication::connection_layer::PayloadEvent>(event)->GetPayload());
-          if (change.GetChangeType() == ChangeType::SET_WORLD) {
-            if (server_initialised) {
-              auto iterator = change.GetContentIterator();
-              auto server_world = World::Deserialize(iterator);
-              world.Update(server_world);
-              assert(world.GetPlayerById(player->player_id) != nullptr);  // the own player should never be removed
-            }
-          } else if (change.GetChangeType() == ChangeType::SET_OWN_ID) {
-            player->player_id = change.payload.at(1);
-            server_initialised = true;
-          } else {
-            throw std::runtime_error("Unexpected ChangeType");
-          }
-        } else if (event->GetType() == communication::connection_layer::EventType::DISCONNECT) {
-          std::cout << "Server disconnected. Maximum player count reached." << std::endl;
-          exit(1);
-        }
-      }
+      HandleEvent(player, client_manager->PopAndGetOldestEvent());
     }
 
     if (world.updated || player->updated || updated) {
@@ -134,6 +115,11 @@ void GameClient::ProcessInput() {
           updated = true;
           return;
         }
+        case KeyCode::X: {
+          compositor->show_statistics_table ^= true;
+          updated = true;
+          return;
+        }
         default:
           return;
       }
@@ -156,4 +142,54 @@ const world::World& GameClient::GetWorld() const {
 
 void GameClient::StartExit() {
   keep_running = false;
+}
+
+void GameClient::HandleEvent(const std::shared_ptr<Player>& player,
+                             const std::shared_ptr<communication::connection_layer::Event>& event) {
+  if (event == nullptr) {
+    return;
+  }
+  if (event->GetType() != communication::connection_layer::EventType::PAYLOAD) {
+    if (event->GetType() == communication::connection_layer::EventType::DISCONNECT) {
+      std::cout << "Server disconnected. Maximum player count reached." << std::endl;
+      exit(1);
+    }
+    return;
+  }
+
+  Change change(std::dynamic_pointer_cast<communication::connection_layer::PayloadEvent>(event)->GetPayload());
+  switch (change.GetChangeType()) {
+    case (ChangeType::SET_WORLD): {
+      if (server_initialised) {
+        auto iterator = change.GetContentIterator();
+        auto server_world = World::Deserialize(iterator);
+
+        world.UpdateWalls(server_world);
+        world.UpdateWithoutWalls(server_world);
+
+        assert(world.GetPlayerById(player->player_id) != nullptr);  // the own player should never be removed
+      }
+      break;
+    }
+    case (ChangeType::UPDATE_WORLD): {
+      if (server_initialised) {
+        auto iterator = change.GetContentIterator();
+        World server_world(world.size);
+        World::DeserializeUpdate(iterator, server_world);
+
+        world.UpdateWithoutWalls(server_world);
+
+        assert(world.GetPlayerById(player->player_id) != nullptr);  // the own player should never be removed
+      }
+      break;
+    }
+    case (ChangeType::SET_OWN_ID): {
+      player->player_id = change.payload.at(1);
+      server_initialised = true;
+      break;
+    }
+    default: {
+      throw std::runtime_error("Unexpected ChangeType");
+    }
+  }
 }

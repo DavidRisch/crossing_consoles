@@ -13,7 +13,7 @@
 
 namespace game {
 
-enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' ', Y = 'y' };
+enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' ', Y = 'y', X = 'x' };
 
 /**
  * \brief Handles keyboard input and connection to `GameServer`.
@@ -68,6 +68,12 @@ class GameClient {
       {KeyCode::D, networking::Change(networking::ChangeType::MOVE_RIGHT)},
       {KeyCode::SPACE, networking::Change(networking::ChangeType::USE_ITEM)},
   };
+
+  /**
+   * \brief Handle an `Event` caused by the `GameServer`.
+   */
+  void HandleEvent(const std::shared_ptr<world::Player>& player,
+                   const std::shared_ptr<communication::connection_layer::Event>& event);
 };
 
 }  // namespace game
