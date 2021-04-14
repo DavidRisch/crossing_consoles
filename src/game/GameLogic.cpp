@@ -145,6 +145,9 @@ void GameLogic::UseWeapon(Player &player, World &world) {
       std::shared_ptr<Sword> sword = std::dynamic_pointer_cast<Sword>(item);
       Position attacked_position = AttackedPositionFromDirection(player.position, player.direction);
 
+      // Add color to field on which damage was caused
+      world.AddColoredField(ColoredField(attacked_position));
+
       // check whether another player has been hit
       auto hit_player_it = std::find_if(world.players.begin(), world.players.end(),
                                         [&attacked_position](const std::shared_ptr<Player> &other_player) {
@@ -277,6 +280,10 @@ bool GameLogic::HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> 
   if (shot_player_it != world.players.end()) {
     // Check that shot player is still alive, otherwise no health or score changes are applied
     Player &hit_player = **shot_player_it;
+
+    // Show hit position in color
+    world.AddColoredField(ColoredField(hit_player.position));
+
     if (!hit_player.IsAlive()) {
       return false;
     }
@@ -305,4 +312,8 @@ void GameLogic::HandlePlayerRespawn(Player &player, World &world) {
   if (!player.IsAlive() && std::chrono::steady_clock::now() - player.time_of_death > GameDefinition::respawn_time) {
     world.ResurrectPlayer(player);
   }
+}
+
+void GameLogic::HandleColoredFields(World &world) {
+  world.ReduceColoredFieldLifetimes();
 }
