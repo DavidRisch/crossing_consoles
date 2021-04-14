@@ -47,7 +47,7 @@ class Compositor {
   /**
    * \brief Composite trailer, shown below the game output.
    */
-  [[nodiscard]] static ColoredCharMatrix CompositeTrailer(int viewport_width);
+  [[nodiscard]] static ColoredCharMatrix CompositeTrailer(int viewport_width, bool has_item);
 
   static ColoredCharMatrix GenerateSeparatorLine(int viewport_size, bool is_first, bool is_last);
 
