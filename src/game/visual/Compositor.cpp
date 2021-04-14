@@ -50,7 +50,7 @@ ColoredCharMatrix Compositor::CompositeViewport() const {
   game_output.InsertMatrix(header, Position(0, 0));
 
   // Set world output
-  game_output.InsertMatrix(rendered_world, coordinate_size_t(border_size_x, header_size.y));
+  game_output.InsertMatrix(rendered_world, Position(border_size_x, header_size.y));
 
   for (int y = header_size.y; y < game_character_count.y + header_size.y; y++) {
     SetBorderLines(game_output, y);
@@ -77,14 +77,14 @@ ColoredCharMatrix Compositor::CompositeViewport() const {
 
     // generate and frame respawn message
     auto respawn_matrix = DrawFrame(ColoredCharMatrix(coordinate_size_t(static_cast<int>(respawn_message.size()), 1)));
-    respawn_matrix.SetString(respawn_message, coordinate_size_t(1, 1));
+    respawn_matrix.SetString(respawn_message, Position(1, 1));
     respawn_matrix.SetAllColors(common::Color::RED);
 
     game_output.InsertMatrix(respawn_matrix, Position(position_x, position_y));
   }
 
   // Set trailer
-  game_output.InsertMatrix(trailer, coordinate_size_t(0, game_output_size_y - trailer_size.y));
+  game_output.InsertMatrix(trailer, Position(0, game_output_size_y - trailer_size.y));
 
   return game_output;
 }
@@ -119,7 +119,7 @@ ColoredCharMatrix Compositor::CompositeHeader(int viewport_width) const {
   SetBorderLines(header, current_position_y);
   current_position_y++;
 
-  header.InsertMatrix(middle_line, coordinate_size_t(0, current_position_y));
+  header.InsertMatrix(middle_line, Position(0, current_position_y));
   current_position_y++;
 
   // set lines containing various information about the game (Score and Health)
@@ -140,7 +140,7 @@ ColoredCharMatrix Compositor::CompositeHeader(int viewport_width) const {
   SetBorderLines(header, current_position_y);
   current_position_y++;
 
-  header.InsertMatrix(middle_line, coordinate_size_t(0, current_position_y));
+  header.InsertMatrix(middle_line, Position(0, current_position_y));
 
   // all lines of the matrix should have been visited
   assert(current_position_y == header_height - 1);
@@ -212,11 +212,11 @@ ColoredCharMatrix Compositor::DrawFrame(const ColoredCharMatrix &content) {
 
   top_line = GenerateSeparatorLine(result_width, true, false);
 
-  result.InsertMatrix(top_line, coordinate_size_t(0, 0));
-  result.InsertMatrix(content, coordinate_size_t(1, 1));
+  result.InsertMatrix(top_line, Position(0, 0));
+  result.InsertMatrix(content, Position(1, 1));
 
   auto bottom_line = GenerateSeparatorLine(result_width, false, true);
-  result.InsertMatrix(bottom_line, coordinate_size_t(0, result_height - 1));
+  result.InsertMatrix(bottom_line, Position(0, result_height - 1));
 
   for (int i = 1; i < result.GetSize().y - 1; i++) {
     SetBorderLines(result, i);
