@@ -6,6 +6,7 @@
 #include "../src/game/GameClient.h"
 #include "../src/game/GameServer.h"
 #include "../src/game/terminal/MockTerminal.h"
+#include "utils/TestGameDefinition.h"
 #include "utils/TimingHelper.h"
 
 using namespace game;
@@ -28,6 +29,7 @@ class GameNetworking : public ::testing::Test {
 
   long server_iteration_count = 0;
 
+  TestGameDefinition game_definition = TestGameDefinition(std::chrono::milliseconds(200));
   communication::ProtocolDefinition::timeout_t communication_timeout = std::chrono::milliseconds(100);
 
   void start_server() {
@@ -66,7 +68,7 @@ class GameNetworking : public ::testing::Test {
   }
 
   void create_server_and_client() {
-    game_server = std::make_shared<GameServer>(coordinate_size_t(35, 45), true, communication_timeout);
+    game_server = std::make_shared<GameServer>(coordinate_size_t(35, 45), true, communication_timeout, game_definition);
 
     create_new_client(Position(1, 5));
   }
@@ -316,7 +318,7 @@ TEST_F(GameNetworking, PlayerDies) {
     EXPECT_FALSE(first_player->IsAlive());
     EXPECT_EQ(second_player->score, old_second.score + 1);
 
-    std::this_thread::sleep_for(GameDefinition::respawn_time);
+    std::this_thread::sleep_for(game_definition.respawn_time);
     wait_for_renderer();
 
     ASSERT_TRUE(first_player->IsAlive());

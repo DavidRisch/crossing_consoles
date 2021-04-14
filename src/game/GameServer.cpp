@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <thread>
+#include <utility>
 
 #include "../communication/connection_layer/event/PayloadEvent.h"
 #include "GameLogic.h"
@@ -16,7 +17,9 @@ using namespace game::world;
 using namespace game::networking;
 
 GameServer::GameServer(const coordinate_size_t &world_size, bool empty_world,
-                       communication::ProtocolDefinition::timeout_t communication_timeout) {
+                       communication::ProtocolDefinition::timeout_t communication_timeout,
+                       GameDefinition game_definition)
+    : game_definition(std::move(game_definition)) {
   if (empty_world) {
     EmptyWorldGenerator world_generator;
     world = world_generator.GenerateWorld(world_size);
@@ -54,7 +57,7 @@ void GameServer::RunIteration() {
 
     for (const auto &player : world->players) {
       // Check if player needs to be respawned
-      GameLogic::HandlePlayerRespawn(*player, *world);
+      GameLogic::HandlePlayerRespawn(*player, *world, game_definition.respawn_time);
 
       // copy communication statistics into the player objects which are sent to clients
       const auto &connection_statistics = server_manager->GetStatisticsFromPartnerConnection(player->player_id);

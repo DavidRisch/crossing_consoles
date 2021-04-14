@@ -17,7 +17,8 @@ class GameServer {
  public:
   explicit GameServer(
       const common::coordinate_size_t &world_size, bool empty_world = false,
-      communication::ProtocolDefinition::timeout_t communication_timeout = communication::ProtocolDefinition::timeout);
+      communication::ProtocolDefinition::timeout_t communication_timeout = communication::ProtocolDefinition::timeout,
+      GameDefinition game_definition = GameDefinition());
 
   /**
    * \brief Handle connections to `GameClient`s. Should be called in a loop.
@@ -49,6 +50,9 @@ class GameServer {
   static constexpr auto generate_item_interval = std::chrono::seconds(10);
 
   static constexpr int max_player_count = 32;
+
+  /// Holds all game definitions valid for this game.
+  const GameDefinition game_definition;
 };
 
 }  // namespace game

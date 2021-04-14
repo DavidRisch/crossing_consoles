@@ -13,11 +13,14 @@ namespace game {
  */
 class GameDefinition {
  public:
+  GameDefinition(std::chrono::milliseconds respawn_time = std::chrono::milliseconds(5000))
+      : respawn_time(respawn_time){};
+
   /// Moving direction of `Player` and `Projectile` in `World`.
   enum Direction : char { NORTH, EAST, SOUTH, WEST };
 
   /// Set waiting duration until player respawn
-  static constexpr std::chrono::duration<int64_t, std::milli> respawn_time = std::chrono::milliseconds(5000);
+  const std::chrono::duration<int64_t, std::milli> respawn_time;
 
   /// Used to reference players.
   typedef uint16_t player_id_t;

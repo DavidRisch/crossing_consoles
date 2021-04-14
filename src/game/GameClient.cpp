@@ -4,6 +4,7 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
+#include <utility>
 
 #include "../communication/connection_layer/event/PayloadEvent.h"
 #include "GameLogic.h"
@@ -22,11 +23,13 @@ using namespace game::visual;
 
 GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_ptr<ITerminal>& terminal,
                        const coordinate_size_t& world_size, bool multiplayer, bool empty_world,
-                       communication::ProtocolDefinition::timeout_t communication_timeout)
+                       communication::ProtocolDefinition::timeout_t communication_timeout,
+                       GameDefinition game_definition)
     : weak_player(player)
     , world(world_size)
     , terminal(terminal)
-    , multiplayer(multiplayer) {
+    , multiplayer(multiplayer)
+    , game_definition(std::move(game_definition)) {
   assert(player != nullptr);
   assert(terminal != nullptr);
 
@@ -78,7 +81,7 @@ void GameClient::Run() {
     if (world.updated || player->updated || updated) {
       if (!multiplayer) {
         GameLogic::HandleProjectiles(world);
-        GameLogic::HandlePlayerRespawn(*player, world);
+        GameLogic::HandlePlayerRespawn(*player, world, game_definition.respawn_time);
       }
 
       updated = false;

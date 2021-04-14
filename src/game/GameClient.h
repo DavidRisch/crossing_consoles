@@ -23,7 +23,8 @@ class GameClient {
   GameClient(
       const std::shared_ptr<world::Player>& player, const std::shared_ptr<terminal::ITerminal>& terminal,
       const common::coordinate_size_t& world_size, bool multiplayer = false, bool empty_world = false,
-      communication::ProtocolDefinition::timeout_t communication_timeout = communication::ProtocolDefinition::timeout);
+      communication::ProtocolDefinition::timeout_t communication_timeout = communication::ProtocolDefinition::timeout,
+      GameDefinition game_definition = GameDefinition());
 
   /**
    * \brief Update world, player, projectiles and process changes.
@@ -53,6 +54,9 @@ class GameClient {
   std::shared_ptr<communication::connection_layer::ClientSideConnectionManager> client_manager;
   bool keep_running = true;
   bool multiplayer;
+
+  /// Holds all game definitions valid for the game in SinglePlayer mode.
+  const GameDefinition game_definition;
 
   /// True if the own `Player` is definitely represented on the server.
   bool server_initialised = false;

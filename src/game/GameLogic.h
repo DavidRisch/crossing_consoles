@@ -19,8 +19,10 @@ class GameLogic {
 
   /**
    * \brief Handle respawn of dead `Player` in `World`.
+   * \details `Player` will be resurrected after the given `respawn_time`.
    */
-  static void HandlePlayerRespawn(world::Player &player, world::World &world);
+  static void HandlePlayerRespawn(world::Player &player, world::World &world,
+                                  std::chrono::duration<int64_t, std::milli> respawn_time);
 
   /**
    * \brief Handle `Projectile`s movement and collision with `Player`s or `Wall`s in `World`.
