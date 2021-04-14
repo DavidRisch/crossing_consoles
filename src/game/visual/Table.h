@@ -73,13 +73,11 @@ class TableColumn {
 };
 
 /**
- * \brief A abstract table which can be rendered.
+ * \brief An abstract table which can be rendered.
  */
 template <typename R>
 class Table {
  public:
-  // Table() = delete;
-
   [[nodiscard]] virtual std::list<R> MakeRows() const = 0;
 
   /**
