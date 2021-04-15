@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
       throw std::runtime_error("The name is not allowed to consist of whitespaces only. Please change it.");
     }
 
-    if (std::any_of(name.begin(), name.end(), [](char c) { return !std::isprint(c); })) {
+    if (std::any_of(name.begin(), name.end(), [](char c) { return !isprint(c); })) {
       throw std::runtime_error("The name contains non-printable characters. Please change it.");
     }
   }
