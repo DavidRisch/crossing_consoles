@@ -107,12 +107,11 @@ void ConnectionManager::ReceiveMessages(std::chrono::steady_clock::time_point no
       connection_remove_list.push_back(partner_id);
     }
 
-    auto current_time = now;
-    if (current_time - connection_entry.second.timestamp_last_received >= timeout) {
+    if (now - connection_entry.second.timestamp_last_received >= timeout) {
       DEBUG_CONNECTION_LOG(connection.get(), "Timeout (ConnectionManager)")
       connection_remove_list.push_back(partner_id);
 
-    } else if (current_time - connection_entry.second.timestamp_last_received >= keep_alive_interval) {
+    } else if (now - connection_entry.second.timestamp_last_received >= keep_alive_interval) {
       DEBUG_CONNECTION_LOG(connection.get(), "Send KeepAlive (ConnectionManager)")
       auto keep_alive_msg = std::make_shared<message_layer::KeepAliveMessage>(message_layer::KeepAliveMessage());
       SendMessageToConnection(partner_id, keep_alive_msg);
