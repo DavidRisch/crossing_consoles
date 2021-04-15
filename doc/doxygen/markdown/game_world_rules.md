@@ -1,4 +1,4 @@
-\page game-world-rules Gameplay Rules  
+\page game-world-rules Gameplay Rules
 Collection of decisions and conventions implemented in the game.
 
 # Gameplay
