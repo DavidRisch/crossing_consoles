@@ -82,7 +82,7 @@ class GameNetworking : public ::testing::Test {
   }
 
   void wait_a_few_iterations() const {
-    auto target_iteration = server_iteration_count + 50;
+    auto target_iteration = server_iteration_count + 100;
     while (server_iteration_count < target_iteration) {
       std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
@@ -114,7 +114,7 @@ class GameNetworking : public ::testing::Test {
   }
 
   void wait_for_renderer() {
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 };
 
@@ -285,7 +285,7 @@ TEST_F(GameNetworking, PlayerDies) {
   communication_timeout = std::chrono::milliseconds(300000);
 
   create_server_and_client();
-  create_new_client(Position(3, 5));
+  create_new_client(Position(4, 5));
 
   std::thread input_thread([this] {
     wait_for_renderer();
@@ -297,23 +297,26 @@ TEST_F(GameNetworking, PlayerDies) {
     auto second_player = game_server->GetWorld().GetPlayerById(2);
     second_player->SetItem(std::make_shared<Gun>(1, 20));
 
+    first_player->position = Position(2, 3);
+    second_player->position = first_player->position + Position(2, 0);
+    second_player->direction = game::GameDefinition::Direction::WEST;
+
     first_player->health = 1;
 
     Player old_first = *first_player;
     Player old_second = *second_player;
 
-    // add input to a single player. This should change the world of all players.
-    mock_terminals.at(1)->AddInput((char)KeyCode::A);
     mock_terminals.at(1)->AddInput((char)KeyCode::SPACE);
 
-    wait_a_few_iterations();
-    wait_a_few_iterations();
-    wait_a_few_iterations();
+    int counter = 1000;
+    while (first_player->IsAlive() && counter > 0) {
+      std::this_thread::sleep_for(std::chrono::microseconds(1000));
+      counter--;
+    }
+    ASSERT_GT(counter, 0);
 
-    EXPECT_FALSE(mock_terminals.at(0)->HasInput());
     EXPECT_FALSE(mock_terminals.at(1)->HasInput());
 
-    EXPECT_FALSE(first_player->IsAlive());
     EXPECT_EQ(second_player->score, old_second.score + 1);
 
     std::this_thread::sleep_for(GameDefinition::respawn_time);
