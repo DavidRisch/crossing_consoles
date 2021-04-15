@@ -17,6 +17,8 @@ namespace game::networking {
  */
 class ISerializable {
  public:
+  virtual ~ISerializable() = default;
+
   /**
    * \brief Place all relevant data into the vector.
    */

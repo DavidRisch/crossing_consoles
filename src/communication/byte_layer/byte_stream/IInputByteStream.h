@@ -9,6 +9,8 @@ namespace byte_layer {
  */
 class IInputByteStream {
  public:
+  virtual ~IInputByteStream() = default;
+
   /**
    * \brief Indicates if data is available and can be read.
    */

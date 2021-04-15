@@ -38,6 +38,8 @@ class ConnectionManager {
       const std::shared_ptr<byte_layer::IConnectionSimulatorProvider>& connection_simulator_provider =
           byte_layer::PerfectConnectionSimulatorProvider::instance);
 
+  virtual ~ConnectionManager() = default;
+
   /**
    * \brief Send data to all clients.
    */

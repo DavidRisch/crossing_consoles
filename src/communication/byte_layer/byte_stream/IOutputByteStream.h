@@ -9,6 +9,8 @@ namespace byte_layer {
  */
 class IOutputByteStream {
  public:
+  virtual ~IOutputByteStream() = default;
+
   virtual void Send(const uint8_t* send_buffer, size_t length) = 0;
 };
 

@@ -16,6 +16,7 @@ enum class ItemType : char { GUN, SWORD, HEART, POINTS, HIGHEST_ELEMENT = POINTS
  */
 class IItem : public networking::ISerializable {
  public:
+  virtual ~IItem() = default;
   virtual visual::ColoredCharMatrix GetSprite(common::coordinate_size_t block_size) = 0;
   virtual ItemType GetItemType() = 0;
 

@@ -22,6 +22,8 @@ class Event {
 
   explicit Event(ProtocolDefinition::partner_id_t partner_id);
 
+  virtual ~Event() = default;
+
  private:
   /**
    * Id of the partner to which this event relates.

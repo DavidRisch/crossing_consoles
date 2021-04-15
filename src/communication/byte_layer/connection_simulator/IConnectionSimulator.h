@@ -11,6 +11,8 @@ namespace byte_layer {
  */
 class IConnectionSimulator {
  public:
+  virtual ~IConnectionSimulator() = default;
+
   /**
    * \brief Run byte through virtual connection and get end result.
    */

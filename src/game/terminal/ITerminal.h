@@ -10,6 +10,8 @@ namespace game::terminal {
  */
 class ITerminal {
  public:
+  virtual ~ITerminal() = default;
+
   /**
    * \brief Is an new input available?
    */

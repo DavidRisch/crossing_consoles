@@ -11,6 +11,8 @@ namespace game::world {
  */
 class IWorldGenerator {
  public:
+  virtual ~IWorldGenerator() = default;
+
   /**
    * \brief Generates a new world.
    */

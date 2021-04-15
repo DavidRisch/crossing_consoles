@@ -18,6 +18,8 @@ class Table;
  */
 class TableRow {
  public:
+  virtual ~TableRow() = default;
+
   template <typename R>
   [[nodiscard]] game::visual::ColoredCharMatrix RenderRow(const Table<R> *p) const {
     assert(p != nullptr);
@@ -37,12 +39,6 @@ class TableRow {
 
     return row;
   }
-
- private:
-  /**
-   * \brief Hack to make this class polymorphic.
-   */
-  [[maybe_unused]] virtual void make_polymorphic(){};
 };
 
 /**
@@ -50,6 +46,8 @@ class TableRow {
  */
 class TableColumn {
  public:
+  virtual ~TableColumn() = default;
+
   typedef std::function<void(const TableRow *row, game::visual::ColoredCharMatrix &field)> render_lambda_t;
 
   TableColumn(int width, std::string title, render_lambda_t render_lambda);
@@ -78,6 +76,8 @@ class TableColumn {
 template <typename R>
 class Table {
  public:
+  virtual ~Table() = default;
+
   [[nodiscard]] virtual std::list<R> MakeRows() const = 0;
 
   /**

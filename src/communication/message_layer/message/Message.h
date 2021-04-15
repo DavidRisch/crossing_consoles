@@ -35,6 +35,8 @@ class Message {
   // Received message
   Message(ProtocolDefinition::sequence_t sequence);
 
+  virtual ~Message() = default;
+
   ProtocolDefinition::sequence_t GetMessageSequence() const;
   void SetMessageSequence(ProtocolDefinition::sequence_t new_sequence);
 

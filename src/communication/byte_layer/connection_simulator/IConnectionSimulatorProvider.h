@@ -12,6 +12,8 @@ namespace communication::byte_layer {
  */
 class IConnectionSimulatorProvider {
  public:
+  virtual ~IConnectionSimulatorProvider() = default;
+
   /**
    * Create a ConnectionSimulator to be used for incoming bytes.
    */
