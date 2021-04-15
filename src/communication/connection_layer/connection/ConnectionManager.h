@@ -56,7 +56,7 @@ class ConnectionManager {
   /**
    * \brief Needs to be implemented on Server and Client side separately.
    */
-  virtual void HandleConnections() = 0;
+  virtual void HandleConnections(std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now()) = 0;
 
   /**
    * \brief Add connection to `connection_map`.
@@ -112,7 +112,7 @@ class ConnectionManager {
   /**
    * \brief handle received messages and timeouts.
    */
-  void ReceiveMessages();
+  void ReceiveMessages(std::chrono::steady_clock::time_point now);
 
   /// connection_map of connection id/ address : ConnectionParameters<connection, timestamp_last_received>
   std::unordered_map<partner_id_t, ConnectionParameters> connection_map;

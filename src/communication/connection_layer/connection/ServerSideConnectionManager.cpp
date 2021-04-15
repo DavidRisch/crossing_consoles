@@ -14,7 +14,7 @@ ServerSideConnectionManager::ServerSideConnectionManager(
     : ConnectionManager(timeout, connection_simulator_provider) {
 }
 
-void ServerSideConnectionManager::HandleConnections() {
+void ServerSideConnectionManager::HandleConnections(std::chrono::steady_clock::time_point now) {
   // Check for and establish new connections
   auto new_client = byte_server->GetNewClient();
   if (new_client != nullptr) {
@@ -31,14 +31,14 @@ void ServerSideConnectionManager::HandleConnections() {
     AddConnection(connection);
   }
 
-  FastHandleConnections();
+  FastHandleConnections(now);
 }
 
-void ServerSideConnectionManager::FastHandleConnections() {
-  ReceiveMessages();
+void ServerSideConnectionManager::FastHandleConnections(std::chrono::steady_clock::time_point now) {
+  ReceiveMessages(now);
 
   for (auto& entry : connection_map) {
-    entry.second.connection->Handle();
+    entry.second.connection->Handle(now);
   }
 }
 

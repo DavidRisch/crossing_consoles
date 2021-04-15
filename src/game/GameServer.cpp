@@ -35,9 +35,9 @@ void GameServer::RunIteration(bool performance_mode) {
   if (!performance_mode || now - last_full_connection_handle >= full_connection_handle_interval) {
     last_full_connection_handle = now;
 
-    server_manager->HandleConnections();
+    server_manager->HandleConnections(now);
   } else {
-    server_manager->FastHandleConnections();
+    server_manager->FastHandleConnections(now);
   }
 
   auto event = server_manager->PopAndGetOldestEvent();

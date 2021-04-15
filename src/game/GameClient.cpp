@@ -68,15 +68,16 @@ void GameClient::Run() {
     auto player = weak_player.lock();
     assert(player != nullptr);
 
+    auto now = std::chrono::steady_clock::now();
+
     ProcessInput();
 
     if (multiplayer) {
-      client_manager->HandleConnections();
+      client_manager->HandleConnections(now);
       HandleEvent(player, client_manager->PopAndGetOldestEvent());
     }
 
     if (world.updated || player->updated || updated) {
-      auto now = std::chrono::steady_clock::now();
       if (now - last_draw >= min_draw_interval) {
         last_draw = now;
 

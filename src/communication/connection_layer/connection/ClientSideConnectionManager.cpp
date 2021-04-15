@@ -30,11 +30,11 @@ std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::Create
   return manager;
 }
 
-void ClientSideConnectionManager::HandleConnections() {
+void ClientSideConnectionManager::HandleConnections(std::chrono::steady_clock::time_point now) {
   for (const auto& pair : connection_map) {
-    pair.second.connection->Handle();
+    pair.second.connection->Handle(now);
   }
-  ReceiveMessages();
+  ReceiveMessages(now);
 }
 
 partner_id_t ClientSideConnectionManager::GetNextPartnerId() {

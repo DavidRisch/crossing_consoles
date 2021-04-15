@@ -40,13 +40,13 @@ const char *communication::connection_layer::connection_state_to_string(Connecti
   throw std::runtime_error("Invalid ConnectionState");
 }
 
-std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout() {
-  const auto start_time = std::chrono::steady_clock::now();
+std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout(std::chrono::steady_clock::time_point now) {
+  const auto start_time = now;
 
-  while (std::chrono::steady_clock::now() - start_time <= timeout) {
-    ResendIfNecessary();
+  while (now - start_time <= timeout) {
+    ResendIfNecessary(now);
 
-    ReceiveAll();
+    ReceiveAll(now);
 
     std::shared_ptr<message_layer::Message> message;
     if (!receive_message_queue.empty()) {
@@ -55,9 +55,11 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveWithTimeout() {
     }
 
     if (message != nullptr) {
-      message->SetTimestampReceived(std::chrono::steady_clock::now());
+      message->SetTimestampReceived(now);
       return message;
     }
+
+    now = std::chrono::steady_clock::now();
   }
   throw ConnectionManager::TimeoutException();
 }
@@ -83,12 +85,13 @@ std::shared_ptr<Connection> Connection::CreateServerSide(
 bool Connection::TryEstablish() {
   // TODO: implement in a none blocking way
 
-  ResendIfNecessary();
+  ResendIfNecessary(std::chrono::steady_clock::now());
 
   switch (state) {
     case (ConnectionState::CLIENT_CONNECTION_START): {
       // step 1:
-      SendMessageNow(std::make_shared<message_layer::ConnectionRequestMessage>(), false);
+      SendMessageNow(std::make_shared<message_layer::ConnectionRequestMessage>(), std::chrono::steady_clock::now(),
+                     false);
 
       state = ConnectionState::CLIENT_CONNECTION_REQUEST_SENT;
       break;
@@ -96,7 +99,7 @@ bool Connection::TryEstablish() {
 
     case (ConnectionState::CLIENT_CONNECTION_REQUEST_SENT): {
       DEBUG_CONNECTION_LOG(this, "Wait for step_2 start")
-      auto step_2 = ReceiveWithTimeout();
+      auto step_2 = ReceiveWithTimeout(std::chrono::steady_clock::now());
       DEBUG_CONNECTION_LOG(this, "Wait for step_2 end")
       assert(step_2 != nullptr);
       if (step_2->GetMessageType() != message_layer::MessageType::CONNECTION_RESPONSE) {
@@ -105,28 +108,30 @@ bool Connection::TryEstablish() {
       unacknowledged_sent_message.clear();
 
       // step 3:
-      SendMessageNow(std::make_shared<message_layer::AcknowledgeMessage>(step_2->GetMessageSequence()), false);
+      SendMessageNow(std::make_shared<message_layer::AcknowledgeMessage>(step_2->GetMessageSequence()),
+                     std::chrono::steady_clock::now(), false);
 
       state = ConnectionState::READY;
       break;
     }
     case (ConnectionState::SERVER_WAITING_FOR_FIRST): {
       DEBUG_CONNECTION_LOG(this, "Wait for step_1 start")
-      auto step_1 = ReceiveWithTimeout();
+      auto step_1 = ReceiveWithTimeout(std::chrono::steady_clock::now());
       DEBUG_CONNECTION_LOG(this, "Wait for step_1 end")
       if (step_1->GetMessageType() != message_layer::MessageType::CONNECTION_REQUEST) {
         throw ConnectionCreationFailed();
       }
 
       // step 2:
-      SendMessageNow(std::make_shared<message_layer::ConnectionResponseMessage>(), false);
+      SendMessageNow(std::make_shared<message_layer::ConnectionResponseMessage>(), std::chrono::steady_clock::now(),
+                     false);
 
       state = ConnectionState::SERVER_CONNECTION_RESPONSE_SENT;
       break;
     }
     case (ConnectionState::SERVER_CONNECTION_RESPONSE_SENT): {
       DEBUG_CONNECTION_LOG(this, "Wait for step_3 start")
-      auto step_3 = ReceiveWithTimeout();
+      auto step_3 = ReceiveWithTimeout(std::chrono::steady_clock::now());
       DEBUG_CONNECTION_LOG(this, "Wait for step_3 end")
       if (step_3->GetMessageType() != message_layer::MessageType::ACKNOWLEDGE) {
         throw ConnectionCreationFailed();
@@ -169,7 +174,7 @@ void Connection::SendMessage(const std::shared_ptr<message_layer::Message> &mess
   Handle();
 }
 
-std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
+std::shared_ptr<message_layer::Message> Connection::ReceiveMessage(std::chrono::steady_clock::time_point now) {
   if (state == ConnectionState::CLOSED) {
     // do not receive any messages if connection is closed
     return nullptr;
@@ -177,7 +182,7 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
   assert(state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE ||
          state == ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE);
 
-  ReceiveAll();
+  ReceiveAll(now);
 
   std::shared_ptr<message_layer::Message> received_message;
   if (!receive_message_queue.empty()) {
@@ -187,7 +192,7 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
 
   if (received_message != nullptr) {
     // set Metadata
-    received_message->SetTimestampReceived(std::chrono::steady_clock::now());
+    received_message->SetTimestampReceived(now);
 
     if (received_message->GetMessageType() == message_layer::MessageType::ACKNOWLEDGE) {
       if (!(state == ConnectionState::WAITING_FOR_ACKNOWLEDGE ||
@@ -208,7 +213,7 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
                              });
 
       if (it != unacknowledged_sent_message.end()) {
-        (**it).SetTimestampReceived(std::chrono::steady_clock::now());
+        (**it).SetTimestampReceived(now);
         statistics.AddSentAndAckMessage(*it);
 
         // remove all messages up to and including it
@@ -225,14 +230,14 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage() {
       assert(false);  // NACKs are handled by TryReceive()
     } else {
       // Send acknowledge for every received message except for other (not-)acknowledges
-      SendAcknowledge(received_message->GetMessageSequence());
+      SendAcknowledge(received_message->GetMessageSequence(), now);
     }
   }
 
   return received_message;
 }
 
-bool Connection::TryReceive() {
+bool Connection::TryReceive(std::chrono::steady_clock::time_point now) {
   std::shared_ptr<message_layer::Message> received_message;
 
   try {
@@ -241,7 +246,7 @@ bool Connection::TryReceive() {
     DEBUG_CONNECTION_LOG(this, "InvalidMessageException " << exception.what())
 
     auto message = std::make_shared<message_layer::NotAcknowledgeMessage>();
-    SendMessageNow(message);
+    SendMessageNow(message, now);
 
     return false;  // no further messages can be received
   }
@@ -251,7 +256,7 @@ bool Connection::TryReceive() {
   }
 
   // set Metadata
-  received_message->SetTimestampReceived(std::chrono::steady_clock::now());
+  received_message->SetTimestampReceived(now);
 
   if (state != ConnectionState::SERVER_CONNECTION_RESPONSE_SENT) {
     // connection establishment is not included in statistics
@@ -283,14 +288,14 @@ bool Connection::TryReceive() {
     return false;  // no further messages can be received
   }
 
-  timestamp_last_change = std::chrono::steady_clock::now();
+  timestamp_last_change = now;
   receive_message_queue.push(received_message);
 
   return true;  // there might be more messages which can be received
 }
 
-void Connection::ReceiveAll() {
-  while (TryReceive()) {
+void Connection::ReceiveAll(std::chrono::steady_clock::time_point now) {
+  while (TryReceive(now)) {
   }
 }
 
@@ -313,7 +318,8 @@ sequence_t Connection::GenerateSequence() {
   return current_counter;
 }
 
-void Connection::SendMessageNow(const std::shared_ptr<message_layer::Message> &message, bool expect_acknowledge) {
+void Connection::SendMessageNow(const std::shared_ptr<message_layer::Message> &message,
+                                std::chrono::steady_clock::time_point now, bool expect_acknowledge) {
   if (message->GetMessageType() != message_layer::MessageType::NOT_ACKNOWLEDGE) {
     auto send_sequence = GenerateSequence();
 
@@ -326,7 +332,7 @@ void Connection::SendMessageNow(const std::shared_ptr<message_layer::Message> &m
     message->SetMessageSequence(4444);  // the sequence of NACKs is never read, using dummy value
   }
 
-  message->SetTimestampSent(std::chrono::steady_clock::now());
+  message->SetTimestampSent(now);
 
   DEBUG_CONNECTION_LOG(this, "~~~~> SendMessageNow: send type " << message_type_to_string(message->GetMessageType())
                                                                 << " seq: " << message->GetMessageSequence())
@@ -340,7 +346,7 @@ void Connection::SendMessageNow(const std::shared_ptr<message_layer::Message> &m
 
   if (message->GetMessageType() != message_layer::MessageType::NOT_ACKNOWLEDGE) {
     unacknowledged_sent_message.push_back(message);
-    timestamp_last_change = std::chrono::steady_clock::now();
+    timestamp_last_change = now;
     DEBUG_CONNECTION_LOG(this,
                          "Add to unacknowledged_sent_message now size " << (int)unacknowledged_sent_message.size())
   }
@@ -356,22 +362,22 @@ void Connection::SendMessageNow(const std::shared_ptr<message_layer::Message> &m
   }
 }
 
-void Connection::SendAcknowledge(sequence_t acknowledged_msg_sequence) {
+void Connection::SendAcknowledge(sequence_t acknowledged_msg_sequence, std::chrono::steady_clock::time_point now) {
   auto ack_msg = std::make_shared<message_layer::AcknowledgeMessage>(acknowledged_msg_sequence);
-  SendMessageNow(ack_msg);
+  SendMessageNow(ack_msg, now);
 }
 
-void Connection::Handle() {
+void Connection::Handle(std::chrono::steady_clock::time_point now) {
   assert(state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE ||
          state == ConnectionState::WAITING_FOR_CONNECTION_RESET_ACKNOWLEDGE);
 
   DEBUG_CONNECTION_LOG(this, "Handle() current state: " << connection_state_to_string(state))
 
-  ResendIfNecessary();
+  ResendIfNecessary(now);
 
   if (state == ConnectionState::READY) {
     if (!send_message_queue.empty()) {
-      SendMessageNow(send_message_queue.front());
+      SendMessageNow(send_message_queue.front(), now);
       send_message_queue.pop();
     }
   }
@@ -389,10 +395,9 @@ bool Connection::IsUsable() const {
   return state == ConnectionState::READY || state == ConnectionState::WAITING_FOR_ACKNOWLEDGE;
 }
 
-void Connection::ResendIfNecessary() {
-  auto current_time = std::chrono::steady_clock::now();
-  if (current_time - timestamp_last_change >= resend_interval) {
-    timestamp_last_change = current_time;
+void Connection::ResendIfNecessary(std::chrono::steady_clock::time_point now) {
+  if (now - timestamp_last_change >= resend_interval) {
+    timestamp_last_change = now;
     ResendLastMessages();
   }
 }
