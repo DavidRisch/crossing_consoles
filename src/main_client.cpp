@@ -57,9 +57,11 @@ int main(int argc, char *argv[]) {
                                std::to_string(GameDefinition::name_length_max) + " chars long.");
     }
 
-    std::regex regex("^[a-zA-Z]+$");
-    if (!std::regex_match(name, regex)) {
-      throw std::runtime_error("Name '" + name + "' is not allowed. Only letters can be used.");
+    if (std::all_of(name.begin(), name.end(), isspace)) {
+      throw std::runtime_error("The name is not allowed to consist of whitespaces only. Please change it.");
+    }
+    if (std::all_of(name.begin(), name.end(), [](char c) { return !std::isprint(c); })) {
+      throw std::runtime_error("The name contains non-printable characters. Please change it.");
     }
   }
   if (argc >= 3) {
