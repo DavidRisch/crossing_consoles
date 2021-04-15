@@ -126,3 +126,12 @@ void ColoredCharMatrix::SetAllColors(const Color& foreground, const Color& backg
     }
   }
 }
+
+void ColoredCharMatrix::SetBackgroundColorInRegion(Position& position, const coordinate_size_t& region_size,
+                                                   const Color& background) {
+  for (int y = position.y; y < position.y + region_size.y; y++) {
+    for (int x = position.x; x < position.x + region_size.x; x++) {
+      characters[y][x].background = background;
+    }
+  }
+}

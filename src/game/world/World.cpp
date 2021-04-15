@@ -5,7 +5,6 @@
 #include <memory>
 #include <utility>
 
-#include "../networking/SerializationUtils.h"
 #include "items/DeserializeItemUtils.h"
 
 using namespace game;
@@ -87,6 +86,7 @@ void World::UpdateWithoutWalls(const World& server_world) {
 
   projectiles = server_world.projectiles;
   items = server_world.items;
+  colored_fields = server_world.colored_fields;
 
   for (const auto& server_player : server_world.players) {
     auto player_id = server_player->player_id;
@@ -146,6 +146,7 @@ void World::SerializeUpdate(std::vector<uint8_t>& output_vector) const {
   }
 
   ISerializable::SerializeList(output_vector, projectiles);
+  ISerializable::SerializeMap(output_vector, colored_fields);
 }
 
 World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
@@ -184,6 +185,14 @@ World World::DeserializeUpdate(std::vector<uint8_t>::iterator& input_iterator, W
   for (size_t i = 0; i < projectile_count; ++i) {
     auto projectile = std::make_shared<Projectile>(Projectile::Deserialize(input_iterator));
     world.AddProjectile(projectile);
+  }
+
+  auto colored_field_count = ISerializable::DeserializeContainerLength(input_iterator);
+  for (size_t i = 0; i < colored_field_count; ++i) {
+    auto position = Position::Deserialize(input_iterator);
+    auto colored_field = ColoredField::Deserialize(input_iterator);
+    assert(position == colored_field.GetPosition());
+    world.AddColoredField(colored_field);
   }
 
   return world;
@@ -239,4 +248,8 @@ void World::ResurrectPlayer(Player& player) {
 
 ItemGenerator& World::GetItemGenerator() {
   return item_generator;
+}
+
+void World::AddColoredField(const ColoredField& colored_field) {
+  colored_fields.insert_or_assign(colored_field.GetPosition(), colored_field);
 }

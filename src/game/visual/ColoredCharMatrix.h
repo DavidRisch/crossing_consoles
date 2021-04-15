@@ -53,6 +53,12 @@ class ColoredCharMatrix {
    */
   void SetAllColors(const common::Color& foreground, const common::Color& background = common::Color::BLACK);
 
+  /**
+   * \brief Set the background color of a certain reason while keeping the foreground.
+   */
+  void SetBackgroundColorInRegion(common::Position& position, const common::coordinate_size_t& region_size,
+                                  const common::Color& background);
+
  private:
   common::coordinate_size_t size;
   std::vector<std::vector<ColoredChar>> characters;

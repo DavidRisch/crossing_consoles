@@ -32,6 +32,9 @@ class GameDefinition {
   static const int name_length_min = 2;
   /// Maximum length of a `Player`'s name
   static const int name_length_max = 16;
+
+  /// Lifetime of the `ColoredField`s representing damage caused on a field
+  static const uint8_t colored_field_lifetime = 5;
 };
 
 }  // namespace game

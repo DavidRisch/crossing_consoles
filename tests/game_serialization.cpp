@@ -134,3 +134,26 @@ TEST(GameSerialization, Color) {
   EXPECT_EQ(original.green, deserialized.green);
   EXPECT_EQ(original.blue, deserialized.blue);
 }
+
+TEST(GameSerialization, ColoredField) {
+  Position position(0, 0);
+  ColoredField original(position);
+
+  auto deserialized = serialize_and_deserialize(original);
+
+  EXPECT_EQ(original.GetLifetime(), deserialized.GetLifetime());
+  EXPECT_EQ(original.GetPosition(), position);
+}
+
+TEST(GameSerialization, WorldWithColoredField) {
+  World original(coordinate_size_t(20, 20));
+  Position position(0, 0);
+  ColoredField colored_field(position);
+  original.AddColoredField(colored_field);
+  EXPECT_TRUE(original.colored_fields.size() == 1);
+
+  auto deserialized = serialize_and_deserialize(original);
+
+  EXPECT_EQ(original.colored_fields.at(position).GetPosition(), deserialized.colored_fields.at(position).GetPosition());
+  EXPECT_EQ(original.colored_fields.at(position).GetLifetime(), deserialized.colored_fields.at(position).GetLifetime());
+}

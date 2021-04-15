@@ -145,6 +145,9 @@ void GameLogic::UseWeapon(Player &player, World &world) {
       std::shared_ptr<Sword> sword = std::dynamic_pointer_cast<Sword>(item);
       Position attacked_position = AttackedPositionFromDirection(player.position, player.direction);
 
+      // Add color to field on which damage was caused
+      world.AddColoredField(ColoredField(attacked_position));
+
       // check whether another player has been hit
       auto hit_player_it = std::find_if(world.players.begin(), world.players.end(),
                                         [&attacked_position](const std::shared_ptr<Player> &other_player) {
@@ -277,9 +280,13 @@ bool GameLogic::HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> 
   if (shot_player_it != world.players.end()) {
     // Check that shot player is still alive, otherwise no health or score changes are applied
     Player &hit_player = **shot_player_it;
+
     if (!hit_player.IsAlive()) {
       return false;
     }
+
+    // Show hit position in color
+    world.AddColoredField(ColoredField(hit_player.position));
 
     // Increase score of shooter and apply damage to shot player
     ApplyDamageToPlayer(hit_player, projectile->GetDamage());
@@ -305,5 +312,20 @@ void GameLogic::HandlePlayerRespawn(Player &player, World &world,
                                     const std::chrono::duration<int64_t, std::milli> respawn_time) {
   if (!player.IsAlive() && std::chrono::steady_clock::now() - player.time_of_death > respawn_time) {
     world.ResurrectPlayer(player);
+  }
+}
+
+void GameLogic::ReduceColoredFieldLifetimes(World &world) {
+  std::list<Position> delete_list;
+
+  for (auto &field_it : world.colored_fields) {
+    field_it.second.ReduceLifetime();
+    if (field_it.second.GetLifetime() == 0) {
+      delete_list.push_back(field_it.first);
+    }
+  }
+
+  for (const auto &delete_position : delete_list) {
+    world.colored_fields.erase(delete_position);
   }
 }

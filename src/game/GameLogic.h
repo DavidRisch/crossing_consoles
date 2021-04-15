@@ -29,6 +29,11 @@ class GameLogic {
    */
   static void HandleProjectiles(world::World &world);
 
+  /**
+   * \brief Reduce the lifetimes of all `ColoredField`s in the `World`.
+   */
+  static void ReduceColoredFieldLifetimes(world::World &world);
+
  private:
   /**
    * \brief Move the player with the given `movement`.

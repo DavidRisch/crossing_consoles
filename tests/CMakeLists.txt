@@ -27,6 +27,7 @@ add_executable(crossing_consoles_test
         game_projectile.cpp
         item_generator.cpp
         item.cpp
+        colored_fields.cpp
         fixtures/GamePlay.cpp
         utils/detect_debugger.cpp
         utils/TimingHelper.cpp

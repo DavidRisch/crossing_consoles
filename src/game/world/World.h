@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "../common/Position.h"
+#include "ColoredField.h"
 #include "Player.h"
 #include "Projectile.h"
 #include "Spawner.h"
@@ -27,6 +28,9 @@ class World : public networking::ISerializable {
   std::unordered_map<common::Position, Wall, common::Position::HashFunction> walls;
   bool updated = false;
   std::unordered_map<common::Position, std::shared_ptr<IItem>, common::Position::HashFunction> items;
+
+  /// Fields on which damage was caused, they will be shown in color.
+  std::unordered_map<common::Position, ColoredField, common::Position::HashFunction> colored_fields;
 
   explicit World(common::coordinate_size_t size);
 
@@ -93,6 +97,11 @@ class World : public networking::ISerializable {
   void ResurrectPlayer(Player& player);
 
   ItemGenerator& GetItemGenerator();
+
+  /**
+   * \brief Color a field in the `World` on which a weapon was used.
+   */
+  void AddColoredField(const ColoredField&);
 
  private:
   Spawner spawner;
