@@ -1,6 +1,7 @@
 #include <cassert>
 #include <csignal>
 #include <iostream>
+#include <regex>
 
 #include "game/GameClient.h"
 #include "game/common/Color.h"
@@ -45,6 +46,7 @@ int main(int argc, char *argv[]) {
     throw std::runtime_error("Invalid number of command line arguments.");
   }
   if (argc >= 2) {
+    // set player name
     name = argv[1];
     if (name.size() < GameDefinition::name_length_min) {
       throw std::runtime_error("Name '" + name + "' is too short, must be at least " +
@@ -54,6 +56,12 @@ int main(int argc, char *argv[]) {
       throw std::runtime_error("Name '" + name + "' is too long, must be at most " +
                                std::to_string(GameDefinition::name_length_max) + " chars long.");
     }
+
+    std::regex regex("^[a-zA-Z]+$");
+    if (!std::regex_match(name, regex)){
+      throw std::runtime_error("Name '" + name + "' is not allowed. Only letters can be used.");
+    }
+
   }
   if (argc >= 3) {
     std::string hex_color = argv[2];
