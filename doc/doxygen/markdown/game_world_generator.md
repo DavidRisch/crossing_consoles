@@ -4,7 +4,7 @@
 
 The class `RandomWorldGenerator` creates a world in two steps:
 
-* First, the landscape is being generated using Perlin Noise.
+* First, the landscape is generated using Perlin Noise.
 * After that, buildings are created randomly (if the world is big enough).
 
 ## Generation of the landscape
@@ -40,13 +40,13 @@ The height is used by the class `HeightMap` to determine what block type to use.
 
 ## Generation of simple buildings
 
-The number of buildings generated depends on the size of the world. If it is too small, no buildings are being created.  
+The number of buildings generated depends on the size of the world. If it is too small, no buildings are created.
 
 To generate buildings, rectangles between a minimum and maximum size are randomly created and placed in the existing
 world.  
-\image html building_rectangle.png
-Afterwards they are being hollowed out by placing a second rectangle (`size - 2`) consisting of empty blocks at the
-relative position (1, 1).  
-\image html building_hollow.png
+\image html building_rectangle.png   
+Afterwards they are hollowed out by placing a second rectangle (`size - 2`)
+consisting of empty blocks at the relative position (1, 1).  
+\image html building_hollow.png   
 Finally, doors are created randomly by removing blocks along the edges of the building.  
 \image html building_doors.png
