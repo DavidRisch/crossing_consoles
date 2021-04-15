@@ -1,5 +1,4 @@
-\page game-player-controls Player   
-Game control and Player information.
+\page game-player-controls Game control and Player information
 
 ## Player
 
