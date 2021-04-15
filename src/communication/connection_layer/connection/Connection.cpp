@@ -229,6 +229,11 @@ std::shared_ptr<message_layer::Message> Connection::ReceiveMessage(std::chrono::
     } else if (received_message->GetMessageType() == message_layer::MessageType::NOT_ACKNOWLEDGE) {
       assert(false);  // NACKs are handled by TryReceive()
     } else {
+      // The other side would only send a (none ACK/NACK) message if it is not waiting for any ACK messages
+      unacknowledged_sent_message.remove_if([](const std::shared_ptr<message_layer::Message> &message) {
+        return message->GetMessageType() == message_layer::MessageType::ACKNOWLEDGE;
+      });
+
       // Send acknowledge for every received message except for other (not-)acknowledges
       SendAcknowledge(received_message->GetMessageSequence(), now);
     }
