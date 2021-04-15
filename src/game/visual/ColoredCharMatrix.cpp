@@ -47,6 +47,7 @@ void ColoredCharMatrix::SetString(const std::wstring& string, const Position& po
 
 void ColoredCharMatrix::InsertMatrix(const ColoredCharMatrix& matrix) {
   InsertMatrix(matrix, set_current);
+  set_current.x += matrix.size.x;
 }
 
 void ColoredCharMatrix::AppendFullWidthMatrix(const ColoredCharMatrix& other_matrix) {
