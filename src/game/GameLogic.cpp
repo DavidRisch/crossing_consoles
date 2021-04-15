@@ -301,8 +301,9 @@ void GameLogic::ApplyDamageToPlayer(Player &player, int damage) {
   }
 }
 
-void GameLogic::HandlePlayerRespawn(Player &player, World &world) {
-  if (!player.IsAlive() && std::chrono::steady_clock::now() - player.time_of_death > GameDefinition::respawn_time) {
+void GameLogic::HandlePlayerRespawn(Player &player, World &world,
+                                    const std::chrono::duration<int64_t, std::milli> respawn_time) {
+  if (!player.IsAlive() && std::chrono::steady_clock::now() - player.time_of_death > respawn_time) {
     world.ResurrectPlayer(player);
   }
 }
