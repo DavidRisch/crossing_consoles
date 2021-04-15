@@ -84,6 +84,9 @@ void GameLogic::MovePlayer(world::Player &player, const coordinate_distance_t &m
   auto projectile = world.GetProjectileFromPosition(new_position);
 
   if (projectile.has_value()) {
+    // Show hit position in color
+    world.AddColoredField(ColoredField(player.position));
+
     // decrease player's health and remove projectile from world
     ApplyDamageToPlayer(player, projectile.value()->GetDamage());
     auto list = std::list<std::shared_ptr<Projectile>>();
