@@ -17,7 +17,8 @@ It is also possible to set your name and/or your figurine's color by entering th
 
     cc [name] [hex code]
 
-Notice that the hex code corresponds to a color in hexadecimal code but **does not** need a leading ` #`.
+If you want to use a name that has whitespaces in it, it has to be enclosed in quotation marks. Also, notice that the
+hex code corresponds to a color in hexadecimal code but **does not** need a leading ` #`.
 
 For a quick start some basic colors are listed below:
 
