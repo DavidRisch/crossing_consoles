@@ -21,8 +21,9 @@ class GameServer {
 
   /**
    * \brief Handle connections to `GameClient`s. Should be called in a loop.
+   * \param performance_mode Improve performance of the server as a hole. Increases time until a new client connects.
    */
-  void RunIteration();
+  void RunIteration(bool performance_mode = false);
 
   [[nodiscard]] const world::World &GetWorld() const;
 

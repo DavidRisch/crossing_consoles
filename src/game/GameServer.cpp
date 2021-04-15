@@ -29,10 +29,10 @@ GameServer::GameServer(const coordinate_size_t &world_size, bool empty_world,
       communication::connection_layer::ServerSideConnectionManager::CreateServerSide(communication_timeout);
 }
 
-void GameServer::RunIteration() {
+void GameServer::RunIteration(bool performance_mode) {
   auto now = std::chrono::steady_clock::now();
 
-  if (now - last_full_connection_handle >= full_connection_handle_interval) {
+  if (!performance_mode || now - last_full_connection_handle >= full_connection_handle_interval) {
     last_full_connection_handle = now;
 
     server_manager->HandleConnections();
