@@ -284,3 +284,14 @@ TEST_F(GamePlay, PlayerDiesAndRespawns) {
 
   reset_elements();
 }
+
+TEST_F(GamePlay, ReduceColoredFieldLifetimes) {
+  initialize_game();
+  Position position(0, 0);
+  ColoredField colored_field(position, 1);
+  world->AddColoredField(colored_field);
+  EXPECT_TRUE(world->colored_fields.size() == 1);
+
+  GameLogic::ReduceColoredFieldLifetimes(*world);
+  EXPECT_TRUE(world->colored_fields.empty());
+}

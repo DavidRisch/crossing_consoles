@@ -1,13 +1,18 @@
 #include "ColoredField.h"
 
-#include <iostream>
+#include "../GameDefinition.h"
 
 using namespace game;
 using namespace world;
 
 ColoredField::ColoredField(game::common::Position& position)
     : position(position) {
-  lifetime = 5;  // world cycles in the Game Server
+  lifetime = GameDefinition::colored_field_lifetime;
+}
+
+ColoredField::ColoredField(game::common::Position& position, uint8_t lifetime)
+    : position(position)
+    , lifetime(lifetime) {
 }
 
 common::Position game::world::ColoredField::GetPosition() const {
@@ -16,10 +21,6 @@ common::Position game::world::ColoredField::GetPosition() const {
 
 uint8_t ColoredField::GetLifetime() const {
   return lifetime;
-}
-
-void ColoredField::SetLifetime(uint8_t new_lifetime) {
-  lifetime = new_lifetime;
 }
 
 void ColoredField::ReduceLifetime() {
@@ -35,8 +36,6 @@ ColoredField ColoredField::Deserialize(std::vector<uint8_t>::iterator& input_ite
   common::Position deserialized_position = common::Position::Deserialize(input_iterator);
   uint8_t deserialized_lifetime = *input_iterator++;
 
-  ColoredField colored_field(deserialized_position);
-  colored_field.SetLifetime(deserialized_lifetime);
-
+  ColoredField colored_field(deserialized_position, deserialized_lifetime);
   return colored_field;
 }

@@ -281,12 +281,12 @@ bool GameLogic::HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> 
     // Check that shot player is still alive, otherwise no health or score changes are applied
     Player &hit_player = **shot_player_it;
 
-    // Show hit position in color
-    world.AddColoredField(ColoredField(hit_player.position));
-
     if (!hit_player.IsAlive()) {
       return false;
     }
+
+    // Show hit position in color
+    world.AddColoredField(ColoredField(hit_player.position));
 
     // Increase score of shooter and apply damage to shot player
     ApplyDamageToPlayer(hit_player, projectile->GetDamage());
@@ -314,6 +314,17 @@ void GameLogic::HandlePlayerRespawn(Player &player, World &world) {
   }
 }
 
-void GameLogic::HandleColoredFields(World &world) {
-  world.ReduceColoredFieldLifetimes();
+void GameLogic::ReduceColoredFieldLifetimes(World &world) {
+  std::list<Position> delete_list;
+
+  for (auto &field_it : world.colored_fields) {
+    field_it.second.ReduceLifetime();
+    if (field_it.second.GetLifetime() == 0) {
+      delete_list.push_back(field_it.first);
+    }
+  }
+
+  for (const auto &delete_position : delete_list) {
+    world.colored_fields.erase(delete_position);
+  }
 }

@@ -131,7 +131,7 @@ void ColoredCharMatrix::SetBackgroundColorInRegion(Position& position, const coo
                                                    const Color& background) {
   for (int y = position.y; y < position.y + region_size.y; y++) {
     for (int x = position.x; x < position.x + region_size.x; x++) {
-      SetChar(characters[y][x].character, Position(x, y), characters[y][x].foreground, background);
+      characters[y][x].background = background;
     }
   }
 }

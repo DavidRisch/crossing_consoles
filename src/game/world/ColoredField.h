@@ -12,7 +12,15 @@ namespace game::world {
  */
 class ColoredField : public networking::ISerializable {
  public:
+  /**
+   * \brief Construct new `ColoredField` with lifetime from `GameDefinition`.
+   */
   explicit ColoredField(common::Position& position);
+
+  /**
+   * \brief Construct new `ColoredField` from `Position`and lifetime.
+   */
+  ColoredField(game::common::Position& position, uint8_t lifetime);
 
   /**
    * \brief Return the `Position`of a `ColoredField`.
@@ -23,11 +31,6 @@ class ColoredField : public networking::ISerializable {
    * \brief Return the lifetime of a `ColoredField`.
    */
   [[nodiscard]] uint8_t GetLifetime() const;
-
-  /**
-   * \brief Set the lifetime of a `ColoredField`.
-   */
-  void SetLifetime(uint8_t new_lifetime);
 
   /**
    * \brief Reduce the lifetime of a `ColoredField`.

@@ -103,11 +103,6 @@ class World : public networking::ISerializable {
    */
   void AddColoredField(const ColoredField&);
 
-  /**
-   * \brief Reduce the lifetimes of all `ColoredField`s in the `World`.
-   */
-  void ReduceColoredFieldLifetimes();
-
  private:
   Spawner spawner;
   ItemGenerator item_generator;

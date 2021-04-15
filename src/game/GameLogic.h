@@ -28,9 +28,9 @@ class GameLogic {
   static void HandleProjectiles(world::World &world);
 
   /**
-   * \brief Handle the `ColoredField`s in the `World` by reducing their lifetime.
+   * \brief Reduce the lifetimes of all `ColoredField`s in the `World`.
    */
-  static void HandleColoredFields(world::World &world);
+  static void ReduceColoredFieldLifetimes(world::World &world);
 
  private:
   /**

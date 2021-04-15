@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
 #include <memory>
 #include <utility>
 
@@ -251,25 +250,6 @@ ItemGenerator& World::GetItemGenerator() {
   return item_generator;
 }
 
-void World::ReduceColoredFieldLifetimes() {
-  std::list<Position> delete_list;
-
-  for (auto& field_it : colored_fields) {
-    field_it.second.ReduceLifetime();
-    if (field_it.second.GetLifetime() == 0) {
-      delete_list.push_back(field_it.first);
-    }
-  }
-
-  for (const auto& delete_position : delete_list) {
-    colored_fields.erase(delete_position);
-  }
-}
-
 void World::AddColoredField(const ColoredField& colored_field) {
-  if (colored_fields.find(colored_field.GetPosition()) == colored_fields.end()) {
-    colored_fields.insert({colored_field.GetPosition(), colored_field});
-  } else {
-    colored_fields.at(colored_field.GetPosition()) = colored_field;
-  }
+  colored_fields.insert_or_assign(colored_field.GetPosition(), colored_field);
 }
