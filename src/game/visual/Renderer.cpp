@@ -81,6 +81,15 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
   player_right_sprite.AppendChar(box_drawings_light_horizontal);
   player_right_sprite.AppendString(L"/ \\");
 
+  ColoredCharMatrix player_dead_sprite(block_size);
+  player_dead_sprite.AppendChar(L' ');
+  player_dead_sprite.AppendChar(L' ');
+  player_dead_sprite.AppendChar(L' ');
+  player_dead_sprite.AppendChar(box_drawings_light_down_and_right);
+  player_dead_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
+  player_dead_sprite.AppendChar(box_drawings_light_down_and_left);
+  player_dead_sprite.AppendString(L"/ \\");
+
   ColoredCharMatrix projectile_sprite(block_size);
   projectile_sprite.AppendString(L"    o    ");
 
@@ -97,6 +106,7 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
   sprite_map.SetSprite(BlockType::PLAYER_DOWN, player_down_sprite);
   sprite_map.SetSprite(BlockType::PLAYER_LEFT, player_left_sprite);
   sprite_map.SetSprite(BlockType::PLAYER_RIGHT, player_right_sprite);
+  sprite_map.SetSprite(BlockType::PLAYER_DEAD, player_dead_sprite);
   sprite_map.SetSprite(BlockType::PROJECTILE, projectile_sprite);
 }
 
@@ -171,21 +181,26 @@ ColoredCharMatrix Renderer::RenderWorld() const {
         if (position.IsGreaterOrEqual(viewport_start) && position.IsLessOrEqual(viewport_end)) {
           // get player position as rendered viewport coordinates
           Position relative_position = position - viewport_start;
-          // get player sprite depending on direction
+
+          // get player sprite depending on direction and life status
           ColoredCharMatrix colored_player_sprite(block_size);
-          switch (player->direction) {
-            case GameDefinition::NORTH:
-              colored_player_sprite.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_UP));
-              break;
-            case GameDefinition::SOUTH:
-              colored_player_sprite.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_DOWN));
-              break;
-            case GameDefinition::WEST:
-              colored_player_sprite.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_LEFT));
-              break;
-            case GameDefinition::EAST:
-              colored_player_sprite.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_RIGHT));
-              break;
+          if (player->IsAlive()) {
+            switch (player->direction) {
+              case GameDefinition::NORTH:
+                colored_player_sprite.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_UP));
+                break;
+              case GameDefinition::SOUTH:
+                colored_player_sprite.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_DOWN));
+                break;
+              case GameDefinition::WEST:
+                colored_player_sprite.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_LEFT));
+                break;
+              case GameDefinition::EAST:
+                colored_player_sprite.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_RIGHT));
+                break;
+            }
+          } else {
+            colored_player_sprite.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_DEAD));
           }
           // insert player sprite
           colored_player_sprite.SetAllColors(player->color);
