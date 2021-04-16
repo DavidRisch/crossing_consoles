@@ -6,6 +6,7 @@
 #include <thread>
 #include <utility>
 
+#include "../communication/byte_layer/connection_simulator/ConnectionSimulatorFlaky.h"
 #include "../communication/connection_layer/event/PayloadEvent.h"
 #include "GameLogic.h"
 #include "networking/Change.h"
@@ -130,6 +131,23 @@ void GameClient::ProcessInput() {
         case KeyCode::X: {
           compositor->show_statistics_table ^= true;
           updated = true;
+          return;
+        }
+        case KeyCode::C: {
+          simulate_bad_connection ^= true;
+          compositor->simulate_bad_connection = simulate_bad_connection;
+
+          std::shared_ptr<communication::byte_layer::IConnectionSimulator> connection_simulator;
+          if (simulate_bad_connection) {
+            connection_simulator = std::make_shared<communication::byte_layer::ConnectionSimulatorFlaky>(
+                communication::byte_layer::ConnectionSimulatorFlaky::Parameters(0, 100, 5));
+          } else {
+            connection_simulator = std::make_shared<communication::byte_layer::ConnectionSimulatorPerfect>();
+          }
+
+          auto socket_byte_stream = client_manager->GetSocketByteStream();
+          assert(socket_byte_stream != nullptr);
+          socket_byte_stream->SetConnectionSimulatorOutgoing(connection_simulator);
           return;
         }
         default:
