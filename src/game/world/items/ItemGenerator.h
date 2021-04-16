@@ -4,6 +4,7 @@
 #include <memory>
 #include <random>
 
+#include "../Spawner.h"
 #include "IItem.h"
 
 namespace game::world {
