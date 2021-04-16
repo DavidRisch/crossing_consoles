@@ -52,11 +52,11 @@ class GameServer {
 
   /// Used to improve performance by accepting new clients less often
   std::chrono::time_point<std::chrono::steady_clock> last_full_connection_handle;
-  static constexpr auto full_connection_handle_interval = std::chrono::milliseconds(250);
+  static constexpr auto full_connection_handle_interval = std::chrono::milliseconds(100);
 
-  static constexpr auto min_run_loop_interval = std::chrono::microseconds(250);
+  static constexpr auto min_run_loop_interval = std::chrono::microseconds(25);
 
-  static constexpr int max_player_count = 32;
+  static constexpr int max_player_count = 25;
 
   /// Holds all game definitions valid for this game.
   const GameDefinition game_definition;

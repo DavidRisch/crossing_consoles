@@ -78,11 +78,11 @@ class GameClient {
   };
 
   std::chrono::time_point<std::chrono::steady_clock> last_draw;
-  static constexpr auto min_draw_interval = std::chrono::milliseconds(50);
+  static constexpr auto min_draw_interval = std::chrono::milliseconds(25);
 
-  static constexpr auto min_main_loop_interval = std::chrono::microseconds(500);
+  static constexpr auto min_main_loop_interval = std::chrono::microseconds(100);
 
-  static constexpr auto min_communication_loop_interval = std::chrono::microseconds(500);
+  static constexpr auto min_communication_loop_interval = std::chrono::microseconds(50);
 
   /**
    * \brief Thread responsible for communication with the server. Required to achieve low latency communication while a
