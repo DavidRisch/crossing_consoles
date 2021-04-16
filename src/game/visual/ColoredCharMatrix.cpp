@@ -25,7 +25,7 @@ void ColoredCharMatrix::AppendChar(wchar_t character, Color foreground, Color ba
 
 void ColoredCharMatrix::SetChar(wchar_t character, const Position& position, Color foreground, Color background) {
   if (position.IsLess(size)) {
-    characters[position.y][position.x] = ColoredChar(character, foreground, std::move(background));
+    characters[position.y][position.x] = ColoredChar(character, std::move(foreground), std::move(background));
     set_current = position;
     set_current.x++;
   }
@@ -47,6 +47,7 @@ void ColoredCharMatrix::SetString(const std::wstring& string, const Position& po
 
 void ColoredCharMatrix::InsertMatrix(const ColoredCharMatrix& matrix) {
   InsertMatrix(matrix, set_current);
+  set_current.x += matrix.size.x;
 }
 
 void ColoredCharMatrix::AppendFullWidthMatrix(const ColoredCharMatrix& other_matrix) {
@@ -58,16 +59,15 @@ void ColoredCharMatrix::AppendFullWidthMatrix(const ColoredCharMatrix& other_mat
   set_current.y += other_matrix.size.y;
 }
 
-void ColoredCharMatrix::InsertMatrix(const ColoredCharMatrix& matrix, const Position& position) {
-  coordinate_distance_t offset = position;
-  const std::vector<std::vector<ColoredChar>>& colored_characters = matrix.GetMatrix();
-  for (int y = 0; y < (int)colored_characters.size(); y++) {
-    for (int x = 0; x < (int)colored_characters[y].size(); x++) {
-      Position new_position = Position(x, y) + offset;
-      if (new_position.IsLess(size)) {
-        SetChar(colored_characters[y][x].character, new_position, colored_characters[y][x].foreground,
-                colored_characters[y][x].background);
-      }
+void ColoredCharMatrix::InsertMatrix(const ColoredCharMatrix& matrix, const coordinate_distance_t& offset) {
+  const std::vector<std::vector<ColoredChar>>& source_colored_characters = matrix.GetMatrix();
+  for (int y = 0; y < (int)source_colored_characters.size(); y++) {
+    for (int x = 0; x < (int)source_colored_characters[y].size(); x++) {
+      assert((Position(x, y) + offset).IsLess(size));
+
+      auto& source_colored_char = source_colored_characters[y][x];
+      auto& destination_colored_char = characters[y + offset.y][x + offset.x];
+      destination_colored_char = source_colored_char;
     }
   }
 }

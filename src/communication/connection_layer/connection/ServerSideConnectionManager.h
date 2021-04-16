@@ -15,7 +15,13 @@ class ServerSideConnectionManager : public ConnectionManager {
   /**
    * \brief Check for and process new connections, messages and timeouts.
    */
-  void HandleConnections() override;
+  void HandleConnections(std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now()) override;
+
+  /**
+   * \brief Much faster than `HandleConnections()` if nothing needs to be done. Does not establish new connections.
+   */
+  void FastHandleConnections(std::chrono::steady_clock::time_point now);
+
   /**
    * \brief Create Connection Manager for usage on server side.
    */

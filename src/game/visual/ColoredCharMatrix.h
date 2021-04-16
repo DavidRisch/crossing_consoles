@@ -35,7 +35,7 @@ class ColoredCharMatrix {
    */
   void AppendFullWidthMatrix(const ColoredCharMatrix& other_matrix);
 
-  void InsertMatrix(const ColoredCharMatrix& matrix, const common::Position& position);
+  void InsertMatrix(const ColoredCharMatrix& matrix, const common::coordinate_distance_t& offset);
 
   [[nodiscard]] const std::vector<std::vector<ColoredChar>>& GetMatrix() const;
   [[nodiscard]] const common::coordinate_size_t& GetSize() const;

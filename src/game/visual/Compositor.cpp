@@ -16,22 +16,14 @@ using namespace game::visual::symbols;
 Compositor::Compositor(const coordinate_size_t &viewport_size, World &world, Player &player)
     : game_viewport_size(viewport_size)
     , world(&world)
-    , player(&player) {
+    , player(&player)
+    , game_output(coordinate_size_t(game_output_size_x, game_output_size_y)) {
   renderer = std::make_unique<Renderer>(viewport_size, block_size, world, player);
   player_list = std::make_unique<PlayerList>(world.players);
 }
 
-ColoredCharMatrix Compositor::CompositeViewport() const {
+const ColoredCharMatrix &Compositor::CompositeViewport() {
   ColoredCharMatrix rendered_world = renderer->RenderWorld();
-
-  // border size = number of characters used to draw the frame
-  int border_size_x = 1;
-
-  // calculate number of characters needed to display world output
-  coordinate_size_t game_character_count = game_viewport_size * block_size;
-
-  int game_output_size_x =
-      game_character_count.x + border_size_x * 2;  // one character at the left and right is added for box lines
 
   // Create header, printed above the world output
   ColoredCharMatrix header = CompositeHeader(game_output_size_x);
@@ -41,10 +33,6 @@ ColoredCharMatrix Compositor::CompositeViewport() const {
   // Create trailer, printed below the world output
   ColoredCharMatrix trailer = CompositeTrailer(game_output_size_x, player->GetItem() != nullptr);
   const common::coordinate_size_t &trailer_size = trailer.GetSize();
-
-  // Create game output, which contains header, world output and trailer
-  int game_output_size_y = game_character_count.y + header_size.y + trailer_size.y;
-  ColoredCharMatrix game_output(coordinate_size_t(game_output_size_x, game_output_size_y));
 
   // Set header
   game_output.InsertMatrix(header, Position(0, 0));
@@ -95,7 +83,6 @@ void Compositor::SetConnectionStatistics(
 }
 
 ColoredCharMatrix Compositor::CompositeHeader(int viewport_width) const {
-  int header_height = 6;
   int current_position_y = 0;  // indicates current line, that needs to be set
   ColoredCharMatrix header(coordinate_size_t(viewport_width, header_height));
 
@@ -149,7 +136,7 @@ ColoredCharMatrix Compositor::CompositeHeader(int viewport_width) const {
 }
 
 ColoredCharMatrix Compositor::CompositeTrailer(int viewport_width, bool has_item) {
-  ColoredCharMatrix trailer(coordinate_size_t(viewport_width, 3));
+  ColoredCharMatrix trailer(coordinate_size_t(viewport_width, trailer_height));
   int position_y = 0;
 
   auto middle_line = GenerateSeparatorLine(viewport_width, false, false);

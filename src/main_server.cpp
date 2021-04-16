@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
   GameServer server(world_size);
   std::cout << "Server ready" << std::endl;
   while (true) {
-    server.RunIteration();
+    server.RunIteration(true);
     std::this_thread::sleep_for(std::chrono::microseconds(10));
   }
 }

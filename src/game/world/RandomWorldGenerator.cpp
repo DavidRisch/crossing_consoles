@@ -151,12 +151,11 @@ void RandomWorldGenerator::GenerateDoors(std::mt19937& random, const Position& s
   }
 }
 
-double RandomWorldGenerator::GenerateNoise(int i, int x, int y) const {
-  // TODO: change seeding for better performance
-  std::mt19937 random(seed + (i + 1) * (x + (y * size.x)));
-  std::uniform_real_distribution<double> noise_distribution(-1.0, 1.0);
+double RandomWorldGenerator::GenerateNoise(int i, int x, int y) {
+  std::uniform_real_distribution<double> noise_distribution = std::uniform_real_distribution<double>(-1.0, 1.0);
+  mersenne_twister.seed(seed + (i + 1) * (x + (y * size.x)));
 
-  return noise_distribution(random);
+  return noise_distribution(mersenne_twister);
 }
 
 double RandomWorldGenerator::SmoothNoise(int i, int x, int y) {

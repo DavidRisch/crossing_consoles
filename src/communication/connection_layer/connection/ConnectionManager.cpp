@@ -68,7 +68,7 @@ std::shared_ptr<Event> ConnectionManager::PopAndGetOldestEvent() {
   return event;
 }
 
-void ConnectionManager::ReceiveMessages() {
+void ConnectionManager::ReceiveMessages(std::chrono::steady_clock::time_point now) {
   // Handle received messages and timeouts
 
   // remove connections after timeout or acknowledged reset
@@ -80,9 +80,9 @@ void ConnectionManager::ReceiveMessages() {
 
     std::shared_ptr<message_layer::Message> received_msg;
     do {
-      received_msg = connection->ReceiveMessage();
+      received_msg = connection->ReceiveMessage(now);
       if (received_msg != nullptr) {
-        connection_entry.second.timestamp_last_received = std::chrono::steady_clock::now();
+        connection_entry.second.timestamp_last_received = now;
 
         switch (received_msg->GetMessageType()) {
           case message_layer::MessageType::PAYLOAD: {
@@ -107,12 +107,11 @@ void ConnectionManager::ReceiveMessages() {
       connection_remove_list.push_back(partner_id);
     }
 
-    auto current_time = std::chrono::steady_clock::now();
-    if (current_time - connection_entry.second.timestamp_last_received >= timeout) {
+    if (now - connection_entry.second.timestamp_last_received >= timeout) {
       DEBUG_CONNECTION_LOG(connection.get(), "Timeout (ConnectionManager)")
       connection_remove_list.push_back(partner_id);
 
-    } else if (current_time - connection_entry.second.timestamp_last_received >= keep_alive_interval) {
+    } else if (now - connection_entry.second.timestamp_last_received >= keep_alive_interval) {
       DEBUG_CONNECTION_LOG(connection.get(), "Send KeepAlive (ConnectionManager)")
       auto keep_alive_msg = std::make_shared<message_layer::KeepAliveMessage>(message_layer::KeepAliveMessage());
       SendMessageToConnection(partner_id, keep_alive_msg);

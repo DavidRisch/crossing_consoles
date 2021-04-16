@@ -71,21 +71,30 @@ void GameClient::Run() {
     auto player = weak_player.lock();
     assert(player != nullptr);
 
+    auto now = std::chrono::steady_clock::now();
+
     ProcessInput();
 
     if (multiplayer) {
-      client_manager->HandleConnections();
+      client_manager->HandleConnections(now);
       HandleEvent(player, client_manager->PopAndGetOldestEvent());
     }
 
     if (world.updated || player->updated || updated) {
-      if (!multiplayer) {
-        GameLogic::HandleProjectiles(world);
-        GameLogic::HandlePlayerRespawn(*player, world, game_definition.respawn_time);
-      }
+      if (now - last_draw >= min_draw_interval) {
+        last_draw = now;
 
-      updated = false;
-      terminal->SetScreen(compositor->CompositeViewport());
+        if (!multiplayer) {
+          GameLogic::HandleProjectiles(world);
+          GameLogic::HandlePlayerRespawn(*player, world, game_definition.respawn_time);
+        }
+
+        world.updated = false;
+        player->updated = false;
+        updated = false;
+
+        terminal->SetScreen(compositor->CompositeViewport());
+      }
     }
 
     std::this_thread::sleep_for(std::chrono::microseconds(100));

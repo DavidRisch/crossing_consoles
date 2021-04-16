@@ -71,7 +71,7 @@ class RandomWorldGenerator : public IWorldGenerator {
   /**
    * \brief Generate random noise for coordinate pair and corresponding octave.
    */
-  [[nodiscard]] double GenerateNoise(int i, int x, int y) const;
+  [[nodiscard]] double GenerateNoise(int i, int x, int y);
   /**
    * \brief Smooth out noise function by looking at neighbouring values.
    */
@@ -90,6 +90,8 @@ class RandomWorldGenerator : public IWorldGenerator {
    * for reference.
    */
   double PerlinNoise(double x, double y);
+
+  std::mt19937 mersenne_twister;
 };
 
 }  // namespace game::world
