@@ -53,6 +53,10 @@ SocketByteServer::SocketByteServer(
 #endif
 
 #ifdef USE_UNIX_SOCKET
+  if (port != socket_default_port) {
+    throw std::runtime_error("port has no effect if in UNIX socket mode (so it should have its default value)");
+  }
+
   if (remove(SOCKET_FILE_PATH) != 0) {
     // ignore 'No such file or directory'
     if (errno != ENOENT) {

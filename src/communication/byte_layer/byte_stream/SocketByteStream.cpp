@@ -27,8 +27,9 @@ std::shared_ptr<SocketByteStream> SocketByteStream::CreateClientSide(
   }
 
 #ifdef USE_UNIX_SOCKET
-  // port has no effect if in UNIX socket mode (so it should have its default value)
-  assert(port == socket_default_port);
+  if (port != socket_default_port) {
+    throw std::runtime_error("port has no effect if in UNIX socket mode (so it should have its default value)");
+  }
 
   struct sockaddr_un server_address {};
   server_address.sun_family = AF_UNIX;

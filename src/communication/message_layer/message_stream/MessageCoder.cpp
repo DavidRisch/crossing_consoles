@@ -130,7 +130,9 @@ std::shared_ptr<Message> MessageCoder::Decode(byte_layer::IInputByteStream &stre
   if (expect_start_sequence) {
     auto found_start_sequence =
         ReadFromStreamWithCRC<ProtocolDefinition::flag_t>(stream, sizeof(ProtocolDefinition::flag), nullptr, false);
-    assert(found_start_sequence == ProtocolDefinition::flag);
+    if (found_start_sequence != ProtocolDefinition::flag) {
+      throw MessageCoder::InvalidMessageException("Expected flag");
+    }
   }
 
   auto message_type_value = ReadFromStreamWithCRC<uint8_t>(stream, sizeof(uint8_t), &crc_handler);
