@@ -12,11 +12,6 @@ using namespace game::common;
 using namespace game::world;
 
 template <typename T>
-bool are_objects_identical(const T &a, const T &b) {
-  return (std::memcmp((void *)&a, (void *)&b, sizeof(T)) == 0);
-}
-
-template <typename T>
 T serialize_and_deserialize(const T &original) {
   std::vector<uint8_t> encoded;
   original.Serialize(encoded);
@@ -35,7 +30,7 @@ TEST(GameSerialization, Position) {
 
   auto deserialized = serialize_and_deserialize(original);
 
-  EXPECT_TRUE(are_objects_identical(original, deserialized));
+  EXPECT_EQ(original, deserialized);
 }
 
 TEST(GameSerialization, Wall) {
@@ -56,7 +51,7 @@ TEST(GameSerialization, World) {
 
   auto deserialized = serialize_and_deserialize(original);
 
-  EXPECT_TRUE(are_objects_identical(original.size, deserialized.size));
+  EXPECT_EQ(original.size, deserialized.size);
 
   ASSERT_EQ(original.walls.size(), deserialized.walls.size());
   for (const auto &pair_original : original.walls) {
@@ -64,7 +59,7 @@ TEST(GameSerialization, World) {
     int identical_count = 0;
     for (const auto &pair_deserialized : deserialized.walls) {
       auto wall_deserialized = pair_deserialized.second;
-      if (are_objects_identical(wall_original.position, wall_deserialized.position)) {
+      if (wall_original.position == wall_deserialized.position) {
         identical_count++;
       }
     }
@@ -85,7 +80,7 @@ TEST(GameSerialization, Player) {
   EXPECT_EQ(original.health, deserialized.health);
   EXPECT_EQ(original.direction, deserialized.direction);
   EXPECT_EQ(original.GetScore(), deserialized.GetScore());
-  EXPECT_TRUE(are_objects_identical(original.position, deserialized.position));
+  EXPECT_EQ(original.position, deserialized.position);
 }
 
 TEST(GameSerialization, Utils) {
@@ -102,11 +97,11 @@ TEST(GameSerialization, Utils) {
   auto it = encoded.begin();
 
   auto a_decoded = networking::SerializationUtils::DeserializeObject<decltype(a_original)>(it);
-  EXPECT_TRUE(are_objects_identical(a_original, a_decoded));
+  EXPECT_EQ(a_original, a_decoded);
   auto b_decoded = networking::SerializationUtils::DeserializeObject<decltype(b_original)>(it);
-  EXPECT_TRUE(are_objects_identical(b_original, b_decoded));
+  EXPECT_EQ(b_original, b_decoded);
   auto c_decoded = networking::SerializationUtils::DeserializeObject<decltype(c_original)>(it);
-  EXPECT_TRUE(are_objects_identical(c_original, c_decoded));
+  EXPECT_EQ(c_original, c_decoded);
 
   EXPECT_EQ(it, encoded.end());
 }
@@ -122,7 +117,7 @@ TEST(GameSerialization, Projectile) {
   EXPECT_EQ(original.GetShooterId(), deserialized.GetShooterId());
   EXPECT_EQ(original.GetRange(), deserialized.GetRange());
 
-  EXPECT_TRUE(are_objects_identical(original.GetPosition(), deserialized.GetPosition()));
+  EXPECT_EQ(original.GetPosition(), deserialized.GetPosition());
 }
 
 TEST(GameSerialization, Color) {
