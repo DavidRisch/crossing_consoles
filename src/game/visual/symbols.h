@@ -12,9 +12,13 @@ const wchar_t box_drawings_double_vertical_and_right = L'\u2560';
 const wchar_t box_drawings_double_vertical_and_left = L'\u2563';
 
 const wchar_t box_drawings_light_horizontal = L'\u2500';
+const wchar_t box_drawings_light_down_and_right = L'\u250C';
+const wchar_t box_drawings_light_down_and_left = L'\u2510';
+const wchar_t box_drawings_light_up_and_right = L'\u2514';
+const wchar_t box_drawings_light_up_and_left = L'\u2518';
 const wchar_t box_drawings_light_vertical_and_horizontal = L'\u253C';
-const wchar_t box_drawings_light_right = L'\u2576';
 const wchar_t box_drawings_light_left = L'\u2574';
+const wchar_t box_drawings_light_right = L'\u2576';
 
 const wchar_t box_drawings_heavy_horizontal = L'\u2501';
 const wchar_t box_drawings_heavy_vertical = L'\u2503';
