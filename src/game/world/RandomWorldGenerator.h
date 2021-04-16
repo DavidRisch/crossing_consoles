@@ -3,7 +3,6 @@
 
 #include <memory>
 #include <random>
-#include <vector>
 
 #include "HeightMap.h"
 #include "IWorldGenerator.h"
