@@ -27,6 +27,7 @@ std::shared_ptr<ClientSideConnectionManager> ClientSideConnectionManager::Create
 
   auto manager = std::shared_ptr<ClientSideConnectionManager>(new ClientSideConnectionManager(timeout));
   manager->AddConnection(connection);
+  manager->socket_byte_stream = byte_stream.get();
   return manager;
 }
 
@@ -51,4 +52,8 @@ void ClientSideConnectionManager::SendDataToServer(std::vector<uint8_t> data) {
 
 void ClientSideConnectionManager::CloseConnectionWithServer() {
   CloseConnection(ProtocolDefinition::server_partner_id);
+}
+
+byte_layer::SocketByteStream* ClientSideConnectionManager::GetSocketByteStream() {
+  return socket_byte_stream;
 }
