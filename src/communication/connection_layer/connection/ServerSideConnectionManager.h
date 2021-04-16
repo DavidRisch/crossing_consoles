@@ -18,7 +18,7 @@ class ServerSideConnectionManager : public ConnectionManager {
   void HandleConnections(std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now()) override;
 
   /**
-   * \brief Much faster that `HandleConnections()` if nothing needs to be done. Does not establish new connections.
+   * \brief Much faster than `HandleConnections()` if nothing needs to be done. Does not establish new connections.
    */
   void FastHandleConnections(std::chrono::steady_clock::time_point now);
 
