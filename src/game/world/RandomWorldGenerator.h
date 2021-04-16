@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <random>
+#include <vector>
 
 #include "HeightMap.h"
 #include "IWorldGenerator.h"
@@ -50,14 +51,6 @@ class RandomWorldGenerator : public IWorldGenerator {
    * \brief Generate landscape from heightmap.
    */
   void GenerateHeight();
-  /**
-   * \brief Smooth out vertical world edges by looking at neighbouring values.
-   */
-  double SmoothVertical(int y);
-  /**
-   * \brief Smooth out horizontal world edges by looking at neighbouring values.
-   */
-  double SmoothHorizontal(int x);
   /**
    * \brief Generate empty buildings.
    */
