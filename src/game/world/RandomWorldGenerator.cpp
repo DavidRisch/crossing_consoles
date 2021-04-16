@@ -50,7 +50,13 @@ void RandomWorldGenerator::GenerateHeight() {
   double height;
   for (int x = 0; x < size.x; x++) {
     for (int y = 0; y < size.y; y++) {
-      height = PerlinNoise(x, y) * 2;
+      if (x == size.x - 1) {
+        height = SmoothVertical(y);
+      } else if (y == size.y - 1) {
+        height = SmoothHorizontal(x);
+      } else {
+        height = PerlinNoise(x, y);
+      }
 
       BlockType type = height_map.GetType((int)height);
       if (type >= BlockType::WALL_START && type <= BlockType::WALL_END) {
@@ -58,6 +64,20 @@ void RandomWorldGenerator::GenerateHeight() {
       }
     }
   }
+}
+
+double RandomWorldGenerator::SmoothVertical(int y) {
+  double left = PerlinNoise(size.x - 2, y - 1) + PerlinNoise(size.x - 2, y) + PerlinNoise(size.x - 2, y + 1);
+  double right = PerlinNoise(0, y - 1) + PerlinNoise(0, y) + PerlinNoise(0, y + 1);
+
+  return (left + right) / 6;
+}
+
+double RandomWorldGenerator::SmoothHorizontal(int x) {
+  double up = PerlinNoise(x - 1, size.y - 2) + PerlinNoise(x, size.y - 2) + PerlinNoise(x + 1, size.y - 2);
+  double down = PerlinNoise(x - 1, 0) + PerlinNoise(x, 0) + PerlinNoise(x + 1, 0);
+
+  return (up + down) / 6;
 }
 
 void RandomWorldGenerator::GenerateBuildings() {
@@ -183,5 +203,5 @@ double RandomWorldGenerator::PerlinNoise(double x, double y) {
     amplitude = pow(persistence, i);
     total += InterpolateNoise(i, x / frequency, y / frequency) * amplitude;
   }
-  return total / frequency;
+  return total / frequency * height_factor;
 }

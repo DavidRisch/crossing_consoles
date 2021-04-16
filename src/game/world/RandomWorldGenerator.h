@@ -30,23 +30,34 @@ class RandomWorldGenerator : public IWorldGenerator {
   void Construct(int seed);
 
   std::shared_ptr<World> world;
-
-  int seed{};
   common::coordinate_size_t size = common::coordinate_size_t(0, 0);
 
+  int seed{};
   HeightMap height_map;
+
+  // building generation parameters
   const int building_count_min = 5;
   const int building_count_max = 15;
   const common::coordinate_size_t building_size_min = common::coordinate_size_t(7, 5);
   const common::coordinate_size_t building_size_max = common::coordinate_size_t(12, 10);
 
+  // perlin noise parameters
   const double persistence = 10;
   const int octaves = 4;
+  const int height_factor = 2;
 
   /**
    * \brief Generate landscape from heightmap.
    */
   void GenerateHeight();
+  /**
+   * \brief Smooth out vertical world edges by looking at neighbouring values.
+   */
+  double SmoothVertical(int y);
+  /**
+   * \brief Smooth out horizontal world edges by looking at neighbouring values.
+   */
+  double SmoothHorizontal(int x);
   /**
    * \brief Generate empty buildings.
    */
