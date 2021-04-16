@@ -36,7 +36,7 @@ class RandomWorldGenerator : public IWorldGenerator {
 
   HeightMap height_map;
 
-  int building_count;
+  int building_count{};
   double building_rate = 0.1;
   const common::coordinate_size_t building_size_min = common::coordinate_size_t(7, 5);
   const common::coordinate_size_t building_size_max = common::coordinate_size_t(12, 10);

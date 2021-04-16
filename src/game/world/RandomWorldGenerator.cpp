@@ -38,7 +38,6 @@ std::shared_ptr<World> RandomWorldGenerator::GenerateWorld(const coordinate_size
   GenerateHeight();
 
   if (size.IsGreater(building_size_max)) {
-    // TODO: add support for bigger world and enable buildings
     GenerateBuildings();
   }
 
@@ -62,7 +61,7 @@ void RandomWorldGenerator::GenerateHeight() {
       }
     }
   }
-  building_count = empty_blocks / (building_size_max.x * building_size_max.y) * building_rate;
+  building_count = static_cast<int>((empty_blocks * building_rate) / (building_size_max.x * building_size_max.y));
 }
 
 void RandomWorldGenerator::GenerateBuildings() {
