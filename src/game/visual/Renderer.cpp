@@ -19,7 +19,7 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
     , own_player(&own_player)
     , sprite_map(SpriteMap(block_size)) {
   ColoredCharMatrix wall_brick_sprite(block_size);
-  wall_brick_sprite.AppendString(std::wstring(9, light_shade), Color::WHITE, Color::RED);
+  wall_brick_sprite.AppendString(std::wstring(9, light_shade), Color::WHITE, Color::LIGHT_BROWN);
 
   ColoredCharMatrix wall_rock_light_sprite(block_size);
   wall_rock_light_sprite.AppendString(std::wstring(9, light_shade), Color::GREY);

@@ -27,6 +27,7 @@ class Color : public networking::ISerializable {
   static const Color RED;
   static const Color GREEN;
   static const Color BLUE;
+  static const Color LIGHT_BROWN;
 
   uint8_t red = 0;
   uint8_t green = 0;
