@@ -56,8 +56,8 @@ void RandomWorldGenerator::GenerateHeight() {
       int distance_to_closest_edge = std::min({x, size.x - x - 1, y, size.y - y - 1});
 
       // smooth out walls next to world edges
-      if (distance_to_closest_edge < 5) {
-        double factor = distance_to_closest_edge / 5.;
+      if (distance_to_closest_edge < smoothing_distance) {
+        double factor = distance_to_closest_edge / (double)smoothing_distance;
         height *= factor;
       }
 

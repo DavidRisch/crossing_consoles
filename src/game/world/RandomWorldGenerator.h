@@ -34,6 +34,7 @@ class RandomWorldGenerator : public IWorldGenerator {
 
   int seed{};
   HeightMap height_map;
+  const int smoothing_distance = 5;
 
   // building generation parameters
   const int building_count_min = 5;
