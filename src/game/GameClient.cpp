@@ -34,7 +34,7 @@ GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_
   assert(terminal != nullptr);
 
   coordinate_size_t viewport_size = Position(51, 25);
-  compositor = std::make_unique<Compositor>(viewport_size, world, *player);
+  compositor = std::make_unique<Compositor>(viewport_size, world_render_copy, *player);
 
   if (multiplayer) {
     client_manager =
@@ -67,17 +67,48 @@ GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_
 }
 
 void GameClient::Run() {
+  if (multiplayer) {
+    StartCommunicationThread();
+
+    try {
+      RunMainThread();
+      communication_thread.join();
+    } catch (const std::exception& e) {
+      if (multiplayer) {
+        // make sure the communication_thread is joined. Otherwise it can hide the real exception.
+        communication_thread.join();
+      }
+      throw e;
+    }
+
+    client_manager->CloseConnectionWithServer();
+    // wait until connection is properly closed
+    while (client_manager->HasConnections()) {
+      client_manager->HandleConnections();
+      std::this_thread::sleep_for(std::chrono::microseconds(100));
+    }
+  } else {
+    RunMainThread();
+  }
+}
+
+void GameClient::RunMainThread() {
   while (keep_running) {
     auto player = weak_player.lock();
     assert(player != nullptr);
 
     auto now = std::chrono::steady_clock::now();
 
-    ProcessInput();
+    auto optional_change = ProcessInput();
 
-    if (multiplayer) {
-      client_manager->HandleConnections(now);
-      HandleEvent(player, client_manager->PopAndGetOldestEvent());
+    if (optional_change.has_value()) {
+      const auto& change = *optional_change;
+      if (multiplayer) {
+        std::lock_guard<std::mutex> lock_guard(communication_mutex);
+        client_manager->SendDataToServer(change.payload);
+      } else {
+        GameLogic::HandleChange(*player, change, world);
+      }
     }
 
     if (world.updated || player->updated || updated) {
@@ -93,24 +124,25 @@ void GameClient::Run() {
         player->updated = false;
         updated = false;
 
+        {
+          std::lock_guard<std::mutex> lock_guard(world_mutex);
+          world_render_copy = world;
+        }
+
         terminal->SetScreen(compositor->CompositeViewport());
       }
     }
 
-    std::this_thread::sleep_for(std::chrono::microseconds(100));
-  }
-
-  if (multiplayer) {
-    client_manager->CloseConnectionWithServer();
-    // wait until connection is properly closed
-    while (client_manager->HasConnections()) {
-      client_manager->HandleConnections();
-      std::this_thread::sleep_for(std::chrono::microseconds(100));
+    const auto& start = now;
+    auto end = std::chrono::steady_clock::now();
+    auto delta = end - start;
+    if (delta < min_main_loop_interval) {
+      std::this_thread::sleep_for(min_main_loop_interval - delta);
     }
   }
 }
 
-void GameClient::ProcessInput() {
+std::optional<Change> GameClient::ProcessInput() {
   if (terminal->HasInput()) {
     int keypress = terminal->GetInput();
     auto keycode = static_cast<KeyCode>(keypress);
@@ -120,32 +152,28 @@ void GameClient::ProcessInput() {
       switch (keycode) {
         case KeyCode::ESCAPE: {
           StartExit();
-          return;
+          return {};
         }
         case KeyCode::Y: {
           compositor->show_player_list ^= true;
           updated = true;
-          return;
+          return {};
         }
         case KeyCode::X: {
           compositor->show_statistics_table ^= true;
           updated = true;
-          return;
+          return {};
         }
         default:
-          return;
+          return {};
       }
     }
 
-    auto change = change_type_it->second;
-    if (multiplayer) {
-      client_manager->SendDataToServer(change.payload);
-    } else {
-      auto player = weak_player.lock();
-      assert(player != nullptr);
-      GameLogic::HandleChange(*player, change, world);
-    }
+    auto& change = change_type_it->second;
+    return {change};
   }
+
+  return {};
 }
 
 const world::World& GameClient::GetWorld() const {
@@ -204,4 +232,31 @@ void GameClient::HandleEvent(const std::shared_ptr<Player>& player,
       throw std::runtime_error("Unexpected ChangeType");
     }
   }
+}
+
+void GameClient::StartCommunicationThread() {
+  communication_thread = std::thread([this] {
+    while (keep_running) {
+      auto start = std::chrono::steady_clock::now();
+
+      {
+        std::lock_guard<std::mutex> lock_guard(communication_mutex);
+        client_manager->HandleConnections(start);
+      }
+
+      {
+        std::lock_guard<std::mutex> lock_guard(world_mutex);
+
+        auto player = weak_player.lock();
+        assert(player != nullptr);
+        HandleEvent(player, client_manager->PopAndGetOldestEvent());
+      }
+
+      auto end = std::chrono::steady_clock::now();
+      auto delta = end - start;
+      if (delta < min_communication_loop_interval) {
+        std::this_thread::sleep_for(min_communication_loop_interval - delta);
+      }
+    }
+  });
 }
