@@ -32,14 +32,14 @@ GameServer::GameServer(const coordinate_size_t &world_size, bool empty_world,
 }
 
 void GameServer::RunIteration(bool performance_mode) {
-  auto now = std::chrono::steady_clock::now();
+  auto start = std::chrono::steady_clock::now();
 
-  if (!performance_mode || now - last_full_connection_handle >= full_connection_handle_interval) {
-    last_full_connection_handle = now;
+  if (!performance_mode || start - last_full_connection_handle >= full_connection_handle_interval) {
+    last_full_connection_handle = start;
 
-    server_manager->HandleConnections(now);
+    server_manager->HandleConnections(start);
   } else {
-    server_manager->FastHandleConnections(now);
+    server_manager->FastHandleConnections(start);
   }
 
   auto event = server_manager->PopAndGetOldestEvent();
@@ -48,20 +48,20 @@ void GameServer::RunIteration(bool performance_mode) {
     event = server_manager->PopAndGetOldestEvent();
   }
 
-  if (now - last_moving_projectiles_updated >= update_projectiles_interval) {
+  if (start - last_moving_projectiles_updated >= update_projectiles_interval) {
     // Moving projectiles should be updated in a lower frequency
 
-    last_moving_projectiles_updated = now;
+    last_moving_projectiles_updated = start;
     GameLogic::HandleProjectiles(*world);
   }
 
-  if (now - last_item_generated >= generate_item_interval) {
-    last_item_generated = now;
+  if (start - last_item_generated >= generate_item_interval) {
+    last_item_generated = start;
     world->GetItemGenerator().GenerateItem();
   }
 
-  if (now - last_world_sent >= send_world_interval) {
-    last_world_sent = now;
+  if (start - last_world_sent >= send_world_interval) {
+    last_world_sent = start;
 
     GameLogic::ReduceColoredFieldLifetimes(*world);
 
@@ -79,6 +79,12 @@ void GameServer::RunIteration(bool performance_mode) {
     Change action(ChangeType::UPDATE_WORLD);
     world->SerializeUpdate(action.payload);
     server_manager->Broadcast(action.payload);
+  }
+
+  auto end = std::chrono::steady_clock::now();
+  auto loop_duration = end - start;
+  if (loop_duration < min_run_loop_interval) {
+    std::this_thread::sleep_for(min_run_loop_interval - loop_duration);
   }
 }
 
