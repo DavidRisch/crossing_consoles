@@ -15,7 +15,9 @@ using namespace game::terminal;
 GameClient *GAME_CLIENT;
 
 void SignalHandler(int signal) {
-  assert(signal == SIGINT);
+  if (signal != SIGINT) {
+    throw std::runtime_error("Unexpected signal caught");
+  }
   assert(GAME_CLIENT != nullptr);
   GAME_CLIENT->StartExit();
 }
