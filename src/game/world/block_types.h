@@ -22,6 +22,7 @@ enum class BlockType {
   PLAYER_DOWN,
   PLAYER_LEFT,
   PLAYER_RIGHT,
+  PLAYER_DEAD,
 
   PROJECTILE
 };
