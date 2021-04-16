@@ -22,8 +22,9 @@ class GameServer {
 
   /**
    * \brief Handle connections to `GameClient`s. Should be called in a loop.
+   * \param performance_mode Improves overall performance of the server. Increases time until a new client connects.
    */
-  void RunIteration();
+  void RunIteration(bool performance_mode = false);
 
   [[nodiscard]] const world::World &GetWorld() const;
 
@@ -48,6 +49,10 @@ class GameServer {
   /// Used to generate new items in the world
   std::chrono::time_point<std::chrono::steady_clock> last_item_generated;
   static constexpr auto generate_item_interval = std::chrono::seconds(10);
+
+  /// Used to improve performance by accepting new clients less often
+  std::chrono::time_point<std::chrono::steady_clock> last_full_connection_handle;
+  static constexpr auto full_connection_handle_interval = std::chrono::milliseconds(250);
 
   static constexpr int max_player_count = 32;
 

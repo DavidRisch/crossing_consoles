@@ -21,18 +21,30 @@ SocketByteStream::SocketByteStream(file_descriptor_t socket_file_descriptor,
 
 std::shared_ptr<SocketByteStream> SocketByteStream::CreateClientSide(
     const std::shared_ptr<IConnectionSimulatorProvider> &connection_simulator_provider, uint16_t port) {
-  file_descriptor_t socket_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
+  file_descriptor_t socket_file_descriptor = socket(SOCKET_PROTOCOL_FAMILY, SOCK_STREAM, 0);
   if (socket_file_descriptor < 0) {
     throw std::runtime_error("socket failed");
   }
 
+#ifdef USE_UNIX_SOCKET
+  // port has no effect if in UNIX socket mode (so it should have its default value)
+  assert(port == socket_default_port);
+
+  struct sockaddr_un server_address {};
+  server_address.sun_family = AF_UNIX;
+  strcpy(server_address.sun_path, SOCKET_FILE_PATH);
+  socklen_t server_address_length = SUN_LEN(&server_address);
+#else
   struct sockaddr_in server_address {};
   server_address.sin_family = AF_INET;
   server_address.sin_port = htons(port);
 
   server_address.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-  if (connect(socket_file_descriptor, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) {
+  socklen_t server_address_length = sizeof(server_address);
+#endif
+
+  if (connect(socket_file_descriptor, (struct sockaddr *)&server_address, server_address_length) < 0) {
     if (errno == ECONNREFUSED) {
       throw ConnectionRefusedException();
     }
@@ -155,12 +167,14 @@ bool SocketByteStream::HasInput() {
 }
 void SocketByteStream::ConfigureSocket() {
 #ifndef _WIN32
+#ifndef USE_UNIX_SOCKET
   // Fix issue causing high latency. See: https://stackoverflow.com/a/39272176
   int tcp_no_delay_value = 1;
   if (setsockopt(socket_holder->file_descriptor, IPPROTO_TCP, TCP_NODELAY, (char *)&tcp_no_delay_value, sizeof(int)) ==
       -1) {
     throw std::runtime_error("setsockopt failed");
   }
+#endif
 #endif
 }
 

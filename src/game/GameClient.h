@@ -73,6 +73,9 @@ class GameClient {
       {KeyCode::SPACE, networking::Change(networking::ChangeType::USE_ITEM)},
   };
 
+  std::chrono::time_point<std::chrono::steady_clock> last_draw;
+  static constexpr auto min_draw_interval = std::chrono::milliseconds(50);
+
   /**
    * \brief Handle an `Event` caused by the `GameServer`.
    */

@@ -31,7 +31,7 @@ class Compositor {
   /**
    * \brief Create game output that is printed to the console.
    */
-  [[nodiscard]] ColoredCharMatrix CompositeViewport() const;
+  [[nodiscard]] const ColoredCharMatrix& CompositeViewport();
 
   void SetConnectionStatistics(const communication::connection_layer::ConnectionStatistics& connection_statistics);
 
@@ -57,6 +57,22 @@ class Compositor {
    * \brief Add a frame around the given `ColoredCharMatrix`.
    */
   static ColoredCharMatrix DrawFrame(const ColoredCharMatrix& content);
+
+  /// border size = number of characters used to draw the frame
+  static const int border_size_x = 1;
+
+  static const int header_height = 6;
+  static const int trailer_height = 3;
+
+  /// calculate number of characters needed to display world output
+  const common::coordinate_size_t game_character_count = game_viewport_size * block_size;
+
+  const int game_output_size_x =
+      game_character_count.x + border_size_x * 2;  // one character at the left and right is added for box lines
+  const int game_output_size_y = game_character_count.y + header_height + trailer_height;
+
+  /// This is an attribute because clearing this object from scratch is slow.
+  ColoredCharMatrix game_output;
 };
 
 }  // namespace game::visual

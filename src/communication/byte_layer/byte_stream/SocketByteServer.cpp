@@ -1,5 +1,7 @@
 #include "SocketByteServer.h"
 
+#include <cassert>
+
 #include "socket_libs.h"
 
 using namespace communication;
@@ -26,7 +28,7 @@ SocketByteServer::SocketByteServer(
       throw std::runtime_error("no usable Winsock.dll");
     }
 #endif
-    file_descriptor_t server_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
+    file_descriptor_t server_file_descriptor = socket(SOCKET_PROTOCOL_FAMILY, SOCK_STREAM, 0);
 
     // Create socket
     if ((server_file_descriptor) < 0) {
@@ -50,14 +52,33 @@ SocketByteServer::SocketByteServer(
   }
 #endif
 
+#ifdef USE_UNIX_SOCKET
+  if (remove(SOCKET_FILE_PATH) != 0) {
+    // ignore 'No such file or directory'
+    if (errno != ENOENT) {
+      throw std::runtime_error("remove failed " + std::to_string(errno));
+    }
+  }
+
+  // port has no effect if in UNIX socket mode (so it should have its default value)
+  assert(port == socket_default_port);
+
+  struct sockaddr_un address {};
+  address.sun_family = AF_UNIX;
+  strcpy(address.sun_path, SOCKET_FILE_PATH);
+  socklen_t address_length = SUN_LEN(&address);
+#else
   struct sockaddr_in address {};
   address.sin_family = AF_INET;
   address.sin_addr.s_addr = INADDR_ANY;
 
   address.sin_port = htons(port);
 
+  socklen_t address_length = sizeof(address);
+#endif
+
   // Attach to port
-  if (bind(socket_holder->file_descriptor, (struct sockaddr *)&address, sizeof(address)) < 0) {
+  if (bind(socket_holder->file_descriptor, (struct sockaddr *)&address, address_length) < 0) {
     throw std::runtime_error("bind failed");
   }
   if (listen(socket_holder->file_descriptor, max_connections) < 0) {

@@ -61,7 +61,7 @@ class Connection {
    */
   void BlockingEstablish();
 
-  void Handle();
+  void Handle(std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now());
 
   /**
    * \brief Add a message to the send queue and call Handle.
@@ -73,7 +73,8 @@ class Connection {
    * \brief Receive and message and send acknowledge message.
    * \details Sends acknowledge message only if received message type is not acknowledge.
    */
-  std::shared_ptr<message_layer::Message> ReceiveMessage();
+  std::shared_ptr<message_layer::Message> ReceiveMessage(
+      std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now());
 
   /**
    * \brief Thrown if something goes wrong during the handshake so the Connection can not be established.
@@ -116,12 +117,13 @@ class Connection {
   /**
    * \brief Send a message.
    */
-  void SendMessageNow(const std::shared_ptr<message_layer::Message>& message, bool expect_acknowledge = true);
+  void SendMessageNow(const std::shared_ptr<message_layer::Message>& message, std::chrono::steady_clock::time_point now,
+                      bool expect_acknowledge = true);
 
   /**
    * Calls `ResendLastMessages()` if the last messages probably has not been received.
    */
-  void ResendIfNecessary();
+  void ResendIfNecessary(std::chrono::steady_clock::time_point now);
 
   /**
    * \brief Resends all Messages which might not have been received.
@@ -132,18 +134,18 @@ class Connection {
    *
    * \brief Check for timeout while receiving messages
    */
-  std::shared_ptr<message_layer::Message> ReceiveWithTimeout();
+  std::shared_ptr<message_layer::Message> ReceiveWithTimeout(std::chrono::steady_clock::time_point now);
 
   /**
    * \brief Receives 1 or 0 new messages and adds them to the `receive_message_queue`.
    * \brief Returns true iff another call might receive the next message.
    */
-  bool TryReceive();
+  bool TryReceive(std::chrono::steady_clock::time_point now);
 
   /**
    * \brief Call `TryReceive()` until no new messages can be received.
    */
-  void ReceiveAll();
+  void ReceiveAll(std::chrono::steady_clock::time_point now);
 
   /// The sequence number of the last send message not including acknowledge and NACK messages.
   sequence_t last_send_sequence{};
@@ -163,7 +165,7 @@ class Connection {
   /**
    * \brief Send acknowledge message for a received message identified by its sequence to the specified address.
    */
-  void SendAcknowledge(sequence_t sequence);
+  void SendAcknowledge(sequence_t sequence, std::chrono::steady_clock::time_point now);
 
   /**
    * \brief Return current sequence count and increment sequence counter.

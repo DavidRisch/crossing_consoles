@@ -31,30 +31,39 @@ GameServer::GameServer(const coordinate_size_t &world_size, bool empty_world,
       communication::connection_layer::ServerSideConnectionManager::CreateServerSide(communication_timeout);
 }
 
-void GameServer::RunIteration() {
-  server_manager->HandleConnections();
+void GameServer::RunIteration(bool performance_mode) {
+  auto now = std::chrono::steady_clock::now();
+
+  if (!performance_mode || now - last_full_connection_handle >= full_connection_handle_interval) {
+    last_full_connection_handle = now;
+
+    server_manager->HandleConnections(now);
+  } else {
+    server_manager->FastHandleConnections(now);
+  }
+
   auto event = server_manager->PopAndGetOldestEvent();
   while (event != nullptr) {
     HandleEvent(event);
     event = server_manager->PopAndGetOldestEvent();
   }
 
-  if (std::chrono::steady_clock::now() - last_moving_projectiles_updated >= update_projectiles_interval) {
+  if (now - last_moving_projectiles_updated >= update_projectiles_interval) {
     // Moving projectiles should be updated in a lower frequency
 
-    last_moving_projectiles_updated = std::chrono::steady_clock::now();
+    last_moving_projectiles_updated = now;
     GameLogic::HandleProjectiles(*world);
   }
 
-  if (std::chrono::steady_clock::now() - last_item_generated >= generate_item_interval) {
-    last_item_generated = std::chrono::steady_clock::now();
+  if (now - last_item_generated >= generate_item_interval) {
+    last_item_generated = now;
     world->GetItemGenerator().GenerateItem();
   }
 
-  if (std::chrono::steady_clock::now() - last_world_sent >= send_world_interval) {
-    GameLogic::ReduceColoredFieldLifetimes(*world);
+  if (now - last_world_sent >= send_world_interval) {
+    last_world_sent = now;
 
-    last_world_sent = std::chrono::steady_clock::now();
+    GameLogic::ReduceColoredFieldLifetimes(*world);
 
     for (const auto &player : world->players) {
       // Check if player needs to be respawned

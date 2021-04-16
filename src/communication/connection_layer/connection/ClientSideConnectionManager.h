@@ -19,7 +19,7 @@ class ClientSideConnectionManager : public ConnectionManager {
    * \brief Check for and process new messages and timeouts.
    * \details On client side only the server connection is managed.
    */
-  void HandleConnections() override;
+  void HandleConnections(std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now()) override;
 
   /**
    * \brief Send a Message from a Client to the Server
