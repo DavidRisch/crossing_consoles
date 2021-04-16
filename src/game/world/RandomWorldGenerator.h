@@ -66,7 +66,7 @@ class RandomWorldGenerator : public IWorldGenerator {
    * \brief Generate doors in buildings.
    * \details Used in GenerateBuildings().
    */
-  void GenerateDoors(std::mt19937& random, const common::Position& start, const common::Position& end);
+  void GenerateDoors(const common::Position& start, const common::Position& end);
 
   /**
    * \brief Generate random noise for coordinate pair and corresponding octave.
@@ -91,7 +91,8 @@ class RandomWorldGenerator : public IWorldGenerator {
    */
   double PerlinNoise(double x, double y);
 
-  std::mt19937 mersenne_twister;
+  std::mt19937 random;
+  std::mt19937 random_perlin_noise;
 };
 
 }  // namespace game::world
