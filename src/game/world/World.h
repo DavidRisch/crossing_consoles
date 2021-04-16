@@ -34,6 +34,8 @@ class World : public networking::ISerializable {
 
   explicit World(common::coordinate_size_t size);
 
+  World();
+
   void AddPlayer(const std::shared_ptr<Player>& player);
 
   void RemovePlayer(GameDefinition::player_id_t player_id);
