@@ -19,6 +19,7 @@ RandomWorldGenerator::RandomWorldGenerator(int seed) {
 
 void RandomWorldGenerator::Construct(int new_seed) {
   seed = new_seed;
+  random.seed(seed);
 
   height_map.SetType(10, BlockType::EMPTY_BLOCK);
   height_map.SetType(28, BlockType::WALL_ROCK_LIGHT);
@@ -50,7 +51,15 @@ void RandomWorldGenerator::GenerateHeight() {
   double height;
   for (int x = 0; x < size.x; x++) {
     for (int y = 0; y < size.y; y++) {
-      height = PerlinNoise(x, y) * 2;
+      height = PerlinNoise(x, y);
+
+      int distance_to_closest_edge = std::min({x, size.x - x - 1, y, size.y - y - 1});
+
+      // smooth out walls next to world edges
+      if (distance_to_closest_edge < smoothing_distance) {
+        double factor = distance_to_closest_edge / (double)smoothing_distance;
+        height *= factor;
+      }
 
       BlockType type = height_map.GetType((int)height);
       if (type == BlockType::EMPTY_BLOCK) {
@@ -65,7 +74,6 @@ void RandomWorldGenerator::GenerateHeight() {
 }
 
 void RandomWorldGenerator::GenerateBuildings() {
-  std::mt19937 random(seed);
   std::uniform_int_distribution<int> position_x(0, size.x - building_size_max.x - 1);
   std::uniform_int_distribution<int> position_y(0, size.y - building_size_max.y - 1);
   std::uniform_int_distribution<int> size_x(building_size_min.x, building_size_max.x);
@@ -97,11 +105,11 @@ void RandomWorldGenerator::GenerateBuildings() {
       }
     }
 
-    GenerateDoors(random, start, end);
+    GenerateDoors(start, end);
   }
 }
 
-void RandomWorldGenerator::GenerateDoors(std::mt19937& random, const Position& start, const Position& end) {
+void RandomWorldGenerator::GenerateDoors(const Position& start, const Position& end) {
   std::uniform_int_distribution<int> building_x(start.x + 1, end.x - 2);
   std::uniform_int_distribution<int> building_y(start.y + 1, end.y - 2);
   std::uniform_int_distribution<int> door_chance(0, 1);
@@ -136,9 +144,9 @@ void RandomWorldGenerator::GenerateDoors(std::mt19937& random, const Position& s
 
 double RandomWorldGenerator::GenerateNoise(int i, int x, int y) {
   std::uniform_real_distribution<double> noise_distribution = std::uniform_real_distribution<double>(-1.0, 1.0);
-  mersenne_twister.seed(seed + (i + 1) * (x + (y * size.x)));
+  random_perlin_noise.seed(seed + (i + 1) * (x + (y * size.x)));
 
-  return noise_distribution(mersenne_twister);
+  return noise_distribution(random_perlin_noise);
 }
 
 double RandomWorldGenerator::SmoothNoise(int i, int x, int y) {
@@ -185,5 +193,5 @@ double RandomWorldGenerator::PerlinNoise(double x, double y) {
     amplitude = pow(persistence, i);
     total += InterpolateNoise(i, x / frequency, y / frequency) * amplitude;
   }
-  return total / frequency;
+  return total / frequency * height_factor;
 }

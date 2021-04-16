@@ -30,19 +30,22 @@ class RandomWorldGenerator : public IWorldGenerator {
   void Construct(int seed);
 
   std::shared_ptr<World> world;
-
-  int seed{};
   common::coordinate_size_t size = common::coordinate_size_t(0, 0);
 
+  int seed{};
   HeightMap height_map;
+  const int smoothing_distance = 5;
 
+  // building generation parameters
   int building_count{};
   double building_rate = 0.1;
   const common::coordinate_size_t building_size_min = common::coordinate_size_t(7, 5);
   const common::coordinate_size_t building_size_max = common::coordinate_size_t(12, 10);
 
+  // perlin noise parameters
   const double persistence = 10;
   const int octaves = 4;
+  const int height_factor = 2;
 
   /**
    * \brief Generate landscape from heightmap.
@@ -56,7 +59,7 @@ class RandomWorldGenerator : public IWorldGenerator {
    * \brief Generate doors in buildings.
    * \details Used in GenerateBuildings().
    */
-  void GenerateDoors(std::mt19937& random, const common::Position& start, const common::Position& end);
+  void GenerateDoors(const common::Position& start, const common::Position& end);
 
   /**
    * \brief Generate random noise for coordinate pair and corresponding octave.
@@ -81,7 +84,8 @@ class RandomWorldGenerator : public IWorldGenerator {
    */
   double PerlinNoise(double x, double y);
 
-  std::mt19937 mersenne_twister;
+  std::mt19937 random;
+  std::mt19937 random_perlin_noise;
 };
 
 }  // namespace game::world
