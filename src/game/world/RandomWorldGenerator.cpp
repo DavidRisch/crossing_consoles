@@ -39,7 +39,7 @@ std::shared_ptr<World> RandomWorldGenerator::GenerateWorld(const coordinate_size
 
   if (size.IsGreater(building_size_max)) {
     // TODO: add support for bigger world and enable buildings
-    // GenerateBuildings();
+    GenerateBuildings();
   }
 
   return world;
@@ -47,29 +47,33 @@ std::shared_ptr<World> RandomWorldGenerator::GenerateWorld(const coordinate_size
 
 void RandomWorldGenerator::GenerateHeight() {
   // generate landscape based on heightmap
+  int empty_blocks = 0;
   double height;
   for (int x = 0; x < size.x; x++) {
     for (int y = 0; y < size.y; y++) {
       height = PerlinNoise(x, y) * 2;
 
       BlockType type = height_map.GetType((int)height);
+      if (type == BlockType::EMPTY_BLOCK) {
+        empty_blocks++;
+      }
       if (type >= BlockType::WALL_START && type <= BlockType::WALL_END) {
         world->AddWall(Position(x, y), type);
       }
     }
   }
+  building_count = empty_blocks / (building_size_max.x * building_size_max.y) * building_rate;
 }
 
 void RandomWorldGenerator::GenerateBuildings() {
   std::mt19937 random(seed);
-  std::uniform_int_distribution<int> count(building_count_min, building_count_max);
   std::uniform_int_distribution<int> position_x(0, size.x - building_size_max.x - 1);
   std::uniform_int_distribution<int> position_y(0, size.y - building_size_max.y - 1);
   std::uniform_int_distribution<int> size_x(building_size_min.x, building_size_max.x);
   std::uniform_int_distribution<int> size_y(building_size_min.y, building_size_max.y);
 
   // generate buildings
-  for (int n = count(random); n > 0; n--) {
+  for (int n = building_count; n > 0; n--) {
     // calculate start and end position of building
     Position start(position_x(random), position_y(random));
     Position end = start + Position(size_x(random), size_y(random));
