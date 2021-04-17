@@ -14,15 +14,14 @@ void Position::Set(int x_new, int y_new) {
 }
 
 Position Position::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
-  coordinate_t x = *input_iterator++;
-  coordinate_t y = *input_iterator++;
+  auto x = networking::SerializationUtils::DeserializeObject<coordinate_t>(input_iterator);
+  auto y = networking::SerializationUtils::DeserializeObject<coordinate_t>(input_iterator);
   return Position(x, y);
 }
 
 void Position::Serialize(std::vector<uint8_t> &output_vector) const {
-  // TODO: use two bytes each
-  output_vector.push_back(x);
-  output_vector.push_back(y);
+  networking::SerializationUtils::SerializeObject(x, output_vector);
+  networking::SerializationUtils::SerializeObject(y, output_vector);
 }
 
 Position Position::operator+(const Position &other_position) const {

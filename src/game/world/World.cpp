@@ -150,7 +150,7 @@ void World::SerializeUpdate(std::vector<uint8_t>& output_vector) const {
   }
 
   ISerializable::SerializeList(output_vector, projectiles);
-  ISerializable::SerializeMap(output_vector, colored_fields);
+  ISerializable::SerializeMap(output_vector, colored_fields, false);
 }
 
 World World::Deserialize(std::vector<uint8_t>::iterator& input_iterator) {
@@ -191,9 +191,7 @@ World World::DeserializeUpdate(std::vector<uint8_t>::iterator& input_iterator, W
 
   auto colored_field_count = ISerializable::DeserializeContainerLength(input_iterator);
   for (size_t i = 0; i < colored_field_count; ++i) {
-    auto position = Position::Deserialize(input_iterator);
     auto colored_field = ColoredField::Deserialize(input_iterator);
-    assert(position == colored_field.GetPosition());
     world.AddColoredField(colored_field);
   }
 

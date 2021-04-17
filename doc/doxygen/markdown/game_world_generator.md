@@ -40,7 +40,10 @@ The height is used by the class `HeightMap` to determine what block type to use.
 
 ## Generation of simple buildings
 
-The number of buildings generated depends on the size of the world. If it is too small, no buildings are created.
+The number of buildings generated depends on the size of the world:  
+While the landscape is being generated, all the occurring empty blocks are counted.  
+The number of buildings is calculated by dividing the remaining area of open space by the maximum area of a building.  
+The result is multiplied by the specified `building_rate` (`0.0` - `1.0`).
 
 To generate buildings, rectangles between a minimum and maximum size are randomly created and placed in the existing
 world.  

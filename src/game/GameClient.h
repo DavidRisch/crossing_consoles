@@ -15,7 +15,7 @@
 
 namespace game {
 
-enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' ', Y = 'y', X = 'x' };
+enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' ', Y = 'y', X = 'x', C = 'c' };
 
 /**
  * \brief Handles keyboard input and connection to `GameServer`.
@@ -67,6 +67,8 @@ class GameClient {
 
   /// Indicates some kind of change which requires a new frame to be drawn.
   bool updated = false;
+
+  bool simulate_bad_connection = false;
 
   /// Map keycode to associated change
   std::unordered_map<const KeyCode, networking::Change> map_key_to_change = {

@@ -46,7 +46,9 @@ class RealTerminal : public ITerminal {
    */
   void Clear();
 
-#ifndef _WIN32
+#ifdef _WIN32
+  COORD terminal_size;
+#else
   struct winsize terminal_size {};
 #endif
 };

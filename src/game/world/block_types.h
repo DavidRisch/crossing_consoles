@@ -18,9 +18,13 @@ enum class BlockType {
   WALL_START = WALL_BRICK,
   WALL_END = WALL_SNOW_FULL,
 
-  PLAYER_BLOCK,
+  PLAYER_UP,
+  PLAYER_DOWN,
+  PLAYER_LEFT,
+  PLAYER_RIGHT,
+  PLAYER_DEAD,
 
-  PROJECTILE_BLOCK
+  PROJECTILE
 };
 
 }  // namespace game::world

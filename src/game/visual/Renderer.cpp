@@ -19,7 +19,7 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
     , own_player(&own_player)
     , sprite_map(SpriteMap(block_size)) {
   ColoredCharMatrix wall_brick_sprite(block_size);
-  wall_brick_sprite.AppendString(std::wstring(9, light_shade), Color::WHITE, Color::RED);
+  wall_brick_sprite.AppendString(std::wstring(9, light_shade), Color::WHITE, Color::LIGHT_BROWN);
 
   ColoredCharMatrix wall_rock_light_sprite(block_size);
   wall_rock_light_sprite.AppendString(std::wstring(9, light_shade), Color::GREY);
@@ -45,14 +45,50 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
   ColoredCharMatrix wall_snow_full_sprite(block_size);
   wall_snow_full_sprite.AppendString(std::wstring(9, full_block), Color::WHITE);
 
-  ColoredCharMatrix player_sprite(block_size);
-  player_sprite.AppendChar(L' ');
-  player_sprite.AppendChar(white_circle);
-  player_sprite.AppendChar(L' ');
-  player_sprite.AppendChar(box_drawings_light_horizontal);
-  player_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
-  player_sprite.AppendChar(box_drawings_light_horizontal);
-  player_sprite.AppendString(L"/ \\");
+  ColoredCharMatrix player_up_sprite(block_size);
+  player_up_sprite.AppendChar(L' ');
+  player_up_sprite.AppendChar(white_circle);
+  player_up_sprite.AppendChar(L' ');
+  player_up_sprite.AppendChar(box_drawings_light_up_and_right);
+  player_up_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
+  player_up_sprite.AppendChar(box_drawings_light_up_and_left);
+  player_up_sprite.AppendString(L"/ \\");
+
+  ColoredCharMatrix player_down_sprite(block_size);
+  player_down_sprite.AppendChar(L' ');
+  player_down_sprite.AppendChar(white_circle);
+  player_down_sprite.AppendChar(L' ');
+  player_down_sprite.AppendChar(box_drawings_light_down_and_right);
+  player_down_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
+  player_down_sprite.AppendChar(box_drawings_light_down_and_left);
+  player_down_sprite.AppendString(L"/ \\");
+
+  ColoredCharMatrix player_left_sprite(block_size);
+  player_left_sprite.AppendChar(L' ');
+  player_left_sprite.AppendChar(white_circle);
+  player_left_sprite.AppendChar(L' ');
+  player_left_sprite.AppendChar(box_drawings_light_horizontal);
+  player_left_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
+  player_left_sprite.AppendChar(L' ');
+  player_left_sprite.AppendString(L"/ \\");
+
+  ColoredCharMatrix player_right_sprite(block_size);
+  player_right_sprite.AppendChar(L' ');
+  player_right_sprite.AppendChar(white_circle);
+  player_right_sprite.AppendChar(L' ');
+  player_right_sprite.AppendChar(L' ');
+  player_right_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
+  player_right_sprite.AppendChar(box_drawings_light_horizontal);
+  player_right_sprite.AppendString(L"/ \\");
+
+  ColoredCharMatrix player_dead_sprite(block_size);
+  player_dead_sprite.AppendChar(L' ');
+  player_dead_sprite.AppendChar(L' ');
+  player_dead_sprite.AppendChar(L' ');
+  player_dead_sprite.AppendChar(box_drawings_light_down_and_right);
+  player_dead_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
+  player_dead_sprite.AppendChar(box_drawings_light_down_and_left);
+  player_dead_sprite.AppendString(L"/ \\");
 
   ColoredCharMatrix projectile_sprite(block_size);
   projectile_sprite.AppendString(L"    o    ");
@@ -66,8 +102,12 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
   sprite_map.SetSprite(BlockType::WALL_SNOW_MEDIUM, wall_snow_medium_sprite);
   sprite_map.SetSprite(BlockType::WALL_SNOW_HEAVY, wall_snow_heavy_sprite);
   sprite_map.SetSprite(BlockType::WALL_SNOW_FULL, wall_snow_full_sprite);
-  sprite_map.SetSprite(BlockType::PLAYER_BLOCK, player_sprite);
-  sprite_map.SetSprite(BlockType::PROJECTILE_BLOCK, projectile_sprite);
+  sprite_map.SetSprite(BlockType::PLAYER_UP, player_up_sprite);
+  sprite_map.SetSprite(BlockType::PLAYER_DOWN, player_down_sprite);
+  sprite_map.SetSprite(BlockType::PLAYER_LEFT, player_left_sprite);
+  sprite_map.SetSprite(BlockType::PLAYER_RIGHT, player_right_sprite);
+  sprite_map.SetSprite(BlockType::PLAYER_DEAD, player_dead_sprite);
+  sprite_map.SetSprite(BlockType::PROJECTILE, projectile_sprite);
 }
 
 ColoredCharMatrix Renderer::RenderWorld() const {
@@ -125,8 +165,7 @@ ColoredCharMatrix Renderer::RenderWorld() const {
           // get projectile position as rendered viewport coordinates
           Position relative_position = position - viewport_start;
           // insert projectile sprite
-          rendered_world.InsertMatrix(sprite_map.GetSprite(BlockType::PROJECTILE_BLOCK),
-                                      relative_position * block_size);
+          rendered_world.InsertMatrix(sprite_map.GetSprite(BlockType::PROJECTILE), relative_position * block_size);
         }
       }
     }
@@ -142,8 +181,28 @@ ColoredCharMatrix Renderer::RenderWorld() const {
         if (position.IsGreaterOrEqual(viewport_start) && position.IsLessOrEqual(viewport_end)) {
           // get player position as rendered viewport coordinates
           Position relative_position = position - viewport_start;
+
+          // get player sprite depending on direction and life status
+          ColoredCharMatrix colored_player_sprite(block_size);
+          if (player->IsAlive()) {
+            switch (player->direction) {
+              case GameDefinition::NORTH:
+                colored_player_sprite.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_UP));
+                break;
+              case GameDefinition::SOUTH:
+                colored_player_sprite.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_DOWN));
+                break;
+              case GameDefinition::WEST:
+                colored_player_sprite.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_LEFT));
+                break;
+              case GameDefinition::EAST:
+                colored_player_sprite.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_RIGHT));
+                break;
+            }
+          } else {
+            colored_player_sprite.InsertMatrix(sprite_map.GetSprite(BlockType::PLAYER_DEAD));
+          }
           // insert player sprite
-          ColoredCharMatrix colored_player_sprite(sprite_map.GetSprite(BlockType::PLAYER_BLOCK));
           colored_player_sprite.SetAllColors(player->color);
           rendered_world.InsertMatrix(colored_player_sprite, relative_position * block_size);
         }

@@ -188,6 +188,11 @@ TEST_F(GameNetworking, TwoPlayers) {
   create_server_and_client();
   create_new_client(Position(3, 4));
 
+  auto first_player = game_server->GetWorld().GetPlayerById(1);
+  auto second_player = game_server->GetWorld().GetPlayerById(2);
+  first_player->position = Position(2, 3);
+  second_player->position = first_player->position + Position(2, 0);
+
   std::thread input_thread([this] {
     wait_for_renderer();
     std::vector<std::vector<std::vector<game::visual::ColoredChar>>> outputs_before;

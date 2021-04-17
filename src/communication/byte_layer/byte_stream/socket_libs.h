@@ -26,7 +26,6 @@
 
 #ifdef USE_UNIX_SOCKET
 const inline int SOCKET_PROTOCOL_FAMILY = PF_UNIX;
-const inline char* SOCKET_FILE_PATH = "/tmp/crossing_consoles_socket";
 #else
 const inline int SOCKET_PROTOCOL_FAMILY = PF_INET;
 #endif

@@ -83,8 +83,6 @@ std::shared_ptr<Connection> Connection::CreateServerSide(
 }
 
 bool Connection::TryEstablish() {
-  // TODO: implement in a none blocking way
-
   ResendIfNecessary(std::chrono::steady_clock::now());
 
   switch (state) {
