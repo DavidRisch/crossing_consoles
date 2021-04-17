@@ -45,6 +45,6 @@ ItemType Gun::GetItemType() {
 
 visual::ColoredCharMatrix Gun::GetSprite(common::coordinate_size_t block_size) {
   visual::ColoredCharMatrix colored_char_matrix = visual::ColoredCharMatrix(block_size);
-  colored_char_matrix.AppendChar(game::visual::symbols::not_sign);
+  colored_char_matrix.AppendChar(game::visual::symbols::reversed_not_sign);
   return colored_char_matrix;
 }
