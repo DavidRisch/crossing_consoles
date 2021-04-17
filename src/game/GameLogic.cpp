@@ -305,7 +305,7 @@ bool GameLogic::HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> 
 }
 
 void GameLogic::ApplyDamageToPlayer(Player &player, int damage) {
-  player.DecreaseHealth(damage);
+  player.ChangeHealth(damage);
   if (!player.IsAlive()) {
     player.Die();
   }

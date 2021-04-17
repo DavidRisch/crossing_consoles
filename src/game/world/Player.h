@@ -48,7 +48,7 @@ class Player : public networking::ISerializable {
   /**
    * \brief Decrease player's health by given damage.
    */
-  void DecreaseHealth(int damage);
+  void ChangeHealth(int damage);
 
   void Serialize(std::vector<uint8_t>& output_vector) const override;
 

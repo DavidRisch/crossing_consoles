@@ -35,6 +35,6 @@ TEST(Player, HasWeapon) {
 TEST(Player, DecreaseHealth) {
   Player player("player", Position(0, 0));
   int damage = 100;
-  player.DecreaseHealth(damage);
+  player.ChangeHealth(damage);
   ASSERT_FALSE(player.IsAlive());
 }

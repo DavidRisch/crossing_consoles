@@ -35,8 +35,14 @@ void Player::MoveTo(const Position &new_position) {
   updated = true;
 }
 
-void Player::DecreaseHealth(int damage) {
-  health -= damage;
+void Player::ChangeHealth(int damage) {
+  if (damage > 0) {  // damage
+    health -= damage;
+  } else {  // healing
+    if (health != max_health) {
+      health -= damage;
+    }
+  }
 }
 
 void Player::Serialize(std::vector<uint8_t> &output_vector) const {
@@ -106,7 +112,7 @@ void Player::IncreaseScore(uint16_t points) {
 void Player::SetItem(std::shared_ptr<IItem> new_item) {
   switch (new_item->GetItemType()) {
     case ItemType::HEART:
-      DecreaseHealth(-std::dynamic_pointer_cast<Heart>(new_item)->GetHealing());
+      ChangeHealth(-std::dynamic_pointer_cast<Heart>(new_item)->GetHealing());
       break;
     case ItemType::POINTS:
       IncreaseScore(std::dynamic_pointer_cast<Points>(new_item)->GetValue());
