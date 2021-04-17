@@ -79,8 +79,10 @@ class GameNetworking : public ::testing::Test {
 
     start_server();
     game_clients.push_back(std::make_shared<GameClient>(player, mock_terminals.back(), coordinate_size_t(1, 1), true,
-                                                        false, communication_timeout));
+                                                        false, communication_timeout, GameDefinition(), true));
     stop_server();
+
+    game_server->GetWorld().players.back()->position = position;
   }
 
   void wait_a_few_iterations() const {

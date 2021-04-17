@@ -24,7 +24,7 @@ class GameClient {
       const std::shared_ptr<world::Player>& player, const std::shared_ptr<terminal::ITerminal>& terminal,
       const common::coordinate_size_t& world_size, bool multiplayer = false, bool empty_world = false,
       communication::ProtocolDefinition::timeout_t communication_timeout = communication::ProtocolDefinition::timeout,
-      GameDefinition game_definition = GameDefinition());
+      GameDefinition game_definition = GameDefinition(), bool instant_input = false);
 
   /**
    * \brief Update world, player, projectiles and process changes.
@@ -82,6 +82,9 @@ class GameClient {
   std::chrono::time_point<std::chrono::steady_clock> last_move;
   static constexpr auto min_move_interval = std::chrono::milliseconds(100);
   std::optional<networking::ChangeType> next_move_type;
+
+  /// Used for testing, disables maximum frequency of input.
+  bool instant_input;
 
   /**
    * \brief Handle an `Event` caused by the `GameServer`.

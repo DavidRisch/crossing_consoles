@@ -25,12 +25,13 @@ using namespace game::visual;
 GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_ptr<ITerminal>& terminal,
                        const coordinate_size_t& world_size, bool multiplayer, bool empty_world,
                        communication::ProtocolDefinition::timeout_t communication_timeout,
-                       GameDefinition game_definition)
+                       GameDefinition game_definition, bool instant_input)
     : weak_player(player)
     , world(world_size)
     , terminal(terminal)
     , multiplayer(multiplayer)
-    , game_definition(std::move(game_definition)) {
+    , game_definition(std::move(game_definition))
+    , instant_input(instant_input) {
   assert(player != nullptr);
   assert(terminal != nullptr);
 
@@ -157,12 +158,14 @@ void GameClient::ProcessInput(std::chrono::steady_clock::time_point now) {
 
     auto& change = change_type_it->second;
 
-    if (change.IsMovement()) {
-      if (last_move + min_move_interval < now) {
-        last_move = now;
-      } else {
-        next_move_type = change.GetChangeType();
-        return;
+    if (!instant_input) {
+      if (change.IsMovement()) {
+        if (last_move + min_move_interval < now) {
+          last_move = now;
+        } else {
+          next_move_type = change.GetChangeType();
+          return;
+        }
       }
     }
 
