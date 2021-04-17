@@ -33,7 +33,6 @@ std::shared_ptr<SocketByteStream> SocketByteStream::CreateClientSide(
   }
   std::string socket_path = ProtocolDefinition::GetUnixSocketPath(port);
 
-
   struct sockaddr_un server_address {};
   server_address.sun_family = AF_UNIX;
   strcpy(server_address.sun_path, socket_path.c_str());
