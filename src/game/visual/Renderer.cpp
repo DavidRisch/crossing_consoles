@@ -47,7 +47,7 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
 
   ColoredCharMatrix player_up_sprite(block_size);
   player_up_sprite.AppendChar(L' ');
-  player_up_sprite.AppendChar(white_circle);
+  player_up_sprite.AppendChar(black_smiling_face);
   player_up_sprite.AppendChar(L' ');
   player_up_sprite.AppendChar(box_drawings_light_up_and_right);
   player_up_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
@@ -56,7 +56,7 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
 
   ColoredCharMatrix player_down_sprite(block_size);
   player_down_sprite.AppendChar(L' ');
-  player_down_sprite.AppendChar(white_circle);
+  player_down_sprite.AppendChar(black_smiling_face);
   player_down_sprite.AppendChar(L' ');
   player_down_sprite.AppendChar(box_drawings_light_down_and_right);
   player_down_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
@@ -65,7 +65,7 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
 
   ColoredCharMatrix player_left_sprite(block_size);
   player_left_sprite.AppendChar(L' ');
-  player_left_sprite.AppendChar(white_circle);
+  player_left_sprite.AppendChar(black_smiling_face);
   player_left_sprite.AppendChar(L' ');
   player_left_sprite.AppendChar(box_drawings_light_horizontal);
   player_left_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
@@ -74,7 +74,7 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
 
   ColoredCharMatrix player_right_sprite(block_size);
   player_right_sprite.AppendChar(L' ');
-  player_right_sprite.AppendChar(white_circle);
+  player_right_sprite.AppendChar(black_smiling_face);
   player_right_sprite.AppendChar(L' ');
   player_right_sprite.AppendChar(L' ');
   player_right_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
