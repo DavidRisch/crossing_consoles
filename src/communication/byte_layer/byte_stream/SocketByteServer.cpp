@@ -1,7 +1,8 @@
 #include "SocketByteServer.h"
 
-#include <cassert>
+#include <sys/stat.h>
 
+#include "../../ProtocolDefinition.h"
 #include "socket_libs.h"
 
 using namespace communication;
@@ -53,7 +54,8 @@ SocketByteServer::SocketByteServer(
 #endif
 
 #ifdef USE_UNIX_SOCKET
-  if (remove(SOCKET_FILE_PATH) != 0) {
+  std::string socket_path = ProtocolDefinition::GetUnixSocketPath(port);
+  if (remove(socket_path.c_str()) != 0) {
     // ignore 'No such file or directory'
     if (errno != ENOENT) {
       throw std::runtime_error("remove failed " + std::to_string(errno));
@@ -63,12 +65,9 @@ SocketByteServer::SocketByteServer(
   // All users are allowed to connect to this server
   umask(0);
 
-  // port has no effect if in UNIX socket mode (so it should have its default value)
-  assert(port == socket_default_port);
-
   struct sockaddr_un address {};
   address.sun_family = AF_UNIX;
-  strcpy(address.sun_path, SOCKET_FILE_PATH);
+  strcpy(address.sun_path, socket_path.c_str());
   socklen_t address_length = SUN_LEN(&address);
 #else
   struct sockaddr_in address {};

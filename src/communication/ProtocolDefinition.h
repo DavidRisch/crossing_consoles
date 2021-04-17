@@ -5,6 +5,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <string>
 
 namespace communication {
 
@@ -51,6 +52,12 @@ class ProtocolDefinition {
   typedef unsigned int partner_id_t;
   /// partner id of the server. A constant because there is only a single server.
   static constexpr partner_id_t server_partner_id = 0;
+
+#ifdef USE_UNIX_SOCKET
+  static std::string GetUnixSocketPath(uint16_t port) {
+    return "/tmp/crossing_consoles_socket_" + std::to_string(port);
+  }
+#endif
 };
 
 }  // namespace communication
