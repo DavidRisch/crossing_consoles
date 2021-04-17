@@ -26,7 +26,6 @@ TEST(Player, IsAlive) {
 }
 
 TEST(Player, HasWeapon) {
-  // TODO Adapt this test if player can have no item!
   Player player("player", Position(0, 0));
   ASSERT_TRUE(player.GetItem() == nullptr);
   player.SetItem(std::make_shared<Gun>(1, 20));
