@@ -42,7 +42,7 @@ class GameClient {
    * \details In single player mode, changes are applied to the world. In multiplayer mode, changes are sent to
    * `GameServer`.
    */
-  void ProcessInput();
+  void ProcessInput(std::chrono::steady_clock::time_point now);
 
   const world::World& GetWorld() const;
 
@@ -78,11 +78,21 @@ class GameClient {
   std::chrono::time_point<std::chrono::steady_clock> last_draw;
   static constexpr auto min_draw_interval = std::chrono::milliseconds(50);
 
+  // Used to enforce a maximum frequency of movements
+  std::chrono::time_point<std::chrono::steady_clock> last_move;
+  static constexpr auto min_move_interval = std::chrono::milliseconds(100);
+  std::optional<networking::ChangeType> next_move_type;
+
   /**
    * \brief Handle an `Event` caused by the `GameServer`.
    */
   void HandleEvent(const std::shared_ptr<world::Player>& player,
                    const std::shared_ptr<communication::connection_layer::Event>& event);
+
+  /**
+   * \brief Send a `Change` to the server (or apply it in single player mode).
+   */
+  void HandleOwnChange(const networking::Change& change, std::chrono::steady_clock::time_point now);
 };
 
 }  // namespace game

@@ -74,7 +74,7 @@ void GameClient::Run() {
 
     auto now = std::chrono::steady_clock::now();
 
-    ProcessInput();
+    ProcessInput(now);
 
     if (multiplayer) {
       client_manager->HandleConnections(now);
@@ -111,7 +111,7 @@ void GameClient::Run() {
   }
 }
 
-void GameClient::ProcessInput() {
+void GameClient::ProcessInput(std::chrono::steady_clock::time_point now) {
   if (terminal->HasInput()) {
     int keypress = terminal->GetInput();
     auto keycode = static_cast<KeyCode>(keypress);
@@ -155,13 +155,26 @@ void GameClient::ProcessInput() {
       }
     }
 
-    auto change = change_type_it->second;
-    if (multiplayer) {
-      client_manager->SendDataToServer(change.payload);
-    } else {
-      auto player = weak_player.lock();
-      assert(player != nullptr);
-      GameLogic::HandleChange(*player, change, world);
+    auto& change = change_type_it->second;
+
+    if (change.IsMovement()) {
+      if (last_move + min_move_interval < now) {
+        last_move = now;
+      } else {
+        next_move_type = change.GetChangeType();
+        return;
+      }
+    }
+
+    HandleOwnChange(change, now);
+  } else {
+    // if no key is pressed, handle old keys. This makes a double key press possible, the second key is handled here.
+
+    if (next_move_type.has_value()) {
+      if (last_move + min_move_interval < now) {
+        HandleOwnChange(networking::Change(*next_move_type), now);
+        next_move_type.reset();
+      }
     }
   }
 }
@@ -221,5 +234,19 @@ void GameClient::HandleEvent(const std::shared_ptr<Player>& player,
     default: {
       throw std::runtime_error("Unexpected ChangeType");
     }
+  }
+}
+
+void GameClient::HandleOwnChange(const networking::Change& change, std::chrono::steady_clock::time_point now) {
+  if (change.IsMovement()) {
+    last_move = now;
+  }
+
+  if (multiplayer) {
+    client_manager->SendDataToServer(change.payload);
+  } else {
+    auto player = weak_player.lock();
+    assert(player != nullptr);
+    GameLogic::HandleChange(*player, change, world);
   }
 }
