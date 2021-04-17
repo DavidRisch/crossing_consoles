@@ -19,7 +19,7 @@ Press the following keys for additional features:
 
 * `Y` Show every player's score, health, package loss and ping in-game.
 * `X` Display detailed statistics of your connection.
-* `C` Enable a simulated bad connection and see the NACKs and package loss rising.
+* `C` Enable a simulated bad connection and see the NACKs and package loss rise.
 
 ### Items
 
