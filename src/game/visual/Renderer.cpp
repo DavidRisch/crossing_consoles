@@ -1,10 +1,8 @@
 #include "Renderer.h"
 
-#include <algorithm>
-#include <iostream>
 #include <utility>
 
-#include "symbols.h"
+#include "SpriteGenerator.h"
 
 using namespace game;
 using namespace game::common;
@@ -17,97 +15,7 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
     , viewport_size(std::move(viewport_size))
     , world(&world)
     , own_player(&own_player)
-    , sprite_map(SpriteMap(block_size)) {
-  ColoredCharMatrix wall_brick_sprite(block_size);
-  wall_brick_sprite.AppendString(std::wstring(9, light_shade), Color::WHITE, Color::LIGHT_BROWN);
-
-  ColoredCharMatrix wall_rock_light_sprite(block_size);
-  wall_rock_light_sprite.AppendString(std::wstring(9, light_shade), Color::GREY);
-
-  ColoredCharMatrix wall_rock_medium_sprite(block_size);
-  wall_rock_medium_sprite.AppendString(std::wstring(9, medium_shade), Color::GREY);
-
-  ColoredCharMatrix wall_rock_heavy_sprite(block_size);
-  wall_rock_heavy_sprite.AppendString(std::wstring(9, dark_shade), Color::GREY);
-
-  ColoredCharMatrix wall_rock_full_sprite(block_size);
-  wall_rock_full_sprite.AppendString(std::wstring(9, full_block), Color::GREY);
-
-  ColoredCharMatrix wall_snow_light_sprite(block_size);
-  wall_snow_light_sprite.AppendString(std::wstring(9, light_shade), Color::WHITE, Color::GREY);
-
-  ColoredCharMatrix wall_snow_medium_sprite(block_size);
-  wall_snow_medium_sprite.AppendString(std::wstring(9, medium_shade), Color::WHITE, Color::GREY);
-
-  ColoredCharMatrix wall_snow_heavy_sprite(block_size);
-  wall_snow_heavy_sprite.AppendString(std::wstring(9, dark_shade), Color::WHITE, Color::GREY);
-
-  ColoredCharMatrix wall_snow_full_sprite(block_size);
-  wall_snow_full_sprite.AppendString(std::wstring(9, full_block), Color::WHITE);
-
-  ColoredCharMatrix player_up_sprite(block_size);
-  player_up_sprite.AppendChar(L' ');
-  player_up_sprite.AppendChar(white_circle);
-  player_up_sprite.AppendChar(L' ');
-  player_up_sprite.AppendChar(box_drawings_light_up_and_right);
-  player_up_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
-  player_up_sprite.AppendChar(box_drawings_light_up_and_left);
-  player_up_sprite.AppendString(L"/ \\");
-
-  ColoredCharMatrix player_down_sprite(block_size);
-  player_down_sprite.AppendChar(L' ');
-  player_down_sprite.AppendChar(white_circle);
-  player_down_sprite.AppendChar(L' ');
-  player_down_sprite.AppendChar(box_drawings_light_down_and_right);
-  player_down_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
-  player_down_sprite.AppendChar(box_drawings_light_down_and_left);
-  player_down_sprite.AppendString(L"/ \\");
-
-  ColoredCharMatrix player_left_sprite(block_size);
-  player_left_sprite.AppendChar(L' ');
-  player_left_sprite.AppendChar(white_circle);
-  player_left_sprite.AppendChar(L' ');
-  player_left_sprite.AppendChar(box_drawings_light_horizontal);
-  player_left_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
-  player_left_sprite.AppendChar(L' ');
-  player_left_sprite.AppendString(L"/ \\");
-
-  ColoredCharMatrix player_right_sprite(block_size);
-  player_right_sprite.AppendChar(L' ');
-  player_right_sprite.AppendChar(white_circle);
-  player_right_sprite.AppendChar(L' ');
-  player_right_sprite.AppendChar(L' ');
-  player_right_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
-  player_right_sprite.AppendChar(box_drawings_light_horizontal);
-  player_right_sprite.AppendString(L"/ \\");
-
-  ColoredCharMatrix player_dead_sprite(block_size);
-  player_dead_sprite.AppendChar(L' ');
-  player_dead_sprite.AppendChar(L' ');
-  player_dead_sprite.AppendChar(L' ');
-  player_dead_sprite.AppendChar(box_drawings_light_down_and_right);
-  player_dead_sprite.AppendChar(box_drawings_light_vertical_and_horizontal);
-  player_dead_sprite.AppendChar(box_drawings_light_down_and_left);
-  player_dead_sprite.AppendString(L"/ \\");
-
-  ColoredCharMatrix projectile_sprite(block_size);
-  projectile_sprite.AppendString(L"    o    ");
-
-  sprite_map.SetSprite(BlockType::WALL_BRICK, wall_brick_sprite);
-  sprite_map.SetSprite(BlockType::WALL_ROCK_LIGHT, wall_rock_light_sprite);
-  sprite_map.SetSprite(BlockType::WALL_ROCK_MEDIUM, wall_rock_medium_sprite);
-  sprite_map.SetSprite(BlockType::WALL_ROCK_HEAVY, wall_rock_heavy_sprite);
-  sprite_map.SetSprite(BlockType::WALL_ROCK_FULL, wall_rock_full_sprite);
-  sprite_map.SetSprite(BlockType::WALL_SNOW_LIGHT, wall_snow_light_sprite);
-  sprite_map.SetSprite(BlockType::WALL_SNOW_MEDIUM, wall_snow_medium_sprite);
-  sprite_map.SetSprite(BlockType::WALL_SNOW_HEAVY, wall_snow_heavy_sprite);
-  sprite_map.SetSprite(BlockType::WALL_SNOW_FULL, wall_snow_full_sprite);
-  sprite_map.SetSprite(BlockType::PLAYER_UP, player_up_sprite);
-  sprite_map.SetSprite(BlockType::PLAYER_DOWN, player_down_sprite);
-  sprite_map.SetSprite(BlockType::PLAYER_LEFT, player_left_sprite);
-  sprite_map.SetSprite(BlockType::PLAYER_RIGHT, player_right_sprite);
-  sprite_map.SetSprite(BlockType::PLAYER_DEAD, player_dead_sprite);
-  sprite_map.SetSprite(BlockType::PROJECTILE, projectile_sprite);
+    , sprite_map(SpriteGenerator(block_size).InitializeMap()) {
 }
 
 ColoredCharMatrix Renderer::RenderWorld() const {
