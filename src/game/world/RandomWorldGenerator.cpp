@@ -185,7 +185,7 @@ double RandomWorldGenerator::InterpolateNoise(int i, double x, double y) {
 
 double RandomWorldGenerator::PerlinNoise(double x, double y) {
   double total = 0;
-  double frequency;
+  double frequency = 0;
   double amplitude;
 
   for (int i = 0; i < octaves; i++) {

@@ -40,7 +40,7 @@ class ProtocolDefinition {
   static constexpr const timeout_t timeout = std::chrono::milliseconds(1000);
 
   /// `timeout` divided by `resend_denominator` is the interval after which a resend is triggered.
-  constexpr static const double resend_denominator = 20;
+  constexpr static const double resend_denominator = 10;
   static_assert(resend_denominator > 1.0);
 
   /// Set keep alive denominator

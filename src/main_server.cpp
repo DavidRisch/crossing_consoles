@@ -21,6 +21,5 @@ int main(int argc, char *argv[]) {
   std::cout << "Server ready" << std::endl;
   while (true) {
     server.RunIteration(true);
-    std::this_thread::sleep_for(std::chrono::microseconds(10));
   }
 }
