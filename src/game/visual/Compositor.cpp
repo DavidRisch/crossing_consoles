@@ -146,9 +146,11 @@ ColoredCharMatrix Compositor::CompositeTrailer(int viewport_width, bool has_item
   std::wstring instructions_movement = L"Movement: [WASD]  ";
   std::wstring instructions_item = L"Use Item: [SPACE]  ";
   std::wstring instruction_player = L"Player Info: [Y]  Statistics: [X]";
+  std::wstring instructions_bad_connection = L"  Simulate bad connection: [C]";
 
   int position_x =
-      int(viewport_width / 2 - (instructions_movement + instructions_item + instruction_player).size() / 2);
+      int(viewport_width / 2 -
+          (instructions_movement + instructions_item + instruction_player + instructions_bad_connection).size() / 2);
   trailer.SetString(instructions_movement, coordinate_size_t(position_x, position_y));
   position_x += int(instructions_movement.size());
 
@@ -157,9 +159,17 @@ ColoredCharMatrix Compositor::CompositeTrailer(int viewport_width, bool has_item
   } else {
     trailer.SetString(instructions_item, coordinate_size_t(position_x, position_y), common::Color::GREY);
   }
-
   position_x += int(instructions_item.size());
+
   trailer.SetString(instruction_player, coordinate_size_t(position_x, position_y));
+  position_x += int(instruction_player.size());
+
+  if (simulate_bad_connection) {
+    trailer.SetString(instructions_bad_connection, coordinate_size_t(position_x, position_y), common::Color::ORANGE);
+  } else {
+    trailer.SetString(instructions_bad_connection, coordinate_size_t(position_x, position_y));
+  }
+
   SetBorderLines(trailer, position_y);
   position_y++;
 
