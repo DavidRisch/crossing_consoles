@@ -45,6 +45,10 @@ int RealTerminal::GetInput() {
 }
 
 void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
+  if (last_screen_content == content) {
+    return;  // the screen already contains the correct content
+  }
+
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
   const std::vector<std::vector<ColoredChar>>& colored_characters = content.GetMatrix();
@@ -107,6 +111,8 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
 #else
   printf("%s", output.c_str());
 #endif
+
+  last_screen_content = content;
 }
 
 void RealTerminal::Initialise() {
