@@ -19,8 +19,6 @@ class ConnectionRequestMessage : public Message {
   explicit ConnectionRequestMessage(ProtocolDefinition::sequence_t sequence);
 
   [[nodiscard]] MessageType GetMessageType() const override;
-
-  // TODO: Protocol specification calls for 'client identification', that should happen here.
 };
 
 }  // namespace communication::message_layer
