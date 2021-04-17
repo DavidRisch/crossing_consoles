@@ -91,7 +91,9 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
   player_dead_sprite.AppendString(L"/ \\");
 
   ColoredCharMatrix projectile_sprite(block_size);
-  projectile_sprite.AppendString(L"    o    ");
+  projectile_sprite.AppendString(L"    ");
+  projectile_sprite.AppendChar(bullet);
+  projectile_sprite.AppendString(L"    ");
 
   sprite_map.SetSprite(BlockType::WALL_BRICK, wall_brick_sprite);
   sprite_map.SetSprite(BlockType::WALL_ROCK_LIGHT, wall_rock_light_sprite);
