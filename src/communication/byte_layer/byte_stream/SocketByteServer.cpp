@@ -60,6 +60,9 @@ SocketByteServer::SocketByteServer(
     }
   }
 
+  // All users are allowed to connect to this server
+  umask(0);
+
   // port has no effect if in UNIX socket mode (so it should have its default value)
   assert(port == socket_default_port);
 
