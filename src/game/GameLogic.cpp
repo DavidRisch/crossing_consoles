@@ -165,7 +165,7 @@ void GameLogic::UseWeapon(Player &player, World &world) {
         }
         // Increase score of player and decrease health of hit player
         ApplyDamageToPlayer(hit_player, sword->GetDamage());
-        player.IncreaseScore(1);  // arbitrarily chosen number of points -> TODO associate with weapon?
+        player.IncreaseScore();
       }
 
       // destroy hit projectiles
@@ -297,7 +297,7 @@ bool GameLogic::HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> 
     auto shooter = world.GetPlayerById(projectile->GetShooterId());
     if (shooter != nullptr && hit_player.player_id != projectile->GetShooterId()) {
       // If shooter is hit by own projectile, score is not increased!
-      shooter->IncreaseScore(1);  // arbitrarily chosen number of points -> TODO associate with weapon?
+      shooter->IncreaseScore();
     }
   }
 
