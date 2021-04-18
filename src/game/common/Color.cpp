@@ -43,4 +43,3 @@ const Color Color::BLUE = Color(0, 0, 255);
 const Color Color::LIGHT_BROWN = Color(107, 58, 48);
 const Color Color::ORANGE = Color(230, 130, 0);
 const Color Color::EMERALD = Color(80, 200, 120);
-const Color Color::SILVER = Color(192, 192, 192);

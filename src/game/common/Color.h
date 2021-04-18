@@ -30,7 +30,6 @@ class Color : public networking::ISerializable {
   static const Color LIGHT_BROWN;
   static const Color ORANGE;
   static const Color EMERALD;
-  static const Color SILVER;
 
   uint8_t red = 0;
   uint8_t green = 0;
