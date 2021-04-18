@@ -37,7 +37,8 @@ class Renderer {
 
   static constexpr auto color_field_red = [](ColoredCharMatrix& matrix, const ColoredCharMatrix* sprite,
                                              const common::Position& position) {
-    matrix.SetBackgroundColorInRegion(const_cast<common::Position&>(position), sprite->GetSize(), common::Color::RED);
+    matrix.SetBackgroundColorInRegion(const_cast<common::Position&>(position), sprite->GetSize(),
+                                      common::Color::LIGHT_RED);
   };
 
   void RenderElement(const common::Position& position_element, const ColoredCharMatrix& element_sprite,
