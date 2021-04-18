@@ -79,7 +79,7 @@ class GameLogic {
   static bool HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> &projectiles, world::World &world);
 
   /**
-   * \brief Returns the position that gets attacked with a coptic_capital_letter_dei when the position and the direction
+   * \brief Returns the position that gets attacked with a dagger when the position and the direction
    * of a player are given.
    */
   static common::Position AttackedPositionFromDirection(const common::Position &position,
