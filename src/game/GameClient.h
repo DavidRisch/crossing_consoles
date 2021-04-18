@@ -83,6 +83,11 @@ class GameClient {
   static constexpr auto min_move_interval = std::chrono::milliseconds(100);
   std::optional<networking::ChangeType> next_move_type;
 
+  // Used to enforce a maximum frequency of item usage
+  std::chrono::time_point<std::chrono::steady_clock> last_item_usage;
+  static constexpr auto min_item_usage_interval = std::chrono::milliseconds(300);
+  std::optional<networking::ChangeType> next_item_usage_type;
+
   /// Used for testing, disables maximum frequency of input.
   bool instant_input;
 

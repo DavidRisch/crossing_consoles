@@ -167,6 +167,15 @@ void GameClient::ProcessInput(std::chrono::steady_clock::time_point now) {
           return;
         }
       }
+
+      if (change.GetChangeType() == ChangeType::USE_ITEM) {
+        if (last_item_usage + min_item_usage_interval < now) {
+          last_item_usage = now;
+        } else {
+          next_item_usage_type = change.GetChangeType();
+          return;
+        }
+      }
     }
 
     HandleOwnChange(change, now);
@@ -177,6 +186,13 @@ void GameClient::ProcessInput(std::chrono::steady_clock::time_point now) {
       if (last_move + min_move_interval < now) {
         HandleOwnChange(networking::Change(*next_move_type), now);
         next_move_type.reset();
+      }
+    }
+
+    if (next_item_usage_type.has_value()) {
+      if (last_item_usage + min_item_usage_interval < now) {
+        HandleOwnChange(networking::Change(*next_item_usage_type), now);
+        next_item_usage_type.reset();
       }
     }
   }
@@ -243,6 +259,10 @@ void GameClient::HandleEvent(const std::shared_ptr<Player>& player,
 void GameClient::HandleOwnChange(const networking::Change& change, std::chrono::steady_clock::time_point now) {
   if (change.IsMovement()) {
     last_move = now;
+  }
+
+  if (change.GetChangeType() == ChangeType::USE_ITEM) {
+    last_item_usage = now;
   }
 
   if (multiplayer) {
