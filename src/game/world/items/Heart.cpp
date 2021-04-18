@@ -3,16 +3,15 @@
 #include <cassert>
 #include <memory>
 
+#include "../../visual/SpriteGenerator.h"
 #include "../../visual/symbols.h"
 
 using namespace game;
 using namespace world;
 
 visual::ColoredCharMatrix Heart::GetSprite(common::coordinate_size_t block_size) {
-  visual::ColoredCharMatrix heart_sprite = visual::ColoredCharMatrix(block_size);
-  common::Position position(int(block_size.x / 2), int(block_size.y / 2));
-  heart_sprite.SetChar(game::visual::symbols::black_heart_suit, position, common::Color::RED, common::Color::BLACK);
-  return heart_sprite;
+  return visual::SpriteGenerator::GenerateItemSprite(game::visual::symbols::black_heart_suit, block_size,
+                                                     common::Color::RED);
 }
 
 void Heart::Serialize(std::vector<uint8_t> &output_vector) const {

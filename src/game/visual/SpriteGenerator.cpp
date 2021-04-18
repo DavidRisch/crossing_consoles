@@ -101,3 +101,19 @@ SpriteMap SpriteGenerator::InitializeMap() {
 SpriteGenerator::SpriteGenerator(common::coordinate_size_t block_size)
     : block_size(std::move(block_size)) {
 }
+
+ColoredCharMatrix SpriteGenerator::GenerateItemSprite(wchar_t type, const common::coordinate_size_t& block_size,
+                                                      const Color& foreground_color, const Color& background_color) {
+  ColoredCharMatrix item_sprite(block_size);
+  common::Position position(int(block_size.x / 2), int(block_size.y / 2));
+  item_sprite.SetChar(type, position, foreground_color, background_color);
+  return item_sprite;
+}
+
+ColoredCharMatrix SpriteGenerator::GeneratePointSprite(int value, const coordinate_size_t& block_size,
+                                                       const Color& foreground_color, const Color& background_color) {
+  ColoredCharMatrix point_sprite(block_size);
+  common::Position position(int(block_size.x / 2), int(block_size.y / 2));
+  point_sprite.SetString(std::to_wstring(value), position, foreground_color, background_color);
+  return point_sprite;
+}
