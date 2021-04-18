@@ -240,7 +240,7 @@ std::optional<std::shared_ptr<Projectile>> World::GetProjectileFromPosition(comm
 }
 
 void World::ResurrectPlayer(Player& player) {
-  player.DecreaseHealth(-game::world::Player::max_health);
+  player.IncreaseHealth(game::world::Player::max_health);
   player.RemoveItem();
   player.score = 0;
   player.position = spawner.GenerateSpawnPosition();

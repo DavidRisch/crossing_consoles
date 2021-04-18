@@ -34,7 +34,14 @@ TEST(Player, HasWeapon) {
 
 TEST(Player, DecreaseHealth) {
   Player player("player", Position(0, 0));
-  int damage = 100;
+  uint8_t damage = 100;
   player.DecreaseHealth(damage);
   ASSERT_FALSE(player.IsAlive());
+}
+
+TEST(Player, IncreaseHealth) {
+  Player player("player", Position(0, 0));
+  uint8_t healing = 100;
+  player.IncreaseHealth(healing);
+  ASSERT_EQ(player.health, player.max_health);
 }
