@@ -205,8 +205,6 @@ std::optional<Change> GameClient::ProcessInput(std::chrono::steady_clock::time_p
 
     if (change_type_it == map_key_to_change.end()) {
       switch (keycode) {
-        case KeyCode::ESCAPE: {
-        }
         case KeyCode::Y: {
           compositor->show_player_list ^= true;
           updated = true;
