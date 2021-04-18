@@ -40,10 +40,9 @@ void Player::DecreaseHealth(uint8_t damage) {
 }
 
 void Player::IncreaseHealth(uint8_t healing) {
-  if (health + healing > max_health){
+  if (health + healing > max_health) {
     health = max_health;
-  }
-  else {
+  } else {
     health += healing;
   }
 }

@@ -39,7 +39,7 @@ TEST(Player, DecreaseHealth) {
   ASSERT_FALSE(player.IsAlive());
 }
 
-TEST(Player, IncreaseHealth){
+TEST(Player, IncreaseHealth) {
   Player player("player", Position(0, 0));
   uint8_t healing = 100;
   player.IncreaseHealth(healing);
