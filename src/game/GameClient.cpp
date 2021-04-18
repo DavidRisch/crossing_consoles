@@ -25,12 +25,13 @@ using namespace game::visual;
 GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_ptr<ITerminal>& terminal,
                        const coordinate_size_t& world_size, bool multiplayer, bool empty_world,
                        communication::ProtocolDefinition::timeout_t communication_timeout,
-                       GameDefinition game_definition)
+                       GameDefinition game_definition, bool instant_input)
     : weak_player(player)
     , world(world_size)
     , terminal(terminal)
     , multiplayer(multiplayer)
-    , game_definition(std::move(game_definition)) {
+    , game_definition(std::move(game_definition))
+    , instant_input(instant_input) {
   assert(player != nullptr);
   assert(terminal != nullptr);
 
@@ -100,16 +101,10 @@ void GameClient::RunMainThread() {
 
     auto now = std::chrono::steady_clock::now();
 
-    auto optional_change = ProcessInput();
+    auto optional_change = ProcessInput(now);
 
     if (optional_change.has_value()) {
-      const auto& change = *optional_change;
-      if (multiplayer) {
-        std::lock_guard<std::mutex> lock_guard(communication_mutex);
-        client_manager->SendDataToServer(change.payload);
-      } else {
-        GameLogic::HandleChange(*player, change, world);
-      }
+      HandleOwnChange(*optional_change, now);
     }
 
     if (world.updated || player->updated || updated) {
@@ -143,7 +138,7 @@ void GameClient::RunMainThread() {
   }
 }
 
-std::optional<Change> GameClient::ProcessInput() {
+std::optional<Change> GameClient::ProcessInput(std::chrono::steady_clock::time_point now) {
   if (terminal->HasInput()) {
     int keypress = terminal->GetInput();
     auto keycode = static_cast<KeyCode>(keypress);
@@ -188,7 +183,44 @@ std::optional<Change> GameClient::ProcessInput() {
     }
 
     auto& change = change_type_it->second;
+
+    if (!instant_input) {
+      if (change.IsMovement()) {
+        if (last_move + min_move_interval < now) {
+          last_move = now;
+        } else {
+          next_move_type = change.GetChangeType();
+          return {};
+        }
+      }
+
+      if (change.GetChangeType() == ChangeType::USE_ITEM) {
+        if (last_item_usage + min_item_usage_interval < now) {
+          last_item_usage = now;
+        } else {
+          next_item_usage_type = change.GetChangeType();
+          return {};
+        }
+      }
+    }
+
     return {change};
+  } else {
+    // if no key is pressed, handle old keys. This makes a double key press possible, the second key is handled here.
+
+    if (next_move_type.has_value()) {
+      if (last_move + min_move_interval < now) {
+        next_move_type.reset();
+        return networking::Change(*next_move_type);
+      }
+    }
+
+    if (next_item_usage_type.has_value()) {
+      if (last_item_usage + min_item_usage_interval < now) {
+        next_item_usage_type.reset();
+        return networking::Change(*next_item_usage_type);
+      }
+    }
   }
 
   return {};
@@ -249,6 +281,25 @@ void GameClient::HandleEvent(const std::shared_ptr<Player>& player,
     default: {
       throw std::runtime_error("Unexpected ChangeType");
     }
+  }
+}
+
+void GameClient::HandleOwnChange(const networking::Change& change, std::chrono::steady_clock::time_point now) {
+  if (change.IsMovement()) {
+    last_move = now;
+  }
+
+  if (change.GetChangeType() == ChangeType::USE_ITEM) {
+    last_item_usage = now;
+  }
+
+  if (multiplayer) {
+    std::lock_guard<std::mutex> lock_guard(communication_mutex);
+    client_manager->SendDataToServer(change.payload);
+  } else {
+    auto player = weak_player.lock();
+    assert(player != nullptr);
+    GameLogic::HandleChange(*player, change, world);
   }
 }
 

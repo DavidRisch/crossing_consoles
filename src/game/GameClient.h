@@ -26,7 +26,7 @@ class GameClient {
       const std::shared_ptr<world::Player>& player, const std::shared_ptr<terminal::ITerminal>& terminal,
       const common::coordinate_size_t& world_size, bool multiplayer = false, bool empty_world = false,
       communication::ProtocolDefinition::timeout_t communication_timeout = communication::ProtocolDefinition::timeout,
-      GameDefinition game_definition = GameDefinition());
+      GameDefinition game_definition = GameDefinition(), bool instant_input = false);
 
   /**
    * \brief Update world, player, projectiles and process changes.
@@ -44,7 +44,7 @@ class GameClient {
    * \details In single player mode, changes are applied to the world. In multiplayer mode, changes are sent to
    * `GameServer`.
    */
-  std::optional<networking::Change> ProcessInput();
+  std::optional<networking::Change> ProcessInput(std::chrono::steady_clock::time_point now);
 
   const world::World& GetWorld() const;
 
@@ -97,11 +97,29 @@ class GameClient {
   /// Used to protect `world` which includes `weak_player`.
   std::mutex world_mutex;
 
+  // Used to enforce a maximum frequency of movements
+  std::chrono::time_point<std::chrono::steady_clock> last_move;
+  static constexpr auto min_move_interval = std::chrono::milliseconds(100);
+  std::optional<networking::ChangeType> next_move_type;
+
+  // Used to enforce a maximum frequency of item usage
+  std::chrono::time_point<std::chrono::steady_clock> last_item_usage;
+  static constexpr auto min_item_usage_interval = std::chrono::milliseconds(300);
+  std::optional<networking::ChangeType> next_item_usage_type;
+
+  /// Used for testing, disables maximum frequency of input.
+  bool instant_input;
+
   /**
    * \brief Handle an `Event` caused by the `GameServer`.
    */
   void HandleEvent(const std::shared_ptr<world::Player>& player,
                    const std::shared_ptr<communication::connection_layer::Event>& event);
+
+  /**
+   * \brief Send a `Change` to the server (or apply it in single player mode).
+   */
+  void HandleOwnChange(const networking::Change& change, std::chrono::steady_clock::time_point now);
 
   void StartCommunicationThread();
 

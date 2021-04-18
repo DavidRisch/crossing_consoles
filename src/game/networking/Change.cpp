@@ -27,3 +27,8 @@ std::vector<uint8_t>::iterator Change::GetContentIterator() {
   ++iterator;
   return iterator;
 }
+
+bool Change::IsMovement() const {
+  return (change_type == ChangeType::MOVE_UP || change_type == ChangeType::MOVE_DOWN ||
+          change_type == ChangeType::MOVE_LEFT || change_type == ChangeType::MOVE_RIGHT);
+}

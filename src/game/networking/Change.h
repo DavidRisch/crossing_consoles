@@ -38,6 +38,11 @@ class Change {
 
   [[nodiscard]] std::vector<uint8_t>::iterator GetContentIterator();
 
+  /**
+   * \brief Returns true iff the Change type matches MOVE_* .
+   */
+  bool IsMovement() const;
+
   std::vector<uint8_t> payload;
 
  private:
