@@ -44,11 +44,11 @@ class GameServer {
 
   /// Handle moving projectiles at a constant frequency.
   std::chrono::time_point<std::chrono::steady_clock> last_moving_projectiles_updated;
-  static constexpr auto update_projectiles_interval = std::chrono::milliseconds(150);
+  static constexpr auto update_projectiles_interval = std::chrono::milliseconds(50);
 
   /// Used to generate new items in the world
   std::chrono::time_point<std::chrono::steady_clock> last_item_generated;
-  static constexpr auto generate_item_interval = std::chrono::seconds(10);
+  static constexpr auto generate_item_interval = std::chrono::seconds(5);
 
   /// Used to improve performance by accepting new clients less often
   std::chrono::time_point<std::chrono::steady_clock> last_full_connection_handle;
