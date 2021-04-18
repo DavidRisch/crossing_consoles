@@ -45,7 +45,7 @@ TEST(Projectile, HitPlayer) {
   auto weapon = Gun(damage, range);
   Projectile projectile = weapon.SpawnProjectile(player->player_id, player->position, player->direction);
 
-  player->ChangeHealth(projectile.GetDamage());
+  player->DecreaseHealth(projectile.GetDamage());
   ASSERT_EQ(player->health, player->max_health - damage);
 }
 

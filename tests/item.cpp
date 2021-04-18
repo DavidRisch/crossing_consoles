@@ -99,7 +99,7 @@ TEST_F(Items, Heart) {
   generate_world();
   add_one_player();
 
-  player_first->ChangeHealth(1);
+  player_first->DecreaseHealth(1);
   int health_with_damage = player_first->health;
 
   auto heart = std::make_shared<Heart>(1);

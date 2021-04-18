@@ -189,7 +189,7 @@ TEST_F(GamePlay, ProjectileHitsDeadPlayer) {
   move_player(player_second, game::networking::ChangeType::MOVE_LEFT, 2);
 
   // Kill player_second
-  player_second->ChangeHealth(player_second->max_health);
+  player_second->DecreaseHealth(player_second->max_health);
   EXPECT_FALSE(player_second->IsAlive());
 
   spawn_projectile(range, damage, player_first->direction, player_first->player_id, player_first->position);
@@ -211,7 +211,7 @@ TEST_F(GamePlay, DeadPlayerNoChange) {
   add_player();
 
   // Kill player_first
-  player_first->ChangeHealth(player_first->max_health);
+  player_first->DecreaseHealth(player_first->max_health);
   EXPECT_FALSE(player_first->IsAlive());
 
   auto initial_position = player_first->position;
