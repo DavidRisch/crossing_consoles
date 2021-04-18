@@ -3,7 +3,6 @@
 #include <utility>
 
 #include "../../visual/SpriteGenerator.h"
-#include "../../visual/symbols.h"
 
 using namespace game;
 using namespace game::world;

@@ -26,11 +26,6 @@ enum class BlockType {
 
   PROJECTILE,
 
-  HEART,
-  POINTS,
-  GUN,
-  SWORD,
-
 };
 
 }  // namespace game::world
