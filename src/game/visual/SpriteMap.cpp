@@ -5,8 +5,7 @@ using namespace game::visual;
 using namespace game::world;
 
 SpriteMap::SpriteMap(common::coordinate_size_t block_size)
-    : block_size(block_size) {
-  SetSprite(BlockType::EMPTY_BLOCK, ColoredCharMatrix(block_size));
+    : block_size(std::move(block_size)) {
 }
 
 void SpriteMap::SetSprite(BlockType type, const ColoredCharMatrix& sprite) {

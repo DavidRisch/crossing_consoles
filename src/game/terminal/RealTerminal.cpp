@@ -183,7 +183,9 @@ void RealTerminal::Clear() {
   if (new_terminal_size.ws_col != terminal_size.ws_col || new_terminal_size.ws_row != terminal_size.ws_row) {
     // clear terminal if its size has changed to prevents artifacts.
     // always clearing would lead to flicker.
-    system("clear");
+    if (system("clear") != 0) {
+      throw std::runtime_error("Unexpected ChangeType");
+    }
   }
 
   terminal_size = new_terminal_size;

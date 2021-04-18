@@ -264,7 +264,7 @@ TEST_F(GameNetworking, ManyPlayers) {
 
   create_server_and_client();
 
-  for (int i = 0; i < 30; ++i) {
+  for (int i = 0; i < 20; ++i) {
     create_new_client(Position(i, 4));
   }
 

@@ -28,6 +28,9 @@ std::shared_ptr<SocketByteStream> SocketByteStream::CreateClientSide(
   }
 
 #ifdef USE_UNIX_SOCKET
+  if (port != socket_default_port) {
+    throw std::runtime_error("port has no effect if in UNIX socket mode (so it should have its default value)");
+  }
   std::string socket_path = ProtocolDefinition::GetUnixSocketPath(port);
 
   struct sockaddr_un server_address {};

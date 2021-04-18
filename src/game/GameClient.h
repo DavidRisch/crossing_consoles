@@ -2,6 +2,8 @@
 #define CROSSING_CONSOLES_GAMECLIENT_H
 
 #include <memory>
+#include <mutex>
+#include <thread>
 #include <unordered_map>
 
 #include "../communication/connection_layer/connection/ClientSideConnectionManager.h"
@@ -42,13 +44,15 @@ class GameClient {
    * \details In single player mode, changes are applied to the world. In multiplayer mode, changes are sent to
    * `GameServer`.
    */
-  void ProcessInput(std::chrono::steady_clock::time_point now);
+  std::optional<networking::Change> ProcessInput(std::chrono::steady_clock::time_point now);
 
   const world::World& GetWorld() const;
 
  private:
   std::weak_ptr<world::Player> weak_player;
   world::World world;
+  /// Copy of `world` used for rendering. Allows the `communication_thread` to access the real `world`.
+  world::World world_render_copy;
   std::shared_ptr<terminal::ITerminal> terminal;
   std::unique_ptr<visual::Compositor> compositor;
   std::shared_ptr<communication::connection_layer::ClientSideConnectionManager> client_manager;
@@ -76,7 +80,22 @@ class GameClient {
   };
 
   std::chrono::time_point<std::chrono::steady_clock> last_draw;
-  static constexpr auto min_draw_interval = std::chrono::milliseconds(50);
+  static constexpr auto min_draw_interval = std::chrono::milliseconds(25);
+
+  static constexpr auto min_main_loop_interval = std::chrono::microseconds(100);
+
+  static constexpr auto min_communication_loop_interval = std::chrono::microseconds(50);
+
+  /**
+   * \brief Thread responsible for communication with the server. Required to achieve low latency communication while a
+   * render is running on the main thread.
+   */
+  std::thread communication_thread;
+
+  /// Used to protect `client_manager`.
+  std::mutex communication_mutex;
+  /// Used to protect `world` which includes `weak_player`.
+  std::mutex world_mutex;
 
   // Used to enforce a maximum frequency of movements
   std::chrono::time_point<std::chrono::steady_clock> last_move;
@@ -101,6 +120,10 @@ class GameClient {
    * \brief Send a `Change` to the server (or apply it in single player mode).
    */
   void HandleOwnChange(const networking::Change& change, std::chrono::steady_clock::time_point now);
+
+  void StartCommunicationThread();
+
+  void RunMainThread();
 };
 
 }  // namespace game
