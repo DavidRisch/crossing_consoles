@@ -33,6 +33,8 @@ class Spawner {
  private:
   World *world;
   static std::random_device random_device;
+
+  int maximum_attempts = 10;
 };
 
 }  // namespace game::world
