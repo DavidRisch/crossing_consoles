@@ -126,6 +126,26 @@ void GameLogic::HandleChange(world::Player &player, const Change &change, world:
       UseWeapon(player, world);
       break;
     }
+    case ChangeType::USE_UP: {
+      player.direction = GameDefinition::NORTH;
+      UseWeapon(player, world);
+      break;
+    }
+    case ChangeType::USE_LEFT: {
+      player.direction = GameDefinition::WEST;
+      UseWeapon(player, world);
+      break;
+    }
+    case ChangeType::USE_RIGHT: {
+      player.direction = GameDefinition::EAST;
+      UseWeapon(player, world);
+      break;
+    }
+    case ChangeType::USE_DOWN: {
+      player.direction = GameDefinition::SOUTH;
+      UseWeapon(player, world);
+      break;
+    }
     default:
       throw std::runtime_error("Unexpected ChangeType");
   }

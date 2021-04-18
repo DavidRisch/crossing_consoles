@@ -15,7 +15,24 @@
 
 namespace game {
 
-enum class KeyCode { ESCAPE = 27, W = 'w', A = 'a', S = 's', D = 'd', SPACE = ' ', Y = 'y', X = 'x', C = 'c' };
+enum class KeyCode {
+  // movement:
+  W = 'w',
+  A = 'a',
+  S = 's',
+  D = 'd',
+  // change direction:
+  I = 'i',
+  J = 'j',
+  K = 'k',
+  L = 'l',
+  // misc:
+  ESCAPE = 27,
+  SPACE = ' ',
+  Y = 'y',
+  X = 'x',
+  C = 'c',
+};
 
 /**
  * \brief Handles keyboard input and connection to `GameServer`.
@@ -77,6 +94,10 @@ class GameClient {
       {KeyCode::A, networking::Change(networking::ChangeType::MOVE_LEFT)},
       {KeyCode::D, networking::Change(networking::ChangeType::MOVE_RIGHT)},
       {KeyCode::SPACE, networking::Change(networking::ChangeType::USE_ITEM)},
+      {KeyCode::I, networking::Change(networking::ChangeType::USE_UP)},
+      {KeyCode::K, networking::Change(networking::ChangeType::USE_DOWN)},
+      {KeyCode::J, networking::Change(networking::ChangeType::USE_LEFT)},
+      {KeyCode::L, networking::Change(networking::ChangeType::USE_RIGHT)},
   };
 
   std::chrono::time_point<std::chrono::steady_clock> last_draw;

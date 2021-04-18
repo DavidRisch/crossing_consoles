@@ -144,7 +144,7 @@ ColoredCharMatrix Compositor::CompositeTrailer(int viewport_width, bool has_item
   position_y++;
 
   std::wstring instructions_movement = L"Movement: [WASD]  ";
-  std::wstring instructions_item = L"Use Item: [SPACE]  ";
+  std::wstring instructions_item = L"Use Item: [SPACE] or [IJKL]  ";
   std::wstring instruction_player = L"Player Info: [Y]  Statistics: [X]";
   std::wstring instructions_bad_connection = L"  Simulate bad connection: [C]";
 

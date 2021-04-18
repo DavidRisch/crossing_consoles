@@ -15,6 +15,10 @@ enum class ChangeType : uint8_t {
   MOVE_DOWN,
   MOVE_LEFT,
   USE_ITEM,
+  USE_UP,
+  USE_RIGHT,
+  USE_DOWN,
+  USE_LEFT,
 
   // server -> client
   SET_OWN_ID,
@@ -42,6 +46,11 @@ class Change {
    * \brief Returns true iff the Change type matches MOVE_* .
    */
   bool IsMovement() const;
+
+  /**
+   * \brief Returns true iff the Change type matches USE_* .
+   */
+  bool IsItemUsage() const;
 
   std::vector<uint8_t> payload;
 

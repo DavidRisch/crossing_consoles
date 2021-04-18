@@ -194,7 +194,7 @@ std::optional<Change> GameClient::ProcessInput(std::chrono::steady_clock::time_p
         }
       }
 
-      if (change.GetChangeType() == ChangeType::USE_ITEM) {
+      if (change.IsItemUsage()) {
         if (last_item_usage + min_item_usage_interval < now) {
           last_item_usage = now;
         } else {
@@ -289,7 +289,7 @@ void GameClient::HandleOwnChange(const networking::Change& change, std::chrono::
     last_move = now;
   }
 
-  if (change.GetChangeType() == ChangeType::USE_ITEM) {
+  if (change.IsItemUsage()) {
     last_item_usage = now;
   }
 
