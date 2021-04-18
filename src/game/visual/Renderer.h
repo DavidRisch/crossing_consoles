@@ -1,6 +1,7 @@
 #ifndef CROSSING_CONSOLES_RENDERER_H
 #define CROSSING_CONSOLES_RENDERER_H
 
+#include <functional>
 #include <string>
 
 #include "../world/Player.h"
@@ -39,9 +40,10 @@ class Renderer {
     matrix.SetBackgroundColorInRegion(const_cast<common::Position&>(position), sprite->GetSize(), common::Color::RED);
   };
 
-  template <typename Function>
   void RenderElement(const common::Position& position_element, const ColoredCharMatrix& element_sprite,
-                     ColoredCharMatrix& rendered_world, Function change_world) const;
+                     ColoredCharMatrix& rendered_world,
+                     const std::function<void(game::visual::ColoredCharMatrix&, const game::visual::ColoredCharMatrix*,
+                                              const game::common::Position&)>& change_world) const;
 };
 
 }  // namespace game::visual

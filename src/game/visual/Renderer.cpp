@@ -18,9 +18,10 @@ Renderer::Renderer(coordinate_size_t viewport_size, coordinate_size_t block_size
     , sprite_map(SpriteGenerator(block_size).InitializeMap()) {
 }
 
-template <typename Function>
-void Renderer::RenderElement(const Position& position_element, const ColoredCharMatrix& sprite,
-                             ColoredCharMatrix& rendered_world, Function change_world) const {
+void Renderer::RenderElement(
+    const Position& position_element, const ColoredCharMatrix& sprite, ColoredCharMatrix& rendered_world,
+    const std::function<void(game::visual::ColoredCharMatrix&, const game::visual::ColoredCharMatrix*,
+                             const game::common::Position&)>& change_world) const {
   for (int y_factor = negative_repetition.y; y_factor < positive_repetition.y; y_factor++) {
     for (int x_factor = negative_repetition.x; x_factor < positive_repetition.x; x_factor++) {
       // get position of element for each world repetition in world coordinates
