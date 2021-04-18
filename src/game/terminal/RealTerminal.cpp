@@ -32,7 +32,9 @@ bool RealTerminal::HasInput() {
 #else
   int bytes_waiting;
   ioctl(0, FIONREAD, &bytes_waiting);
-  return bytes_waiting > 0;
+  // bytes_waiting is 0 or 1 except for arrow key escape sequences where it is 3
+  remaining_bytes_waiting += bytes_waiting;
+  return remaining_bytes_waiting > 0;
 #endif
 }
 
@@ -40,6 +42,7 @@ int RealTerminal::GetInput() {
 #ifdef _WIN32
   return _getch();
 #else
+  --remaining_bytes_waiting;
   return getchar();
 #endif
 }

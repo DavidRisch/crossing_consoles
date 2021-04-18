@@ -142,13 +142,70 @@ std::optional<Change> GameClient::ProcessInput(std::chrono::steady_clock::time_p
   if (terminal->HasInput()) {
     int keypress = terminal->GetInput();
     auto keycode = static_cast<KeyCode>(keypress);
+
+    if (keycode == KeyCode::SHELL_ESCAPE) {
+      if (!terminal->HasInput()) {
+        // The literal escape key was pressed
+        StartExit();
+        return {};
+      }
+      // Some kind of escape sequence was entered, might be an arrow key
+
+#ifdef _WIN32
+      // https://stackoverflow.com/a/10473315/13623303
+      int value = terminal->GetInput();
+      switch (value) {
+        case 72:
+          keycode = KeyCode::USE_UP;
+          break;
+        case 80:
+          keycode = KeyCode::USE_DOWN;
+          break;
+        case 77:
+          keycode = KeyCode::USE_RIGHT;
+          break;
+        case 75:
+          keycode = KeyCode::USE_LEFT;
+          break;
+        default:
+          return {};
+      }
+#else
+      // https://stackoverflow.com/a/11432632/13623303
+      if (terminal->GetInput() != '[') {
+        return {};
+      }
+
+      if (!terminal->HasInput()) {
+        return {};
+      }
+
+      int value = terminal->GetInput();
+      switch (value) {
+        case 'A':
+          keycode = KeyCode::USE_UP;
+          break;
+        case 'B':
+          keycode = KeyCode::USE_DOWN;
+          break;
+        case 'C':
+          keycode = KeyCode::USE_RIGHT;
+          break;
+        case 'D':
+          keycode = KeyCode::USE_LEFT;
+          break;
+        default:
+          return {};
+      }
+
+#endif
+    }
+
     auto change_type_it = map_key_to_change.find(keycode);
 
     if (change_type_it == map_key_to_change.end()) {
       switch (keycode) {
         case KeyCode::ESCAPE: {
-          StartExit();
-          return {};
         }
         case KeyCode::Y: {
           compositor->show_player_list ^= true;

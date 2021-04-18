@@ -59,6 +59,7 @@ class RealTerminal : public ITerminal {
   COORD terminal_size;
 #else
   struct winsize terminal_size {};
+  int remaining_bytes_waiting = 0;
 #endif
 };
 
