@@ -11,7 +11,7 @@ using namespace world;
 visual::ColoredCharMatrix Heart::GetSprite(common::coordinate_size_t block_size) {
   visual::ColoredCharMatrix heart_sprite = visual::ColoredCharMatrix(block_size);
   common::Position position(int(block_size.x / 2), int(block_size.y / 2));
-  heart_sprite.SetChar(game::visual::symbols::black_heart_suit, position, common::Color::WHITE, common::Color::BLACK);
+  heart_sprite.SetChar(game::visual::symbols::black_heart_suit, position, common::Color::RED, common::Color::BLACK);
   return heart_sprite;
 }
 

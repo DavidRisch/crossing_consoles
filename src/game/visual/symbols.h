@@ -17,8 +17,6 @@ const wchar_t box_drawings_light_down_and_left = L'\u2510';
 const wchar_t box_drawings_light_up_and_right = L'\u2514';
 const wchar_t box_drawings_light_up_and_left = L'\u2518';
 const wchar_t box_drawings_light_vertical_and_horizontal = L'\u253C';
-const wchar_t box_drawings_light_left = L'\u2574';
-const wchar_t box_drawings_light_right = L'\u2576';
 
 const wchar_t box_drawings_heavy_horizontal = L'\u2501';
 const wchar_t box_drawings_heavy_vertical = L'\u2503';
@@ -36,11 +34,12 @@ const wchar_t full_block = L'\u2588';
 const wchar_t light_shade = L'\u2591';
 const wchar_t medium_shade = L'\u2592';
 const wchar_t dark_shade = L'\u2593';
-const wchar_t white_circle = L'\u25CB';
 
 const wchar_t black_heart_suit = L'\u2665';  // rendered as an extra wide character
-const wchar_t coptic_capital_letter_dei = L'\u03EE';
-const wchar_t not_sign = L'\u00AC';
+const wchar_t dagger = L'\u2020';
+const wchar_t reversed_not_sign = L'\u2310';
+const wchar_t bullet = L'\u2022';
+const wchar_t black_smiling_face = L'\u263B';
 
 const wchar_t black_vertical_ellipse = L'\u2B2E';
 

@@ -15,9 +15,8 @@ ColoredCharMatrix HealthDisplay::Render(int health) {
     output.AppendChar(L' ');  // needed because black_heart_suit is rendered extra wide
   }
   for (; i < world::Player::max_health; ++i) {
-    // draw emtpy space for a heart
-    output.AppendChar(symbols::box_drawings_light_right);
-    output.AppendChar(symbols::box_drawings_light_left);
+    output.AppendChar(symbols::black_heart_suit, common::Color::GREY);
+    output.AppendChar(L' ');  // needed because black_heart_suit is rendered extra wide
   }
 
   return output;

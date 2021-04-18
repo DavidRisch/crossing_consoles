@@ -9,7 +9,7 @@ Points::Points(uint8_t value)
 visual::ColoredCharMatrix game::world::Points::GetSprite(common::coordinate_size_t block_size) {
   visual::ColoredCharMatrix point_sprite = visual::ColoredCharMatrix(block_size);
   common::Position position(int(block_size.x / 2), int(block_size.y / 2));
-  point_sprite.SetString(std::to_wstring(value), position, common::Color::WHITE, common::Color::BLACK);
+  point_sprite.SetString(std::to_wstring(value), position, common::Color::EMERALD, common::Color::BLACK);
   return point_sprite;
 }
 

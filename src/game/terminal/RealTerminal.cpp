@@ -177,28 +177,25 @@ std::string RealTerminal::ColorEscapeSequence(const common::Color& color, bool b
 }
 
 void RealTerminal::Clear() {
-#ifdef _WIN32
-  CONSOLE_SCREEN_BUFFER_INFO screen_buffer_info;
-  GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &screen_buffer_info);
-
-  if (screen_buffer_info.dwSize.X != terminal_size.X || screen_buffer_info.dwSize.Y != terminal_size.Y) {
-    system("cls");
-  }
-
-  terminal_size = screen_buffer_info.dwSize;
-#else
   // clear terminal if its size has changed to prevents artifacts.
   // always clearing would lead to flicker.
+#ifdef _WIN32
+  system("cls");
+#else
   if (system("clear") != 0) {
     throw std::runtime_error("clear failed");
   }
-
 #endif
 }
 
 void RealTerminal::CheckTerminalChanged() {
 #ifdef _WIN32
-  redraw_needed = true;  // TODO: implement on windows
+  CONSOLE_SCREEN_BUFFER_INFO screen_buffer_info;
+  GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &screen_buffer_info);
+
+  redraw_needed = (screen_buffer_info.dwSize.X != terminal_size.X || screen_buffer_info.dwSize.Y != terminal_size.Y);
+
+  terminal_size = screen_buffer_info.dwSize;
 #else
   struct winsize new_terminal_size {};
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &new_terminal_size);
@@ -207,5 +204,5 @@ void RealTerminal::CheckTerminalChanged() {
       (new_terminal_size.ws_col != terminal_size.ws_col || new_terminal_size.ws_row != terminal_size.ws_row);
 
   terminal_size = new_terminal_size;
-}
 #endif
+}
