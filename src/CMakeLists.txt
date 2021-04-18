@@ -83,6 +83,8 @@ add_library(crossing_consoles_lib
         communication/connection_layer/event/PayloadEvent.cpp
         )
 
+target_link_libraries(crossing_consoles_lib pthread)
+
 add_executable(crossing_consoles_main_server
         main_server.cpp)
 target_link_libraries(crossing_consoles_main_server crossing_consoles_lib)

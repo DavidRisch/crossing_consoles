@@ -55,7 +55,9 @@ class RealTerminal : public ITerminal {
 
   visual::ColoredCharMatrix last_screen_content{{0, 0}};
 
-#ifndef _WIN32
+#ifdef _WIN32
+  COORD terminal_size;
+#else
   struct winsize terminal_size {};
 #endif
 };

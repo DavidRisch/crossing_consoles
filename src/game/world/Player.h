@@ -58,8 +58,9 @@ class Player : public networking::ISerializable {
 
   /**
    * \brief Increase player's score by given `points`.
+   * \details Standard increase is set to 1 point.
    */
-  void IncreaseScore(uint16_t points);
+  void IncreaseScore(uint16_t points = 1);
 
   /**
    * \brief Returns the player's item.

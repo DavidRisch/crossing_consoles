@@ -178,11 +178,21 @@ std::string RealTerminal::ColorEscapeSequence(const common::Color& color, bool b
 
 void RealTerminal::Clear() {
 #ifdef _WIN32
-  // TODO: implement clear if size has changed
+  CONSOLE_SCREEN_BUFFER_INFO screen_buffer_info;
+  GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &screen_buffer_info);
+
+  if (screen_buffer_info.dwSize.X != terminal_size.X || screen_buffer_info.dwSize.Y != terminal_size.Y) {
+    system("cls");
+  }
+
+  terminal_size = screen_buffer_info.dwSize;
 #else
-  system("clear");
-  // new output printed now will fit in the current terminal_size
-  ioctl(STDOUT_FILENO, TIOCGWINSZ, &terminal_size);
+  // clear terminal if its size has changed to prevents artifacts.
+  // always clearing would lead to flicker.
+  if (system("clear") != 0) {
+    throw std::runtime_error("Unexpected ChangeType");
+  }
+
 #endif
 }
 
@@ -195,5 +205,7 @@ void RealTerminal::CheckTerminalChanged() {
 
   redraw_needed =
       (new_terminal_size.ws_col != terminal_size.ws_col || new_terminal_size.ws_row != terminal_size.ws_row);
+
+  terminal_size = new_terminal_size;
+  }
 #endif
-}
