@@ -46,6 +46,13 @@ class RealTerminal : public ITerminal {
    */
   void Clear();
 
+  /**
+   * \brief Set `redraw_needed` to true if a call to `Clear()` is required to fix artifacts in the terminal.
+   */
+  void CheckTerminalChanged();
+
+  bool redraw_needed = true;
+
   visual::ColoredCharMatrix last_screen_content{{0, 0}};
 
 #ifndef _WIN32

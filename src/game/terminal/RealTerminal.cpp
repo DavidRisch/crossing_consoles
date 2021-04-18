@@ -45,7 +45,9 @@ int RealTerminal::GetInput() {
 }
 
 void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
-  if (last_screen_content == content) {
+  CheckTerminalChanged();
+
+  if (!redraw_needed && last_screen_content == content) {
     return;  // the screen already contains the correct content
   }
 
@@ -104,7 +106,9 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
   output = "\033[1;1H" + output;  // reset cursor to the top left (dont clear to prevent flickering)
 #endif
 
-  Clear();
+  if (redraw_needed) {
+    Clear();
+  }
 
 #ifdef _WIN32
   WriteConsoleW(console_handle, output.c_str(), output.size(), nullptr, nullptr);
@@ -176,15 +180,20 @@ void RealTerminal::Clear() {
 #ifdef _WIN32
   // TODO: implement clear if size has changed
 #else
+  system("clear");
+  // new output printed now will fit in the current terminal_size
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &terminal_size);
+#endif
+}
+
+void RealTerminal::CheckTerminalChanged() {
+#ifdef _WIN32
+  redraw_needed = true;  // TODO: implement on windows
+#else
   struct winsize new_terminal_size {};
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &new_terminal_size);
 
-  if (new_terminal_size.ws_col != terminal_size.ws_col || new_terminal_size.ws_row != terminal_size.ws_row) {
-    // clear terminal if its size has changed to prevents artifacts.
-    // always clearing would lead to flicker.
-    system("clear");
-  }
-
-  terminal_size = new_terminal_size;
+  redraw_needed =
+      (new_terminal_size.ws_col != terminal_size.ws_col || new_terminal_size.ws_row != terminal_size.ws_row);
 #endif
 }
