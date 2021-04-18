@@ -155,7 +155,7 @@ TEST_F(GamePlay, PlayerHitByOwnProjectile) {
   player_first->direction = GameDefinition::Direction::WEST;
   spawn_projectile(range, damage, player_first->direction, player_first->player_id, player_first->position);
 
-  move_player(player_first, game::networking::ChangeType::MOVE_LEFT, 2);
+  move_player(player_first, game::networking::ChangeType::MOVE_LEFT, 3);
 
   // Move projectile
   for (int i = 0; i < range; i++) {
@@ -263,11 +263,18 @@ TEST_F(GamePlay, PlayerDiesAndRespawns) {
   ASSERT_NE(player_first->GetItem(), nullptr);
 
   // Kill player
-  spawn_projectile(2, player_first->max_health, GamePlay::standard_direction, player_first->player_id,
-                   Position(player_first->position.x, player_first->position.y - 1));
+  spawn_projectile(99, player_first->max_health, GameDefinition::Direction::NORTH, player_first->player_id,
+                   Position(player_first->position.x, player_first->position.y));
 
   ASSERT_FALSE(world->GetProjectiles().empty());
-  move_player(player_first, networking::ChangeType::MOVE_UP, 2);
+  move_player(player_first, networking::ChangeType::MOVE_UP, 5);
+
+  for (int i = 0; i < 99; i++) {
+    GameLogic::HandleProjectiles(*world);
+    if (world->GetProjectiles().empty()) {
+      break;
+    }
+  }
 
   ASSERT_TRUE(world->GetProjectiles().empty());
   ASSERT_FALSE(player_first->IsAlive());
