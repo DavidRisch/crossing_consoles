@@ -41,10 +41,12 @@ ColoredCharMatrix Renderer::RenderWorld() {
   world->updated = false;
   own_player->updated = false;
 
+  // max viewport index does not equal viewport size as the array indices starts at Position(0,0)
+  auto max_viewport_index = viewport_size - coordinate_size_t(1, 1);
   ColoredCharMatrix rendered_world(viewport_size * block_size);
 
   // calculate delta between player and rendered viewport start/end
-  coordinate_size_t viewport_size_delta(viewport_size.x / 2, viewport_size.y / 2);
+  coordinate_size_t viewport_size_delta(max_viewport_index.x / 2, max_viewport_index.y / 2);
   // calculate start and end of rendered viewport in world coordinates
   viewport_start =
       Position(own_player->position.x - viewport_size_delta.x, own_player->position.y - viewport_size_delta.y);

@@ -41,7 +41,7 @@ TEST_F(GamePlayerList, Compositor) {
   world.AddPlayer(player);
 
   // a small viewport_size causes errors
-  coordinate_size_t viewport_size = Position(99, 99);
+  coordinate_size_t viewport_size = Position(100, 100);
   Compositor compositor(viewport_size, world, *player);
 
   {
