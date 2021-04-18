@@ -20,7 +20,9 @@ ColoredCharMatrix SpriteGenerator::GenerateWallSprite(const wchar_t type, const 
 
 ColoredCharMatrix SpriteGenerator::GenerateProjectileSprite() {
   ColoredCharMatrix projectile_sprite(block_size);
-  projectile_sprite.AppendString(L"    o    ");
+  projectile_sprite.AppendString(L"    ");
+  projectile_sprite.AppendChar(bullet);
+  projectile_sprite.AppendString(L"    ");
   return projectile_sprite;
 }
 
