@@ -10,6 +10,7 @@
 
 using namespace game;
 using namespace world;
+using namespace common;
 
 std::random_device ItemGenerator::random_device;
 
@@ -43,16 +44,7 @@ void ItemGenerator::GenerateItem() {
       break;
   }
 
-  // Generate a position for the item which is not blocked by a wall, player or other item
-  common::Position generated_position(0, 0);
-  do {
-    // TODO: avoid possible endless loop -> throw exception or return at some point
-    std::uniform_int_distribution<int> x_coordinate(0, world->size.x);
-    int random_x = distribution(random_device);
-    std::uniform_int_distribution<int> y_coordinate(0, world->size.y);
-    int random_y = distribution(random_device);
-    generated_position = common::Position(random_x, random_y);
-  } while (world->IsBlockedForItem(generated_position));
+  Position generated_position = world->GetSpawner().GenerateSpawnPosition();
 
   world->AddItem(generated_position, item);
 }

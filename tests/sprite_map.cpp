@@ -1,8 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "../src/game/common/Position.h"
-#include "../src/game/visual/SpriteMap.h"
-#include "../src/game/visual/symbols.h"
+#include "../src/game/visual/SpriteGenerator.h"
 
 using namespace game::visual;
 using namespace game::visual::symbols;
@@ -11,7 +10,7 @@ using namespace game::world;
 
 TEST(SpriteMap, Empty) {
   coordinate_size_t block_size(3, 3);
-  SpriteMap sprite_map(block_size);
+  SpriteMap sprite_map = SpriteGenerator(block_size).InitializeMap();
 
   const std::vector<std::vector<ColoredChar>>& matrix = sprite_map.GetSprite(BlockType::EMPTY_BLOCK).GetMatrix();
   for (const auto& i_lines : matrix) {
@@ -23,9 +22,9 @@ TEST(SpriteMap, Empty) {
 
 TEST(SpriteMap, NonExistentType) {
   coordinate_size_t block_size(3, 3);
-  SpriteMap sprite_map(block_size);
+  SpriteMap sprite_map = SpriteGenerator(block_size).InitializeMap();
 
-  EXPECT_THROW(sprite_map.GetSprite(BlockType::WALL_BRICK), SpriteMap::BlockTypeNotFoundException);
+  EXPECT_THROW(sprite_map.GetSprite(static_cast<BlockType>(100)), SpriteMap::BlockTypeNotFoundException);
 }
 
 TEST(SpriteMap, ExistentType) {

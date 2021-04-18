@@ -37,10 +37,18 @@ class ClientSideConnectionManager : public ConnectionManager {
    */
   void CloseConnectionWithServer();
 
+  /**
+   * \brief Return the underlying `SocketByteStream` or a nullptr.
+   * \details Used to change the connection simulators on the fly.
+   */
+  byte_layer::SocketByteStream* GetSocketByteStream();
+
  private:
   ClientSideConnectionManager(ProtocolDefinition::timeout_t timeout);
 
   partner_id_t GetNextPartnerId() override;
+
+  byte_layer::SocketByteStream* socket_byte_stream;
 };
 }  // namespace connection_layer
 }  // namespace communication

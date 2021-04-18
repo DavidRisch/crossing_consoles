@@ -25,6 +25,7 @@ class Compositor {
   world::Player* player;
   bool show_player_list = false;
   bool show_statistics_table = false;
+  bool simulate_bad_connection = false;
 
   Compositor(const common::coordinate_size_t& viewport_size, world::World& world, world::Player& player);
 
@@ -47,7 +48,7 @@ class Compositor {
   /**
    * \brief Composite trailer, shown below the game output.
    */
-  [[nodiscard]] static ColoredCharMatrix CompositeTrailer(int viewport_width, bool has_item);
+  [[nodiscard]] ColoredCharMatrix CompositeTrailer(int viewport_width, bool has_item);
 
   static ColoredCharMatrix GenerateSeparatorLine(int viewport_size, bool is_first, bool is_last);
 

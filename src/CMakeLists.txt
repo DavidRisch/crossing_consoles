@@ -34,6 +34,7 @@ add_library(crossing_consoles_lib
         game/visual/HealthDisplay.cpp
         game/visual/Table.cpp
         game/visual/StatisticsTable.cpp
+        game/visual/SpriteGenerator.cpp
 
         game/networking/Change.cpp
         game/networking/SerializationUtils.cpp
@@ -82,6 +83,8 @@ add_library(crossing_consoles_lib
         communication/connection_layer/event/DisconnectEvent.cpp
         communication/connection_layer/event/PayloadEvent.cpp
         )
+
+target_link_libraries(crossing_consoles_lib pthread)
 
 add_executable(crossing_consoles_main_server
         main_server.cpp)

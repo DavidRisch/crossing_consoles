@@ -17,6 +17,10 @@ World::World(coordinate_size_t size)
     , item_generator(this) {
 }
 
+World::World()
+    : World(common::coordinate_size_t(0, 0)) {
+}
+
 void World::AddPlayer(const std::shared_ptr<Player>& player) {
   assert(player != nullptr);
   players.push_back(player);
@@ -236,7 +240,7 @@ std::optional<std::shared_ptr<Projectile>> World::GetProjectileFromPosition(comm
 }
 
 void World::ResurrectPlayer(Player& player) {
-  player.DecreaseHealth(-game::world::Player::max_health);
+  player.IncreaseHealth(game::world::Player::max_health);
   player.RemoveItem();
   player.score = 0;
   player.position = spawner.GenerateSpawnPosition();

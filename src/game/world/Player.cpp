@@ -35,12 +35,20 @@ void Player::MoveTo(const Position &new_position) {
   updated = true;
 }
 
-void Player::DecreaseHealth(int damage) {
+void Player::DecreaseHealth(uint8_t damage) {
   health -= damage;
 }
 
+void Player::IncreaseHealth(uint8_t healing) {
+  if (health + healing > max_health) {
+    health = max_health;
+  } else {
+    health += healing;
+  }
+}
+
 void Player::Serialize(std::vector<uint8_t> &output_vector) const {
-  output_vector.push_back(player_id);  // TODO: use 2 Bytes
+  networking::SerializationUtils::SerializeObject(player_id, output_vector);
 
   networking::SerializationUtils::SerializeString(name, output_vector);
   color.Serialize(output_vector);
@@ -64,7 +72,7 @@ void Player::Serialize(std::vector<uint8_t> &output_vector) const {
 }
 
 Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
-  int player_id = *input_iterator++;
+  auto player_id = networking::SerializationUtils::DeserializeObject<GameDefinition::player_id_t>(input_iterator);
 
   auto name = networking::SerializationUtils::DeserializeString(input_iterator);
   auto color = Color::Deserialize(input_iterator);
@@ -106,7 +114,7 @@ void Player::IncreaseScore(uint16_t points) {
 void Player::SetItem(std::shared_ptr<IItem> new_item) {
   switch (new_item->GetItemType()) {
     case ItemType::HEART:
-      DecreaseHealth(-std::dynamic_pointer_cast<Heart>(new_item)->GetHealing());
+      IncreaseHealth(std::dynamic_pointer_cast<Heart>(new_item)->GetHealing());
       break;
     case ItemType::POINTS:
       IncreaseScore(std::dynamic_pointer_cast<Points>(new_item)->GetValue());

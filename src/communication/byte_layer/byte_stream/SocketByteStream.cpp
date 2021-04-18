@@ -5,6 +5,7 @@
 #include <thread>
 #include <utility>
 
+#include "../../ProtocolDefinition.h"
 #include "socket_libs.h"
 
 using namespace communication;
@@ -27,12 +28,14 @@ std::shared_ptr<SocketByteStream> SocketByteStream::CreateClientSide(
   }
 
 #ifdef USE_UNIX_SOCKET
-  // port has no effect if in UNIX socket mode (so it should have its default value)
-  assert(port == socket_default_port);
+  if (port != socket_default_port) {
+    throw std::runtime_error("port has no effect if in UNIX socket mode (so it should have its default value)");
+  }
+  std::string socket_path = ProtocolDefinition::GetUnixSocketPath(port);
 
   struct sockaddr_un server_address {};
   server_address.sun_family = AF_UNIX;
-  strcpy(server_address.sun_path, SOCKET_FILE_PATH);
+  strcpy(server_address.sun_path, socket_path.c_str());
   socklen_t server_address_length = SUN_LEN(&server_address);
 #else
   struct sockaddr_in server_address {};

@@ -45,6 +45,12 @@ int RealTerminal::GetInput() {
 }
 
 void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
+  CheckTerminalChanged();
+
+  if (!redraw_needed && last_screen_content == content) {
+    return;  // the screen already contains the correct content
+  }
+
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
   const std::vector<std::vector<ColoredChar>>& colored_characters = content.GetMatrix();
@@ -100,13 +106,17 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
   output = "\033[1;1H" + output;  // reset cursor to the top left (dont clear to prevent flickering)
 #endif
 
-  Clear();
+  if (redraw_needed) {
+    Clear();
+  }
 
 #ifdef _WIN32
   WriteConsoleW(console_handle, output.c_str(), output.size(), nullptr, nullptr);
 #else
   printf("%s", output.c_str());
 #endif
+
+  last_screen_content = content;
 }
 
 void RealTerminal::Initialise() {
@@ -168,17 +178,34 @@ std::string RealTerminal::ColorEscapeSequence(const common::Color& color, bool b
 
 void RealTerminal::Clear() {
 #ifdef _WIN32
-  // TODO: implement clear if size has changed
+  CONSOLE_SCREEN_BUFFER_INFO screen_buffer_info;
+  GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &screen_buffer_info);
+
+  if (screen_buffer_info.dwSize.X != terminal_size.X || screen_buffer_info.dwSize.Y != terminal_size.Y) {
+    system("cls");
+  }
+
+  terminal_size = screen_buffer_info.dwSize;
+#else
+  // clear terminal if its size has changed to prevents artifacts.
+  // always clearing would lead to flicker.
+  if (system("clear") != 0) {
+    throw std::runtime_error("Unexpected ChangeType");
+  }
+
+#endif
+}
+
+void RealTerminal::CheckTerminalChanged() {
+#ifdef _WIN32
+  redraw_needed = true;  // TODO: implement on windows
 #else
   struct winsize new_terminal_size {};
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &new_terminal_size);
 
-  if (new_terminal_size.ws_col != terminal_size.ws_col || new_terminal_size.ws_row != terminal_size.ws_row) {
-    // clear terminal if its size has changed to prevents artifacts.
-    // always clearing would lead to flicker.
-    system("clear");
-  }
+  redraw_needed =
+      (new_terminal_size.ws_col != terminal_size.ws_col || new_terminal_size.ws_row != terminal_size.ws_row);
 
   terminal_size = new_terminal_size;
-#endif
 }
+#endif

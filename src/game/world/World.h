@@ -34,6 +34,8 @@ class World : public networking::ISerializable {
 
   explicit World(common::coordinate_size_t size);
 
+  World();
+
   void AddPlayer(const std::shared_ptr<Player>& player);
 
   void RemovePlayer(GameDefinition::player_id_t player_id);
@@ -64,7 +66,7 @@ class World : public networking::ISerializable {
   bool IsBlocked(const common::Position& position);
 
   /**
-   * \brief Return whhether a `Position`is blocked for an item by either a `Player`, `Wall`or another item.
+   * \brief Return whether a `Position`is blocked for an item by either a `Player`, `Wall`or another item.
    */
   bool IsBlockedForItem(const common::Position& position);
 

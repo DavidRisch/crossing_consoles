@@ -15,9 +15,11 @@ The player's movement is controlled by the following keys:
 * `SPACE` Use current item
 * `ESC` Close the game
 
-Press `Y` to show every player's score, health, package loss and ping in-game.
+Press the following keys for additional features:
 
-Press `X` to show detailed statistics of your connection.
+* `Y` Show every player's score, health, package loss and ping in-game.
+* `X` Display detailed statistics of your connection.
+* `C` Enable a simulated bad connection and see the NACKs and package loss rise.
 
 ### Items
 

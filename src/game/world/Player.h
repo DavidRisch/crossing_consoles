@@ -46,9 +46,14 @@ class Player : public networking::ISerializable {
   void MoveTo(const common::Position& new_position);
 
   /**
-   * \brief Decrease player's health by given damage.
+   * \brief Decrease `Player`'s health by given damage.
    */
-  void DecreaseHealth(int damage);
+  void DecreaseHealth(uint8_t damage);
+
+  /**
+   * \brief Increase `Player`'s health by given healing.
+   */
+  void IncreaseHealth(uint8_t healing);
 
   void Serialize(std::vector<uint8_t>& output_vector) const override;
 
@@ -58,8 +63,9 @@ class Player : public networking::ISerializable {
 
   /**
    * \brief Increase player's score by given `points`.
+   * \details Standard increase is set to 1 point.
    */
-  void IncreaseScore(uint16_t points);
+  void IncreaseScore(uint16_t points = 1);
 
   /**
    * \brief Returns the player's item.

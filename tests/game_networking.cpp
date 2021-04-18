@@ -79,8 +79,10 @@ class GameNetworking : public ::testing::Test {
 
     start_server();
     game_clients.push_back(std::make_shared<GameClient>(player, mock_terminals.back(), coordinate_size_t(1, 1), true,
-                                                        false, communication_timeout));
+                                                        false, communication_timeout, GameDefinition(), true));
     stop_server();
+
+    game_server->GetWorld().players.back()->position = position;
   }
 
   void wait_a_few_iterations() const {
@@ -188,6 +190,11 @@ TEST_F(GameNetworking, TwoPlayers) {
   create_server_and_client();
   create_new_client(Position(3, 4));
 
+  auto first_player = game_server->GetWorld().GetPlayerById(1);
+  auto second_player = game_server->GetWorld().GetPlayerById(2);
+  first_player->position = Position(2, 3);
+  second_player->position = first_player->position + Position(2, 0);
+
   std::thread input_thread([this] {
     wait_for_renderer();
     std::vector<std::vector<std::vector<game::visual::ColoredChar>>> outputs_before;
@@ -257,7 +264,7 @@ TEST_F(GameNetworking, ManyPlayers) {
 
   create_server_and_client();
 
-  for (int i = 0; i < 30; ++i) {
+  for (int i = 0; i < 20; ++i) {
     create_new_client(Position(i, 4));
   }
 
