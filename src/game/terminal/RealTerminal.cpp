@@ -207,5 +207,5 @@ void RealTerminal::CheckTerminalChanged() {
       (new_terminal_size.ws_col != terminal_size.ws_col || new_terminal_size.ws_row != terminal_size.ws_row);
 
   terminal_size = new_terminal_size;
-  }
+}
 #endif
