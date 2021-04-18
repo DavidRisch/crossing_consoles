@@ -13,12 +13,20 @@ Spawner::Spawner(World* world)
 }
 
 Position Spawner::GenerateSpawnPosition() const {
-  // generate a random position
-  std::uniform_int_distribution<int> x_coordinate(0, world->size.x - 1);
-  int random_x = x_coordinate(random_device);
-  std::uniform_int_distribution<int> y_coordinate(0, world->size.y - 1);
-  int random_y = y_coordinate(random_device);
-  Position random_position(random_x, random_y);
+  Position random_position(0, 0);
+  // try to generate a random position that is not blocked
+  for (int i = 0; i < maximum_attempts; i++) {
+    // generate a random position
+    std::uniform_int_distribution<int> x_coordinate(0, world->size.x - 1);
+    int random_x = x_coordinate(random_device);
+    std::uniform_int_distribution<int> y_coordinate(0, world->size.y - 1);
+    int random_y = y_coordinate(random_device);
+    random_position.Set(random_x, random_y);
+
+    if (!world->IsBlockedForItem(random_position)) {
+      return random_position;
+    }
+  }
 
   Position new_position = random_position;
   // move to next position if current is blocked
