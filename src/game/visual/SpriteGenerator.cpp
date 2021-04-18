@@ -26,7 +26,7 @@ ColoredCharMatrix SpriteGenerator::GenerateProjectileSprite() {
 
 ColoredCharMatrix SpriteGenerator::GeneratePlayerSprite(world::BlockType block_type) {
   ColoredCharMatrix player_sprite(block_size);
-  wchar_t head = white_circle;
+  wchar_t head = black_smiling_face;
   wchar_t body = box_drawings_light_vertical_and_horizontal;
   wchar_t arm_left = box_drawings_light_down_and_left;
   wchar_t arm_right = box_drawings_light_down_and_right;
