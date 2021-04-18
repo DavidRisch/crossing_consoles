@@ -151,26 +151,7 @@ std::optional<Change> GameClient::ProcessInput(std::chrono::steady_clock::time_p
       }
       // Some kind of escape sequence was entered, might be an arrow key
 
-#ifdef _WIN32
-      // https://stackoverflow.com/a/10473315/13623303
-      int value = terminal->GetInput();
-      switch (value) {
-        case 72:
-          keycode = KeyCode::USE_UP;
-          break;
-        case 80:
-          keycode = KeyCode::USE_DOWN;
-          break;
-        case 77:
-          keycode = KeyCode::USE_RIGHT;
-          break;
-        case 75:
-          keycode = KeyCode::USE_LEFT;
-          break;
-        default:
-          return {};
-      }
-#else
+#ifndef _WIN32
       // https://stackoverflow.com/a/11432632/13623303
       if (terminal->GetInput() != '[') {
         return {};
@@ -200,6 +181,30 @@ std::optional<Change> GameClient::ProcessInput(std::chrono::steady_clock::time_p
 
 #endif
     }
+
+#ifdef _WIN32
+    // https://stackoverflow.com/a/10473315/13623303
+    // check if escape sequence for an arrow key was entered
+    if (keypress == 0 || keypress == 224) {
+      int value = terminal->GetInput();
+      switch (value) {
+        case 72:
+          keycode = KeyCode::USE_UP;
+          break;
+        case 80:
+          keycode = KeyCode::USE_DOWN;
+          break;
+        case 77:
+          keycode = KeyCode::USE_RIGHT;
+          break;
+        case 75:
+          keycode = KeyCode::USE_LEFT;
+          break;
+        default:
+          return {};
+      }
+    }
+#endif
 
     auto change_type_it = map_key_to_change.find(keycode);
 
