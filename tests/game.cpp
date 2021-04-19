@@ -17,7 +17,7 @@ TEST(Game, NoAction) {
   world.AddWall(Position(4, 4));
 
   auto mock_terminal = std::make_shared<MockTerminal>();
-  mock_terminal->AddInput((char)KeyCode::ESCAPE);
+  mock_terminal->AddInput((char)KeyCode::SHELL_ESCAPE);
 
   GameClient gc(player, mock_terminal, coordinate_size_t(10, 10));
   gc.Run();
@@ -42,7 +42,7 @@ TEST(Game, Actions) {
   mock_terminal->AddInput((char)KeyCode::A);
   mock_terminal->AddInput((char)KeyCode::S);
   mock_terminal->AddInput((char)KeyCode::D);
-  mock_terminal->AddInput((char)KeyCode::ESCAPE);
+  mock_terminal->AddInput((char)KeyCode::SHELL_ESCAPE);
 
   GameClient gc(player, mock_terminal, coordinate_size_t(10, 10));
   gc.Run();
@@ -66,7 +66,7 @@ TEST(Game, ActionShoot) {
 
   auto mock_terminal = std::make_shared<MockTerminal>();
   mock_terminal->AddInput((char)KeyCode::SPACE);
-  mock_terminal->AddInput((char)KeyCode::ESCAPE);
+  mock_terminal->AddInput((char)KeyCode::SHELL_ESCAPE);
 
   GameClient gc(player, mock_terminal, coordinate_size_t(10, 10), false, true);
   gc.Run();

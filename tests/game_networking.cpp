@@ -125,7 +125,7 @@ class GameNetworking : public ::testing::Test {
 TEST_F(GameNetworking, NoAction) {
   create_server_and_client();
 
-  mock_terminals.at(0)->AddInput((char)KeyCode::ESCAPE);
+  mock_terminals.at(0)->AddInput((char)KeyCode::SHELL_ESCAPE);
 
   start_server();
   run_clients();
@@ -174,7 +174,7 @@ TEST_F(GameNetworking, Actions) {
       EXPECT_EQ(new_position, old_position + Position(-1, -1));
     }
 
-    mock_terminals.at(0)->AddInput((char)KeyCode::ESCAPE);
+    mock_terminals.at(0)->AddInput((char)KeyCode::SHELL_ESCAPE);
   });
 
   run_clients();
@@ -244,7 +244,7 @@ TEST_F(GameNetworking, TwoPlayers) {
     wait_a_few_iterations();
 
     for (const auto& mock_terminal : mock_terminals) {
-      mock_terminal->AddInput((char)KeyCode::ESCAPE);
+      mock_terminal->AddInput((char)KeyCode::SHELL_ESCAPE);
     }
   });
 
@@ -276,7 +276,7 @@ TEST_F(GameNetworking, ManyPlayers) {
     wait_a_few_iterations();
 
     for (const auto& mock_terminal : mock_terminals) {
-      mock_terminal->AddInput((char)KeyCode::ESCAPE);
+      mock_terminal->AddInput((char)KeyCode::SHELL_ESCAPE);
     }
   });
 
@@ -336,7 +336,7 @@ TEST_F(GameNetworking, PlayerDies) {
     ASSERT_EQ(first_player->score, 0);
 
     for (const auto& mock_terminal : mock_terminals) {
-      mock_terminal->AddInput((char)KeyCode::ESCAPE);
+      mock_terminal->AddInput((char)KeyCode::SHELL_ESCAPE);
     }
   });
 
@@ -358,12 +358,12 @@ TEST_F(GameNetworking, Disconnect) {
 
   start_server();
 
-  mock_terminals.at(0)->AddInput((char)KeyCode::ESCAPE);
+  mock_terminals.at(0)->AddInput((char)KeyCode::SHELL_ESCAPE);
 
   std::thread input_thread([this] {
     wait_a_few_iterations();  // wait for the first player to disconnect
 
-    mock_terminals.at(1)->AddInput((char)KeyCode::ESCAPE);
+    mock_terminals.at(1)->AddInput((char)KeyCode::SHELL_ESCAPE);
   });
 
   run_clients();
