@@ -18,6 +18,8 @@ class DeserializeItemUtils {
  public:
   static std::shared_ptr<IItem> DeserializeItem(ItemType item_type, std::vector<uint8_t>::iterator& input_iterator) {
     switch (item_type) {
+      case ItemType::WEAPON:
+        break;
       case ItemType::HEART:
         return Heart::Deserialize(input_iterator);
       case ItemType::POINTS:
@@ -35,7 +37,7 @@ class DeserializeItemUtils {
       case WeaponType::SWORD:
         return Sword::Deserialize(input_iterator);
       default:
-        throw std::runtime_error("Unknown ItemType: " + std::to_string(static_cast<int>(weapon_type)));
+        throw std::runtime_error("Unknown WeaponType: " + std::to_string(static_cast<int>(weapon_type)));
     }
   };
 

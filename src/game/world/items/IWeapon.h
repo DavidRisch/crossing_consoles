@@ -6,12 +6,12 @@
 namespace game::world {
 
 /**
- * \brief Possible item types.
+ * \brief Possible weapon types.
  */
 enum class WeaponType : char { GUN, SWORD, HIGHEST_ELEMENT = SWORD };
 
 /**
- * \brief Interface for game items.
+ * \brief Interface for game weapons.
  */
 class IWeapon : public IItem {
  public:

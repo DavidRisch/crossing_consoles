@@ -69,7 +69,7 @@ class Player : public networking::ISerializable {
   void IncreaseScore(uint16_t points = 1);
 
   /**
-   * \brief Returns the player's item.
+   * \brief Returns the player's weapon.
    */
   std::shared_ptr<IWeapon> GetWeapon();
 
@@ -79,7 +79,7 @@ class Player : public networking::ISerializable {
   void SetItem(const std::shared_ptr<IItem>& new_item);
 
   /**
-   * \brief Remove the current item.
+   * \brief Remove the current weapon.
    */
   void RemoveWeapon();
 

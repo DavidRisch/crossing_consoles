@@ -61,7 +61,7 @@ class Gun : public IWeapon {
   visual::ColoredCharMatrix GetSprite(common::coordinate_size_t block_size) override;
 
   /**
-   * \brief Return the sprite of this item.
+   * \brief Return the item bar sprite of this item.
    */
   visual::ColoredCharMatrix GetItemBarSprite() override;
 
