@@ -19,7 +19,7 @@ PlayerList::PlayerList(world::player_ptr_list_t &players)
       TableColumn(2 + GameDefinition::name_length_max, "name",
                   [](const TableRow *table_row, game::visual::ColoredCharMatrix &field) {
                     auto row = dynamic_cast<const PlayerListRow *>(table_row);
-                    field.AppendChar(symbols::black_vertical_ellipse, row->player_color);
+                    field.AppendChar(symbols::black_diamond_suite, row->player_color);
                     field.AppendChar(L' ');
 
                     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;

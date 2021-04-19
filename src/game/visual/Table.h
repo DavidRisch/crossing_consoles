@@ -26,7 +26,7 @@ class TableRow {
 
     ColoredCharMatrix row(common::coordinate_size_t(p->CalculateTotalWidth(), 1));
 
-    row.AppendChar(symbols::box_drawings_heavy_vertical);
+    row.AppendChar(symbols::box_drawings_light_vertical);
 
     for (const auto &column : p->columns) {
       auto field = column.RenderCell(this);
@@ -34,7 +34,7 @@ class TableRow {
 
       row.InsertMatrix(field);
 
-      row.AppendChar(symbols::box_drawings_heavy_vertical);
+      row.AppendChar(symbols::box_drawings_light_vertical);
     }
 
     return row;
@@ -122,7 +122,7 @@ class Table {
   [[nodiscard]] game::visual::ColoredCharMatrix MakeHeader() const {
     ColoredCharMatrix row(common::coordinate_size_t(CalculateTotalWidth(), 1));
 
-    row.AppendChar(symbols::box_drawings_heavy_vertical);
+    row.AppendChar(symbols::box_drawings_light_vertical);
 
     for (const auto &column : columns) {
       auto field = column.RenderTitle();
@@ -130,7 +130,7 @@ class Table {
 
       row.InsertMatrix(field);
 
-      row.AppendChar(symbols::box_drawings_heavy_vertical);
+      row.AppendChar(symbols::box_drawings_light_vertical);
     }
 
     return row;
@@ -141,35 +141,35 @@ class Table {
     ColoredCharMatrix row(common::coordinate_size_t(CalculateTotalWidth(), 1));
 
     if (is_first) {
-      row.AppendChar(symbols::box_drawings_heavy_down_and_right);
+      row.AppendChar(symbols::box_drawings_light_down_and_right);
     } else if (is_last) {
-      row.AppendChar(symbols::box_drawings_heavy_up_and_right);
+      row.AppendChar(symbols::box_drawings_light_up_and_right);
     } else {
-      row.AppendChar(symbols::box_drawings_heavy_vertical_and_right);
+      row.AppendChar(symbols::box_drawings_light_vertical_and_right);
     }
 
     for (const auto &column : columns) {
       for (int i = 0; i < column.GetWidth(); ++i) {
-        row.AppendChar(symbols::box_drawings_heavy_horizontal);
+        row.AppendChar(symbols::box_drawings_light_horizontal);
       }
 
       if (is_first) {
-        row.AppendChar(symbols::box_drawings_heavy_horizontal_and_down);
+        row.AppendChar(symbols::box_drawings_light_horizontal_and_down);
       } else if (is_last) {
-        row.AppendChar(symbols::box_drawings_heavy_horizontal_and_up);
+        row.AppendChar(symbols::box_drawings_light_horizontal_and_up);
       } else {
-        row.AppendChar(symbols::box_drawings_heavy_vertical_and_horizontal);
+        row.AppendChar(symbols::box_drawings_light_vertical_and_horizontal);
       }
     }
 
     common::Position last_position(row.GetSize().x - 1, 0);
 
     if (is_first) {
-      row.SetChar(symbols::box_drawings_heavy_down_and_left, last_position);
+      row.SetChar(symbols::box_drawings_light_down_and_left, last_position);
     } else if (is_last) {
-      row.SetChar(symbols::box_drawings_heavy_up_and_left, last_position);
+      row.SetChar(symbols::box_drawings_light_up_and_left, last_position);
     } else {
-      row.SetChar(symbols::box_drawings_heavy_vertical_and_left, last_position);
+      row.SetChar(symbols::box_drawings_light_vertical_and_left, last_position);
     }
 
     return row;
