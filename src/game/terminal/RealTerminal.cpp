@@ -119,6 +119,18 @@ void RealTerminal::SetScreen(const ColoredCharMatrix& content) {
   last_screen_content = content;
 }
 
+void RealTerminal::Restore() {
+#ifdef _WIN32
+
+#else
+  struct termios current {};
+  tcgetattr(0, &current);           // grab old terminal i/o settings
+  current.c_lflag |= ICANON;        // enable buffered i/o
+  current.c_lflag |= ECHO;          // set echo mode
+  tcsetattr(0, TCSANOW, &current);  // use these new terminal i/o settings now
+#endif
+}
+
 void RealTerminal::Initialise() {
 #ifdef _WIN32
   _setmode(_fileno(stdout), _O_U16TEXT);

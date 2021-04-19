@@ -27,6 +27,11 @@ class RealTerminal : public ITerminal {
 
   void SetScreen(const visual::ColoredCharMatrix& content) override;
 
+  /**
+   * \brief Revert to normal terminal i/o settings.
+   */
+  static void Restore();
+
  private:
   static std::string title;
   /**
