@@ -34,8 +34,6 @@ const wchar_t dark_shade = L'\u2593';
 const wchar_t black_heart_suit = L'\u2665';
 const wchar_t black_diamond_suite = L'\u2666';
 
-const wchar_t dagger = L'\u2020';
-const wchar_t reversed_not_sign = L'\u2310';
 const wchar_t bullet = L'\u2022';
 const wchar_t black_smiling_face = L'\u263B';
 const wchar_t white_circle = L'\u25CB';

@@ -111,7 +111,7 @@ void Player::IncreaseScore(uint16_t points) {
   score += points;
 }
 
-void Player::SetItem(const std::shared_ptr<IItem>& new_item) {
+void Player::SetItem(const std::shared_ptr<IItem> &new_item) {
   switch (new_item->GetItemType()) {
     case ItemType::HEART:
       IncreaseHealth(std::dynamic_pointer_cast<Heart>(new_item)->GetHealing());
