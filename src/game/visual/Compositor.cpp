@@ -31,7 +31,7 @@ const ColoredCharMatrix &Compositor::CompositeViewport() {
   const common::coordinate_size_t &header_size = header.GetSize();
 
   // Create trailer, printed below the world output
-  ColoredCharMatrix trailer = CompositeTrailer(game_output_size_x, player->GetItem() != nullptr);
+  ColoredCharMatrix trailer = CompositeTrailer(game_output_size_x, player->GetWeapon() != nullptr);
   const common::coordinate_size_t &trailer_size = trailer.GetSize();
 
   // Set header
@@ -116,9 +116,13 @@ ColoredCharMatrix Compositor::CompositeHeader(int viewport_width) const {
   // show item in top bar
   std::wstring item = L"ITEM";
   header.SetString(item, Position((header.GetSize().x / 2) - 4, current_position_y), Color::WHITE);
-  if (player->GetItem() != nullptr) {
-    header.InsertMatrix(player->GetItem()->GetSprite(coordinate_size_t(1, 1)),
+  if (player->GetWeapon() != nullptr) {
+    header.InsertMatrix(player->GetWeapon()->GetItemBarSprite(),
                         Position((header.GetSize().x / 2) + 2, current_position_y));
+    std::wstring tooltip = L"(";
+    tooltip += player->GetWeapon()->GetName();
+    tooltip += L")";
+    header.SetString(tooltip, Position((header.GetSize().x / 2) + 4, current_position_y), Color::GREY);
   }
 
   header.InsertMatrix(HealthDisplay::Render(player->health),

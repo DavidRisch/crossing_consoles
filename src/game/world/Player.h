@@ -2,12 +2,13 @@
 #define CROSSING_CONSOLES_PLAYER_H
 
 #include <chrono>
+#include <memory>
 #include <string>
 
 #include "../GameDefinition.h"
 #include "../common/Color.h"
 #include "../common/Position.h"
-#include "items/Gun.h"
+#include "items/IWeapon.h"
 
 namespace game::world {
 
@@ -70,20 +71,20 @@ class Player : public networking::ISerializable {
   /**
    * \brief Returns the player's item.
    */
-  std::shared_ptr<IItem> GetItem();
+  std::shared_ptr<IWeapon> GetWeapon();
 
   /**
    * \brief Assign new item to the `Player`if he walked into it. `Heart`s and `Point`s are used immediately.
    */
-  void SetItem(std::shared_ptr<IItem> new_item);
+  void SetItem(const std::shared_ptr<IItem>& new_item);
 
   /**
    * \brief Remove the current item.
    */
-  void RemoveItem();
+  void RemoveWeapon();
 
  private:
-  std::shared_ptr<IItem> item;
+  std::shared_ptr<IWeapon> weapon;
 };
 
 }  // namespace game::world

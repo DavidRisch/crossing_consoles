@@ -154,20 +154,20 @@ void GameLogic::HandleChange(world::Player &player, const Change &change, world:
 }
 
 void GameLogic::UseWeapon(Player &player, World &world) {
-  auto item = player.GetItem();
-  if (item == nullptr) {
+  auto weapon = player.GetWeapon();
+  if (weapon == nullptr) {
     return;
   }
 
-  switch (item->GetItemType()) {
-    case ItemType::GUN: {
+  switch (weapon->GetWeaponType()) {
+    case WeaponType::GUN: {
       Projectile bullet =
-          std::dynamic_pointer_cast<Gun>(item)->SpawnProjectile(player.player_id, player.position, player.direction);
+          std::dynamic_pointer_cast<Gun>(weapon)->SpawnProjectile(player.player_id, player.position, player.direction);
       world.AddProjectile(std::make_shared<Projectile>(bullet));
       break;
     }
-    case ItemType::SWORD: {
-      std::shared_ptr<Sword> sword = std::dynamic_pointer_cast<Sword>(item);
+    case WeaponType::SWORD: {
+      std::shared_ptr<Sword> sword = std::dynamic_pointer_cast<Sword>(weapon);
       Position attacked_position = AttackedPositionFromDirection(player.position, player.direction);
 
       // Add color to field on which damage was caused
@@ -199,8 +199,6 @@ void GameLogic::UseWeapon(Player &player, World &world) {
       }
       break;
     }
-    default:
-      break;
   }
 }
 

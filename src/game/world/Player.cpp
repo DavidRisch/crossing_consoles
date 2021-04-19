@@ -56,10 +56,10 @@ void Player::Serialize(std::vector<uint8_t> &output_vector) const {
 
   networking::SerializationUtils::SerializeObject(direction, output_vector);
 
-  if (item != nullptr) {
+  if (weapon != nullptr) {
     networking::SerializationUtils::SerializeObject(true, output_vector);
-    networking::SerializationUtils::SerializeObject(item->GetItemType(), output_vector);
-    item->Serialize(output_vector);
+    networking::SerializationUtils::SerializeObject(weapon->GetWeaponType(), output_vector);
+    weapon->Serialize(output_vector);
   } else {
     networking::SerializationUtils::SerializeObject(false, output_vector);
   }
@@ -84,9 +84,9 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
   // Deserialize item of the player, either Gun or Sword
   bool has_item = networking::SerializationUtils::DeserializeObject<bool>(input_iterator);
   if (has_item) {
-    auto item_type = networking::SerializationUtils::DeserializeObject<ItemType>(input_iterator);
-    auto new_item = game::world::DeserializeItemUtils::DeserializeItem(item_type, input_iterator);
-    player.SetItem(new_item);
+    auto weapon_type = networking::SerializationUtils::DeserializeObject<WeaponType>(input_iterator);
+    auto new_weapon = game::world::DeserializeItemUtils::DeserializeWeapon(weapon_type, input_iterator);
+    player.SetItem(new_weapon);
   }
 
   player.health = networking::SerializationUtils::DeserializeObject<decltype(health)>(input_iterator);
@@ -99,8 +99,8 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
   return player;
 }
 
-std::shared_ptr<IItem> Player::GetItem() {
-  return item;
+std::shared_ptr<IWeapon> Player::GetWeapon() {
+  return weapon;
 }
 
 uint16_t Player::GetScore() const {
@@ -111,7 +111,7 @@ void Player::IncreaseScore(uint16_t points) {
   score += points;
 }
 
-void Player::SetItem(std::shared_ptr<IItem> new_item) {
+void Player::SetItem(const std::shared_ptr<IItem>& new_item) {
   switch (new_item->GetItemType()) {
     case ItemType::HEART:
       IncreaseHealth(std::dynamic_pointer_cast<Heart>(new_item)->GetHealing());
@@ -119,9 +119,8 @@ void Player::SetItem(std::shared_ptr<IItem> new_item) {
     case ItemType::POINTS:
       IncreaseScore(std::dynamic_pointer_cast<Points>(new_item)->GetValue());
       break;
-    case ItemType::GUN:
-    case ItemType::SWORD:
-      item = std::move(new_item);
+    case ItemType::WEAPON:
+      weapon = std::dynamic_pointer_cast<IWeapon>(new_item);
       break;
   }
 }
@@ -130,6 +129,6 @@ void Player::Die() {
   time_of_death = std::chrono::steady_clock::now();
 }
 
-void Player::RemoveItem() {
-  item.reset();
+void Player::RemoveWeapon() {
+  weapon.reset();
 }

@@ -5,10 +5,15 @@
 #include "../../visual/SpriteGenerator.h"
 
 using namespace game;
-using namespace world;
+using namespace game::world;
+using namespace game::common;
 
 visual::ColoredCharMatrix Sword::GetSprite(common::coordinate_size_t block_size) {
   return visual::SpriteGenerator::GenerateItemSprite(visual::symbols::dagger, block_size, common::Color::ORANGE);
+}
+
+visual::ColoredCharMatrix Sword::GetItemBarSprite() {
+  return GetSprite(coordinate_size_t(1, 1));
 }
 
 void Sword::Serialize(std::vector<uint8_t> &output_vector) const {
@@ -31,5 +36,13 @@ int Sword::GetDamage() const {
 }
 
 ItemType Sword::GetItemType() {
-  return ItemType::SWORD;
+  return ItemType::WEAPON;
+}
+
+WeaponType Sword::GetWeaponType() {
+  return WeaponType::SWORD;
+}
+
+std::wstring Sword::GetName() {
+  return name;
 }

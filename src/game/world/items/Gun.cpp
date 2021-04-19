@@ -6,6 +6,7 @@
 
 using namespace game;
 using namespace game::world;
+using namespace game::common;
 
 int Gun::GetDamage() const {
   return damage;
@@ -40,10 +41,22 @@ std::shared_ptr<Gun> Gun::Deserialize(std::vector<uint8_t>::iterator &input_iter
 }
 
 ItemType Gun::GetItemType() {
-  return ItemType::GUN;
+  return ItemType::WEAPON;
+}
+
+WeaponType Gun::GetWeaponType() {
+  return WeaponType::GUN;
+}
+
+std::wstring Gun::GetName() {
+  return name;
 }
 
 visual::ColoredCharMatrix Gun::GetSprite(common::coordinate_size_t block_size) {
   return visual::SpriteGenerator::GenerateItemSprite(game::visual::symbols::reversed_not_sign, block_size,
                                                      common::Color::ORANGE);
+}
+
+visual::ColoredCharMatrix Gun::GetItemBarSprite() {
+  return GetSprite(coordinate_size_t(1, 1));
 }

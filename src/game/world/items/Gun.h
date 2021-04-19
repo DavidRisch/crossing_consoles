@@ -5,11 +5,11 @@
 
 #include "../../GameDefinition.h"
 #include "../Projectile.h"
-#include "IItem.h"
+#include "IWeapon.h"
 
 namespace game::world {
 
-class Gun : public IItem {
+class Gun : public IWeapon {
  public:
   Gun(int damage, uint8_t max_range);
 
@@ -46,13 +46,29 @@ class Gun : public IItem {
   ItemType GetItemType() override;
 
   /**
+   * \brief Return the type of this weapon.
+   */
+  WeaponType GetWeaponType() override;
+
+  /**
+   * \brief Return the name of this weapon.
+   */
+  std::wstring GetName() override;
+
+  /**
    * \brief Return the sprite of this item.
    */
   visual::ColoredCharMatrix GetSprite(common::coordinate_size_t block_size) override;
 
+  /**
+   * \brief Return the sprite of this item.
+   */
+  visual::ColoredCharMatrix GetItemBarSprite() override;
+
  private:
   int damage;
   uint8_t range;
+  const std::wstring name = L"Gun";
 };
 }  // namespace game::world
 

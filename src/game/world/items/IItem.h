@@ -9,7 +9,7 @@ namespace game::world {
 /**
  * \brief Possible item types.
  */
-enum class ItemType : char { GUN, SWORD, HEART, POINTS, HIGHEST_ELEMENT = POINTS };
+enum class ItemType : char { WEAPON, HEART, POINTS, HIGHEST_ELEMENT = POINTS };
 
 /**
  * \brief Interface for game items.

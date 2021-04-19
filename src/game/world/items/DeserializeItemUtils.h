@@ -8,6 +8,7 @@
 #include "Gun.h"
 #include "Heart.h"
 #include "IItem.h"
+#include "IWeapon.h"
 #include "Points.h"
 #include "Sword.h"
 
@@ -17,16 +18,24 @@ class DeserializeItemUtils {
  public:
   static std::shared_ptr<IItem> DeserializeItem(ItemType item_type, std::vector<uint8_t>::iterator& input_iterator) {
     switch (item_type) {
-      case ItemType::GUN:
-        return Gun::Deserialize(input_iterator);
-      case ItemType::SWORD:
-        return Sword::Deserialize(input_iterator);
       case ItemType::HEART:
         return Heart::Deserialize(input_iterator);
       case ItemType::POINTS:
         return Points::Deserialize(input_iterator);
       default:
         throw std::runtime_error("Unknown ItemType: " + std::to_string(static_cast<int>(item_type)));
+    }
+  };
+
+  static std::shared_ptr<IWeapon> DeserializeWeapon(WeaponType weapon_type,
+                                                    std::vector<uint8_t>::iterator& input_iterator) {
+    switch (weapon_type) {
+      case WeaponType::GUN:
+        return Gun::Deserialize(input_iterator);
+      case WeaponType::SWORD:
+        return Sword::Deserialize(input_iterator);
+      default:
+        throw std::runtime_error("Unknown ItemType: " + std::to_string(static_cast<int>(weapon_type)));
     }
   };
 
