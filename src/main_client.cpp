@@ -92,4 +92,6 @@ int main(int argc, char *argv[]) {
   SetupSignalHandler(&game_client);
 
   game_client.Run();
+
+  RealTerminal::Restore();
 }
