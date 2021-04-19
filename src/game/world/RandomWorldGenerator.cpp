@@ -116,23 +116,41 @@ void RandomWorldGenerator::GenerateDoors(const Position& start, const Position& 
 
   // place doors randomly
   int door_count = 0;
+  Position door_position(0, 0);
   for (int i = 0; i < 4; i++) {
     if (door_chance(random) == 0) {
-      door_count++;
       switch (i) {
         case 0:
-          world->RemoveWall(Position(building_x(random), start.y));
+          // up
+          door_position.Set(building_x(random), start.y);
+          if (world->IsBlocked(door_position + Position(0, -1))) {
+            continue;
+          }
           break;
         case 1:
-          world->RemoveWall(Position(building_x(random), end.y - 1));
+          // down
+          door_position.Set(building_x(random), end.y - 1);
+          if (world->IsBlocked(door_position + Position(0, 1))) {
+            continue;
+          }
           break;
         case 2:
-          world->RemoveWall(Position(start.x, building_y(random)));
+          // left
+          door_position.Set(start.x, building_y(random));
+          if (world->IsBlocked(door_position + Position(-1, 0))) {
+            continue;
+          }
           break;
         case 3:
-          world->RemoveWall(Position(end.x - 1, building_y(random)));
+          // right
+          door_position.Set(end.x - 1, building_y(random));
+          if (world->IsBlocked(door_position + Position(1, 0))) {
+            continue;
+          }
           break;
       }
+      world->RemoveWall(door_position);
+      door_count++;
     }
 
     // repeat if no door has been placed
