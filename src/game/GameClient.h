@@ -101,7 +101,7 @@ class GameClient {
   };
 
   std::chrono::time_point<std::chrono::steady_clock> last_draw;
-  static constexpr auto min_draw_interval = std::chrono::milliseconds(25);
+  static constexpr auto min_draw_interval = std::chrono::milliseconds(30);
 
   static constexpr auto min_main_loop_interval = std::chrono::microseconds(100);
 

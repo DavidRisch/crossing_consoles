@@ -35,7 +35,7 @@ GameClient::GameClient(const std::shared_ptr<Player>& player, const std::shared_
   assert(player != nullptr);
   assert(terminal != nullptr);
 
-  coordinate_size_t viewport_size = Position(51, 25);
+  coordinate_size_t viewport_size = Position(51, 18);
   compositor = std::make_unique<Compositor>(viewport_size, world_render_copy, *player);
 
   if (multiplayer) {
