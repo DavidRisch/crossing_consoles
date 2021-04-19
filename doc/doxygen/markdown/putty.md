@@ -23,3 +23,7 @@ Fill out the basic options under _Session_ and save them as a session (e.g. _Cro
 * Cursor appearance: `Vertical line`
 * Font: `Lucida Console`
 * Size: `12-point`
+
+\image html putty_ssh.png
+
+* Enable compression: `true`
