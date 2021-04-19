@@ -84,8 +84,8 @@ Player Player::Deserialize(std::vector<uint8_t>::iterator &input_iterator) {
   // Deserialize item of the player, either Gun or Sword
   bool has_item = networking::SerializationUtils::DeserializeObject<bool>(input_iterator);
   if (has_item) {
-    auto weapon_type = networking::SerializationUtils::DeserializeObject<WeaponType>(input_iterator);
-    auto new_weapon = game::world::DeserializeItemUtils::DeserializeWeapon(weapon_type, input_iterator);
+    auto item_type = networking::SerializationUtils::DeserializeObject<ItemType>(input_iterator);
+    auto new_weapon = game::world::DeserializeItemUtils::DeserializeItem(item_type, input_iterator);
     player.SetItem(new_weapon);
   }
 

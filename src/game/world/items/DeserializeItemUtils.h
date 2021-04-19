@@ -19,7 +19,7 @@ class DeserializeItemUtils {
   static std::shared_ptr<IItem> DeserializeItem(ItemType item_type, std::vector<uint8_t>::iterator& input_iterator) {
     switch (item_type) {
       case ItemType::WEAPON:
-        break;
+        return DeserializeWeapon((WeaponType)*input_iterator++, input_iterator);
       case ItemType::HEART:
         return Heart::Deserialize(input_iterator);
       case ItemType::POINTS:

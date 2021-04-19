@@ -30,6 +30,7 @@ Projectile Gun::SpawnProjectile(GameDefinition::player_id_t shooter_id, common::
 }
 
 void Gun::Serialize(std::vector<uint8_t> &output_vector) const {
+  output_vector.push_back((int)WeaponType::GUN);
   output_vector.push_back(damage);
   output_vector.push_back(range);
 }

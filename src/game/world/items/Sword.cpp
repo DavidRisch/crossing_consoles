@@ -28,6 +28,7 @@ ColoredCharMatrix Sword::GetItemBarSprite() {
 }
 
 void Sword::Serialize(std::vector<uint8_t> &output_vector) const {
+  output_vector.push_back((int)WeaponType::SWORD);
   output_vector.push_back(damage);
 }
 
