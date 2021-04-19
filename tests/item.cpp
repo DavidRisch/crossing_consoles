@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "../src/game/world/EmptyWorldGenerator.h"
+#include "../src/game/world/items/Gun.h"
 #include "../src/game/world/items/Heart.h"
 #include "../src/game/world/items/Points.h"
 #include "../src/game/world/items/Sword.h"
@@ -12,10 +13,12 @@ using namespace game::common;
 
 TEST_F(Items, GetItemType) {
   auto gun = std::make_shared<Gun>(1, 20);
-  ASSERT_EQ(gun->GetItemType(), ItemType::GUN);
+  ASSERT_EQ(gun->GetItemType(), ItemType::WEAPON);
+  ASSERT_EQ(gun->GetWeaponType(), WeaponType::GUN);
 
   auto sword = std::make_shared<Sword>(2);
-  ASSERT_EQ(sword->GetItemType(), ItemType::SWORD);
+  ASSERT_EQ(sword->GetItemType(), ItemType::WEAPON);
+  ASSERT_EQ(sword->GetWeaponType(), WeaponType::SWORD);
 
   auto heart = std::make_shared<Heart>(1);
   ASSERT_EQ(heart->GetItemType(), ItemType::HEART);
@@ -132,7 +135,7 @@ TEST_F(Items, PickUpWeapons) {
   generate_world();
   add_one_player();
 
-  EXPECT_EQ(player_first->GetItem(), nullptr);
+  EXPECT_EQ(player_first->GetWeapon(), nullptr);
 
   auto sword = std::make_shared<Sword>(2);
   world->AddItem(Position(1, 0), sword);
@@ -141,9 +144,9 @@ TEST_F(Items, PickUpWeapons) {
   EXPECT_FALSE(world->items.empty());
 
   action_with_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
-  ASSERT_EQ(player_first->GetItem(), sword);
+  ASSERT_EQ(player_first->GetWeapon(), sword);
   action_with_player(player_first, game::networking::ChangeType::MOVE_RIGHT, 1);
-  ASSERT_EQ(player_first->GetItem(), gun);
+  ASSERT_EQ(player_first->GetWeapon(), gun);
 
   ASSERT_TRUE(world->items.empty());
 }

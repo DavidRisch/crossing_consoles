@@ -260,7 +260,7 @@ TEST_F(GamePlay, PlayerDiesAndRespawns) {
   add_player();
   auto sword = std::make_shared<Sword>(2);
   player_first->SetItem(sword);
-  ASSERT_NE(player_first->GetItem(), nullptr);
+  ASSERT_NE(player_first->GetWeapon(), nullptr);
 
   // Kill player
   spawn_projectile(99, player_first->max_health, GameDefinition::Direction::NORTH, player_first->player_id,
@@ -287,7 +287,7 @@ TEST_F(GamePlay, PlayerDiesAndRespawns) {
   ASSERT_TRUE(player_first->IsAlive());
   ASSERT_EQ(player_first->score, 0);
   ASSERT_EQ(player_first->health, Player::max_health);
-  ASSERT_EQ(player_first->GetItem(), nullptr);
+  ASSERT_EQ(player_first->GetWeapon(), nullptr);
 
   reset_elements();
 }

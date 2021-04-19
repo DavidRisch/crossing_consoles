@@ -2,6 +2,7 @@
 
 #include "../src/game/GameClient.h"
 #include "../src/game/GameLogic.h"
+#include "../src/game/world/items/Gun.h"
 
 using namespace game;
 using namespace game::common;

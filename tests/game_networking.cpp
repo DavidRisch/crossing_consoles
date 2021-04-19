@@ -6,6 +6,7 @@
 #include "../src/game/GameClient.h"
 #include "../src/game/GameServer.h"
 #include "../src/game/terminal/MockTerminal.h"
+#include "../src/game/world/items/Gun.h"
 #include "utils/TestGameDefinition.h"
 #include "utils/TimingHelper.h"
 

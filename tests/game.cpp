@@ -4,6 +4,7 @@
 
 #include "../src/game/GameClient.h"
 #include "../src/game/terminal/MockTerminal.h"
+#include "../src/game/world/items/Gun.h"
 
 using namespace game;
 using namespace game::common;

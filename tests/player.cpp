@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include "../src/game/world/items/Gun.h"
+
 using namespace game::world;
 using namespace game::common;
 
@@ -27,9 +29,9 @@ TEST(Player, IsAlive) {
 
 TEST(Player, HasWeapon) {
   Player player("player", Position(0, 0));
-  ASSERT_TRUE(player.GetItem() == nullptr);
+  ASSERT_TRUE(player.GetWeapon() == nullptr);
   player.SetItem(std::make_shared<Gun>(1, 20));
-  ASSERT_TRUE(player.GetItem() != nullptr);
+  ASSERT_TRUE(player.GetWeapon() != nullptr);
 }
 
 TEST(Player, DecreaseHealth) {
