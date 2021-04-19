@@ -7,7 +7,7 @@ The GameClient only sends information about the player's keyboard input and meta
 the GameServer processes the client's input and applies the provided `GameLogic` as seen in \ref uml-game.
 
 The type of the requested change to the world by the server or the client is marked using `ChangeType`s which
-defintiions are listed below.
+definitions are listed below.
 
 | ChangeType | Sender | Definition
 | :------------- | :---------- | :---------- |

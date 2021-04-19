@@ -12,14 +12,23 @@ The player's movement is controlled by the following keys:
 * `A` Move player 1 field to the left
 * `S` Move player 1 field down
 * `D` Move player 1 field to the right
-* `SPACE` Use current item
-* `ESC` Close the game
+
+Items that are picked up during the game can be used with the following keys:
+
+* `SPACE` Use item in the direction the player is currently facing
+* `I` or `↑` Use item in the direction up
+* `J` or `←` Use item in the direction left
+* `K` or `↓` Use item in the direction down
+* `L` or `→` Use item in the direction right
 
 Press the following keys for additional features:
 
 * `Y` Show every player's score, health, package loss and ping in-game.
 * `X` Display detailed statistics of your connection.
 * `C` Enable a simulated bad connection and see the NACKs and package loss rise.
+
+
+* `ESC` Close the game
 
 ### Items
 
