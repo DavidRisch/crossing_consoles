@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "../../visual/symbols.h"
+#include "../../visual/SpriteGenerator.h"
 
 using namespace game;
 using namespace game::world;
@@ -44,8 +44,6 @@ ItemType Gun::GetItemType() {
 }
 
 visual::ColoredCharMatrix Gun::GetSprite(common::coordinate_size_t block_size) {
-  visual::ColoredCharMatrix gun_sprite = visual::ColoredCharMatrix(block_size);
-  common::Position position(int(block_size.x / 2), int(block_size.y / 2));
-  gun_sprite.SetChar(game::visual::symbols::reversed_not_sign, position, common::Color::ORANGE, common::Color::BLACK);
-  return gun_sprite;
+  return visual::SpriteGenerator::GenerateItemSprite(game::visual::symbols::reversed_not_sign, block_size,
+                                                     common::Color::ORANGE);
 }

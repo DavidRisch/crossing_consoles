@@ -24,7 +24,8 @@ enum class BlockType {
   PLAYER_RIGHT,
   PLAYER_DEAD,
 
-  PROJECTILE
+  PROJECTILE,
+
 };
 
 }  // namespace game::world
