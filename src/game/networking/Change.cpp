@@ -32,3 +32,9 @@ bool Change::IsMovement() const {
   return (change_type == ChangeType::MOVE_UP || change_type == ChangeType::MOVE_DOWN ||
           change_type == ChangeType::MOVE_LEFT || change_type == ChangeType::MOVE_RIGHT);
 }
+
+bool Change::IsItemUsage() const {
+  return (change_type == ChangeType::USE_UP || change_type == ChangeType::USE_DOWN ||
+          change_type == ChangeType::USE_LEFT || change_type == ChangeType::USE_RIGHT ||
+          change_type == ChangeType::USE_ITEM);
+}

@@ -7,6 +7,10 @@
 
 namespace game {
 
+namespace world {
+class Player;
+}
+
 class Projectile : public networking::ISerializable {
   /**
    * \brief Projectiles are moving objects of `World` with a certain range and damage
@@ -24,6 +28,12 @@ class Projectile : public networking::ISerializable {
    * \brief True if projectile's range is greater than 0.
    */
   [[nodiscard]] bool StillFlying() const;
+
+  /**
+   * \brief True unless `player` is the also the shooter and the bullet has just been fired.
+   * \details Prevents a player from running into their own bullet right after firing.
+   */
+  [[nodiscard]] bool CanCollideWithPlayer(const world::Player& player) const;
 
   /**
    * \brief Returns Id of player that spawned the projectile.
@@ -45,6 +55,7 @@ class Projectile : public networking::ISerializable {
   static Projectile Deserialize(std::vector<uint8_t>::iterator& input_iterator);
 
  private:
+  uint8_t distance = 0;
   uint8_t range;
   uint8_t damage;
   const GameDefinition::player_id_t shooter_id;

@@ -43,6 +43,11 @@ const wchar_t black_smiling_face = L'\u263B';
 
 const wchar_t black_vertical_ellipse = L'\u2B2E';
 
+const wchar_t upwards_arrow = L'\u2191';
+const wchar_t downwards_arrow = L'\u2193';
+const wchar_t leftwards_arrow = L'\u2190';
+const wchar_t rightwards_arrow = L'\u2192';
+
 const std::wstring title_top /*  */ = L" ▄▀▀ █▀▄ ▄▀▄ ▄▀▀ ▄▀▀ █ █▄ █ ▄▀▀   ▄▀▀ ▄▀▄ █▄ █ ▄▀▀ ▄▀▄ █   ██▀ ▄▀▀";
 const std::wstring title_down /* */ = L" ▀▄▄ █▀▄ ▀▄▀ ▄██ ▄██ █ █ ▀█ ▀▄█   ▀▄▄ ▀▄▀ █ ▀█ ▄██ ▀▄▀ █▄▄ █▄▄ ▄██";
 

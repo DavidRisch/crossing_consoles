@@ -84,14 +84,16 @@ void GameLogic::MovePlayer(world::Player &player, const coordinate_distance_t &m
   auto projectile = world.GetProjectileFromPosition(new_position);
 
   if (projectile.has_value()) {
-    // Show hit position in color
-    world.AddColoredField(ColoredField(player.position));
+    if ((*projectile)->CanCollideWithPlayer(player)) {
+      // Show hit position in color
+      world.AddColoredField(ColoredField(player.position));
 
-    // decrease player's health and remove projectile from world
-    ApplyDamageToPlayer(player, projectile.value()->GetDamage());
-    auto list = std::list<std::shared_ptr<Projectile>>();
-    list.push_back(projectile.value());
-    world.RemoveProjectiles(list);
+      // decrease player's health and remove projectile from world
+      ApplyDamageToPlayer(player, projectile.value()->GetDamage());
+      auto list = std::list<std::shared_ptr<Projectile>>();
+      list.push_back(projectile.value());
+      world.RemoveProjectiles(list);
+    }
   }
 }
 
@@ -123,6 +125,26 @@ void GameLogic::HandleChange(world::Player &player, const Change &change, world:
       break;
     }
     case ChangeType::USE_ITEM: {
+      UseWeapon(player, world);
+      break;
+    }
+    case ChangeType::USE_UP: {
+      player.direction = GameDefinition::NORTH;
+      UseWeapon(player, world);
+      break;
+    }
+    case ChangeType::USE_LEFT: {
+      player.direction = GameDefinition::WEST;
+      UseWeapon(player, world);
+      break;
+    }
+    case ChangeType::USE_RIGHT: {
+      player.direction = GameDefinition::EAST;
+      UseWeapon(player, world);
+      break;
+    }
+    case ChangeType::USE_DOWN: {
+      player.direction = GameDefinition::SOUTH;
       UseWeapon(player, world);
       break;
     }
@@ -285,6 +307,10 @@ bool GameLogic::HandleProjectileCollisionWithPlayer(std::shared_ptr<Projectile> 
     Player &hit_player = **shot_player_it;
 
     if (!hit_player.IsAlive()) {
+      return false;
+    }
+
+    if (!projectile->CanCollideWithPlayer(hit_player)) {
       return false;
     }
 

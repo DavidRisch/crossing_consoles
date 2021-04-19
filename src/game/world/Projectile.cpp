@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "../networking/SerializationUtils.h"
+#include "Player.h"
 
 using namespace game;
 using namespace game::common;
@@ -24,6 +25,7 @@ bool Projectile::StillFlying() const {
 void Projectile::DecreaseRange() {
   if (range > 0) {
     range -= 1;
+    ++distance;
   } else {
     range = 0;
   }
@@ -71,4 +73,8 @@ void Projectile::SetPosition(common::Position new_position, GameDefinition::Dire
 
 uint8_t Projectile::GetRange() const {
   return range;
+}
+
+bool Projectile::CanCollideWithPlayer(const world::Player& player) const {
+  return (player.player_id != shooter_id || distance > 2);
 }
