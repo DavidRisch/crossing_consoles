@@ -212,11 +212,17 @@ std::optional<Change> GameClient::ProcessInput(std::chrono::steady_clock::time_p
       switch (keycode) {
         case KeyCode::Y: {
           compositor->show_player_list ^= true;
+          if (compositor->show_player_list) {
+            compositor->show_statistics_table = false;
+          }
           updated = true;
           return {};
         }
         case KeyCode::X: {
           compositor->show_statistics_table ^= true;
+          if (compositor->show_statistics_table) {
+            compositor->show_player_list = false;
+          }
           updated = true;
           return {};
         }
