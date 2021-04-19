@@ -26,7 +26,7 @@ class SpriteGenerator {
    */
   game::visual::SpriteMap InitializeMap();
 
-  static ColoredCharMatrix GenerateItemSprite(wchar_t type, const common::coordinate_size_t& block_size,
+  static ColoredCharMatrix GenerateItemSprite(const std::wstring& string, const common::coordinate_size_t& block_size,
                                               const common::Color& foreground_color = common::Color::WHITE,
                                               const common::Color& background_color = common::Color::BLACK);
 

@@ -2,11 +2,13 @@
 
 #include <utility>
 
+#include "../../visual/ColoredCharMatrix.h"
 #include "../../visual/SpriteGenerator.h"
 
 using namespace game;
 using namespace game::world;
 using namespace game::common;
+using namespace game::visual;
 
 int Gun::GetDamage() const {
   return damage;
@@ -52,11 +54,18 @@ std::wstring Gun::GetName() {
   return name;
 }
 
-visual::ColoredCharMatrix Gun::GetSprite(common::coordinate_size_t block_size) {
-  return visual::SpriteGenerator::GenerateItemSprite(game::visual::symbols::reversed_not_sign, block_size,
-                                                     common::Color::ORANGE);
+ColoredCharMatrix Gun::GetSprite(common::coordinate_size_t block_size) {
+  std::wstring sprite;
+  sprite += symbols::box_drawings_light_down_and_right;
+  sprite += symbols::box_drawings_double_horizontal_and_down;
+  sprite += symbols::box_drawings_light_horizontal_and_down;
+  return visual::SpriteGenerator::GenerateItemSprite(sprite, block_size, common::Color::ORANGE);
 }
 
-visual::ColoredCharMatrix Gun::GetItemBarSprite() {
-  return GetSprite(coordinate_size_t(1, 1));
+ColoredCharMatrix Gun::GetItemBarSprite() {
+  ColoredCharMatrix sprite(coordinate_size_t(3, 1));
+  sprite.AppendChar(symbols::box_drawings_light_down_and_right, Color::ORANGE);
+  sprite.AppendChar(symbols::box_drawings_double_horizontal_and_down, Color::ORANGE);
+  sprite.AppendChar(symbols::box_drawings_light_horizontal_and_down, Color::ORANGE);
+  return sprite;
 }

@@ -10,6 +10,8 @@ const wchar_t box_drawings_double_up_and_right = L'\u255A';
 const wchar_t box_drawings_double_up_and_left = L'\u255D';
 const wchar_t box_drawings_double_vertical_and_right = L'\u2560';
 const wchar_t box_drawings_double_vertical_and_left = L'\u2563';
+const wchar_t box_drawings_double_horizontal_and_down = L'\u2566';
+const wchar_t box_drawings_vertical_single_and_horizontal_double = L'\u256A';
 
 const wchar_t box_drawings_light_horizontal = L'\u2500';
 const wchar_t box_drawings_light_vertical = L'\u2502';

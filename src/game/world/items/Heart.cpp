@@ -9,8 +9,8 @@ using namespace game;
 using namespace world;
 
 visual::ColoredCharMatrix Heart::GetSprite(common::coordinate_size_t block_size) {
-  return visual::SpriteGenerator::GenerateItemSprite(game::visual::symbols::black_heart_suit, block_size,
-                                                     common::Color::RED);
+  return visual::SpriteGenerator::GenerateItemSprite(std::wstring(game::visual::symbols::black_heart_suit, 1),
+                                                     block_size, common::Color::RED);
 }
 
 void Heart::Serialize(std::vector<uint8_t> &output_vector) const {

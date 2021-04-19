@@ -107,11 +107,12 @@ SpriteGenerator::SpriteGenerator(common::coordinate_size_t block_size)
     : block_size(std::move(block_size)) {
 }
 
-ColoredCharMatrix SpriteGenerator::GenerateItemSprite(wchar_t type, const common::coordinate_size_t& block_size,
+ColoredCharMatrix SpriteGenerator::GenerateItemSprite(const std::wstring& string,
+                                                      const common::coordinate_size_t& block_size,
                                                       const Color& foreground_color, const Color& background_color) {
   ColoredCharMatrix item_sprite(block_size);
-  common::Position position(int(block_size.x / 2), int(block_size.y / 2));
-  item_sprite.SetChar(type, position, foreground_color, background_color);
+  common::Position position(int(block_size.x / 2) - int(string.size() / 2), int(block_size.y / 2));
+  item_sprite.SetString(string, position, foreground_color, background_color);
   return item_sprite;
 }
 
