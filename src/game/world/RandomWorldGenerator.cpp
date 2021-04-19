@@ -155,7 +155,7 @@ void RandomWorldGenerator::GenerateDoors(const Position& start, const Position& 
 
     // repeat if no door has been placed
     if (i == 3 && door_count == 0) {
-      i--;
+      i=-1;
     }
   }
 }
